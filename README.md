@@ -58,4 +58,4 @@ We dogfood all of our stuff. NuGet uses NuGet to build NuGet, so to speak. All o
 
 ## Feedback
 
-Check out the [contributing](http://docs.nuget.org/contribute) page to see the best places to log issues and start discussions.
+Check out the [contributing](http://docs.nuget.org/contribute) page to see the best places to log issues and start discussions. Note that not all of our repositories are open for contribution yet. Ping us if unsure.
