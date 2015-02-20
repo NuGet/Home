@@ -1,4 +1,4 @@
-![NuGet logo](resources/NuGet_Logo.svg)
+![NuGet logo](http://cdn.meme.am/instances/55368401.jpg)
 
 -----
 
