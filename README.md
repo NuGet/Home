@@ -29,7 +29,7 @@ In the legacy department, we have the following repos:
 * [NuGet (on CodePlex)](http://nuget.codeplex.com) - the NuGet command-line tool, Visual Studio Extension and PowerShell CmdLets
 * [NuGetGallery](https://github.com/NuGet/NuGetGallery) - the current NuGet Gallery
 
-We are woring hard to make NuGet a modern package manager for .NET. The repos where the action around that is happening:
+We are working hard to make NuGet a modern package manager for .NET. The repos where the action around that is happening:
 
 * [NuGet.CommandLine](https://github.com/NuGet/NuGet.CommandLine) - the NuGet command-line tool
 * [NuGet.VisualStudioExtension](https://github.com/NuGet/NuGet.VisualStudioExtension) - the NuGet Visual Studio Extension and PowerShell CmdLets
