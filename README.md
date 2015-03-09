@@ -37,6 +37,8 @@ We are working hard to make NuGet a modern package manager for .NET. The repos w
 * [NuGet.Protocol](https://github.com/NuGet/NuGet.Protocol) - the NuGet API v3 protocol client 
 * [NuGet.Versioning](https://github.com/NuGet/NuGet.Versioning) - NuGet's implementation of package versioning
 * [NuGet.Configuration](https://github.com/NuGet/NuGet.Configuration) - NuGet's configuration implementation 
+* [NuGet.Packaging](https://github.com/NuGet/NuGet.Packaging) - Readers for nupkgs, nuspecs, packages.config and various other NuGet packaging files.
+* [NuGet.PackageManagement](https://github.com/NuGet/NuGet.PackageManagement) - reading and writing manifests of installed packages
 
 NuGet is backed by several core services:
 
@@ -49,6 +51,7 @@ While building NuGet, we sometimes need something that can be used outside of Nu
 
 * [json-ld.net](https://github.com/NuGet/json-ld.net), a JSON-LD processor for .NET ([json-ld.net on NuGet](https://www.nuget.org/packages/json-ld.net/))
 * [PoliteCaptcha](https://github.com/NuGet/PoliteCaptcha), a spam prevention library for ASP.NET MVC ([PoliteCaptcha on NuGet](https://www.nuget.org/packages/PoliteCaptcha/))
+* [WebBackgrounder](https://github.com/NuGet/WebBackgrounder), a proof-of-concept of a web-farm friendly background task manager meant to just work with a vanilla ASP.NET web application ([WebBackgrounder on NuGet](https://www.nuget.org/packages/WebBackgrounder/))
 
 A [full list of all the repos](https://github.com/NuGet) is available as well.
 
