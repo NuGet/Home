@@ -1,4 +1,4 @@
-![NuGet logo](https://raw.githubusercontent.com/NuGet/Home/master/resources/NuGet_Logo.svg)
+![NuGet logo](https://raw.githubusercontent.com/NuGet/Home/master/resources/nuget.png)
 
 -----
 
