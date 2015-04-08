@@ -16,11 +16,11 @@ The NuGet Docs are the ideal place to start if you are new to NuGet. They are ca
 
 * [Consume NuGet packages](http://docs.nuget.org/consume) in your projects;
 * [Create NuGet packages](http://docs.nuget.org/create) to learn about packaging and publishing your own NuGet Packages;
-* [Contribute to NuGet](http://docs.nuget.org/contribute) gives an overview of how you can contribute to teh various NuGet projects.
+* [Contribute to NuGet](http://docs.nuget.org/contribute) gives an overview of how you can contribute to the various NuGet projects.
 
 ### [NuGet Blog](http://blog.nuget.org/)
 
-The NuGet Blog is where we announce new features, write engineering blog posts, demonstrate proof-of-conepts and features under development.
+The NuGet Blog is where we announce new features, write engineering blog posts, demonstrate proof-of-concepts and features under development.
 
 ## Repos and Projects
 
