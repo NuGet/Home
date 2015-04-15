@@ -11,9 +11,14 @@ function ProjectKBuild([string]$projectDirectory, [string]$outputDirectory)
     Write-Host "======== Building in $ProjectDirectory ======"
 
     # build the project
-    & "$projectDirectory\build.cmd"
-    Write-Output "last exit code $lastexitcode"
-    if ($lastexitcode -ne 0) 
+	$prevDirectory = Get-Location
+	cd $projectDirectory
+    & ".\build.cmd"
+	$result = $lastexitcode
+	cd $prevDirectory
+
+    Write-Output "last exit code $result"
+    if ($result -ne 0) 
     {		
     	throw "Build failed"
     }
@@ -44,8 +49,6 @@ function BuildNuGetPackageManagement()
 	{		
 	  	throw "Build failed"
 	}
-	
-	Copy-Item "$GitRoot\NuGet.PackageManagement\nupkgs\*.nupkg" "$packagesDirectory"
 }
 
 # version number of non-k projects
