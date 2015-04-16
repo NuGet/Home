@@ -1,6 +1,7 @@
 param (
     [ValidateSet("debug", "release")][string]$Configuration="release",    
-    [switch]$Clean
+    [switch]$Clean,
+	[switch]$SkipTests
 )
 
 # Build a project k project.
@@ -41,7 +42,14 @@ function BuildNuGetPackageManagement()
 {
 	cd "$GitRoot\NuGet.PackageManagement"
 	$env:NUGET_PUSH_TARGET = $packagesDirectory
-	& "$GitRoot\NuGet.PackageManagement\pack.ps1" -Configuration $Configuration -PushTarget $packagesDirectory -Version $Version -NoLock
+	$args = @{ Configuration = $Configuration; PushTarget = $packagesDirectory;
+		Version = $Version; NoLock = $true }
+	if ($SkipTests)
+	{	
+		$args.Add("SkipTests", $true)
+	}
+
+	& "$GitRoot\NuGet.PackageManagement\pack.ps1" @args
 	$result = $lastexitcode
 	cd $GitRoot
 
