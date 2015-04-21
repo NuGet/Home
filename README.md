@@ -61,8 +61,8 @@ Prerequistes:
 - VisualStudio 2015 SDK
 - Git
 - Powershell
-- Add msbuild, e.g. C:\Program Files (x86)\MSBuild\12.0\Bin, to PATH
-- Download the latest version of nuget, www.nuget.org/nuget.exe, and add it to PATH
+- Add the directory of msbuild 14, e.g. C:\Program Files (x86)\MSBuild\14.0\Bin, to PATH
+- Download the latest version of nuget, www.nuget.org/nuget.exe, and add its directory to PATH
 
 Steps to build:
 - Start powershell. Create a directory, cd into that directory
