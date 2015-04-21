@@ -59,47 +59,16 @@ A [full list of all the repos](https://github.com/NuGet) is available as well.
 Prerequistes:
 - VisualStudio 2015
 - VisualStudio 2015 SDK
-- Add msbuild (e.g. C:\Program Files (x86)\MSBuild\12.0\Bin) to PATH
-- latest version of nuget (www.nuget.org/nuget.exe)
+- Git
+- Powershell
+- Add msbuild, e.g. C:\Program Files (x86)\MSBuild\12.0\Bin, to PATH
+- Download the latest version of nuget, www.nuget.org/nuget.exe, and add it to PATH
 
 Steps to build:
-- Clone NuGet Repos. Note that they need to be under the same directory (say c:\RootDirectory),
-  without their names (i.e. directories) changed since the directories are hard coded in the build
-  script. The repos to clone are:
-  - NuGet.Configuration (https://github.com/NuGet/NuGet.Configuration.git)
-  - NuGet.PackageManagement (https://github.com/NuGet/NuGet.PackageManagement.git)
-  - NuGet.Packaging (https://github.com/NuGet/NuGet.Packaging.git)
-  - NuGet.Protocol (https://github.com/NuGet/NuGet.Protocol.git)
-  - NuGet.Versioning (https://github.com/NuGet/NuGet.Versioning.git)
-  - and NuGet.VisualStudioExtension (https://github.com/NuGet/NuGet.VisualStudioExtension.git).
-
-  Some background info: the K build system is used by NuGet.Configuration, NuGet.Packaging, NuGet.Protocol and
-  NuGet.Versioning, while MSBUILD system is used by NuGet.PackageManagement and
-  NuGet.VisualStudioExtension. This separation is the reason why building NuGet is kind of messy today.
-
-- Switch the branch to dev in all the repos.
- 
-- Get the build script build-nuget.ps1.
-
-- Under the root directory, execute
-  ```
-  build-nuget.ps1 -configuration <configuration> -clean
-  ```
-  where _configuration_ is either `debug` or `release`. The build script builds all solutions,
-  except NuGet.VisualStudioExtension. The result is that the output nupkg files are copies into directory RootDirectory\nupkgs.
-
-- Now it's time to compile the extension. cd into root directory\NuGet.VisualStudioExtension, run 
-  ```
-  nuget restore -source c:\RootDirectory\nupkgs\
-  ```
-
-  If there are errors that some packages cannot be restored (this is the case when the repo is cleaned), run
-  ```
-  nuget restore
-  ```
-  to restore them from other sources.
-  
-  After all packages are restored, you can open the solution file in VisualStudio 2015 to compile and debug the extension.
+- Start powershell. Create a directory, cd into that directory
+- Run `git clone https://github.com/NuGet/Home.git`
+- Run `Home\clone-repo.ps1`
+- Run `Home\build-nuget.ps1 -configuration debug -clean`. The generated vsix will be  NuGet.VisualStudioExtension\src\VsExtension\bin\Debug\NuGet.Tools.vsix.
 
 ## NuGet Packages by the NuGet team
 

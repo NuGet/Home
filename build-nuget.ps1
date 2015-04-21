@@ -59,6 +59,16 @@ function BuildNuGetPackageManagement()
 	}
 }
 
+function BuildVSExtension()
+{
+	cd "$GitRoot\NuGet.VisualStudioExtension"
+	& nuget restore -source "$GitRoot\nupkgs"
+	& nuget restore
+	$env:VisualStudioVersion="14.0"
+	& msbuild NuGet.VisualStudioExtension.sln /p:Configuration=$Configuration /p:VisualStudioVersion="14.0" /p:DeployExtension=false
+	cd $GitRoot
+}
+
 # version number of non-k projects
 $Version="3.0.0-beta"
 
@@ -95,3 +105,6 @@ ProjectKBuild "$GitRoot\NuGet.Protocol" "$GitRoot\nupkgs"
 
 # now build NuGet.PackageManagement
 BuildNuGetPackageManagement
+
+# build nuget.VisualStudioExtension
+BuildVSExtension
