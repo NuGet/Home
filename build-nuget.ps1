@@ -21,7 +21,8 @@ function ProjectKBuild([string]$projectDirectory, [string]$outputDirectory)
     Write-Output "last exit code $result"
     if ($result -ne 0) 
     {		
-    	throw "Build failed"
+		$errorMessage = "Build failed. Project directory is $projectDirectory"
+    	throw $errorMessage
     }
 
     # copy the generated nupkgs
@@ -88,20 +89,13 @@ if ($Clean)
 {
     rm "$packagesDirectory\*.nupkg"
     
-    RemovePackages "$GitRoot\NuGet.Versioning\packages"
-    RemovePackages "$GitRoot\NuGet.Configuration\packages"
-    RemovePackages "$GitRoot\NuGet.Packaging\packages"
-    RemovePackages "$GitRoot\NuGet.Protocol\packages"
+    RemovePackages "$GitRoot\NuGet3\packages"
     RemovePackages "$GitRoot\NuGet.PackageManagement\packages"
-    RemovePackages "$GitRoot\NuGet.CommandLine\packages"
     RemovePackages "$GitRoot\NuGet.VisualStudioExtension\packages"
 }
 
 # build k-based solutions
-ProjectKBuild "$GitRoot\NuGet.Versioning" "$GitRoot\nupkgs"
-ProjectKBuild "$GitRoot\NuGet.Configuration" "$GitRoot\nupkgs"
-ProjectKBuild "$GitRoot\NuGet.Packaging" "$GitRoot\nupkgs"
-ProjectKBuild "$GitRoot\NuGet.Protocol" "$GitRoot\nupkgs"
+ProjectKBuild "$GitRoot\NuGet3" "$GitRoot\nupkgs"
 
 # now build NuGet.PackageManagement
 BuildNuGetPackageManagement
