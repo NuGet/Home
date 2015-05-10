@@ -1,7 +1,8 @@
 param (
     [ValidateSet("debug", "release")][string]$Configuration="release",    
-    [switch]$Clean,
-	[switch]$SkipTests
+    [switch]$SkipClean,
+    [switch]$SkipTests,
+    [switch]$Fast
 )
 
 # Build a project k project.
@@ -12,17 +13,27 @@ function ProjectKBuild([string]$projectDirectory, [string]$outputDirectory)
     Write-Host "======== Building in $ProjectDirectory ======"
 
     # build the project
-	$prevDirectory = Get-Location
-	cd $projectDirectory
-    & ".\build.cmd"
-	$result = $lastexitcode
-	cd $prevDirectory
+    $prevDirectory = Get-Location
+    cd $projectDirectory
+
+    if ($Fast)
+    {
+        # build with DNX in parallel, do not use this if there are build errors
+        Invoke-expression ".\build --parallel verify"
+    }
+    else
+    {
+        & ".\build.cmd"
+    }
+
+    $result = $lastexitcode
+    cd $prevDirectory
 
     Write-Output "last exit code $result"
     if ($result -ne 0) 
-    {		
-		$errorMessage = "Build failed. Project directory is $projectDirectory"
-    	throw $errorMessage
+    {       
+        $errorMessage = "Build failed. Project directory is $projectDirectory"
+        throw $errorMessage
     }
 
     # copy the generated nupkgs
@@ -41,33 +52,33 @@ function RemovePackages([string]$packagesDirectory)
 
 function BuildNuGetPackageManagement()
 {
-	cd "$GitRoot\NuGet.PackageManagement"
-	$env:NUGET_PUSH_TARGET = $packagesDirectory
-	$args = @{ Configuration = $Configuration; PushTarget = $packagesDirectory;
-		Version = $Version; NoLock = $true }
-	if ($SkipTests)
-	{	
-		$args.Add("SkipTests", $true)
-	}
+    cd "$GitRoot\NuGet.PackageManagement"
+    $env:NUGET_PUSH_TARGET = $packagesDirectory
+    $args = @{ Configuration = $Configuration; PushTarget = $packagesDirectory;
+        Version = $Version; NoLock = $true }
+    if ($SkipTests -or $Fast)
+    {   
+        $args.Add("SkipTests", $true)
+    }
 
-	& "$GitRoot\NuGet.PackageManagement\pack.ps1" @args
-	$result = $lastexitcode
-	cd $GitRoot
+    & "$GitRoot\NuGet.PackageManagement\pack.ps1" @args
+    $result = $lastexitcode
+    cd $GitRoot
 
-	if ($result -ne 0) 
-	{		
-	  	throw "Build failed"
-	}
+    if ($result -ne 0) 
+    {       
+        throw "Build failed"
+    }
 }
 
 function BuildVSExtension()
 {
-	cd "$GitRoot\NuGet.VisualStudioExtension"
-	& nuget restore -source "$GitRoot\nupkgs"
-	& nuget restore
-	$env:VisualStudioVersion="14.0"
-	& msbuild NuGet.VisualStudioExtension.sln /p:Configuration=$Configuration /p:VisualStudioVersion="14.0" /p:DeployExtension=false
-	cd $GitRoot
+    cd "$GitRoot\NuGet.VisualStudioExtension"
+    & nuget restore -source "$GitRoot\nupkgs"
+    & nuget restore
+    $env:VisualStudioVersion="14.0"
+    & msbuild NuGet.VisualStudioExtension.sln /p:Configuration=$Configuration /p:VisualStudioVersion="14.0" /p:DeployExtension=false
+    cd $GitRoot
 }
 
 # version number of non-k projects
@@ -82,10 +93,10 @@ $GitRoot = Get-Location
 $packagesDirectory = "$GitRoot\nupkgs"
 if (!(Test-Path $packagesDirectory))
 {
-	mkdir $packagesDirectory
+    mkdir $packagesDirectory
 }
 
-if ($Clean)
+if (!$SkipClean)
 {
     rm "$packagesDirectory\*.nupkg"
     
