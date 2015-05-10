@@ -1,5 +1,5 @@
 param (
-    [ValidateSet("debug", "release")][string]$Configuration="release",    
+    [ValidateSet("debug", "release")][string]$Configuration="debug",    
     [switch]$SkipClean,
     [switch]$SkipTests,
     [switch]$Fast
