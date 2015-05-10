@@ -65,7 +65,7 @@ Steps to build:
 - Start powershell. Create a directory, cd into that directory
 - Run `git clone https://github.com/NuGet/Home.git`
 - Run `Home\clone-repos.ps1`
-- Run `Home\build-nuget.ps1 -configuration debug -clean`. The generated vsix will be  NuGet.VisualStudioExtension\src\VsExtension\bin\Debug\NuGet.Tools.vsix.
+- Run `Home\build-nuget.ps1`. The generated vsix will be  NuGet.VisualStudioExtension\src\VsExtension\bin\Debug\NuGet.Tools.vsix.
 
 ## NuGet Packages by the NuGet team
 
