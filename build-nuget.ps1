@@ -1,8 +1,20 @@
 param (
     [ValidateSet("debug", "release")][string]$Configuration="debug",    
-    [switch]$SkipClean,
+
     [switch]$SkipTests,
-    [switch]$Fast
+    [switch]$Fast,
+
+    # The first repo to build. Default is NuGet3. This allows to us to do pseudo incremental
+    # build.
+    # E.g. if there are changes in NuGet.PackageManagement, then the repos we need to build
+    # are NuGet.PackageManagement and NuGet.VisualStudioExtension. We don't need to build NuGet3.
+    # So we can run the command as
+    #     build-nuget -FirstRepo NuGet.PackageManagement
+    # or
+    #     build-nuget -FirstRepo pm
+    #
+    [ValidateSet("NuGet3", "NuGet.PackageManagement", "NuGet.VisualStudioExtension",
+        "pm", "vsix")][string]$FirstRepo = "NuGet3"
 )
 
 # Build a project k project.
@@ -96,20 +108,22 @@ if (!(Test-Path $packagesDirectory))
     mkdir $packagesDirectory
 }
 
-if (!$SkipClean)
+if ($FirstRepo -eq "NuGet3")
 {
+    # build NuGet3
     rm "$packagesDirectory\*.nupkg"
-    
-    RemovePackages "$GitRoot\NuGet3\packages"
+    ProjectKBuild "$GitRoot\NuGet3" "$GitRoot\nupkgs"
+}    
+
+if (($FirstRepo -eq "NuGet3") -or
+   ($FirstRepo -eq "NuGet.PackageManagement") -or
+   ($FirstRepo -eq "pm"))
+{
+    # build NuGet.PackageManagement
     RemovePackages "$GitRoot\NuGet.PackageManagement\packages"
-    RemovePackages "$GitRoot\NuGet.VisualStudioExtension\packages"
+    BuildNuGetPackageManagement
 }
 
-# build k-based solutions
-ProjectKBuild "$GitRoot\NuGet3" "$GitRoot\nupkgs"
-
-# now build NuGet.PackageManagement
-BuildNuGetPackageManagement
-
-# build nuget.VisualStudioExtension
+# build NuGet.VisualStudioExtension
+RemovePackages "$GitRoot\NuGet.VisualStudioExtension\packages"
 BuildVSExtension
