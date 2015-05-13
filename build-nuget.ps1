@@ -67,7 +67,7 @@ function BuildNuGetPackageManagement()
     cd "$GitRoot\NuGet.PackageManagement"
     $env:NUGET_PUSH_TARGET = $packagesDirectory
     $args = @{ Configuration = $Configuration; PushTarget = $packagesDirectory;
-        Version = $Version; NoLock = $true }
+        Version = $Version }
     if ($SkipTests -or $Fast)
     {   
         $args.Add("SkipTests", $true)
