@@ -65,6 +65,8 @@ function RemovePackages([string]$packagesDirectory)
 function BuildNuGetPackageManagement()
 {
     cd "$GitRoot\NuGet.PackageManagement"
+    & nuget restore -source "$GitRoot\nupkgs"
+    & nuget restore
     $env:NUGET_PUSH_TARGET = $packagesDirectory
     $args = @{ Configuration = $Configuration; PushTarget = $packagesDirectory;
         Version = $Version }
