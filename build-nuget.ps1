@@ -25,21 +25,20 @@ function ProjectKBuild([string]$projectDirectory, [string]$outputDirectory)
     Write-Host "======== Building in $ProjectDirectory ======"
 
     # build the project
-    $prevDirectory = Get-Location
-    cd $projectDirectory
+    pushd $projectDirectory
 
     if ($Fast)
     {
         # build with DNX in parallel, do not use this if there are build errors
-        Invoke-expression ".\build --parallel verify"
+        .\build --parallel verify
     }
     else
     {
-        & ".\build.cmd"
+        .\build.cmd
     }
 
     $result = $lastexitcode
-    cd $prevDirectory
+    popd
 
     Write-Output "last exit code $result"
     if ($result -ne 0) 
@@ -53,20 +52,9 @@ function ProjectKBuild([string]$projectDirectory, [string]$outputDirectory)
     Copy-Item (Join-Path $artifactDirectory "*.nupkg") $outputDirectory -Verbose:$true
 }
 
-# remove NuGet.* packages from the specified directory
-function RemovePackages([string]$packagesDirectory)
-{
-    if (Test-Path "$packagesDirectory") 
-    { 
-        rm -r -force "$packagesDirectory\NuGet.*" 
-    }
-}
-
 function BuildNuGetPackageManagement()
 {
-    cd "$GitRoot\NuGet.PackageManagement"
-    & nuget restore -source "$GitRoot\nupkgs"
-    & nuget restore
+    pushd "$GitRoot\NuGet.PackageManagement"
     $env:NUGET_PUSH_TARGET = $packagesDirectory
     $args = @{ Configuration = $Configuration; PushTarget = $packagesDirectory;
         Version = $Version }
@@ -77,7 +65,7 @@ function BuildNuGetPackageManagement()
 
     & "$GitRoot\NuGet.PackageManagement\pack.ps1" @args
     $result = $lastexitcode
-    cd $GitRoot
+    popd
 
     if ($result -ne 0) 
     {       
@@ -87,20 +75,20 @@ function BuildNuGetPackageManagement()
 
 function BuildVSExtension()
 {
-    cd "$GitRoot\NuGet.VisualStudioExtension"
-    & nuget restore -source "$GitRoot\nupkgs"
-    & nuget restore
+    pushd "$GitRoot\NuGet.VisualStudioExtension"
     $env:VisualStudioVersion="14.0"
+    .\restore.cmd
     & msbuild NuGet.VisualStudioExtension.sln /p:Configuration=$Configuration /p:VisualStudioVersion="14.0" /p:DeployExtension=false
-    cd $GitRoot
+    popd
 }
 
 # version number of non-k projects
-$Version="3.0.0-beta"
+$timestamp = [DateTime]::UtcNow.ToString("yyMMddHHmmss");
+$Version="3.1.0-local-$timestamp"
 
 # set environment used by k
 $env:Configuration=$Configuration
-$env:DNX_BUILD_VERSION="beta"
+$env:DNX_BUILD_VERSION="local-$timestamp"
 
 # Create the packages directory
 $GitRoot = Get-Location
@@ -122,10 +110,8 @@ if (($FirstRepo -eq "NuGet3") -or
    ($FirstRepo -eq "pm"))
 {
     # build NuGet.PackageManagement
-    RemovePackages "$GitRoot\NuGet.PackageManagement\packages"
     BuildNuGetPackageManagement
 }
 
 # build NuGet.VisualStudioExtension
-RemovePackages "$GitRoot\NuGet.VisualStudioExtension\packages"
 BuildVSExtension
