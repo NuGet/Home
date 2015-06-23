@@ -130,4 +130,3 @@ if (($FirstRepo -eq "NuGet3") -or
 # build NuGet.VisualStudioExtension
 BuildVSExtension
 
-rm env:NUGET_BUILD_FEEDS
