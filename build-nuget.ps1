@@ -1,5 +1,5 @@
 param (
-    [ValidateSet("debug", "release")][string]$Configuration="debug",    
+    [ValidateSet("debug", "release")][string]$Configuration="debug",
 
     [switch]$SkipTests,
     [switch]$Fast,
@@ -20,7 +20,7 @@ param (
 # Build a project k project.
 # - projectDirectory is the root directory of the project
 # - outputDirectory is the directory where the generated nupkg files are copied to
-function ProjectKBuild([string]$projectDirectory, [string]$outputDirectory) 
+function ProjectKBuild([string]$projectDirectory, [string]$outputDirectory)
 {
     Write-Host "======== Building in $ProjectDirectory ======"
 
@@ -41,8 +41,8 @@ function ProjectKBuild([string]$projectDirectory, [string]$outputDirectory)
     popd
 
     Write-Output "last exit code $result"
-    if ($result -ne 0) 
-    {       
+    if ($result -ne 0)
+    {
         $errorMessage = "Build failed. Project directory is $projectDirectory"
         throw $errorMessage
     }
@@ -59,7 +59,7 @@ function BuildNuGetPackageManagement()
     $args = @{ Configuration = $Configuration; PushTarget = $packagesDirectory;
         Version = $Version }
     if ($SkipTests -or $Fast)
-    {   
+    {
         $args.Add("SkipTests", $true)
     }
 
@@ -67,8 +67,8 @@ function BuildNuGetPackageManagement()
     $result = $lastexitcode
     popd
 
-    if ($result -ne 0) 
-    {       
+    if ($result -ne 0)
+    {
         throw "Build failed"
     }
 }
@@ -77,8 +77,22 @@ function BuildVSExtension()
 {
     pushd "$GitRoot\NuGet.VisualStudioExtension"
     $env:VisualStudioVersion="14.0"
-    .\restore.cmd
+    & msbuild build\build.proj /t:RestorePackages /p:NUGET_BUILD_FEEDS=$packagesDirectory
+
+    if ($LASTEXITCODE -ne 0)
+    {
+        popd
+        throw "Build failed"
+    }
+
     & msbuild NuGet.VisualStudioExtension.sln /p:Configuration=$Configuration /p:VisualStudioVersion="14.0" /p:DeployExtension=false
+    if ($LASTEXITCODE -ne 0)
+    {
+        popd
+        throw "Build failed"
+    }
+
+
     popd
 }
 
@@ -103,7 +117,7 @@ if ($FirstRepo -eq "NuGet3")
     # build NuGet3
     rm "$packagesDirectory\*.nupkg"
     ProjectKBuild "$GitRoot\NuGet3" "$GitRoot\nupkgs"
-}    
+}
 
 if (($FirstRepo -eq "NuGet3") -or
    ($FirstRepo -eq "NuGet.PackageManagement") -or
@@ -115,3 +129,5 @@ if (($FirstRepo -eq "NuGet3") -or
 
 # build NuGet.VisualStudioExtension
 BuildVSExtension
+
+rm env:NUGET_BUILD_FEEDS
