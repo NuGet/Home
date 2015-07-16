@@ -65,6 +65,22 @@ function BuildNuGetPackageManagement()
 
     & "$GitRoot\NuGet.PackageManagement\pack.ps1" @args
     $result = $lastexitcode
+	
+	# ILMerge nuget.exe
+	cd "$GitRoot\NuGet.PackageManagement\src\NuGet.CommandLine\bin\$Configuration"		
+	if (Test-Path Merged)
+	{	 
+	    rmdir Merged
+	}
+	else 
+	{
+	    mkdir Merged
+	}
+	if ($result -eq 0) 
+	{
+	    Write-Output "Creating the ilmerged nuget.exe"		
+        & $ILMerge NuGet.exe NuGet.Client.dll NuGet.Commands.dll NuGet.Configuration.dll NuGet.ContentModel.dll NuGet.Core.dll NuGet.DependencyResolver.Core.dll NuGet.DependencyResolver.dll NuGet.Frameworks.dll NuGet.LibraryModel.dll NuGet.Logging.dll NuGet.PackageManagement.dll NuGet.Packaging.Core.dll NuGet.Packaging.Core.Types.dll NuGet.Packaging.dll NuGet.ProjectManagement.dll NuGet.ProjectModel.dll NuGet.Protocol.Core.Types.dll NuGet.Protocol.Core.v2.dll NuGet.Protocol.Core.v3.dll NuGet.Repositories.dll NuGet.Resolver.dll NuGet.RuntimeModel.dll NuGet.Versioning.dll Microsoft.Web.XmlTransform.dll Newtonsoft.Json.dll /lib:"C:\Program Files (x86)\MSBuild\14.0\Bin" /log:mergelog.txt /out:Merged\nuget.exe
+	}	
     popd
 
     if ($result -ne 0)
@@ -95,6 +111,8 @@ function BuildVSExtension()
 
     popd
 }
+
+$ilmerge = Join-Path $PSScriptRoot "ilmerge.exe"
 
 # version number of non-k projects
 $timestamp = [DateTime]::UtcNow.ToString("yyMMddHHmmss");
