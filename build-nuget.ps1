@@ -70,7 +70,7 @@ function BuildNuGetPackageManagement()
 	cd "$GitRoot\NuGet.PackageManagement\src\NuGet.CommandLine\bin\$Configuration"		
 	if (Test-Path Merged)
 	{	 
-	    rmdir Merged
+	    rmdir Merged\nuget.exe
 	}
 	else 
 	{
