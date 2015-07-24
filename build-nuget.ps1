@@ -50,6 +50,7 @@ function ProjectKBuild([string]$projectDirectory, [string]$outputDirectory)
     # copy the generated nupkgs
     $artifactDirectory = Join-Path $projectDirectory "artifacts\build"
     Copy-Item (Join-Path $artifactDirectory "*.nupkg") $outputDirectory -Verbose:$true
+    ls $outputDirectory NuGet.CommandLine*.nupkg | rm
 }
 
 function BuildNuGetPackageManagement()
