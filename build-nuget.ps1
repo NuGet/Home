@@ -117,7 +117,7 @@ $ilmerge = Join-Path $PSScriptRoot "ilmerge.exe"
 
 # version number of non-k projects
 $timestamp = [DateTime]::UtcNow.ToString("yyMMddHHmmss");
-$Version="3.1.1-local-$timestamp"
+$Version="3.1.2-local-$timestamp"
 
 # set environment used by k
 $env:Configuration=$Configuration
