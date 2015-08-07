@@ -94,6 +94,7 @@ function BuildVSExtension()
 {
     pushd "$GitRoot\NuGet.VisualStudioExtension"
     $env:VisualStudioVersion="14.0"
+    & msbuild build\build.proj /t:Clean /m
     & msbuild build\build.proj /t:RestorePackages /p:NUGET_BUILD_FEEDS=$packagesDirectory
 
     if ($LASTEXITCODE -ne 0)
