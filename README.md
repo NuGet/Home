@@ -33,7 +33,7 @@ We are working hard to make NuGet a modern package manager for .NET. The repos w
 
 * [NuGet.CommandLine](https://github.com/NuGet/NuGet.CommandLine) - the NuGet command-line tool
 * [NuGet.VisualStudioExtension](https://github.com/NuGet/NuGet.VisualStudioExtension) - the NuGet Visual Studio Extension and PowerShell CmdLets
-* [NuGet.Gallery](https://github.com/NuGet/NuGet.Gallery) - the new NuGet Gallery
+* [NuGet.Gallery](https://github.com/NuGet/NuGetGallery) - the new NuGet Gallery
 * [NuGet.NuGet3](https://github.com/NuGet/NuGet3) - the NuGet API v3 protocol client, NuGet's implementation of package versioning, NuGet's configuration implementation, readers for nupkgs, nuspecs, packages.config and various other NuGet packaging files.
 * [NuGet.PackageManagement](https://github.com/NuGet/NuGet.PackageManagement) - reading and writing manifests of installed packages
 
