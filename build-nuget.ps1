@@ -57,8 +57,7 @@ function BuildNuGetPackageManagement()
 {
     pushd "$GitRoot\NuGet.PackageManagement"
     $env:NUGET_PUSH_TARGET = $packagesDirectory
-    $args = @{ Configuration = $Configuration; PushTarget = $packagesDirectory;
-        Version = $Version }
+    $args = @{ Configuration = $Configuration; PushTarget = $packagesDirectory; }
     if ($SkipTests -or $Fast)
     {
         $args.Add("SkipTests", $true)
@@ -103,7 +102,7 @@ function BuildVSExtension()
         throw "Build failed"
     }
 
-    & msbuild NuGet.VisualStudioExtension.sln /p:Configuration=$Configuration /p:VisualStudioVersion="14.0" /p:DeployExtension=false
+    & msbuild NuGet.VisualStudioExtension.sln /p:Configuration=$Configuration /p:VisualStudioVersion="14.0" /p:DeployExtension=false /p:PublicRelease=false
     if ($LASTEXITCODE -ne 0)
     {
         popd
@@ -116,16 +115,9 @@ function BuildVSExtension()
 
 $ilmerge = Join-Path $PSScriptRoot "ilmerge.exe"
 
-# version number of non-k projects
-$timestamp = [DateTime]::UtcNow.ToString("yyMMddHHmmss");
-# $Version="3.2.0-local-$timestamp"
-
-# This is set for release mode
-$Version="3.2.0"
-$env:PublicRelease="true"
-
 # set environment used by k
 $env:Configuration=$Configuration
+$timestamp = [DateTime]::UtcNow.ToString("yyMMddHHmmss");
 $env:DNX_BUILD_VERSION="local-$timestamp"
 
 # Create the packages directory
