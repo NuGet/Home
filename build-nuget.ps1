@@ -3,6 +3,7 @@ param (
 
     [switch]$SkipTests,
     [switch]$Fast,
+	[switch]$CleanCache,
 
     # The first repo to build. Default is NuGet3. This allows to us to do pseudo incremental
     # build.
@@ -113,6 +114,52 @@ function BuildVSExtension()
     popd
 }
 
+# Clean the machine level cache from all package
+function CleanCache()
+{
+	Write-Host Removing MEF cache
+
+	if (Test-Path $env:localappdata\Microsoft\VisualStudio\14.0Exp)
+	{
+		rm -r $env:localappdata\Microsoft\VisualStudio\14.0Exp -Force
+	}
+
+	Write-Host Removing DNX packages
+
+	if (Test-Path $env:userprofile\.dnx\packages)
+	{
+		rm -r $env:userprofile\.dnx\packages -Force
+	}
+
+	Write-Host Removing .NUGET packages
+
+	if (Test-Path $env:userprofile\.nuget\packages)
+	{
+		rm -r $env:userprofile\.nuget\packages -Force
+	}
+
+	Write-Host Removing DNU cache
+
+	if (Test-Path $env:localappdata\dnu\cache)
+	{
+		rm -r $env:localappdata\dnu\cache -Force
+	}
+
+	Write-Host Removing NuGet web cache
+
+	if (Test-Path $env:localappdata\NuGet\v3-cache)
+	{
+		rm -r $env:localappdata\NuGet\v3-cache -Force
+	}
+
+	Write-Host Removing NuGet machine cache
+
+	if (Test-Path $env:localappdata\NuGet\Cache)
+	{
+		rm -r $env:localappdata\NuGet\Cache -Force
+	}
+}
+
 $ilmerge = Join-Path $PSScriptRoot "ilmerge.exe"
 
 # set environment used by k
@@ -126,6 +173,11 @@ $packagesDirectory = "$GitRoot\nupkgs"
 if (!(Test-Path $packagesDirectory))
 {
     mkdir $packagesDirectory
+}
+
+if($CleanCache)
+{
+	CleanCache
 }
 
 if ($FirstRepo -eq "NuGet3")
