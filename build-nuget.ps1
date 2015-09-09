@@ -4,6 +4,7 @@ param (
     [switch]$SkipTests,
     [switch]$Fast,
 	[switch]$CleanCache,
+	[switch]$PublicRelease,
 
     # The first repo to build. Default is NuGet3. This allows to us to do pseudo incremental
     # build.
@@ -58,7 +59,16 @@ function BuildNuGetPackageManagement()
 {
     pushd "$GitRoot\NuGet.PackageManagement"
     $env:NUGET_PUSH_TARGET = $packagesDirectory
-    $args = @{ Configuration = $Configuration; PushTarget = $packagesDirectory; }
+	
+	if ($PublicRelease)
+	{
+		$args = @{ Configuration = $Configuration; PushTarget = $packagesDirectory; PublicRelease="true"; }
+	}
+	else
+	{
+		$args = @{ Configuration = $Configuration; PushTarget = $packagesDirectory; }
+	}
+    
     if ($SkipTests -or $Fast)
     {
         $args.Add("SkipTests", $true)
@@ -103,7 +113,16 @@ function BuildVSExtension()
         throw "Build failed"
     }
 
-    & msbuild NuGet.VisualStudioExtension.sln /p:Configuration=$Configuration /p:VisualStudioVersion="14.0" /p:DeployExtension=false /p:PublicRelease=false
+	if($PublicRelease)
+	{
+		$Release = 'true'
+	}
+	else
+	{
+		$Release = 'false'
+	}
+
+    & msbuild NuGet.VisualStudioExtension.sln /p:Configuration=$Configuration /p:VisualStudioVersion="14.0" /p:DeployExtension=false /p:PublicRelease=$Release
     if ($LASTEXITCODE -ne 0)
     {
         popd
