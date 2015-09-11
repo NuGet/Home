@@ -32,7 +32,7 @@ function ProjectKBuild([string]$projectDirectory, [string]$outputDirectory)
     if ($Fast)
     {
         # build with DNX in parallel, do not use this if there are build errors
-        .\build --parallel verify
+        .\build.cmd --parallel verify
     }
     else
     {
