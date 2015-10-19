@@ -41,8 +41,6 @@ NuGet is backed by several core services:
 
 * [NuGet.Services.Metadata](https://github.com/NuGet/NuGet.Services.Metadata) - NuGet's Metadata Service
 * [NuGet.Services.Search](https://github.com/NuGet/NuGet.Services.Search) - NuGet's Search Service
-* [NuGet.Services.Messaging](https://github.com/NuGet/NuGet.Services.Messaging) - NuGet's Messaging Service
-* [NuGet.Services.Metrics](https://github.com/NuGet/NuGet.Services.Metrics) - NuGet's Metrics Service
 
 While building NuGet, we sometimes need something that can be used outside of NuGet, too. Examples are:
 
