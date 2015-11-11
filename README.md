@@ -6,7 +6,7 @@
 
 The Home repository is the starting point for people to learn about NuGet, the project. If you're new to NuGet, and want to add packages to your own projects, [check our docs](http://docs.nuget.org). This repo contains pointers to the various GitHub repositories used by NuGet and allows folks to learn more about what's coming in NuGet.
 
-NuGet is being actively developed by the .NET Foundation. NuGet is the package manager for the Microsoft development platform including .NET. The [NuGet client tools (on CodePlex)](http://nuget.codeplex.com) provide the ability to produce and consume packages. The [NuGet Gallery](https://github.com/NuGet/NuGetGallery) is the central package repository used by all package authors and consumers and has a live deployment at [www.nuget.org](https://www.nuget.org).
+NuGet is being actively developed by the .NET Foundation. NuGet is the package manager for the Microsoft development platform including .NET. The [NuGet client tools](https://github.com/nuget/nuget.client) provide the ability to produce and consume packages. The [NuGet Gallery](https://github.com/NuGet/NuGetGallery) is the central package repository used by all package authors and consumers and has a live deployment at [www.nuget.org](https://www.nuget.org).
 
 ## Documentation and Further Learning
 
@@ -24,46 +24,46 @@ The NuGet Blog is where we announce new features, write engineering blog posts, 
 
 ## Repos and Projects
 
-In the legacy department, we have the following repos:
+* [NuGet client tools](https://github.com/nuget/nuget.client) - this repo contains the following clients:
+  * NuGet command-line tool 3.0 and higher
+  * Visual Studio 2015 Extension
+  * PowerShell CmdLets
 
-* [NuGet (on CodePlex)](http://nuget.codeplex.com) - the NuGet command-line tool, Visual Studio Extension and PowerShell CmdLets
+* [NuGet V2](https://github.com/NuGet/NuGet2) - this repo contains the following clients:
+  * NuGet command-line tool 2.9
+  * Visual Studio Extension (Previous versions e.g. Visual studio 2013)
+  * PowerShell  CmdLets
+  * NuGet.Core
+
 * [NuGetGallery](https://github.com/NuGet/NuGetGallery) - the current NuGet Gallery
 
-We are working hard to make NuGet a modern package manager for .NET. The repos where the action around that is happening:
-
-* [NuGet.CommandLine](https://github.com/NuGet/NuGet.CommandLine) - the NuGet command-line tool
-* [NuGet.VisualStudioExtension](https://github.com/NuGet/NuGet.VisualStudioExtension) - the NuGet Visual Studio Extension and PowerShell CmdLets
-* [NuGet.Gallery](https://github.com/NuGet/NuGetGallery) - the new NuGet Gallery
-* [NuGet.NuGet3](https://github.com/NuGet/NuGet3) - the NuGet API v3 protocol client, NuGet's implementation of package versioning, NuGet's configuration implementation, readers for nupkgs, nuspecs, packages.config and various other NuGet packaging files.
-* [NuGet.PackageManagement](https://github.com/NuGet/NuGet.PackageManagement) - reading and writing manifests of installed packages
-
-NuGet is backed by several core services:
+[NuGet.org](https://www.nuget.org/) is backed by several core services:
 
 * [NuGet.Services.Metadata](https://github.com/NuGet/NuGet.Services.Metadata) - NuGet's Metadata Service
 * [NuGet.Services.Search](https://github.com/NuGet/NuGet.Services.Search) - NuGet's Search Service
 
-While building NuGet, we sometimes need something that can be used outside of NuGet, too. Examples are:
-
-* [json-ld.net](https://github.com/NuGet/json-ld.net), a JSON-LD processor for .NET ([json-ld.net on NuGet](https://www.nuget.org/packages/json-ld.net/))
-* [PoliteCaptcha](https://github.com/NuGet/PoliteCaptcha), a spam prevention library for ASP.NET MVC ([PoliteCaptcha on NuGet](https://www.nuget.org/packages/PoliteCaptcha/))
-* [WebBackgrounder](https://github.com/NuGet/WebBackgrounder), a proof-of-concept of a web-farm friendly background task manager meant to just work with a vanilla ASP.NET web application ([WebBackgrounder on NuGet](https://www.nuget.org/packages/WebBackgrounder/))
-
 A [full list of all the repos](https://github.com/NuGet) is available as well.
 
 ## How to build NuGet VisualStudio extension
-Prerequistes:
-- VisualStudio 2015
-- VisualStudio 2015 SDK
-- Git
-- Powershell
-- Add the directory of msbuild 14, e.g. C:\Program Files (x86)\MSBuild\14.0\Bin, to PATH
-- Download the latest version of [nuget.exe](https://dist.nuget.org/win-x86-commandline/latest/nuget.exe), and add its directory to PATH
 
-Steps to build:
-- Start powershell. Create a directory, cd into that directory
-- Run `git clone https://github.com/NuGet/Home.git`
-- Run `Home\clone-repos.ps1`
-- Run `Home\build-nuget.ps1`. The generated vsix will be  NuGet.VisualStudioExtension\src\VsExtension\bin\Debug\NuGet.Tools.vsix.
+###Prerequistes:
+- [VisualStudio 2015](https://www.visualstudio.com/)
+- [VisualStudio 2015 SDK](https://msdn.microsoft.com/en-us/library/bb166441.aspx)
+- [Windows 10 SDK](https://dev.windows.com/en-US/downloads/windows-10-sdk)
+- Git 
+- Powershell
+
+###Steps to build the clients tools repo:
+- Clone [NuGet.Client](https://github.com/nuget/nuget.client) Repo by running the following command `git clone https://github.com/NuGet/NuGet.Client`
+- Start powershell
+- CD into the clone repo directory
+- Run `.\build.ps1 -CleanCache`
+
+######In case you have build issues please clean the local repo using `git clean -xdf` and retry building
+
+###Build Artifacts
+- (RepoRootFolder)\Artifacts - this folder will contain the Vsix and NuGet command-line
+- (RepoRootFolder)\Nupkgs - this folder will contain all our projects packages
 
 ## NuGet Packages by the NuGet team
 
