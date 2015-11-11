@@ -37,7 +37,7 @@ The NuGet Blog is where we announce new features, write engineering blog posts, 
 
 * [NuGetGallery](https://github.com/NuGet/NuGetGallery) - the current NuGet Gallery
 
-NuGet is backed by several core services:
+[NuGet.org](https://www.nuget.org/) is backed by several core services:
 
 * [NuGet.Services.Metadata](https://github.com/NuGet/NuGet.Services.Metadata) - NuGet's Metadata Service
 * [NuGet.Services.Search](https://github.com/NuGet/NuGet.Services.Search) - NuGet's Search Service
