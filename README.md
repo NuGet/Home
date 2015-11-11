@@ -47,12 +47,11 @@ A [full list of all the repos](https://github.com/NuGet) is available as well.
 ## How to build NuGet VisualStudio extension
 
 ###Prerequistes:
-- VisualStudio 2015
-- VisualStudio 2015 SDK
-- Windows 10 tools
-- Git
+- [VisualStudio 2015](https://www.visualstudio.com/)
+- [VisualStudio 2015 SDK](https://msdn.microsoft.com/en-us/library/bb166441.aspx)
+- [Windows 10 SDK](https://dev.windows.com/en-US/downloads/windows-10-sdk)
+- Git 
 - Powershell
-- Add the directory of msbuild 14, e.g. C:\Program Files (x86)\MSBuild\14.0\Bin, to PATH
 
 ###Steps to build the clients tools repo:
 - Clone [NuGet.Client](https://github.com/nuget/nuget.client) Repo by running the following command `git clone https://github.com/NuGet/NuGet.Client`
