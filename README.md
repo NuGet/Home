@@ -31,7 +31,7 @@ The NuGet Blog is where we announce new features, write engineering blog posts, 
 
 * [NuGet V2](https://github.com/NuGet/NuGet2) - this repo contains the following clients:
   * NuGet command-line tool 2.9
-  * Visual Studio Extension (Privouse versions e.g. Visual studio 2013)
+  * Visual Studio Extension (Previous versions e.g. Visual studio 2013)
   * PowerShell  CmdLets
   * NuGet.Core
 
@@ -56,10 +56,11 @@ A [full list of all the repos](https://github.com/NuGet) is available as well.
 
 ###Steps to build the clients tools repo:
 - Clone [NuGet.Client](https://github.com/nuget/nuget.client) Repo by running the following command `git clone https://github.com/NuGet/NuGet.Client`
-- Start powershell. cd into the clone repo directory
+- Start powershell
+- CD into the clone repo directory
 - Run `.\build.ps1 -CleanCache`
 
-######In case you have build issues please clean the local repo using `git clean -xdf` and try building
+######In case you have build issues please clean the local repo using `git clean -xdf` and retry building
 
 ###Build Artifacts
 - (RepoRootFolder)\Artifacts - this folder will contain the Vsix and NuGet command-line
