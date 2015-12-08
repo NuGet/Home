@@ -35,12 +35,13 @@ The NuGet Blog is where we announce new features, write engineering blog posts, 
   * PowerShell  CmdLets
   * NuGet.Core
 
-* [NuGetGallery](https://github.com/NuGet/NuGetGallery) - the current NuGet Gallery
-
 [NuGet.org](https://www.nuget.org/) is backed by several core services:
 
+* [NuGetGallery](https://github.com/NuGet/NuGetGallery) - the current NuGet Gallery
 * [NuGet.Services.Metadata](https://github.com/NuGet/NuGet.Services.Metadata) - NuGet's Metadata Service
 * [NuGet.Services.Search](https://github.com/NuGet/NuGet.Services.Search) - NuGet's Search Service
+
+[NuGet.Server](https://github.com/NuGet/NuGet.Server) is a lightweight standalone NuGet server.
 
 A [full list of all the repos](https://github.com/NuGet) is available as well.
 
