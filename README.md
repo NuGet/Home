@@ -76,4 +76,4 @@ If you're having trouble with the NuGet.org Website, file a bug on the [NuGet Ga
 
 If you're having trouble with the NuGet client tools (the Visual Studio extension, NuGet.exe command line tool, etc.), file a bug on [NuGet Home](https://github.com/nuget/home/issues).
 
-Check out the [contributing](http://docs.nuget.org/contribute) page to see the best places to log issues and start discussions. Note that not all of our repositories are open for contribution yet. Ping us if unsure.
+Check out the [contributing](http://docs.nuget.org/contribute) page to see the best places to log issues and start discussions.  You are welcome to respond to any issues that are marked as ['Up for Grabs'](https://github.com/NuGet/Home/issues?q=is%3Aopen+is%3Aissue+label%3A%22Up+for+Grabs%22) with appropriate pull-requests to address them.  Note that not all of our repositories are open for contribution yet. Ping us if unsure.
