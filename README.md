@@ -47,7 +47,7 @@ A [full list of all the repos](https://github.com/NuGet) is available as well.
 
 ## How to build NuGet VisualStudio extension
 
-###Prerequistes:
+###Prerequisites:
 - [VisualStudio 2015](https://www.visualstudio.com/)
 - [VisualStudio 2015 SDK](https://msdn.microsoft.com/en-us/library/bb166441.aspx)
 - [Windows 10 SDK](https://dev.windows.com/en-US/downloads/windows-10-sdk)
