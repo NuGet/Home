@@ -62,6 +62,19 @@ A [full list of all the repos](https://github.com/NuGet) is available as well.
 
 ######In case you have build issues please clean the local repo using `git clean -xdf` and retry building
 
+####Notable .\build.ps1 switches
+- `-SkipDev14` - builds only binaries targeting Visual Studio 15 (Dev15)
+- `-SkipDev15` - builds only binaries targeting Visual Studio 2015 (Dev14)
+
+Note that if only one of Visual Studio 2015 (Dev14) or Visual Studio 15 (Dev15) is installed, neither of the above switches is necessary - the script will build according to the installed version.
+
+- `-SkipXProj` - skips building the NuGet.Core XProj projects
+- `-SkipTests` - builds binaries, skips running tests
+- `-SkipRestore` - builds without restoring first
+- `-SkipSubmodules` - builds without updating submodules
+- `-SkipILMerge` - builds without creating an ILMerged nuget.exe
+- `-Fast` - skips tests, submodule updates, and ILMerged nuget.exe
+
 ###Build Artifacts
 - (RepoRootFolder)\Artifacts - this folder will contain the Vsix and NuGet command-line
 - (RepoRootFolder)\Nupkgs - this folder will contain all our projects packages
