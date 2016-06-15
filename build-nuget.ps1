@@ -3,6 +3,8 @@ param (
 
     [switch]$SkipTests,
     [switch]$Fast,
+	[switch]$CleanCache,
+	[switch]$PublicRelease,
 
     # The first repo to build. Default is NuGet3. This allows to us to do pseudo incremental
     # build.
@@ -30,7 +32,7 @@ function ProjectKBuild([string]$projectDirectory, [string]$outputDirectory)
     if ($Fast)
     {
         # build with DNX in parallel, do not use this if there are build errors
-        .\build --parallel verify
+        .\build.cmd --parallel verify
     }
     else
     {
@@ -50,14 +52,23 @@ function ProjectKBuild([string]$projectDirectory, [string]$outputDirectory)
     # copy the generated nupkgs
     $artifactDirectory = Join-Path $projectDirectory "artifacts\build"
     Copy-Item (Join-Path $artifactDirectory "*.nupkg") $outputDirectory -Verbose:$true
+    ls $outputDirectory NuGet.CommandLine*.nupkg | rm
 }
 
 function BuildNuGetPackageManagement()
 {
     pushd "$GitRoot\NuGet.PackageManagement"
     $env:NUGET_PUSH_TARGET = $packagesDirectory
-    $args = @{ Configuration = $Configuration; PushTarget = $packagesDirectory;
-        Version = $Version }
+	
+	if ($PublicRelease)
+	{
+		$args = @{ Configuration = $Configuration; PushTarget = $packagesDirectory; PublicRelease="true"; }
+	}
+	else
+	{
+		$args = @{ Configuration = $Configuration; PushTarget = $packagesDirectory; }
+	}
+    
     if ($SkipTests -or $Fast)
     {
         $args.Add("SkipTests", $true)
@@ -79,7 +90,7 @@ function BuildNuGetPackageManagement()
 	if ($result -eq 0) 
 	{
 	    Write-Output "Creating the ilmerged nuget.exe"		
-        & $ILMerge NuGet.exe NuGet.Client.dll NuGet.Commands.dll NuGet.Configuration.dll NuGet.ContentModel.dll NuGet.Core.dll NuGet.DependencyResolver.Core.dll NuGet.DependencyResolver.dll NuGet.Frameworks.dll NuGet.LibraryModel.dll NuGet.Logging.dll NuGet.PackageManagement.dll NuGet.Packaging.Core.dll NuGet.Packaging.Core.Types.dll NuGet.Packaging.dll NuGet.ProjectManagement.dll NuGet.ProjectModel.dll NuGet.Protocol.Core.Types.dll NuGet.Protocol.Core.v2.dll NuGet.Protocol.Core.v3.dll NuGet.Repositories.dll NuGet.Resolver.dll NuGet.RuntimeModel.dll NuGet.Versioning.dll Microsoft.Web.XmlTransform.dll Newtonsoft.Json.dll /lib:"C:\Program Files (x86)\MSBuild\14.0\Bin" /log:mergelog.txt /out:Merged\nuget.exe
+        & $ILMerge NuGet.exe NuGet.Client.dll NuGet.Commands.dll NuGet.Configuration.dll NuGet.ContentModel.dll NuGet.Core.dll NuGet.DependencyResolver.Core.dll NuGet.DependencyResolver.dll NuGet.Frameworks.dll NuGet.LibraryModel.dll NuGet.Logging.dll NuGet.PackageManagement.dll NuGet.Packaging.Core.dll NuGet.Packaging.Core.Types.dll NuGet.Packaging.dll NuGet.ProjectManagement.dll NuGet.ProjectModel.dll NuGet.Protocol.Core.Types.dll NuGet.Protocol.Core.v2.dll NuGet.Protocol.Core.v3.dll NuGet.Repositories.dll NuGet.Resolver.dll NuGet.RuntimeModel.dll NuGet.Versioning.dll Microsoft.Web.XmlTransform.dll Newtonsoft.Json.dll /log:mergelog.txt /out:Merged\nuget.exe
 	}	
     popd
 
@@ -93,6 +104,7 @@ function BuildVSExtension()
 {
     pushd "$GitRoot\NuGet.VisualStudioExtension"
     $env:VisualStudioVersion="14.0"
+    & msbuild build\build.proj /t:Clean /m
     & msbuild build\build.proj /t:RestorePackages /p:NUGET_BUILD_FEEDS=$packagesDirectory
 
     if ($LASTEXITCODE -ne 0)
@@ -101,7 +113,16 @@ function BuildVSExtension()
         throw "Build failed"
     }
 
-    & msbuild NuGet.VisualStudioExtension.sln /p:Configuration=$Configuration /p:VisualStudioVersion="14.0" /p:DeployExtension=false
+	if($PublicRelease)
+	{
+		$Release = 'true'
+	}
+	else
+	{
+		$Release = 'false'
+	}
+
+    & msbuild NuGet.VisualStudioExtension.sln /p:Configuration=$Configuration /p:VisualStudioVersion="14.0" /p:DeployExtension=false /p:PublicRelease=$Release
     if ($LASTEXITCODE -ne 0)
     {
         popd
@@ -112,14 +133,57 @@ function BuildVSExtension()
     popd
 }
 
-$ilmerge = Join-Path $PSScriptRoot "ilmerge.exe"
+# Clean the machine level cache from all package
+function CleanCache()
+{
+	Write-Host Removing MEF cache
 
-# version number of non-k projects
-$timestamp = [DateTime]::UtcNow.ToString("yyMMddHHmmss");
-$Version="3.1.0-local-$timestamp"
+	if (Test-Path $env:localappdata\Microsoft\VisualStudio\14.0Exp)
+	{
+		rm -r $env:localappdata\Microsoft\VisualStudio\14.0Exp -Force
+	}
+
+	Write-Host Removing DNX packages
+
+	if (Test-Path $env:userprofile\.dnx\packages)
+	{
+		rm -r $env:userprofile\.dnx\packages -Force
+	}
+
+	Write-Host Removing .NUGET packages
+
+	if (Test-Path $env:userprofile\.nuget\packages)
+	{
+		rm -r $env:userprofile\.nuget\packages -Force
+	}
+
+	Write-Host Removing DNU cache
+
+	if (Test-Path $env:localappdata\dnu\cache)
+	{
+		rm -r $env:localappdata\dnu\cache -Force
+	}
+
+	Write-Host Removing NuGet web cache
+
+	if (Test-Path $env:localappdata\NuGet\v3-cache)
+	{
+		rm -r $env:localappdata\NuGet\v3-cache -Force
+	}
+
+	Write-Host Removing NuGet machine cache
+
+	if (Test-Path $env:localappdata\NuGet\Cache)
+	{
+		rm -r $env:localappdata\NuGet\Cache -Force
+	}
+}
+
+$ilmerge = Join-Path $PSScriptRoot "ilmerge.exe"
 
 # set environment used by k
 $env:Configuration=$Configuration
+$timestamp = [DateTime]::UtcNow.ToString("yyMMddHHmmss");
 $env:DNX_BUILD_VERSION="local-$timestamp"
 
 # Create the packages directory
@@ -128,6 +192,11 @@ $packagesDirectory = "$GitRoot\nupkgs"
 if (!(Test-Path $packagesDirectory))
 {
     mkdir $packagesDirectory
+}
+
+if($CleanCache)
+{
+	CleanCache
 }
 
 if ($FirstRepo -eq "NuGet3")
