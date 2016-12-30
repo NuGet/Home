@@ -1,27 +1,25 @@
-Please read the following information before posting the issue.
-
-## Before posting the issue...
+## Read before posting the issue...
 
 * If you're having trouble with the NuGet.org Website, please post in [NuGetGallery issues](http://github.com/nuget/nugetgallery/issues)
 * If you're having trouble with the NuGet client tools (the Visual Studio extension, NuGet.exe command line tool, etc.), you are in the right place.
 
 Remove the content above here and fill out details below.
 
-## Details about Problem
+## Product and OS Information
 
-NuGet product used (NuGet.exe | VS UI | Package Manager Console | dotnet.exe):
+**NuGet product used (NuGet.exe | VS UI | Package Manager Console | dotnet.exe):**
 
-NuGet version (x.x.x.xxx):
+**NuGet version (x.x.x.xxx):**
 
-dotnet.exe --version (if appropirate):
+**dotnet.exe --version (if appropirate):**
 
-VS version (if appropriate):
+**VS version (if appropriate):**
 
-OS version (i.e. win10 v1607 (14393.321)):
+**OS version (i.e. win10 v1607 (14393.321)):**
 
-Worked before? If so, with which NuGet version:
+**Worked before? If so, with which NuGet version:**
 
-## Detailed repro steps so we can see the same problem
+## Detailed Repro Steps
 
 1.
 
@@ -29,7 +27,7 @@ Worked before? If so, with which NuGet version:
 
 ...
 
-## Other suggested things
+## Other recommended information to add to the Issue
 
 ### Verbose Logs
 
