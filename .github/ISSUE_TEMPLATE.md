@@ -13,7 +13,7 @@ NuGet product used (NuGet.exe | VS UI | Package Manager Console | dotnet.exe):
 
 NuGet version (x.x.x.xxx):
 
-dotnet.exe --version (if appropirate):
+dotnet.exe --version (if appropriate):
 
 VS version (if appropriate):
 
