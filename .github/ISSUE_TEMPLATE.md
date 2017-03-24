@@ -33,7 +33,7 @@ Worked before? If so, with which NuGet version:
 
 ### Verbose Logs
 
-Please include verbose logs (NuGet.exe <COMMAND> -verbosity detailed | dotnet.exe <COMMAND> --verbose | etc...)
+Please include verbose logs (NuGet.exe <COMMAND> -verbosity detailed | dotnet.exe <COMMAND> --verbosity diag | etc...)
 
 ### Sample Project
 
