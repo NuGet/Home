@@ -1,6 +1,13 @@
 ![NuGet logo](https://raw.githubusercontent.com/NuGet/Home/dev/resources/nuget.png)
 
 -----
+[![GitHub issues](https://img.shields.io/github/issues/NuGet/Home.svg?style=for-the-badge)](https://github.com/NuGet/Home/issues)
+[![GitHub forks](https://img.shields.io/github/forks/NuGet/Home.svg?style=for-the-badge)](https://github.com/NuGet/Home/network)
+[![GitHub stars](https://img.shields.io/github/stars/NuGet/Home.svg?style=for-the-badge)](https://github.com/NuGet/Home/stargazers)
+![Github All Releases](https://img.shields.io/github/downloads/NuGet/Home/total.svg?style=for-the-badge)
+![GitHub (pre-)release](https://img.shields.io/github/release/qubyte/rubidium/all.svg?style=for-the-badge)
+
+-----
 
 # NuGet Home
 
