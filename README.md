@@ -60,7 +60,7 @@ A [full list of all the repos](https://github.com/NuGet) is available as well.
 - Clone [NuGet.Client](https://github.com/nuget/nuget.client) Repo by running the following command `git clone https://github.com/NuGet/NuGet.Client`
 - Start powershell
 - CD into the clone repo directory
-- Run `.\build.ps1 -SkipUnitTests`
+- Run `.\build.ps1 -SkipUnitTest`
 
 ###### In case you have build issues please clean the local repo using `git clean -xdf` and retry building
 
