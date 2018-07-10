@@ -7,7 +7,7 @@
         "requested": "11.0.61030",
         "resolved": "11.0.61030",
         "sha512": "ZFJct/BjqYhJuWVIB5k56t2qJa6VfOQbeuniUPBH0aMNiVLLkm7Ph7r9pgtnsKxldf/JNjAcgOshp8GzMjCI+g==",
-		"dependencies": {
+	"dependencies": {
           "VSLangProj80": "8.0.50727",
           "VSLangProj90": "9.0.30729"
         },
@@ -23,11 +23,11 @@
         "requested": "7.0.5000",
         "resolved": "7.0.5000",
         "sha512": "NzBo3oq3lYRsTtG9RNBsA45J7hDm7x9n+Cq7HK4KkVUdGZbXMSOish9+ZrnsSjV42Be6Bfn4Vp9JwO3P8b0U3g==",
-		"dependencies": {
+	"dependencies": {
           "VSLangProj": "7.0.3300"
         },
       },
-	  "NuGet.Build.Tasks.Pack": {
+      "NuGet.Build.Tasks.Pack": {
         "type": "direct",
         "requested": "4.4.0",
         "resolved": "4.4.0",
@@ -39,13 +39,13 @@
         "resolved": "3.0.41",
         "sha512": "LBeCjKYbWdrZHSNVOp/5VusxjmJg4xkU8Pnz9DgSHGXApPYW3RnsOTvfpDErtnACpRaB4W16lHN91id20D4i8w=="
       },
-	  "NuGet.Credentials.csproj": {
-		"type": "project",
+      "NuGet.Credentials.csproj": {
+	"type": "project",
         "dependencies": {
           "Microsoft.AspNet.WebApi.Core": "5.2.2",
           "Microsoft.Bcl": "1.1.8"
         },
-	  },
+      },
       "EnvDTE": {
         "type": "transitive",
         "resolved": "8.0.1",
