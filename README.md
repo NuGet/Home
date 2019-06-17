@@ -12,7 +12,7 @@ This project has adopted the [Microsoft Open Source Code of Conduct](https://ope
 
 ## Documentation and Further Learning
 
-### [NuGet Docs](http://docs.nuget.org)
+### [NuGet Docs](http://docs.microsoft.com/en-us/nuget)
 
 The NuGet Docs are the ideal place to start if you are new to NuGet. They are categorized in 3 broader topics:
 
@@ -28,15 +28,9 @@ The NuGet Blog is where we announce new features, write engineering blog posts, 
 
 * [NuGet client tools](https://github.com/nuget/nuget.client) - this repo contains the following clients:
   * NuGet command-line tool 4.0 and higher
-  * Visual Studio 2017 Extension
+  * Visual Studio Extension (2017 and later)
   * PowerShell CmdLets
-
-* [NuGet V2](https://github.com/NuGet/NuGet2) - this repo contains the following clients:
-  * NuGet command-line tool 2.9
-  * Visual Studio Extension (Previous versions e.g. Visual studio 2013)
-  * PowerShell  CmdLets
-  * NuGet.Core
-
+ 
 [NuGet.org](https://www.nuget.org/) is backed by several core services:
 
 * [NuGetGallery](https://github.com/NuGet/NuGetGallery) - the current NuGet Gallery
@@ -45,29 +39,9 @@ The NuGet Blog is where we announce new features, write engineering blog posts, 
 
 [NuGet.Server](https://github.com/NuGet/NuGet.Server) is a lightweight standalone NuGet server.
 
+[NuGet Documentation](https://github.com/NuGet/docs.microsoft.com-nuget) contains NuGet's documentation. 
+
 A [full list of all the repos](https://github.com/NuGet) is available as well.
-
-## How to build NuGet VisualStudio extension
-
-### Prerequisites:
-- [VisualStudio 2017 Update 5](https://www.visualstudio.com/)
-- [VisualStudio 2017 SDK](https://msdn.microsoft.com/en-us/library/bb166441.aspx)
-- [Windows 10 SDK](https://dev.windows.com/en-US/downloads/windows-10-sdk)
-- Git 
-- Powershell
-
-### Steps to build the clients tools repo:
-- Clone [NuGet.Client](https://github.com/nuget/nuget.client) Repo by running the following command `git clone https://github.com/NuGet/NuGet.Client`
-- Start powershell
-- CD into the clone repo directory
-- Run `.\build.ps1 -SkipUnitTest`
-
-###### In case you have build issues please clean the local repo using `git clean -xdf` and retry building
-
-
-### Build Artifacts
-- (RepoRootFolder)\Artifacts - this folder will contain the Vsix and NuGet command-line
-- (RepoRootFolder)\Nupkgs - this folder will contain all our projects packages
 
 ## NuGet Packages by the NuGet team
 
