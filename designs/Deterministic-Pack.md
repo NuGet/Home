@@ -1,6 +1,7 @@
-# Package Download support
+# Deterministic pack
 
-* Status: **Implementing**
+* Status: **Implemented** 
+* Update; **Reverted in 5.3 and .NET Core 3.0.100** See https://github.com/NuGet/Home/issues/8601 for more details
 * Author(s): [Nikolche Kolev](https://github.com/nkolev92)
   * I'm merely the person writing up the spec, the bulk of the analysis and implementation work goes to [tmat](https://github.com/tmat) and [ctaggart](https://github.com/ctaggart)
 
