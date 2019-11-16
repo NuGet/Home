@@ -52,7 +52,7 @@ Can be configured with 2 Add item's and item text body
 
 - Key="**Path**" Value="Absolute or relative path to certificate file". Relative path resolve have 2 stages: first relative to configuration file origin, second relative to current application directory.
 - Optional Key="**Password**" Value="Encrypted password". Password for certificate file. Encrypted in same manner as PackageSourceCredential password.
-- Items body can be filled with Base-64 encoded x.509 certificate. Start and end of text are trimmed from spaces and new line chars.
+- Items body can be filled with [PEM](https://en.wikipedia.org/wiki/Privacy-Enhanced_Mail) (Base-64 encoded x.509 certificate). Start and end of text are trimmed from spaces and new line chars.
 
 ## Configuration example
 
