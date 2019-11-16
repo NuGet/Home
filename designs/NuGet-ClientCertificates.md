@@ -25,7 +25,7 @@ All .NET Core customers.
 
 * Ability to specify client certificates from common [certificate stores](https://docs.microsoft.com/en-us/dotnet/framework/wcf/feature-details/working-with-certificates#certificate-stores)
 * Ability to specify client certificates from external files in standard [formats](https://en.wikipedia.org/wiki/X.509#Certificate_filename_extensions)
-* Ability to specify inline client certificates in Base64 encoded DER certificate ([PEM](https://en.wikipedia.org/wiki/Privacy-Enhanced_Mail) format)
+* Ability to specify inline client Base64 encoded DER certificate in [PEM](https://en.wikipedia.org/wiki/Privacy-Enhanced_Mail) format
 
 ## Solution
 
