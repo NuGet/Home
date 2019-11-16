@@ -99,7 +99,7 @@ For high level usage were introduced:
 `ClientCertificateProvider` class
 * `Provide(settings:ISettings) : IEnumerable<X509Certificate>` - extracts certificates from settings
 
-`ClientCertificates` static singletone certificate storage.
+`ClientCertificates` static singleton certificate storage.
 * `Store(certificates: IEnumerable<X509Certificate>)` - stores certificate instances
 * `SetupClientHandler(httpClientHandler:HttpClientHandler)` - adds stored certificates to HttpClientHandler instance. 
 
