@@ -25,7 +25,7 @@ All .NET Core customers.
 
 * Ability to specify client certificates from common [certificate stores](https://docs.microsoft.com/en-us/dotnet/framework/wcf/feature-details/working-with-certificates#certificate-stores)
 * Ability to specify client certificates from external files in standard [formats](https://en.wikipedia.org/wiki/X.509#Certificate_filename_extensions)
-* Ability to specify inline client certificates in Base64 encoded DER certificate format
+* Ability to specify inline client certificates in Base64 encoded DER certificate ([PEM](https://en.wikipedia.org/wiki/Privacy-Enhanced_Mail) format)
 
 ## Solution
 
@@ -47,12 +47,19 @@ Equals '**My**' by default
 Equals '**FindByThumbprint**' by default
 - Optional Key="**FindValue**" Value="The search criteria as an object"
 
-- **fromCert** - item for certificate import directly from file (DER encoded x.509, Base-64 encoded x.509, PKCS)
-Can be configured with 2 Add item's and item text body
+- **fromFile** - item for certificate import directly from file (DER encoded x.509, Base-64 encoded x.509, PKCS)
+Can be configured with 2 Add item's
 
 - Key="**Path**" Value="Absolute or relative path to certificate file". Relative path resolve have 2 stages: first relative to configuration file origin, second relative to current application directory.
 - Optional Key="**Password**" Value="Encrypted password". Password for certificate file. Encrypted in same manner as PackageSourceCredential password.
-- Items body can be filled with [PEM](https://en.wikipedia.org/wiki/Privacy-Enhanced_Mail) (Base-64 encoded x.509 certificate). Start and end of text are trimmed from spaces and new line chars.
+
+- **fromPEM** - item for certificate import directly from configuration body (Base-64 encoded x.509 in PEM format)
+Can be configured with 1 optional Add item
+
+- Items body must  be filled with [PEM](https://en.wikipedia.org/wiki/Privacy-Enhanced_Mail) (Base-64 encoded x.509 certificate). Start and end of text are trimmed from spaces and new line chars.
+
+- Optional Key="**Password**" Value="Encrypted password". Password for certificate file. Encrypted in same manner as PackageSourceCredential password.
+
 
 ## Configuration example
 
@@ -70,21 +77,19 @@ Can be configured with 2 Add item's and item text body
             <!-- Required. -->
             <add key="FindValue" value="4894671ae5aa84840cc1079e89e82d426bc24ec6" />
         </fromStorage>
-        <!-- Form 1 -->
-        <fromCert>
+        <fromFile>
             <!-- Absolute or relative path to certificate file. -->
             <add key="Path" value=".\certificate.pfx" />
             <!-- Encrypted password -->
             <add key="Password" value="..." />
-        </fromCert>
-        <!-- Form 2 -->
-        <fromCert>
+        </fromFile>
+        <fromPEM>
 -----BEGIN CERTIFICATE-----
 MIIEjjCCA3agAwIBAgIJIBkBGf8AAAAPMA0GCSqGSIb3DQEBCwUAMIGzMQswCQYD
 ...
 tJl1UvF7GWJd0yNyPVqCCnBY
 -----END CERTIFICATE-----
-        </fromCert>
+        </fromPEM>
     </clientCertificates>
 ...
 </configuration>
