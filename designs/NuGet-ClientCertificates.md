@@ -26,6 +26,7 @@ All .NET Core customers.
 * Ability to specify client certificates from common [certificate stores](https://docs.microsoft.com/en-us/dotnet/framework/wcf/feature-details/working-with-certificates#certificate-stores)
 * Ability to specify client certificates from external files in standard [formats](https://en.wikipedia.org/wiki/X.509#Certificate_filename_extensions)
 * Ability to specify inline client Base64 encoded DER certificate in [PEM](https://en.wikipedia.org/wiki/Privacy-Enhanced_Mail) format
+* Ability to configure settings with command line
 
 ## Solution
 
@@ -34,32 +35,27 @@ All .NET Core customers.
 
 ## NuGet configuration changes
 
-Added new configuration section **clientCertificates** which may have children of 2 types:
+Provide new configuration section `clientCertificates` which may have children of 3 types:
 
-**fromStorage** - item for certificate import from [certificate store](https://docs.microsoft.com/en-us/dotnet/framework/wcf/feature-details/working-with-certificates#certificate-stores). Internally uses [X509Certificate2Collection.Find](https://docs.microsoft.com/en-us/dotnet/api/system.security.cryptography.x509certificates.x509certificate2collection.find?view=netframework-4.8#System_Security_Cryptography_X509Certificates_X509Certificate2Collection_Find_System_Security_Cryptography_X509Certificates_X509FindType_System_Object_System_Boolean_) method.
-Can be configured with 4 Add item's
+1. `fromStorage` - certificate import from [certificate store](https://docs.microsoft.com/en-us/dotnet/framework/wcf/feature-details/working-with-certificates#certificate-stores). Internally uses [X509Certificate2Collection.Find](https://docs.microsoft.com/en-us/dotnet/api/system.security.cryptography.x509certificates.x509certificate2collection.find?view=netframework-4.8#System_Security_Cryptography_X509Certificates_X509Certificate2Collection_Find_System_Security_Cryptography_X509Certificates_X509FindType_System_Object_System_Boolean_) method.
+Can be configured with:
+    - Attribute `name`. Required. Unique setting identifier.
+    - Child item `<Add Key="StoreLocation" Value="[values]" />`. [Possible values](https://docs.microsoft.com/en-us/dotnet/api/system.security.cryptography.x509certificates.storelocation?view=netframework-4.8#fields). Optional. Equals `CurrentUser` by default.
+    - Child item `<Add Key="StoreName" Value="[values]" />`. [Possible values](https://docs.microsoft.com/en-us/dotnet/api/system.security.cryptography.x509certificates.storename?view=netframework-4.8#fields). Optional. Equals `My` by default.
+    - Child item `<Add Key="FindType" Value="[values]" />`. [Possible values](https://docs.microsoft.com/en-us/dotnet/api/system.security.cryptography.x509certificates.x509findtype?view=netframework-4.8#fields). Optional. Equals `FindByThumbprint` by default.
+    - Child item `<Add Key="FindValue" Value="value" />`. `value` - the search criteria as an object. Required.
 
-- Optional Key="**StoreLocation**" Value="[possible values](https://docs.microsoft.com/en-us/dotnet/api/system.security.cryptography.x509certificates.storelocation?view=netframework-4.8#fields)".  
-Equals '**CurrentUser**' by default
-- Optional Key="**StoreName**" Value="[possible values](https://docs.microsoft.com/en-us/dotnet/api/system.security.cryptography.x509certificates.storename?view=netframework-4.8#fields)". 
-Equals '**My**' by default
-- Optional Key="**FindType**" Value="[possible values](https://docs.microsoft.com/en-us/dotnet/api/system.security.cryptography.x509certificates.x509findtype?view=netframework-4.8#fields)". 
-Equals '**FindByThumbprint**' by default
-- Optional Key="**FindValue**" Value="The search criteria as an object"
+2. `fromFile` - certificate import from file (DER encoded x.509, Base-64 encoded x.509, PKCS)
+Can be configured with:
+    - Attribute `name`. Required. Unique setting identifier.
+    - Child item `<Add Key="Path" Value="value" />`. `value` - Absolute or relative path to certificate file. Required.
+    - Child item `<Add Key="Password" Value="value" />`. `value` - Plain or encrypted password string. Optional. Encrypted in same manner as PackageSourceCredential password.
 
-- **fromFile** - item for certificate import directly from file (DER encoded x.509, Base-64 encoded x.509, PKCS)
-Can be configured with 2 Add item's
-
-- Key="**Path**" Value="Absolute or relative path to certificate file". Relative path resolve have 2 stages: first relative to configuration file origin, second relative to current application directory.
-- Optional Key="**Password**" Value="Encrypted password". Password for certificate file. Encrypted in same manner as PackageSourceCredential password.
-
-- **fromPEM** - item for certificate import directly from configuration body (Base-64 encoded x.509 in PEM format)
-Can be configured with 1 optional Add item
-
-- Items body must  be filled with [PEM](https://en.wikipedia.org/wiki/Privacy-Enhanced_Mail) (Base-64 encoded x.509 certificate). Start and end of text are trimmed from spaces and new line chars.
-
-- Optional Key="**Password**" Value="Encrypted password". Password for certificate file. Encrypted in same manner as PackageSourceCredential password.
-
+3. `fromPEM` - certificate inline import from configuration body (Base-64 encoded x.509 in PEM format)
+Can be configured with:
+    - Attribute `name`. Required. Unique setting identifier.
+    - Item text body must be filled with [PEM](https://en.wikipedia.org/wiki/Privacy-Enhanced_Mail) (Base-64 encoded x.509 certificate).
+    - Child item `<Add Key="Password" Value="value" />`. `value` - Plain or encrypted password string. Optional. Encrypted in same manner as PackageSourceCredential password.
 
 ## Configuration example
 
@@ -67,7 +63,7 @@ Can be configured with 1 optional Add item
 <configuration>
 ...
     <clientCertificates>	
-        <fromStorage>
+        <fromStorage name="unique name 1">
             <!-- Optional. CurrentUser by default -->
             <add key="StoreLocation" value="CurrentUser" />
             <!-- Optional. My by default -->
@@ -77,13 +73,13 @@ Can be configured with 1 optional Add item
             <!-- Required. -->
             <add key="FindValue" value="4894671ae5aa84840cc1079e89e82d426bc24ec6" />
         </fromStorage>
-        <fromFile>
+        <fromFile name="unique name 2">
             <!-- Absolute or relative path to certificate file. -->
             <add key="Path" value=".\certificate.pfx" />
             <!-- Encrypted password -->
             <add key="Password" value="..." />
         </fromFile>
-        <fromPEM>
+        <fromPEM name="unique name 3">
 -----BEGIN CERTIFICATE-----
 MIIEjjCCA3agAwIBAgIJIBkBGf8AAAAPMA0GCSqGSIb3DQEBCwUAMIGzMQswCQYD
 ...
@@ -95,24 +91,130 @@ tJl1UvF7GWJd0yNyPVqCCnBY
 </configuration>
 ```
 
-## Configuration components implementation
+## client-certificates command
 
-Added several new SettingItem's to parse configuration above. Certificates search logic encapsulated inside.
+Gets, sets or lists client certificates to the NuGet configuration.
 
-For high level usage were introduced:
+Usage
+```
+nuget client-certificates <list|add|remove> [options]
+```
 
-`ClientCertificateProvider` class
-* `Provide(settings:ISettings) : IEnumerable<X509Certificate>` - extracts certificates from settings
+if none of `list|add|remove` is specified, the command will default to `list`.
 
-`ClientCertificates` static singleton certificate storage.
-* `Store(certificates: IEnumerable<X509Certificate>)` - stores certificate instances
-* `SetupClientHandler(httpClientHandler:HttpClientHandler)` - adds stored certificates to HttpClientHandler instance. 
+### nuget client-certificates list [options]
 
-## NuGet Cli implementation as example
+Lists all the client certificates in the configuration. This option will include all configured client certificates that match to specified options.
 
-1) Internally certificates extracted from configuration items on base [Command.Execute](https://github.com/NuGet/NuGet.Client/blob/d4f53c3e523493fcbe35c537cb004e9a3e228abd/src/NuGet.Clients/NuGet.CommandLine/Commands/Command.cs) with `ClientCertificateProvider.Provide` method
-2) Extracted certificates stored as singleton inside static `ClientCertificates` class with `ClientCertificates.Store` method.
-2) On any [HttpHandlerResourceV3 creation](https://github.com/NuGet/NuGet.Client/blob/d4f53c3e523493fcbe35c537cb004e9a3e228abd/src/NuGet.Core/NuGet.Protocol/HttpSource/HttpHandlerResourceV3Provider.cs) internal `HttpClientHandler` filled with configured certificates with `ClientCertificates.SetupClientHandler` method.
+- `-Check` one of `true|false` - Indicates that certificate existence must be checked. If the certificate is found, its fingerprint will be printed.
+
+- `-SourceType` one of `file|pem|storage` - Filter available client certificates by it's source type.
+
+- `-Name` `string` - Filter client certificates **from all sources** by string presence in it's name.
+
+- `-Path` `string` - Filter client certificates **from file source** by string presence in it's Path.
+
+- `-PEM` `string` - Filter client certificates **from PEM source** by string presence in it's PEM.
+
+- `-StoreLocation` [possible values](https://docs.microsoft.com/en-us/dotnet/api/system.security.cryptography.x509certificates.storelocation?view=netframework-4.8) - Filter client certificates **from storage source** by it's StoreLocation.
+
+- `-StoreName` [possible values](https://docs.microsoft.com/en-us/dotnet/api/system.security.cryptography.x509certificates.storename?view=netframework-4.8) - Filter client certificates **from storage source** by it's StoreName.
+
+- `-FindType` [possible values](https://docs.microsoft.com/en-us/dotnet/api/system.security.cryptography.x509certificates.x509findtype?view=netframework-4.8) - Filter client certificates **from storage source** by it's FindType.
+
+- `-FindValue` `string` - Filter client certificates from storage source by string presence in it's FindValue.
+
+Below is an example output from this command:
+
+```
+Registered client certificates:
+
+
+ 1.   file3 [fromFile]
+      Path: d:\Temp\nuget\foo.pfx
+      Password: ****
+      Certificate: 4894671AE5AA84840C31079E89E82D426BC24EC6
+
+ 2.   Foo organization certificate in storage [fromStorage]
+      Store location: CurrentUser
+      Store name: My
+      Find type: FindByThumbprint
+      Find value: ba4d3cc1f011388626a23af5627bb4721d44db6e
+      Certificate: BA4D3CC1F011388626A23AF5627BB4721D44DB6E
+```
+
+### nuget client-certificates add [options]
+
+- `-Check` one of `true|false` - Indicates that certificate existence must be checked before add action. If the certificate is not found it will not be added.
+
+- `-Name` `string` - Required option for client certificate identification. If certificate with same name exist it will be updated.
+
+- `-Path` `string` - Path to certificate file added to a file client certificate source.
+
+- `-PEM` `string` - Base64 encoded DER certificate in PEM format added to a PEM client certificate source.
+
+- `-Password` `string` - Password for the certificate, if needed. This option can be used to specify the password for the certificate. Available only for from PEM and from file source types.
+
+- `-StorePasswordInClearText` `string` - Enables storing password for the certificate by disabling password encryption. Default value: false
+
+- `-StoreLocation` [possible values](https://docs.microsoft.com/en-us/dotnet/api/system.security.cryptography.x509certificates.storelocation?view=netframework-4.8) - StoreLocation added to a storage client certificate source. Default value: CurrentUser
+
+- `-StoreName` [possible values](https://docs.microsoft.com/en-us/dotnet/api/system.security.cryptography.x509certificates.storename?view=netframework-4.8) - StoreName added to a storage client certificate source. Default value: My
+
+- `-FindType` [possible values](https://docs.microsoft.com/en-us/dotnet/api/system.security.cryptography.x509certificates.x509findtype?view=netframework-4.8) - FindType added to a storage client certificate source. Default value: FindByThumbprint
+
+- `-FindValue` `string` - FindValue added to a storage client certificate source.
+
+
+
+Providing `-Path`, `-PEM` and one of `-StoreLocation`, `-StoreName`, `-FindType`, `-FindValue` at the same time is not supported.
+
+### nuget client-certificates remove -Name <name>
+
+Removes any client certificate that match the given name.
+
+### Examples
+
+```
+nuget client-certificates Add -Name certificateName -Path .\MyCertificate.pfx
+
+nuget client-certificates Add -Name certificateName -Path c:\MyCertificate.pfx -Password 42 -Check true
+
+nuget client-certificates Add -Name certificateName -PEM "-----BEGIN CERTIFICATE-----...-----END CERTIFICATE-----"
+
+nuget client-certificates Add -Name certificateName -PEM "-----BEGIN CERTIFICATE-----...-----END CERTIFICATE-----" -Password 42 -StorePasswordInClearText true
+
+nuget client-certificates Add -Name certificateName -FindValue ca4e7b265780fc87f3cb90b6b89c54bf4341e755
+
+nuget client-certificates Add -Name certificateName -StoreLocation LocalMachine -StoreName My -FindType FindByThumbprint -FindValue ca4e7b265780fc87f3cb90b6b89c54bf4341e755
+
+nuget client-certificates Remove -Name certificateName
+
+nuget client-certificates
+
+nuget client-certificates List -Check true
+
+nuget client-certificates List -Name containsInName
+
+nuget client-certificates List -SourceType storage
+
+nuget client-certificates -PEM "containsSequenceInBase64EncodedCertificate" -Path "containsInPath" -StoreName My
+```
+
+## Internal components
+
+Provide `IClientCertificateProvider` generic provider for client certificate management from `ISettings`. Also provide `ClientCertificates` processor for `HttpClientHandler` setup.
+
+### IClientCertificateProvider interface
+
+* `AddOrUpdate(item : CertificateSearchItem)` - Adds a new client certificate or updates an existing one in the settings.
+* `Remove(item : IReadOnlyList<CertificateSearchItem>)` - Removes client certificates from the settings.
+* `GetClientCertificates() : IReadOnlyList<CertificateSearchItem>` - Get a list of all the trusted signer entries under the computer trusted signers section.
+
+### ClientCertificates processor.
+
+* `Add(certificate: X509Certificate)` - Add client certificates which will be set to http clients
+* `SetupClientHandler(httpClientHandler:HttpClientHandler)` - Setup http client handler with stored client certificates.
 
 ## Implementation pull request
 
