@@ -27,6 +27,21 @@ All VS IDE customers
 
 ### Long-Term solution
 
-* WIP
+* Create a new async version of [`IVsPackageSourceProvider`](https://docs.microsoft.com/en-us/nuget/visual-studio-extensibility/nuget-api-in-visual-studio#ivspackagesourceprovider-interface) interface
+```
+public interface IAsyncVsPackageSourceProvider
+{
+    /// <summary>
+    /// Provides the list of package sources.
+    /// </summary>
+    /// <param name="includeUnOfficial">Unofficial sources will be included in the results</param>
+    /// <param name="includeDisabled">Disabled sources will be included in the results</param>
+    /// <returns>Key: source name Value: source URI</returns>
+    Task<IEnumerable<KeyValuePair<string, string>>> GetSourcesAsync(bool includeUnOfficial, bool includeDisabled);
 
-## Implementation
+    /// <summary>
+    /// Raised when sources are added, removed, disabled, or modified.
+    /// </summary>
+    event EventHandler SourcesChanged;
+}
+```
