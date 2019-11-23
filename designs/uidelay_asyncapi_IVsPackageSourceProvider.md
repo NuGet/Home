@@ -27,8 +27,8 @@ All VS IDE customers
 
 ### Long-Term solution
 
-* Create a new async version of [`IVsPackageSourceProvider`](https://docs.microsoft.com/en-us/nuget/visual-studio-extensibility/nuget-api-in-visual-studio#ivspackagesourceprovider-interface) interface
-```
+* Create a new async version of [`IVsPackageSourceProvider`](https://docs.microsoft.com/en-us/nuget/visual-studio-extensibility/nuget-api-in-visual-studio#ivspackagesourceprovider-interface) interface. Modify [`VsPackageSourceProvider`](https://github.com/NuGet/NuGet.Client/blob/0c59e87628fbcbd158162ebb61638ce20e0dc75c/src/NuGet.Clients/NuGet.VisualStudio.Implementation/Extensibility/VsPackageSourceProvider.cs) to implement new async interface. This approach will ensure that heavyweight code in the constructor is moved to another async method resulting in increased VS IDE UI responsiveness.
+```cs
 public interface IAsyncVsPackageSourceProvider
 {
     /// <summary>
