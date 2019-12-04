@@ -23,11 +23,12 @@ All VS IDE customers
 
 ### Short-Term solution
 
-* As per [this](https://github.com/NuGet/NuGet.Client/blob/ba2a72ac9afd9e7260798a6ad14088297570b350/src/NuGet.Clients/NuGet.VisualStudio/Extensibility/IVsPackageSourceProvider.cs#L23) remark, it is not required to invoke `IVsPackageSourceProvider` API on UI thread. Modify Roslyn implementation to call NuGet API on a background thread. NuGet can switch to main thread within the context of JTF as and when required.
+* Modify Roslyn implementation to call NuGet API on a background thread. NuGet can switch to main thread within the context of JTF as and when required.
 
 ### Long-Term solution
 
-* Create a new async version of [`IVsPackageSourceProvider`](https://docs.microsoft.com/en-us/nuget/visual-studio-extensibility/nuget-api-in-visual-studio#ivspackagesourceprovider-interface) interface. Modify [`VsPackageSourceProvider`](https://github.com/NuGet/NuGet.Client/blob/0c59e87628fbcbd158162ebb61638ce20e0dc75c/src/NuGet.Clients/NuGet.VisualStudio.Implementation/Extensibility/VsPackageSourceProvider.cs) to implement new async interface. This approach will ensure that heavyweight code in the constructor is moved to another async method resulting in increased VS IDE UI responsiveness.
+* Create a new async version of [`IVsPackageSourceProvider`](https://docs.microsoft.com/en-us/nuget/visual-studio-extensibility/nuget-api-in-visual-studio#ivspackagesourceprovider-interface) interface. Modify [`VsPackageSourceProvider`](https://github.com/NuGet/NuGet.Client/blob/0c59e87628fbcbd158162ebb61638ce20e0dc75c/src/NuGet.Clients/NuGet.VisualStudio.Implementation/Extensibility/VsPackageSourceProvider.cs) to implement new async interface. Goal is to move heavyweight code in the MEF activation path to another async methods resulting in increased VS IDE UI responsiveness because UI thread is not blocked.
+
 ```cs
 public interface IAsyncVsPackageSourceProvider
 {
