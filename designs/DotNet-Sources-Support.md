@@ -47,67 +47,68 @@ Possible future approaches:
 Do we have:
 * commands only in nuget?
   Commands:
-  add
-  clean
-  delete
-  disable
-  enable
-  get
-  list
-  pack
-  push
-  remove
-  restore
-  search
-  set
-  sign
-  sync
-  update
-  verify
+-  add
+-  clean
+-  delete
+-  disable
+-  enable
+-  get
+-  list
+-  pack
+-  push
+-  remove
+-  restore
+-  search
+-  set
+-  sign
+-  sync
+-  update
+-  verify
 
 * commands only in toplevel?
 
 Execute a .NET Core SDK command.
 
 sdk-options:
-  -d|--diagnostics  Enable diagnostic output.
-  -h|--help         Show command line help.
-  --info            Display .NET Core information.
-  --list-runtimes   Display the installed runtimes.
-  --list-sdks       Display the installed SDKs.
-  --version         Display .NET Core SDK version in use.
+-  -d|--diagnostics  Enable diagnostic output.
+-  -h|--help         Show command line help.
+-  --info            Display .NET Core information.
+-  --list-runtimes   Display the installed runtimes.
+-  --list-sdks       Display the installed SDKs.
+-  --version         Display .NET Core SDK version in use.
 
 SDK commands:
-  add               Add a package or reference to a .NET project. **trusted-signers, sources
-  build             Build a .NET project.
-  build-server      Interact with servers started by a build.
-  clean             Clean build outputs of a .NET project.  **nuget locals
-  delete            **Delete packages from server.
-  disable           **disable a source
-  enable            **enable a source
-  get               **get nugetconfig value
-  help              Show command line help.
-  list              List project references of a .NET project. **packages, sources, trusted-signers
-  msbuild           Run Microsoft Build Engine (MSBuild) commands.
-  new               Create a new .NET project or file.
-  nuget             Provides additional NuGet commands.
-  pack              Create a NuGet package.
-  publish           Publish a .NET project for deployment.
-  push              **push a nuget packages to server
-  remove            Remove a package or reference from a .NET project.
-  restore           Restore dependencies specified in a .NET project. 
-  run               Build and run a .NET project output.
-  search            **for a package on servers
-  set               **set nugetconfig value
-  sign              **package
-  sln               Modify Visual Studio solution files.
-  store             Store the specified assemblies in the runtime package store.
-  sync              ** trusted signers
-  test              Run unit tests using the test runner specified in a .NET project.
-  tool              Install or manage tools that extend the .NET experience.
-  update            **package
-  verify            **signature or full validation of package
-  vstest            Run Microsoft Test Engine (VSTest) commands.
+-  add               Add a package or reference to a .NET project. **trusted-signers, sources
+-  build             Build a .NET project.
+-  build-server      Interact with servers started by a build.
+-  clean             Clean build outputs of a .NET project.  **nuget locals
+-  delete            **Delete packages from server.
+-  disable           **disable a source
+-  enable            **enable a source
+-  get               **get nugetconfig value
+-  help              Show command line help.
+-  list              List project references of a .NET project. **packages, sources, trusted-signers
+-  msbuild           Run Microsoft Build Engine (MSBuild) commands.
+-  new               Create a new .NET project or file.
+-  nuget             Provides additional NuGet commands.
+-  pack              Create a NuGet package.
+-  publish           Publish a .NET project for deployment.
+-  push              **push a nuget packages to server
+-  remove            Remove a package or reference from a .NET project.
+-  restore           Restore dependencies specified in a .NET project. 
+-  run               Build and run a .NET project output.
+-  search            **for a package on servers
+-  set               **set nugetconfig value
+-  sign              **package
+-  sln               Modify Visual Studio solution files.
+-  store             Store the specified assemblies in the runtime package store.
+-  sync              ** trusted signers
+-  test              Run unit tests using the test runner specified in a .NET project.
+-  tool              Install or manage tools that extend the .NET experience.
+-  update            **package
+-  verify            **signature or full validation of package
+-  vstest            Run Microsoft Test Engine (VSTest) commands.
+
 
 Additional commands from bundled tools:
   dev-certs         Create and manage development certificates.
