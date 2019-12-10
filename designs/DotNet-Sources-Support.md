@@ -109,6 +109,7 @@ SDK commands:
 -  verify            **signature or full validation of package
 -  vstest            Run Microsoft Test Engine (VSTest) commands.
 
+
 Additional commands from bundled tools:
   dev-certs         Create and manage development certificates.
   fsi               Start F# Interactive / execute F# scripts.
