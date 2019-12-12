@@ -25,7 +25,6 @@ All .NET Core customers.
 
 * Ability to specify client certificates from common [certificate stores](https://docs.microsoft.com/en-us/dotnet/framework/wcf/feature-details/working-with-certificates#certificate-stores)
 * Ability to specify client certificates from external files in standard [formats](https://en.wikipedia.org/wiki/X.509#Certificate_filename_extensions)
-* Ability to specify inline client Base64 encoded DER certificate in [PEM](https://en.wikipedia.org/wiki/Privacy-Enhanced_Mail) format
 * Ability to configure settings with command line
 
 ## Solution
@@ -35,7 +34,7 @@ All .NET Core customers.
 
 ## NuGet configuration changes
 
-Provide new configuration section `clientCertificates` which may have children of 3 types:
+Provide new configuration section `clientCertificates` which may have children of 2 types:
 
 1. `fromStorage` - certificate import from [certificate store](https://docs.microsoft.com/en-us/dotnet/framework/wcf/feature-details/working-with-certificates#certificate-stores). Internally uses [X509Certificate2Collection.Find](https://docs.microsoft.com/en-us/dotnet/api/system.security.cryptography.x509certificates.x509certificate2collection.find?view=netframework-4.8#System_Security_Cryptography_X509Certificates_X509Certificate2Collection_Find_System_Security_Cryptography_X509Certificates_X509FindType_System_Object_System_Boolean_) method.
 Can be configured with:
@@ -51,12 +50,6 @@ Can be configured with:
     - Child item `<Add Key="Path" Value="value" />`. `value` - Absolute or relative path to certificate file. Required.
     - Child item `<Add Key="Password" Value="value" />`. `value` - Plain or encrypted password string. Optional. Encrypted in same manner as PackageSourceCredential password.
 
-3. `fromPEM` - certificate inline import from configuration body (Base-64 encoded x.509 in PEM format)
-Can be configured with:
-    - Attribute `name`. Required. Unique setting identifier.
-    - Item text body must be filled with [PEM](https://en.wikipedia.org/wiki/Privacy-Enhanced_Mail) (Base-64 encoded x.509 certificate).
-    - Child item `<Add Key="Password" Value="value" />`. `value` - Plain or encrypted password string. Optional. Encrypted in same manner as PackageSourceCredential password.
-
 ## Configuration example
 
 ```xml
@@ -64,6 +57,8 @@ Can be configured with:
 ...
     <clientCertificates>	
         <fromStorage name="unique name 1">
+            <!-- Require at least one reference to source -->
+            <add key="TargetSource" value="<source name from packageSources section>" />
             <!-- Optional. CurrentUser by default -->
             <add key="StoreLocation" value="CurrentUser" />
             <!-- Optional. My by default -->
@@ -74,18 +69,13 @@ Can be configured with:
             <add key="FindValue" value="4894671ae5aa84840cc1079e89e82d426bc24ec6" />
         </fromStorage>
         <fromFile name="unique name 2">
+            <!-- Require at least one reference to source -->
+            <add key="TargetSource" value="<source name from packageSources section>" />
             <!-- Absolute or relative path to certificate file. -->
             <add key="Path" value=".\certificate.pfx" />
             <!-- Encrypted password -->
             <add key="Password" value="..." />
         </fromFile>
-        <fromPEM name="unique name 3">
------BEGIN CERTIFICATE-----
-MIIEjjCCA3agAwIBAgIJIBkBGf8AAAAPMA0GCSqGSIb3DQEBCwUAMIGzMQswCQYD
-...
-tJl1UvF7GWJd0yNyPVqCCnBY
------END CERTIFICATE-----
-        </fromPEM>
     </clientCertificates>
 ...
 </configuration>
@@ -108,13 +98,11 @@ Lists all the client certificates in the configuration. This option will include
 
 - `-Check` one of `true|false` - Indicates that certificate existence must be checked. If the certificate is found, its fingerprint will be printed.
 
-- `-SourceType` one of `file|pem|storage` - Filter available client certificates by it's source type.
+- `-SourceType` one of `file|storage` - Filter available client certificates by it's source type.
 
 - `-Name` `string` - Filter client certificates **from all sources** by string presence in it's name.
 
 - `-Path` `string` - Filter client certificates **from file source** by string presence in it's Path.
-
-- `-PEM` `string` - Filter client certificates **from PEM source** by string presence in it's PEM.
 
 - `-StoreLocation` [possible values](https://docs.microsoft.com/en-us/dotnet/api/system.security.cryptography.x509certificates.storelocation?view=netframework-4.8) - Filter client certificates **from storage source** by it's StoreLocation.
 
@@ -151,9 +139,9 @@ Registered client certificates:
 
 - `-Path` `string` - Path to certificate file added to a file client certificate source.
 
-- `-PEM` `string` - Base64 encoded DER certificate in PEM format added to a PEM client certificate source.
+- `-TargetSource` `string` - Required semicolon separated option to specify NuGet sources on which client certificate will be applied.
 
-- `-Password` `string` - Password for the certificate, if needed. This option can be used to specify the password for the certificate. Available only for from PEM and from file source types.
+- `-Password` `string` - Password for the certificate, if needed. This option can be used to specify the password for the certificate. Available only for from file source types.
 
 - `-StorePasswordInClearText` `string` - Enables storing password for the certificate by disabling password encryption. Default value: false
 
@@ -167,7 +155,7 @@ Registered client certificates:
 
 
 
-Providing `-Path`, `-PEM` and one of `-StoreLocation`, `-StoreName`, `-FindType`, `-FindValue` at the same time is not supported.
+Providing `-Path` and one of `-StoreLocation`, `-StoreName`, `-FindType`, `-FindValue` at the same time is not supported.
 
 ### nuget client-certificates remove -Name <name>
 
@@ -176,17 +164,13 @@ Removes any client certificate that match the given name.
 ### Examples
 
 ```
-nuget client-certificates Add -Name certificateName -Path .\MyCertificate.pfx
+nuget client-certificates Add -Name certificateName -Path .\MyCertificate.pfx -TargetSource "Foo"
 
-nuget client-certificates Add -Name certificateName -Path c:\MyCertificate.pfx -Password 42 -Check true
+nuget client-certificates Add -Name certificateName -Path c:\MyCertificate.pfx -TargetSource "Foo;Bar" -Password 42 -Check true
 
-nuget client-certificates Add -Name certificateName -PEM "-----BEGIN CERTIFICATE-----...-----END CERTIFICATE-----"
+nuget client-certificates Add -Name certificateName -FindValue ca4e7b265780fc87f3cb90b6b89c54bf4341e755 -TargetSource "Foo"
 
-nuget client-certificates Add -Name certificateName -PEM "-----BEGIN CERTIFICATE-----...-----END CERTIFICATE-----" -Password 42 -StorePasswordInClearText true
-
-nuget client-certificates Add -Name certificateName -FindValue ca4e7b265780fc87f3cb90b6b89c54bf4341e755
-
-nuget client-certificates Add -Name certificateName -StoreLocation LocalMachine -StoreName My -FindType FindByThumbprint -FindValue ca4e7b265780fc87f3cb90b6b89c54bf4341e755
+nuget client-certificates Add -Name certificateName -StoreLocation LocalMachine -StoreName My -FindType FindByThumbprint -FindValue ca4e7b265780fc87f3cb90b6b89c54bf4341e755 -TargetSource "Foo"
 
 nuget client-certificates Remove -Name certificateName
 
@@ -197,8 +181,6 @@ nuget client-certificates List -Check true
 nuget client-certificates List -Name containsInName
 
 nuget client-certificates List -SourceType storage
-
-nuget client-certificates -PEM "containsSequenceInBase64EncodedCertificate" -Path "containsInPath" -StoreName My
 ```
 
 ## Internal components
@@ -209,12 +191,7 @@ Provide `IClientCertificateProvider` generic provider for client certificate man
 
 * `AddOrUpdate(item : CertificateSearchItem)` - Adds a new client certificate or updates an existing one in the settings.
 * `Remove(item : IReadOnlyList<CertificateSearchItem>)` - Removes client certificates from the settings.
-* `GetClientCertificates() : IReadOnlyList<CertificateSearchItem>` - Get a list of all the trusted signer entries under the computer trusted signers section.
-
-### ClientCertificates processor.
-
-* `Add(certificate: X509Certificate)` - Add client certificates which will be set to http clients
-* `SetupClientHandler(httpClientHandler:HttpClientHandler)` - Setup http client handler with stored client certificates.
+* `GetClientCertificates(sourceName : string) : IReadOnlyList<CertificateSearchItem>` - Get a list of all the trusted signer entries under the computer trusted signers section for specified source name.
 
 ## Implementation pull request
 
