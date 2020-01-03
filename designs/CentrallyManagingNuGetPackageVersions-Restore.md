@@ -37,7 +37,7 @@ The following scenarios will be enabled when the proposed design changes will be
 The requirements are defined in the [feature spec](https://github.com/NuGet/Home/wiki/Centrally-managing-NuGet-package-versions). A summary of the requirements targeted only at this design are below.
 
 
-* It should not be possible to specify PackageReference with Version metadata at the project level. Otherwise an error is raised.
+* For a project that is opted in to CPVM, it should not be possible to specify PackageReference with Version metadata at the project level. Otherwise an error is raised.
 * There will be an opt-in/opt-out switch for projects to opt-in CPVM. [Default: Opt-in]
 * The Private Assets and the other PackageReference metadata except Version need to be defined at the PackageReference level.
 * The Package versions defined in the Central Package Versions file are respected for direct and transitive dependencies.
@@ -271,9 +271,10 @@ Telemetry events will need to provide enough information to answer to the questi
 
 1. How many projects use CPVM?
 2. How many projects had transitive dependencies that were pinned?
-3. How many projects got the downgraded warning because of transitive pinning?
+3. How many projects got the downgraded error because of transitive pinning?
 
 **[Note]** Restore performance events are already in place they can be correlated with the above data to answer perf questions.  
+**[Note]** Solution - project mapping is already possible through VS telemetry. It should be enough to get statistics regarding solutions with projects that use CPVM or opted-out CPVM.
 
 ### Future work
 
