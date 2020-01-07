@@ -23,6 +23,17 @@ Package Authors & Package Consumers who are using .NET core. Many of these devs 
 
 ## DotNet CLI command strategy
 
+How do NuGet Commands fit into Dotnet.exe?
+
+
+1. Make part of dotnet verb-noun pattern: `dotnet <add|remove|enable|disable|update|list> source`
+repository|feed|source
+
+1. Port directly, but under "nuget" keyword: `dotnet nuget sources <add|remove|enable|disable|update|list>`
+
+We are choosing the first. (verb-noun, rather than noun-verb)
+
+
 dotnet project commands
 	add       (add package)
 	build
@@ -63,6 +74,132 @@ dotnet sln
 dotnet build-server
 dotnet vstest
 dotnet store
+
+
+### Usage: dotnet nuget list source[s] [options]
+Q: should list accept "source and sources" as synonyms?
+
+Options:
+
+ -f|--format Applies to the list action. Accepts two values: Detailed (the default) and Short.
+
+ -c|--configfile  The NuGet configuration file. If specified, only the settings from this file will be used. If not specified, the hierarchy of configuration files from the current directory will be used. To learn more about NuGet configuration go to https://docs.microsoft.com/en-us/nuget/consume-packages/configuring-nuget-behavior.
+ 
+ -h|--help        Show help information
+
+Outputs a list of configured sources, including if they are enabled or disabled.
+
+### Usage: dotnet nuget add source [options]
+
+Options:
+  -n|--name <name>                Name of the source.
+  -s|--source <source>            Path to the package(s) source.
+
+  -u|--username <username>        UserName to be used when connecting to an authenticated source.
+
+  -p|--password <password>        UserName to be used when connecting to an authenticated source.
+
+  --store-password-in-clear-text  Enables storing portable package source credentials by disabling password encryption.
+
+  --valid-authentication-types    Comma-separated list of valid authentication types for this source. By default, all authentication types are valid. Example: basic,negotiate
+
+  -c|--configfile                 The NuGet configuration file. If specified, only the settings from this file will be used. If not specified, the hierarchy of configuration files from the current directory will be used. To learn more about NuGet configuration go to https://docs.microsoft.com/en-us/nuget/consume-packages/configuring-nuget-behavior.
+
+  -h|--help                       Show help information
+
+Improvement: target first config file found, not just one with PackageSources - [#1589](https://github.com/NuGet/Home/issues/1589)
+Improvement: if config file is not found, create one.
+Improvement: tell which config it was added to.
+Spec: where do credentials get written down? is that good? should there be another flag to control? (looks like -configfile will write the source and the creds in the file pointed to????)
+
+
+### Usage: dotnet nuget update source [options]
+
+Options:
+  -n|--name <name>                Name of the source.
+
+  -s|--source <source>            Path to the package(s) source.
+
+  -u|--username <username>        UserName to be used when connecting to an authenticated source.
+
+  -p|--password <password>        UserName to be used when connecting to an authenticated source.
+
+  --store-password-in-clear-text  Enables storing portable package source credentials by disabling password encryption.
+
+  --valid-authentication-types    Comma-separated list of valid authentication types for this source. By default, all authentication types are valid. Example: basic,negotiate
+
+  -c|--configfile                 The NuGet configuration file. If specified, only the settings from this file will be used. If not specified, the hierarchy of configuration files from the current directory will be used. To learn more about NuGet configuration go to https://docs.microsoft.com/en-us/nuget/consume-packages/configuring-nuget-behavior.
+
+  -h|--help                       Show help information
+
+If -name param matches existing source, updates all other properties of that source.
+
+
+### Usage: dotnet nuget remove source [options]
+
+Options:
+  -n|--name <name>  Name of the source.
+
+  -c|--configfile   The NuGet configuration file. If specified, only the settings from this file will be used. If not specified, the hierarchy of configuration files from the current directory will be used. To learn more about NuGet configuration go to https://docs.microsoft.com/en-us/nuget/consume-packages/configuring-nuget-behavior.
+
+  -h|--help         Show help information
+
+If -name param matches existing source, removes the source.
+
+TODO: test case sensitivity
+
+
+### Usage: dotnet nuget enable source [options]
+
+Options:
+  -n|--name <name>  Name of the source.
+
+  -c|--configfile   The NuGet configuration file. If specified, only the settings from this file will be used. If not specified, the hierarchy of configuration files from the current directory will be used. To learn more about NuGet configuration go to https://docs.microsoft.com/en-us/nuget/consume-packages/configuring-nuget-behavior.
+
+  -h|--help         Show help information
+
+If -name param matches existing source, enables the source.
+
+
+### Usage: dotnet nuget disable source [options]
+
+Options:
+  -n|--name <name>  Name of the source.
+
+  -c|--configfile   The NuGet configuration file. If specified, only the settings from this file will be used. If not specified, the hierarchy of configuration files from the current directory will be used. To learn more about NuGet configuration go to https://docs.microsoft.com/en-us/nuget/consume-packages/configuring-nuget-behavior.
+
+  -h|--help         Show help information
+
+If -name param matches existing source, disables the source.
+
+Likely should fix this soon: [#8668](https://github.com/NuGet/Home/issues/8668)
+
+### Implementation
+
+Old implementation
+
+- NuGet.CommandsLine\SourcesCommand.cs
+
+Refactored into:
+
+- NuGet.CommandsLine\SourcesCommand.cs
+- NuGet.CommandsLineXplat\SourceCommand.cs
+- NuGet.Commands\SourceArgs.cs
+- NuGet.Commands\SourceRunner.cs
+
+### Localization Impact
+
+NuGet.exe is using an out of date localization strategy.
+(new/changed strings aren't being localized by our current processes)
+
+Plan:
+- First step:
+Move string from NuGet.CommandLine -> NuGet.Commands
+ILMerge NuGet.Commands.resources.dll (for each localized lang), into NuGet.exe
+- Second step
+Get moved string localized, then consider right testing.
+- Third step
+Move rest of strings from NuGet.exe into satellite assemblies and ILMerge them
 
 ### Related issues:
 
@@ -112,167 +249,11 @@ Andy: if you `dotnet nuget add source` with credentials -- he doesn't like that 
 - RestoreSources set via MSBuild properties cannot use credentials [#6045](https://github.com/NuGet/Home/issues/6045)
 - Warn or error when no package sources exist [#2472](https://github.com/NuGet/Home/issues/2472)
 
-### Usage: dotnet nuget list source[s] [options]
-Q: should list accept "source and sources" as synonyms?
-
-Options:
-
- -f|--format Applies to the list action. Accepts two values: Detailed (the default) and Short.
-
- -c|--configfile  The NuGet configuration file. If specified, only the settings from this file will be used. If not specified, the hierarchy of configuration files from the current directory will be used. To learn more about NuGet configuration go to https://docs.microsoft.com/en-us/nuget/consume-packages/configuring-nuget-behavior.
- 
- -h|--help        Show help information
-
-Outputs a list of configured sources, including if they are enabled or disabled.
-
-### Usage: dotnet nuget add source [options]
-
-Options:
-  -n|--name <name>                Name of the source.
-  -s|--source <source>            Path to the package(s) source.
-
-  -u|--username <username>        UserName to be used when connecting to an authenticated source.
-
-  -p|--password <password>        UserName to be used when connecting to an authenticated source.
-
-  --store-password-in-clear-text  Enables storing portable package source credentials by disabling password encryption.
-
-  --valid-authentication-types    Comma-separated list of valid authentication types for this source. By default, all authentication types are valid. Example: basic,negotiate
-
-  -c|--configfile                 The NuGet configuration file. If specified, only the settings from this file will be used. If not specified, the hierarchy of configuration files from the current directory will be used. To learn more about NuGet configuration go to https://docs.microsoft.com/en-us/nuget/consume-packages/configuring-nuget-behavior.
-
-  -h|--help                       Show help information
-
-Improvement: target first config file found, not just one with PackageSources
-Improvement: if config file is not found, create one.
-Improvement: tell which config it was added to.
-Spec: where do credentials get written down? is that good? should there be another flag to control? (looks like -configfile will write the source and the creds in the file pointed to????)
-
-
-### Usage: dotnet nuget update source [options]
-
-Options:
-  -n|--name <name>                Name of the source.
-
-  -s|--source <source>            Path to the package(s) source.
-
-  -u|--username <username>        UserName to be used when connecting to an authenticated source.
-
-  -p|--password <password>        UserName to be used when connecting to an authenticated source.
-
-  --store-password-in-clear-text  Enables storing portable package source credentials by disabling password encryption.
-
-  --valid-authentication-types    Comma-separated list of valid authentication types for this source. By default, all authentication types are valid. Example: basic,negotiate
-
-  -c|--configfile                 The NuGet configuration file. If specified, only the settings from this file will be used. If not specified, the hierarchy of configuration files from the current directory will be used. To learn more about NuGet configuration go to https://docs.microsoft.com/en-us/nuget/consume-packages/configuring-nuget-behavior.
-
-  -h|--help                       Show help information
-
-If -name param matches existing source, updates all other properties of that source.
-
-
-### Usage: dotnet nuget remove source [options]
-
-Options:
-  -n|--name <name>  Name of the source.
-
-  -c|--configfile   The NuGet configuration file. If specified, only the settings from this file will be used. If not specified, the hierarchy of configuration files from the current directory will be used. To learn more about NuGet configuration go to https://docs.microsoft.com/en-us/nuget/consume-packages/configuring-nuget-behavior.
-
-  -h|--help         Show help information
-
-If -name param matches existing source, removes the source.
-
-
-### Usage: dotnet nuget enable source [options]
-
-Options:
-  -n|--name <name>  Name of the source.
-
-  -c|--configfile   The NuGet configuration file. If specified, only the settings from this file will be used. If not specified, the hierarchy of configuration files from the current directory will be used. To learn more about NuGet configuration go to https://docs.microsoft.com/en-us/nuget/consume-packages/configuring-nuget-behavior.
-
-  -h|--help         Show help information
-
-If -name param matches existing source, enables the source.
-
-
-### Usage: dotnet nuget disable source [options]
-
-Options:
-  -n|--name <name>  Name of the source.
-
-  -c|--configfile   The NuGet configuration file. If specified, only the settings from this file will be used. If not specified, the hierarchy of configuration files from the current directory will be used. To learn more about NuGet configuration go to https://docs.microsoft.com/en-us/nuget/consume-packages/configuring-nuget-behavior.
-
-  -h|--help         Show help information
-
-If -name param matches existing source, disables the source.
-
-### Implementation
-
-
-
-#### Package declaration
-
-
-#### Error handling
-
-
-#### Assets file changes
-
-
-#### PackageDownload and trust policies
-
-### PackageDownload repeatable build
-
-
-### Open work items
-
 
 ### Open Questions
-
-### Question 1
-
-
-### Question 2
-
-
-### Question 3
 
 
 #### Non-Goals
 
 
-##### Risky cases
-
-
-### Alternative approaches considered
-
-
-## References
-
-### Other options
-
-1. Make part of dotnet verb-noun pattern: `dotnet <add|remove|enable|disable|update|list> source`
-repository|feed|source
-
-1. Port directly, but under "nuget" keyword: `dotnet nuget sources <add|remove|enable|disable|update|list>`
-
-1. Other?
-
-
-
-
-Dotnet
-  Add -> Package
-  Remove -> Package
-  Update* -> Package
-  List -> Package
-
-  Nuget
-
-    Add -> Source
-    Disable -> Source
-    Enable -> Source
-    List -> Source
-    Remove -> Source
-    Update -> Source
 
