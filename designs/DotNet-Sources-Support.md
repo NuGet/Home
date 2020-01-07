@@ -5,7 +5,7 @@
 
 ## Issue
 
-CLI support for `dotnet <list|add|update|remove|disable|enable> source` [#4126](https://github.com/NuGet/Home/issues/4126)
+add `dotnet nuget <add|remove|update|disable|enable|list> source` command [#4126](https://github.com/NuGet/Home/issues/4126)
 
 ## Problem Background
 
@@ -31,9 +31,10 @@ repository|feed|source
 
 1. Port directly, but under "nuget" keyword: `dotnet nuget sources <add|remove|enable|disable|update|list>`
 
+
 We are choosing the first. (verb-noun, rather than noun-verb)
 
-
+```
 dotnet project commands
 	add       (add package)
 	build
@@ -74,18 +75,22 @@ dotnet sln
 dotnet build-server
 dotnet vstest
 dotnet store
+```
 
 ### Usage: dotnet nuget list source[s] [options]
 Q: should list accept "source and sources" as synonyms?
-Anand: yes. (and do it for each command...???)
-Nikolche: only source
-Anand: if somebody does "sources" -- > give them a good error?
+- Anand: yes. (and do it for each command...???)
+- Nikolche: only source
+- Anand: if somebody does "sources" -- > give them a good error?
 
 THIS IS CURRENT BEHAVIOR: 
+```
   PS C:\temp\dotnetSources> dotnet nuget sources add
   Specify --help for a list of available options and commands.
-  error: Unrecognized command or argument 'sources'
-Available commands are ... 
+ error: Unrecognized command or argument 'sources'
+```
+- Perhaps should do: "Available commands are ... "
+
 
 Options:
 
@@ -119,16 +124,18 @@ Options:
 
 Improvement: target first config file found, not just one with PackageSources - [#1589](https://github.com/NuGet/Home/issues/1589)
 Improvement: if config file is not found, create one.
-Improvement: tell which config it was added to.
+TODO: Improvement: tell which config it was added to or removed from
   ANDY: really important when config isn't specified.
 
 Spec: where do credentials get written down? is that good? should there be another flag to control? (looks like -configfile will write the source and the creds in the file pointed to????)
+```
    Anand: likes that behavior.
    Others: ??
-   Perhaps we ask nuget cabal
+   Perhaps we ask nuget authors DL
    Andy: do we do it via docs...2 steps...
+```
 
-Anand: wants 'dotnet nuget add source https://foo.com' to work.
+TODO: Anand: wants 'dotnet nuget add source https://foo.com' to work.
 
 
 ### Usage: dotnet nuget update source [options]
@@ -164,8 +171,6 @@ Options:
 
 If -name param matches existing source, removes the source.
 
-TODO: test case sensitivity
-
 
 ### Usage: dotnet nuget enable source [options]
 
@@ -178,7 +183,7 @@ Options:
 
 If -name param matches existing source, enables the source.
 
-ANand: should you be able to pass in a source instead of name?
+TODO: Anand: should you be able to pass in a source instead of name?
 
 
 
@@ -210,7 +215,7 @@ Refactored into:
 - NuGet.Commands\SourceArgs.cs
 - NuGet.Commands\SourceRunner.cs
 
-Andy: is nuget.commands.dll the best =choice? did other commands do that?
+TODO: Andy: is nuget.commands.dll the best =choice? did other commands do that?
 
 ### Localization Impact
 
@@ -291,13 +296,10 @@ credentail provider...
   could client make it easier to install?
   should validation rules for sources, help you understand if sources exist...if you can authenticate.
 
-
-
 TODO: go write CLI level code for validation/intellisense.
 
-
+TODO: finish all strings...including code gen of resx from commands.xml
 
 TODO: VS PM UI...compare where source info goes from that dialog vs CLI commands. And rationalize.
 
-
-Loïc: what about encrypted passwords on non-windows machines?
+TODO: Loïc: what about encrypted passwords on non-windows machines?
