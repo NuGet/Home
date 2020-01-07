@@ -1,4 +1,4 @@
-# `dotnet <add|remove|enable|disable|update|list> source`
+# `dotnet nuget <add|remove|enable|disable|update|list> source`
 
 * Status: ** Draft **
 * Author(s): [Rob Relyea](https://github.com/rrelyea)
@@ -26,7 +26,7 @@ Package Authors & Package Consumers who are using .NET core. Many of these devs 
 How do NuGet Commands fit into Dotnet.exe?
 
 
-1. Make part of dotnet verb-noun pattern: `dotnet <add|remove|enable|disable|update|list> source`
+1. Make part of dotnet verb-noun pattern: `dotnet nuget <add|remove|enable|disable|update|list> source`
 repository|feed|source
 
 1. Port directly, but under "nuget" keyword: `dotnet nuget sources <add|remove|enable|disable|update|list>`
@@ -75,13 +75,23 @@ dotnet build-server
 dotnet vstest
 dotnet store
 
-
 ### Usage: dotnet nuget list source[s] [options]
 Q: should list accept "source and sources" as synonyms?
+Anand: yes. (and do it for each command...???)
+Nikolche: only source
+Anand: if somebody does "sources" -- > give them a good error?
+
+THIS IS CURRENT BEHAVIOR: 
+  PS C:\temp\dotnetSources> dotnet nuget sources add
+  Specify --help for a list of available options and commands.
+  error: Unrecognized command or argument 'sources'
+Available commands are ... 
 
 Options:
 
  -f|--format Applies to the list action. Accepts two values: Detailed (the default) and Short.
+
+ TODO: short is broken.
 
  -c|--configfile  The NuGet configuration file. If specified, only the settings from this file will be used. If not specified, the hierarchy of configuration files from the current directory will be used. To learn more about NuGet configuration go to https://docs.microsoft.com/en-us/nuget/consume-packages/configuring-nuget-behavior.
  
@@ -97,7 +107,7 @@ Options:
 
   -u|--username <username>        UserName to be used when connecting to an authenticated source.
 
-  -p|--password <password>        UserName to be used when connecting to an authenticated source.
+  -p|--password <password>        ...
 
   --store-password-in-clear-text  Enables storing portable package source credentials by disabling password encryption.
 
@@ -110,7 +120,15 @@ Options:
 Improvement: target first config file found, not just one with PackageSources - [#1589](https://github.com/NuGet/Home/issues/1589)
 Improvement: if config file is not found, create one.
 Improvement: tell which config it was added to.
+  ANDY: really important when config isn't specified.
+
 Spec: where do credentials get written down? is that good? should there be another flag to control? (looks like -configfile will write the source and the creds in the file pointed to????)
+   Anand: likes that behavior.
+   Others: ??
+   Perhaps we ask nuget cabal
+   Andy: do we do it via docs...2 steps...
+
+Anand: wants 'dotnet nuget add source https://foo.com' to work.
 
 
 ### Usage: dotnet nuget update source [options]
@@ -160,6 +178,9 @@ Options:
 
 If -name param matches existing source, enables the source.
 
+ANand: should you be able to pass in a source instead of name?
+
+
 
 ### Usage: dotnet nuget disable source [options]
 
@@ -173,19 +194,23 @@ Options:
 If -name param matches existing source, disables the source.
 
 Likely should fix this soon: [#8668](https://github.com/NuGet/Home/issues/8668)
+  andy: do 2 fixes, make case match...but support non-matching cases.
+  anand: should we persist as lower case?
 
 ### Implementation
 
 Old implementation
 
-- NuGet.CommandsLine\SourcesCommand.cs
+- NuGet.CommandLine\SourcesCommand.cs
 
 Refactored into:
 
-- NuGet.CommandsLine\SourcesCommand.cs
-- NuGet.CommandsLineXplat\SourceCommand.cs
+- NuGet.CommandLine\SourcesCommand.cs
+- NuGet.CommandLineXplat\SourceCommand.cs
 - NuGet.Commands\SourceArgs.cs
 - NuGet.Commands\SourceRunner.cs
+
+Andy: is nuget.commands.dll the best =choice? did other commands do that?
 
 ### Localization Impact
 
@@ -201,6 +226,8 @@ Get moved string localized, then consider right testing.
 - Third step
 Move rest of strings from NuGet.exe into satellite assemblies and ILMerge them
 
+TODO: should we merge in all satellite assemblies??? or just a few imporatnt ones...
+
 ### Related issues:
 
 This is a review of NuGet sources issues.
@@ -213,7 +240,7 @@ This is a review of NuGet sources issues.
 - [Test Failure][Accessibility][ESN][CSY]Duplicated hotkeys show in “Options->NuGet Package Manager->Package Sources” dialog [#7822](https://github.com/NuGet/Home/issues/7822)
 - Nuget.exe sources add does not work if nuget.config does not have proper section [#1589](https://github.com/NuGet/Home/issues/1589)
 - Determine if nuget source name is case-sensitive and ensure disable and other uses works properly given that [#8668](https://github.com/NuGet/Home/issues/8668)
-- andy added one to be able to add a clear??
+- andy added one to be able to add and remove clear??
 - command to be able to convert a nuget.config to ignore all things above it.??
 
 Andy: if you `dotnet nuget add source` with credentials -- he doesn't like that it adds credentials in the local file if you point it towards a nuget.config.
@@ -249,11 +276,28 @@ Andy: if you `dotnet nuget add source` with credentials -- he doesn't like that 
 - RestoreSources set via MSBuild properties cannot use credentials [#6045](https://github.com/NuGet/Home/issues/6045)
 - Warn or error when no package sources exist [#2472](https://github.com/NuGet/Home/issues/2472)
 
+### Other ideas
+
+Validation rules on sources could be integrated into CLI and VS. (http vs https, source exists, etc...)
 
 ### Open Questions
+SHould dotnet nuget list source understand sources (and fallback folders?) set in project files?
+should there be a way to probe .csproj files??? to list other sources?
+    dotnet nuget list source --solution foo.sln
+
+credentail provider...
+  should authenticated sources be handled better.
+  could servers advertise what they need?
+  could client make it easier to install?
+  should validation rules for sources, help you understand if sources exist...if you can authenticate.
 
 
-#### Non-Goals
+
+TODO: go write CLI level code for validation/intellisense.
 
 
 
+TODO: VS PM UI...compare where source info goes from that dialog vs CLI commands. And rationalize.
+
+
+Loïc: what about encrypted passwords on non-windows machines?
