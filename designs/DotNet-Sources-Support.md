@@ -9,7 +9,7 @@ add `dotnet nuget <add|remove|update|disable|enable|list> source` command [#4126
 
 ## Problem Background
 
-`NuGet.exe sources < add | remove | enable | disable | update | list >` functionality hasn't been ported to `dotnet.exe` yet. 
+`NuGet.exe sources <add|remove|enable|disable|update|list>` functionality hasn't been ported to `dotnet.exe` yet. 
 
 ## Who are the customers
 
@@ -90,13 +90,15 @@ THIS IS CURRENT BEHAVIOR:
  error: Unrecognized command or argument 'sources'
 ```
 - Perhaps should do: "Available commands are ... "
+- Currently implemented something that 
+                    // Redirects users nicely if they do 'dotnet nuget sources *' or 'dotnet nuget * sources' 
+                    
+
 
 
 Options:
 
  -f|--format Applies to the list action. Accepts two values: Detailed (the default) and Short.
-
- TODO: short is broken.
 
  -c|--configfile  The NuGet configuration file. If specified, only the settings from this file will be used. If not specified, the hierarchy of configuration files from the current directory will be used. To learn more about NuGet configuration go to https://docs.microsoft.com/en-us/nuget/consume-packages/configuring-nuget-behavior.
  
@@ -136,6 +138,9 @@ Spec: where do credentials get written down? is that good? should there be anoth
 ```
 
 TODO: Anand: wants 'dotnet nuget add source https://foo.com' to work.
+ - if we did enable an argument, should it be the source or the name? all the other commands take a name.
+
+TODO: Discussion with Loïc:  consider validating a source on creation... does the directory exist? does the web url exist? if you cannot access the url, do you need to add a password or credprovider?
 
 
 ### Usage: dotnet nuget update source [options]
@@ -238,7 +243,6 @@ TODO: should we merge in all satellite assemblies??? or just a few imporatnt one
 This is a review of NuGet sources issues.
 
 #### Do as part of this work
-- ensure localization of nuget.exe isn't broken. also, make sure dotnet.exe loc works. [Done - ILMerge includes 13 NuGet.Commands.resources.dll into NuGet.exe on 1/6/20]
 - Documentation recommendations for setting up sources (w/ or w/o auth) for projects that run on CI [#5881](https://github.com/NuGet/Home/issues/5881)
 
 #### Followup
@@ -284,9 +288,12 @@ Andy: if you `dotnet nuget add source` with credentials -- he doesn't like that 
 ### Other ideas
 
 Validation rules on sources could be integrated into CLI and VS. (http vs https, source exists, etc...)
+- on add/update, and on list.
+
+consider an airplane mode, or the like, to disable all sources which aren't available right now. but perhaps not the same disable as normal, so we can move back to enable later.
 
 ### Open Questions
-SHould dotnet nuget list source understand sources (and fallback folders?) set in project files?
+Should dotnet nuget list source understand sources (and fallback folders?) set in project files?
 should there be a way to probe .csproj files??? to list other sources?
     dotnet nuget list source --solution foo.sln
 
@@ -296,10 +303,11 @@ credentail provider...
   could client make it easier to install?
   should validation rules for sources, help you understand if sources exist...if you can authenticate.
 
-TODO: go write CLI level code for validation/intellisense.
 
-TODO: finish all strings...including code gen of resx from commands.xml
-
-TODO: VS PM UI...compare where source info goes from that dialog vs CLI commands. And rationalize.
+TODO: Investigate - VS PM UI...compare where source info goes from that dialog vs CLI commands. And rationalize.
 
 TODO: Loïc: what about encrypted passwords on non-windows machines?
+
+
+TODO: go write CLI level code for validation/intellisense.
+TODO: finish all strings...including code gen of resx from commands.xml
