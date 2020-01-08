@@ -25,12 +25,10 @@ Package Authors & Package Consumers who are using .NET core. Many of these devs 
 
 How do NuGet Commands fit into Dotnet.exe?
 
-
 1. Make part of dotnet verb-noun pattern: `dotnet nuget <add|remove|enable|disable|update|list> source`
 repository|feed|source
 
 1. Port directly, but under "nuget" keyword: `dotnet nuget sources <add|remove|enable|disable|update|list>`
-
 
 We are choosing the first. (verb-noun, rather than noun-verb)
 
@@ -77,24 +75,7 @@ dotnet vstest
 dotnet store
 ```
 
-### Usage: dotnet nuget list source[s] [options]
-Q: should list accept "source and sources" as synonyms?
-- Anand: yes. (and do it for each command...???)
-- Nikolche: only source
-- Anand: if somebody does "sources" -- > give them a good error?
-
-THIS IS CURRENT BEHAVIOR: 
-```
-  PS C:\temp\dotnetSources> dotnet nuget sources add
-  Specify --help for a list of available options and commands.
- error: Unrecognized command or argument 'sources'
-```
-- Perhaps should do: "Available commands are ... "
-- Currently implemented something that 
-                    // Redirects users nicely if they do 'dotnet nuget sources *' or 'dotnet nuget * sources' 
-                    
-
-
+### Usage: dotnet nuget list source [options]
 
 Options:
 
@@ -124,12 +105,12 @@ Options:
 
   -h|--help                       Show help information
 
-Improvement: target first config file found, not just one with PackageSources - [#1589](https://github.com/NuGet/Home/issues/1589)
-Improvement: if config file is not found, create one.
-TODO: Improvement: tell which config it was added to or removed from
+Consider Post-MVP Improvement: target first config file found, not just one with PackageSources - [#1589](https://github.com/NuGet/Home/issues/1589)
+Consider Post-MVP Improvement: if config file is not found, create one.
+Consider Post-MVP Improvement: Improvement: tell which config it was added to or removed from
   ANDY: really important when config isn't specified.
 
-Spec: where do credentials get written down? is that good? should there be another flag to control? (looks like -configfile will write the source and the creds in the file pointed to????)
+Consider Post-MVP Improvement: where do credentials get written down? is that good? should there be another flag to control? (looks like -configfile will write the source and the creds in the file pointed to????)
 ```
    Anand: likes that behavior.
    Others: ??
@@ -140,7 +121,7 @@ Spec: where do credentials get written down? is that good? should there be anoth
 TODO: Anand: wants 'dotnet nuget add source https://foo.com' to work.
  - if we did enable an argument, should it be the source or the name? all the other commands take a name.
 
-TODO: Discussion with Loïc:  consider validating a source on creation... does the directory exist? does the web url exist? if you cannot access the url, do you need to add a password or credprovider?
+Consider Post-MVP Improvement: Discussion with Loïc:  consider validating a source on creation... does the directory exist? does the web url exist? if you cannot access the url, do you need to add a password or credprovider?
 
 
 ### Usage: dotnet nuget update source [options]
@@ -188,7 +169,7 @@ Options:
 
 If -name param matches existing source, enables the source.
 
-TODO: Anand: should you be able to pass in a source instead of name?
+Consider Post-MVP Improvement: Anand: should you be able to pass in a source instead of name?
 
 
 
@@ -203,9 +184,10 @@ Options:
 
 If -name param matches existing source, disables the source.
 
-Likely should fix this soon: [#8668](https://github.com/NuGet/Home/issues/8668)
+Consider Post-MVP Improvement: [#8668](https://github.com/NuGet/Home/issues/8668)
   andy: do 2 fixes, make case match...but support non-matching cases.
   anand: should we persist as lower case?
+  rob: for MVP, i've made a change to persist the disabled source name as the same case as the source. can consider 2nd fix to support non-matching case, post-MVP.
 
 ### Implementation
 
@@ -220,7 +202,6 @@ Refactored into:
 - NuGet.Commands\SourceArgs.cs
 - NuGet.Commands\SourceRunner.cs
 
-TODO: Andy: is nuget.commands.dll the best =choice? did other commands do that?
 
 ### Localization Impact
 
@@ -236,7 +217,7 @@ Get moved string localized, then consider right testing.
 - Third step
 Move rest of strings from NuGet.exe into satellite assemblies and ILMerge them
 
-TODO: should we merge in all satellite assemblies??? or just a few imporatnt ones...
+Consider Post-MVP Improvement: should we merge in all satellite assemblies??? or just a few imporatnt ones...
 
 ### Related issues:
 
@@ -244,14 +225,13 @@ This is a review of NuGet sources issues.
 
 #### Do as part of this work
 - Documentation recommendations for setting up sources (w/ or w/o auth) for projects that run on CI [#5881](https://github.com/NuGet/Home/issues/5881)
+- Determine if nuget source name is case-sensitive and ensure disable and other uses works properly given that [#8668](https://github.com/NuGet/Home/issues/8668) - fixing main scenario.
 
 #### Followup
 - [Test Failure][Accessibility][ESN][CSY]Duplicated hotkeys show in “Options->NuGet Package Manager->Package Sources” dialog [#7822](https://github.com/NuGet/Home/issues/7822)
 - Nuget.exe sources add does not work if nuget.config does not have proper section [#1589](https://github.com/NuGet/Home/issues/1589)
-- Determine if nuget source name is case-sensitive and ensure disable and other uses works properly given that [#8668](https://github.com/NuGet/Home/issues/8668)
 - andy added one to be able to add and remove clear??
 - command to be able to convert a nuget.config to ignore all things above it.??
-
 Andy: if you `dotnet nuget add source` with credentials -- he doesn't like that it adds credentials in the local file if you point it towards a nuget.config.
 
 #### Substantial
@@ -287,27 +267,30 @@ Andy: if you `dotnet nuget add source` with credentials -- he doesn't like that 
 
 ### Other ideas
 
-Validation rules on sources could be integrated into CLI and VS. (http vs https, source exists, etc...)
+Q: should these commands accept "source and sources" as synonyms?
+A: Code now detects and redirects users nicely if they do 'dotnet nuget sources *' or 'dotnet nuget * sources' to: 'dotnet nuget * source'
+
+Consider Post-MVP Improvement: Validation rules on sources could be integrated into CLI and VS. (http vs https, source exists, etc...)
 - on add/update, and on list.
 
-consider an airplane mode, or the like, to disable all sources which aren't available right now. but perhaps not the same disable as normal, so we can move back to enable later.
+Consider Post-MVP Improvement: consider an airplane mode, or the like, to disable all sources which aren't available right now. but perhaps not the same disable as normal, so we can move back to enable later.
 
 ### Open Questions
-Should dotnet nuget list source understand sources (and fallback folders?) set in project files?
+Consider Post-MVP Improvement: Should dotnet nuget list source understand sources (and fallback folders?) set in project files?
 should there be a way to probe .csproj files??? to list other sources?
     dotnet nuget list source --solution foo.sln
 
-credentail provider...
+Consider Post-MVP Improvement: credentail provider...
   should authenticated sources be handled better.
   could servers advertise what they need?
   could client make it easier to install?
   should validation rules for sources, help you understand if sources exist...if you can authenticate.
 
 
+
+Consider Post-MVP Improvement: Loïc: what about encrypted passwords on non-windows machines?
+
 TODO: Investigate - VS PM UI...compare where source info goes from that dialog vs CLI commands. And rationalize.
-
-TODO: Loïc: what about encrypted passwords on non-windows machines?
-
-
 TODO: go write CLI level code for validation/intellisense.
 TODO: finish all strings...including code gen of resx from commands.xml
+TODO: fix overridable log, for dotnet.exe scenario.
