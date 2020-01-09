@@ -119,7 +119,12 @@ Consider Post-MVP Improvement: where do credentials get written down? is that go
 ```
 
 TODO: Anand: wants 'dotnet nuget add source https://foo.com' to work.
- - if we did enable an argument, should it be the source or the name? all the other commands take a name.
+SOMEPROGRESS: 
+ - current plan on drawing board:
+   - default name to "source1", "source2", etc...
+   - sourceUri is default arg in add source
+   - name is default arg in remove source
+
 
 Consider Post-MVP Improvement: Discussion with Loïc:  consider validating a source on creation... does the directory exist? does the web url exist? if you cannot access the url, do you need to add a password or credprovider?
 
@@ -288,9 +293,12 @@ Consider Post-MVP Improvement: credentail provider...
 
 
 
-Consider Post-MVP Improvement: Loïc: what about encrypted passwords on non-windows machines?
-
 TODO: Investigate - VS PM UI...compare where source info goes from that dialog vs CLI commands. And rationalize.
+Answer: They both have same behavior today...first nuget.config found with a clear in the sources, is used. if not, it uses %userprofile%\AppData\Roaming\NuGet\NuGet.Config
+
+Consider Post-MVP Improvement: Loïc: what about encrypted passwords on non-windows machines?
+TODO: figure out long term strategy here...so we know whether to have store-in-clear-text param.
+
 TODO: go write CLI level code for validation/intellisense.
 TODO: finish all strings...including code gen of resx from commands.xml
 TODO: fix overridable log, for dotnet.exe scenario.
