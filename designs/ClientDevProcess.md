@@ -25,7 +25,7 @@ Each quarter, a new Project should be created for each quarterly Objective, and 
 
 ## Epic Tracking
 
-The Client Team uses Epics to track high-level status of various issues. These are GitHub issues tagged as Epic, and they navigate the board slightly different from regular issues:
+The Client Team uses Epics to track high-level status of various issues. Epics should be created instead of issues when a particular task is fairly large in estimate size (for example, more than ~5 days of work), or when there's many disparate subtasks that will be involved and potentially assigned to multiple people. These are GitHub issues tagged as Epic, and they navigate the board slightly different from regular issues:
 
 1. When any issue under an Epic is In Progress, the Epic should be moved to the In Progress pipeline as well.
 2. Epics should remain under "In Review" or "Validating" until the related change is available to customers.
@@ -52,7 +52,7 @@ When issues are scheduled, they should be assigned an appropriate Release, along
 
 ### Pipelines
 
-These are the columns on the board, and each one has a specific purpose, described below:
+These are the columns on the board, and each one has a specific purpose, described below. Note that epics are handled slightly different, as outlined in [Epic Tracking](#epic-tracking):
 
 #### New Issues
 
