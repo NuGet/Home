@@ -25,10 +25,14 @@ Each quarter, a new Project should be created for each quarterly Objective, and 
 
 ## Epic Tracking
 
-The Client Team uses Epics to track high-level status of various issues. Epics should be created instead of issues when a particular task is fairly large in estimate size (for example, more than ~5 days of work), or when there's many disparate subtasks that will be involved and potentially assigned to multiple people. These are GitHub issues tagged as Epic, and they navigate the board slightly different from regular issues:
+The Client Team uses Epics to track high-level status of various issues. Epics should be created for tracking large verticals of work, or when there's many disparate subtasks that will be involved and potentially assigned to multiple people, or involve multiple PRs to complete. As described in [OKR Tracking](#okr-tracking), they should also be created to track specific KRs.
 
-1. When any issue under an Epic is In Progress, the Epic should be moved to the In Progress pipeline as well.
-2. Epics should remain under "In Review" or "Validating" until the related change is available to customers.
+Another way to think about Epics is: if there is a customer-facing feature, an Epic should be the parent of all tasks from spec'ing to writing the actual code to test to insertion to shipping and writing docs.
+
+Concretely, these are GitHub issues tagged as Epic, and they navigate the board slightly different from regular issues:
+
+1. When any issue under an Epic is In Progress, the associated Epic should be moved to the In Progress pipeline as well.
+2. Epics should remain under "In Review" or "Validating" until the related change is available to customers. That is, they shouldn't be closed until released.
 
 Tracking Epics in this way allows customers and stakeholders to see a more fine-grained view of the status of any KR work by going to the Board and [filtering by Epics and hiding subtasks](https://github.com/NuGet/Home#workspaces/nuget-client-team-55aec9a240305cf007585881/board?epics:settings=epicsOnly&filterLogic=any&repos=29996513).
 
@@ -45,6 +49,8 @@ Over time, doing things this way will allow the Client Team to get a sense of it
 As mentioned above, the Client Team used GitHub Milestones to track releases. Since those are now being used for Sprints (for the sake of ZenHub tracking reports), release tracking is moved to the [Release feature](https://github.com/NuGet/Home#workspaces/nuget-client-team-55aec9a240305cf007585881/reports/release?release=5e0e5fbd021f7aa0ec95db18) in ZenHub.
 
 When issues are scheduled, they should be assigned an appropriate Release, along with a Sprint.
+
+In order to generate release changelogs, the team should use [the ZenHub API](https://github.com/ZenHubIO/API#get-all-the-issues-for-a-release-report) -- possibly through [ZenHub.NET](https://github.com/AlexGhiondea/ZenHub.NET/blob/21cd562b30570594beb3842b28c372d66f87dcc6/src/ZenHubReleaseClient.cs#L84-L90).
 
 ## The Board
 
