@@ -11,7 +11,7 @@
 
 For a while now, the NuGet Client team has been using [ZenHub](https://zenhub.com) as part of its development process. At the same time, while ZenHub provides a lot of features, the team isn't taking advantage of some of the nicer ones, such as its charting capabilities and its Roadmap feature. It also has other features, like Blockers and Epics, which the team does use but could be using more often, or differently.
 
-This proposal is aimed at overhauling the Client Team's usage of ZenHub and further streamline its development process to increase velocity, as well as increase visibility into what's being done, and what needs to be done. It also describes existing processes, so this document may be used as a reference for development flow.
+This proposal is aimed at overhauling the Client Team's usage of ZenHub and further streamline its public development process to increase velocity, as well as increase visibility into what's being done, and what needs to be done. It also describes existing processes, so this document may be used as a reference for development flow.
 
 # Proposal
 
@@ -51,6 +51,10 @@ As mentioned above, the Client Team used GitHub Milestones to track releases. Si
 When issues are scheduled, they should be assigned an appropriate Release, along with a Sprint.
 
 In order to generate release changelogs, the team should use [the ZenHub API](https://github.com/ZenHubIO/API#get-all-the-issues-for-a-release-report) -- possibly through [ZenHub.NET](https://github.com/AlexGhiondea/ZenHub.NET/blob/21cd562b30570594beb3842b28c372d66f87dcc6/src/ZenHubReleaseClient.cs#L84-L90).
+
+## Tracking Private/Sensitive Issues
+
+This document focuses on **public** issue tracking. Private issues, such as private design specs and security issues are handled through separate processes, and are thus out of the scope of this document.
 
 ## The Board
 
