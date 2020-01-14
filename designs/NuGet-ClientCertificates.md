@@ -98,6 +98,8 @@ Lists all the client certificates in the configuration. This option will include
 
 - `-Check` one of `true|false` - Indicates that certificate existence must be checked. If the certificate is found, its fingerprint will be printed.
 
+- `-TargetSource` - Filter available client certificates for specific source.
+
 - `-SourceType` one of `file|storage` - Filter available client certificates by it's source type.
 
 - `-Name` `string` - Filter client certificates **from all sources** by string presence in it's name.
