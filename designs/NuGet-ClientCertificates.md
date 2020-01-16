@@ -96,7 +96,7 @@ if none of `list|add|remove` is specified, the command will default to `list`.
 
 Lists all the client certificates in the configuration. This option will include all configured client certificates that match to specified options.
 
-- `-Check` one of `true|false` - Indicates that certificate existence must be checked. If the certificate is found, its fingerprint will be printed.
+- `-Check` one of `true|false` - Indicates that certificate existence must be checked. If the certificate is found, its fingerprint will be printed. Default value is `false`. Simplified form `-Check` with out value equals to `-Check true`.
 
 - `-TargetSource` - Filter available client certificates for specific source.
 
@@ -135,7 +135,7 @@ Registered client certificates:
 
 ### nuget client-certificates add [options]
 
-- `-Check` one of `true|false` - Indicates that certificate existence must be checked before add action. If the certificate is not found it will not be added.
+- `-Check` one of `true|false` - Indicates that certificate existence must be checked before add action. If the certificate is not found it will not be added. Default value is `false`. Simplified form `-Check` with out value equals to `-Check true`.
 
 - `-Name` `string` - Required option for client certificate identification. If certificate with same name exist it will be updated.
 
