@@ -185,16 +185,6 @@ nuget client-certificates List -Name containsInName
 nuget client-certificates List -SourceType storage
 ```
 
-## Internal components
-
-Provide `IClientCertificateProvider` generic provider for client certificate management from `ISettings`. Also provide `ClientCertificates` processor for `HttpClientHandler` setup.
-
-### IClientCertificateProvider interface
-
-* `AddOrUpdate(item : CertificateSearchItem)` - Adds a new client certificate or updates an existing one in the settings.
-* `Remove(item : IReadOnlyList<CertificateSearchItem>)` - Removes client certificates from the settings.
-* `GetClientCertificates(sourceName : string) : IReadOnlyList<CertificateSearchItem>` - Get a list of all the trusted signer entries under the computer trusted signers section for specified source name.
-
 ## Implementation pull request
 
 [3098](https://github.com/NuGet/NuGet.Client/pull/3098) Implemented fromStorage and fromCert client certificates
