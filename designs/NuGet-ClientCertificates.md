@@ -38,7 +38,7 @@ Provide new configuration section `clientCertificates` which may have children o
 
 1. `fromStorage` - certificate import from [certificate store](https://docs.microsoft.com/en-us/dotnet/framework/wcf/feature-details/working-with-certificates#certificate-stores). Internally uses [X509Certificate2Collection.Find](https://docs.microsoft.com/en-us/dotnet/api/system.security.cryptography.x509certificates.x509certificate2collection.find?view=netframework-4.8#System_Security_Cryptography_X509Certificates_X509Certificate2Collection_Find_System_Security_Cryptography_X509Certificates_X509FindType_System_Object_System_Boolean_) method.
 Can be configured with:
-    - Attribute `name`. Required. Unique setting identifier.
+    - Attribute `packageSource`. Required. `packageSources` source name reference.
     - Child item `<Add Key="StoreLocation" Value="[values]" />`. [Possible values](https://docs.microsoft.com/en-us/dotnet/api/system.security.cryptography.x509certificates.storelocation?view=netframework-4.8#fields). Optional. Equals `CurrentUser` by default.
     - Child item `<Add Key="StoreName" Value="[values]" />`. [Possible values](https://docs.microsoft.com/en-us/dotnet/api/system.security.cryptography.x509certificates.storename?view=netframework-4.8#fields). Optional. Equals `My` by default.
     - Child item `<Add Key="FindType" Value="[values]" />`. [Possible values](https://docs.microsoft.com/en-us/dotnet/api/system.security.cryptography.x509certificates.x509findtype?view=netframework-4.8#fields). Optional. Equals `FindByThumbprint` by default.
@@ -46,7 +46,7 @@ Can be configured with:
 
 2. `fromFile` - certificate import from file (DER encoded x.509, Base-64 encoded x.509, PKCS)
 Can be configured with:
-    - Attribute `name`. Required. Unique setting identifier.
+    - Attribute `packageSource`. Required. `packageSources` source name reference.
     - Child item `<Add Key="Path" Value="value" />`. `value` - Absolute or relative path to certificate file. Required.
     - Child item `<Add Key="Password" Value="value" />`. `value` - Plain or encrypted password string. Optional. Encrypted in same manner as PackageSourceCredential password.
 
@@ -54,11 +54,15 @@ Can be configured with:
 
 ```xml
 <configuration>
-...
+    ...
+    <packageSources>
+        <add key="nuget.org" value="https://api.nuget.org/v3/index.json" protocolVersion="3" />
+        <add key="Contoso" value="https://contoso.com/packages/" />
+        <add key="Foo" value="https://foo.com/bar/packages/" />
+    </packageSources>
+    ...
     <clientCertificates>	
-        <fromStorage name="unique name 1">
-            <!-- Require at least one reference to source -->
-            <add key="TargetSource" value="<source name from packageSources section>" />
+        <fromStorage packageSource="Contoso">
             <!-- Optional. CurrentUser by default -->
             <add key="StoreLocation" value="CurrentUser" />
             <!-- Optional. My by default -->
@@ -68,9 +72,7 @@ Can be configured with:
             <!-- Required. -->
             <add key="FindValue" value="4894671ae5aa84840cc1079e89e82d426bc24ec6" />
         </fromStorage>
-        <fromFile name="unique name 2">
-            <!-- Require at least one reference to source -->
-            <add key="TargetSource" value="<source name from packageSources section>" />
+        <fromFile packageSource="Foo">
             <!-- Absolute or relative path to certificate file. -->
             <add key="Path" value=".\certificate.pfx" />
             <!-- Encrypted password -->
@@ -90,7 +92,7 @@ Usage
 nuget client-certificates <list|add|remove|update> [options]
 ```
 
-if none of `list|add|remove` is specified, the command will default to `list`.
+if none of `list|add|remove|update` is specified, the command will default to `list`.
 
 ### nuget client-certificates list [options]
 
@@ -98,11 +100,11 @@ Lists all the client certificates in the configuration. This option will include
 
 - `-Check` one of `true|false` - Indicates that certificate existence must be checked. If the certificate is found, its fingerprint will be printed. Default value is `false`. Simplified form `-Check` with out value equals to `-Check true`.
 
-- `-TargetSource` - Filter available client certificates for specific source.
+- `-PackageSource` - Filter available client certificates for specific source.
 
 - `-SourceType` one of `file|storage` - Filter available client certificates by it's source type.
 
-- `-Name` `string` - Filter client certificates **from all sources** by string presence in it's name.
+- `-Name` `string` - Filter client certificates **from all sources** by string presence in package source name.
 
 - `-Path` `string` - Filter client certificates **from file source** by string presence in it's Path.
 
@@ -120,12 +122,12 @@ Below is an example output from this command:
 Registered client certificates:
 
 
- 1.   file3 [fromFile]
+ 1.   Contoso [fromFile]
       Path: d:\Temp\nuget\foo.pfx
       Password: ****
       Certificate: 4894671AE5AA84840C31079E89E82D426BC24EC6
 
- 2.   Foo organization certificate in storage [fromStorage]
+ 2.   Foo [fromStorage]
       Store location: CurrentUser
       Store name: My
       Find type: FindByThumbprint
@@ -137,11 +139,9 @@ Registered client certificates:
 
 - `-Check` one of `true|false` - Indicates that certificate existence must be checked before add action. If the certificate is not found it will not be added. Default value is `false`. Simplified form `-Check` with out value equals to `-Check true`.
 
-- `-Name` `string` - Required option for client certificate identification. If certificate with same name exist it will be updated.
+- `-PackageSource` `string` - Required option. Determines to which package source client certificate will be applied to. If there are any existing client certificate configuration which points to specified source command will fail.
 
 - `-Path` `string` - Path to certificate file added to a file client certificate source.
-
-- `-TargetSource` `string` - Required semicolon separated option to specify NuGet sources on which client certificate will be applied.
 
 - `-Password` `string` - Password for the certificate, if needed. This option can be used to specify the password for the certificate. Available only for from file source types.
 
@@ -163,11 +163,9 @@ It is denied to use options from different certificate source type at the same t
 
 ### nuget client-certificates update [options]
 
-- `-Name` `string` - Required option for client certificate identification.
+- `-PackageSource` `string` - Required option. Determines to which existing package source client certificate will be applied to.
 
 - `-Path` `string` - Path to certificate file added to a file client certificate source.
-
-- `-TargetSource` `string` - Required semicolon separated option to specify NuGet sources on which client certificate will be applied.
 
 - `-Password` `string` - Password for the certificate, if needed. This option can be used to specify the password for the certificate. Available only for from file source types.
 
@@ -190,30 +188,30 @@ It is denied to use options from different certificate source type at the same t
 Command will fail if user tries to change initial certificate source type.
 
 
-### nuget client-certificates remove -Name <name>
+### nuget client-certificates remove -PackageSource <name>
 
-Removes any client certificate that match the given name.
+Removes any client certificate configuration that match the given package source name.
 
 ### Examples
 
 ```
-nuget client-certificates Add -Name certificateName -Path .\MyCertificate.pfx -TargetSource "Foo"
+nuget client-certificates Add -PackageSource Foo -Path .\MyCertificate.pfx
 
-nuget client-certificates Add -Name certificateName -Path c:\MyCertificate.pfx -TargetSource "Foo;Bar" -Password 42 -Check true
+nuget client-certificates Add -PackageSource Contoso -Path c:\MyCertificate.pfx -Password 42 -Check true
 
-nuget client-certificates Add -Name certificateName -FindValue ca4e7b265780fc87f3cb90b6b89c54bf4341e755 -TargetSource "Foo"
+nuget client-certificates Add -PackageSource Foo -FindValue ca4e7b265780fc87f3cb90b6b89c54bf4341e755
 
-nuget client-certificates Add -Name certificateName -StoreLocation LocalMachine -StoreName My -FindType FindByThumbprint -FindValue ca4e7b265780fc87f3cb90b6b89c54bf4341e755 -TargetSource "Foo"
+nuget client-certificates Add -PackageSource Contoso -StoreLocation LocalMachine -StoreName My -FindType FindByThumbprint -FindValue ca4e7b265780fc87f3cb90b6b89c54bf4341e755
 
-nuget client-certificates Update -Name certificateName -FindValue ca4e7b265780fc87f3cb90b6b89c54bf4341e755 -TargetSource "Foo"
+nuget client-certificates Update -PackageSource Foo -FindValue ca4e7b265780fc87f3cb90b6b89c54bf4341e755
 
-nuget client-certificates Remove -Name certificateName
+nuget client-certificates Remove -PackageSource certificateName
 
 nuget client-certificates
 
 nuget client-certificates List -Check true
 
-nuget client-certificates List -Name containsInName
+nuget client-certificates List -Name containsInPackageSourceName
 
 nuget client-certificates List -SourceType storage
 ```
