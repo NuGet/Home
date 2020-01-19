@@ -83,11 +83,11 @@ Can be configured with:
 
 ## client-certificates command
 
-Gets, sets or lists client certificates to the NuGet configuration.
+Gets, updates, sets or lists client certificates to the NuGet configuration.
 
 Usage
 ```
-nuget client-certificates <list|add|remove> [options]
+nuget client-certificates <list|add|remove|update> [options]
 ```
 
 if none of `list|add|remove` is specified, the command will default to `list`.
@@ -155,9 +155,40 @@ Registered client certificates:
 
 - `-FindValue` `string` - FindValue added to a storage client certificate source.
 
+`-Path` and `-Password` options determine final certificate source type as `fromFile`
 
+`-StoreLocation`, `-StoreName`, `-FindType` and `-FindValue` options determine final certificate source type as `fromStorage`
 
-Providing `-Path` and one of `-StoreLocation`, `-StoreName`, `-FindType`, `-FindValue` at the same time is not supported.
+It is denied to use options from different certificate source type at the same time.
+
+### nuget client-certificates update [options]
+
+- `-Name` `string` - Required option for client certificate identification.
+
+- `-Path` `string` - Path to certificate file added to a file client certificate source.
+
+- `-TargetSource` `string` - Required semicolon separated option to specify NuGet sources on which client certificate will be applied.
+
+- `-Password` `string` - Password for the certificate, if needed. This option can be used to specify the password for the certificate. Available only for from file source types.
+
+- `-StorePasswordInClearText` `string` - Enables storing password for the certificate by disabling password encryption. Default value: false
+
+- `-StoreLocation` [possible values](https://docs.microsoft.com/en-us/dotnet/api/system.security.cryptography.x509certificates.storelocation?view=netframework-4.8) - StoreLocation added to a storage client certificate source. Default value: CurrentUser
+
+- `-StoreName` [possible values](https://docs.microsoft.com/en-us/dotnet/api/system.security.cryptography.x509certificates.storename?view=netframework-4.8) - StoreName added to a storage client certificate source. Default value: My
+
+- `-FindType` [possible values](https://docs.microsoft.com/en-us/dotnet/api/system.security.cryptography.x509certificates.x509findtype?view=netframework-4.8) - FindType added to a storage client certificate source. Default value: FindByThumbprint
+
+- `-FindValue` `string` - FindValue added to a storage client certificate source.
+
+`-Path` and `-Password` options determine final certificate source type as `fromFile`
+
+`-StoreLocation`, `-StoreName`, `-FindType` and `-FindValue` options determine final certificate source type as `fromStorage`
+
+It is denied to use options from different certificate source type at the same time.
+
+Command will fail if user tries to change initial certificate source type.
+
 
 ### nuget client-certificates remove -Name <name>
 
@@ -173,6 +204,8 @@ nuget client-certificates Add -Name certificateName -Path c:\MyCertificate.pfx -
 nuget client-certificates Add -Name certificateName -FindValue ca4e7b265780fc87f3cb90b6b89c54bf4341e755 -TargetSource "Foo"
 
 nuget client-certificates Add -Name certificateName -StoreLocation LocalMachine -StoreName My -FindType FindByThumbprint -FindValue ca4e7b265780fc87f3cb90b6b89c54bf4341e755 -TargetSource "Foo"
+
+nuget client-certificates Update -Name certificateName -FindValue ca4e7b265780fc87f3cb90b6b89c54bf4341e755 -TargetSource "Foo"
 
 nuget client-certificates Remove -Name certificateName
 
