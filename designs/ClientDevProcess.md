@@ -19,9 +19,9 @@ This proposal is aimed at overhauling the Client Team's usage of ZenHub and furt
 
 - Link: https://github.com/NuGet/Home#workspaces/nuget-client-team-55aec9a240305cf007585881/roadmap?repos=29996513
 
-One of the main additions in this proposal is that it adds explicit tracking of OKRs into our ZenHub process. The way this works is by using ZenHub's Roadmap feature.
+One of the main additions in this proposal is that it adds (indirect) tracking of OKRs into our ZenHub process. The way this works is by using ZenHub's Roadmap feature.
 
-Each quarter, a new Project should be created for each quarterly Objective, and labeled as such. Inside each Project should be any Epics created for those particular KRs, with dates adjusted appropriately. Additionally, a "Non-KR Work" Project should be created, with any non-KR epics, such as bugfixes and such. Ideally, all work will exist under some quarterly epic and be displayed on the roadmap.
+Each quarter, Epics should be created for particular public KRs (internally associated with Objectives, but we don't publish this), with dates adjusted appropriately. Ideally, all work will exist under some quarterly epic and be displayed on the roadmap. While we want to hide the mechanics of OKRs from public view, it is still useful to communicate with each other, and with the larger community, about what work we have scheduled on the roadmap, and how complete that work is. The Roadmap feature is perfect for this!
 
 ## Epic Tracking
 
@@ -40,9 +40,17 @@ Tracking Epics in this way allows customers and stakeholders to see a more fine-
 
 Previously, the Client Team used GitHub labels to track its 3-week sprints, using the format `Sprint <number>`, and Milestones to track release versions. Now, the Client Team uses GitHub Milestones to track sprint tasks. This is done for one main reason: enabling the [Velocity Tracking](https://github.com/NuGet/Home#workspaces/nuget-client-team-55aec9a240305cf007585881/reports/velocity) and [Burndown](https://github.com/NuGet/Home#workspaces/nuget-client-team-55aec9a240305cf007585881/reports/burndown?milestoneId=4983201) reports.
 
-Issues start off without an assigned sprint. During Sprint Planning at the beginning of each Sprint, items in the Backlog should be assigned to an appropriate Sprint Milestone.
+Issues start off without an assigned sprint. During Sprint Planning at the beginning of each Sprint, items in the Backlog should be assigned to an appropriate Sprint Milestone, as well as (generally) assigned to someone who will be working on it during that sprint.
 
 Over time, doing things this way will allow the Client Team to get a sense of its overall Velocity, which will help with future planning and resourcing.
+
+At the beginning of every sprint, issues that were partially worked on but not completed should be re-estimated to reflect the amount of work **left to be done**. While this means velocity data may be partially "lost", [it's a better choice for the sake of estimating the new sprint, which is what should matter more](https://www.scrum.org/index.php/forum/scrum-forum/29033/re-estimate-story-points-or-not).
+
+## Quality/Engineering Backlog Handling
+
+By using certain tags, the Client Team maintains ongoing quality and engineering backlogs, which represent things like bugs, engineering improvements, and tech debt.
+
+Every 6 months or so, the Client Team dedicates one sprint just to these backlog issues, with a full-team push in that direction.
 
 ## Release Tracking
 
@@ -54,7 +62,7 @@ In order to generate release changelogs, the team should use [the ZenHub API](ht
 
 ## Tracking Private/Sensitive Issues
 
-This document focuses on **public** issue tracking. Private issues, such as private design specs and security issues are handled through separate processes, and are thus out of the scope of this document.
+This document focuses on **public** issue tracking. Private issues, such as private design specs and security issues are handled through a private repo and tracked separately.
 
 ## The Board
 
@@ -95,23 +103,21 @@ All issues in the Backlog should be estimated, with each Story Point being rough
 
 The Backlog can further be filtered into three main buckets, using GitHub Labels:
 
-1. Quality - test improvements, bugfixes
+1. Quality - test improvements, bugfixes, tech debt
 2. Engineering - engineering process improvements like CI and other process optimizations
 3. Product - Issues associated with OKRs
 
 During a Sprint, the first two weeks should be spent on Product Backlog issues, according to team assignments. Starting week 3, or earlier if someone's Product tasks are done, the Client Team will start pulling things out of the Quality and Engineering Backlogs.
 
-Issues in the Backlog should not be assigned to anyone. They only get assigned when moved to In Progress.
-
 Issues move out of the Backlog one of three ways:
 
-1. Work starts on the issue, so it gets assigned + moved to In Progress
+1. Work starts on the issue, so it gets moved to In Progress
 2. The issue is considered no longer relevant, and is closed
 3. The issue is no longer considered an active priority, and so is moved to the Icebox and tagged accordingly
 
 #### In Progress
 
-When issues are actively being worked on, they should be assigned to someone and moved to the In Progress pipeline. This Pipeline represents our active work.
+When issues are actively being worked on, they should be moved to the In Progress pipeline. This Pipeline represents our active work.
 
 Blocked items should be left in the In Progress Pipeline, and marked as blocked by going into the issue and creating a dependency to an issue tracking the blocker itself.
 
