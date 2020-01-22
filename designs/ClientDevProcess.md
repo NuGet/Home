@@ -25,7 +25,7 @@ Each quarter, Epics should be created for particular public KRs (internally asso
 
 ## Epic Tracking
 
-The Client Team uses Epics to track high-level status of various issues. Epics should be created for tracking large verticals of work, or when there's many disparate subtasks that will be involved and potentially assigned to multiple people, or involve multiple PRs to complete. As described in [OKR Tracking](#okr-tracking), they should also be created to track specific KRs.
+The Client Team uses Epics to track high-level status of various issues. Epics should be created for tracking large verticals of work, or when there's many disparate subtasks that will be involved and potentially assigned to multiple people, or involve multiple PRs to complete. As described in [OKR Tracking](#okr-tracking), they should also be created to track specific (public) KRs.
 
 Another way to think about Epics is: if there is a customer-facing feature, an Epic should be the parent of all tasks from spec'ing to writing the actual code to test to insertion to shipping and writing docs.
 
