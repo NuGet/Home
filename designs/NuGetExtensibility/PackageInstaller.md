@@ -1,5 +1,5 @@
 
-# IVsAsyncPackageInstaller
+# INuGetPackageInstaller
 
 * Status: **In Review**
 * Author(s): [Nikolche Kolev](https://github.com/nkolev92)
