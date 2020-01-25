@@ -21,6 +21,8 @@ Right now this will only include stable package versions.
 | -----------------|--------------------|-----------------------|
 | 5.* | 5.0.0 <br> 5.1.0 <br> 5.2.0 <br> 5.3.0 <br> 5.4.0 <br> 5.5.0-preview.1 <br> 5.5.0-preview.2 | 5.4.0 |
 
+There is no way to float to both stable and prerelease versions at the same time.
+
 ## Who are the customers
 
 PackageReference customers. A popular customer with > 80 comments & 38+ up-votes.
