@@ -1,4 +1,4 @@
-# Asynchronous NuGet extensibility services
+# NuGet extensibility services
 
 * Status: **Reviewed**
 * Author(s): [Nikolche Kolev](https://github.com/nkolev92)
