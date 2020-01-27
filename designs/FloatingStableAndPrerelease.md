@@ -17,6 +17,7 @@ Consider a PackageReference as such:
 ```
 
 Right now this will only include stable package versions.
+
 | Floating Version | Available Versions | Best matching version |
 | -----------------|--------------------|-----------------------|
 | 5.* | 5.0.0 <br> 5.1.0 <br> 5.2.0 <br> 5.3.0 <br> 5.4.0 <br> 5.5.0-preview.1 <br> 5.5.0-preview.2 | 5.4.0 |
