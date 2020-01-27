@@ -76,10 +76,6 @@ For convenience, the implementation of this proposal has been uploaded to a help
 
 You can switch the versions to compare the behavior.
 
-### Grammar
-
-TODO NK
-
 ## Considerations
 
 *  Why not use an extra parameter like `<PackageReference Include="NuGet.Packaging" Version="1.*" IncludePrerelease="true" />`
