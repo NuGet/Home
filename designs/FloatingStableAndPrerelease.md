@@ -26,7 +26,7 @@ There is no way to float to both stable and prerelease versions at the same time
 
 ## Who are the customers
 
-PackageReference customers. A popular customer with > 80 comments & 38+ up-votes.
+PackageReference customers. A popular customer issue with > 80 comments & 38+ up-votes.
 
 ## Requirements
 
@@ -34,8 +34,8 @@ From the issue:
 
 As Noel, who uses NuGet packages in PackageReference based projects,
 
-I would like to use floating versions that only resolves to stable versions of the package (Current behavior)
-I would like to use floating version that can resolve to the latest version even if the latest happens to be a pre-release version.
+I would like to use floating versions that only resolve to stable versions of the package (Current behavior)
+I would like to use floating versions that can resolve to the latest version even if the latest happens to be a pre-release version.
 I should be able to use both the braces/regex formats i.e. 1.* or [1.0.0, 2.0.0) that can include pre-release versions
 I would like to additionally define whether I want to resolve to rc, beta, alpha or all pre-releases.
 
@@ -62,7 +62,7 @@ For example:
 
 Note that 5.2.0-beta.1 and 6.0.0-rc.1 do not match.
 
-The behavior is best illusrated with examples
+The behavior is best illustrated with examples
 
 | Floating Version | Available Versions | Matching Versions | Best version | Notes |
 | -----------------|--------------------|-------------------|--------------|-------|
@@ -72,6 +72,8 @@ The behavior is best illusrated with examples
 | *-*              | 1.1.0 <br> 1.2.0-rc.1 <br> 1.2.0-rc.2 <br> 2.0.0 <br> 3.0.0-beta.1 | 1.1.0 <br> 1.2.0-rc.1 <br> 1.2.0-rc.2 <br> 2.0.0 <br> 3.0.0-beta.1 | 3.0.0-beta.1 | 3.0.0 is the highest version |
 | 1.*-*              | 1.1.0 <br> 1.2.0-rc.1 <br> 1.2.0-rc.2 <br> 2.0.0 <br> 3.0.0-beta.1 | 1.1.0 <br> 1.2.0-rc.1 <br> 1.2.0-rc.2 | 1.2.0-rc.2 | A prerelease version is the highest matching version |
 | *-rc.*              | 1.1.0 <br> 1.2.0-rc.1 <br> 1.2.0-rc.2 <br> 2.0.0 <br> 3.0.0-beta.1 | 1.1.0 <br> 1.2.0-rc.1 <br> 1.2.0-rc.2 <br> 2.0.0 | 2.0.0 | A stable version is the highest matching version |
+| 1.*-rc*              | 1.1.0 <br> 1.2.0-rc.1 <br> 1.2.0-rc.2 <br> 1.2.0-rc1 <br> 2.0.0 <br> 3.0.0-beta.1 | 1.1.0 <br> 1.2.0-rc.1 <br> 1.2.0-rc.2 <br> 1.2.0-rc1 | 1.2.0-rc1 | A prerelease version with a common prefix is the highest available version |
+| 1.1*-*              | 1.1.0 <br> 1.2.0-rc.1 <br> 1.2.0-rc.2 <br> 1.2.0-rc1 <br> 1.10.0 <br> 2.0.0 <br> 3.0.0-beta.1 | 1.10.0 | 1.10.0 | A stable version is the only matching version, because the minimum stable part is 1.10.0 |
 
 For convenience, the implementation of this proposal has been uploaded to a helper service where you can try out the version parsing and the version selection. https://nugettoolsdev.azurewebsites.net/5.3.0
 
@@ -79,7 +81,7 @@ You can switch the versions to compare the behavior.
 
 ## Considerations
 
-*  Why not use an extra parameter like `<PackageReference Include="NuGet.Packaging" Version="1.*" IncludePrerelease="true" />`
+* Why not use an extra parameter like `<PackageReference Include="NuGet.Packaging" Version="1.*" IncludePrerelease="true" />`
 
 There are a few reasons why we decided against that approach:
 
@@ -90,6 +92,14 @@ There are a few reasons why we decided against that approach:
 
 * How will old clients behave
 
-Old clients fail to parse this version. This is arguably the desired behavior, as it allows the customer to recognize very early that things will not work the way they expect them to. 
+Old clients fail to parse this version. This is arguably the desired behavior, as it allows the customer to recognize very early that things will not work the way they expect them to.
+The error message with which old clients fail is:
+
+```console
+error : '*-*' is not a valid version string. [F:\Test\floating.csproj]
+```
+
+The error itself does not indicate a required action, but in general it's difficult for old clients to predict what would be valid in future versions.
+In general, the focus is on the user to ensure all their tooling is up to date across their local development machines and CI.
 
 ### Open Questions
