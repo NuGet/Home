@@ -80,7 +80,7 @@ You can switch the versions to compare the behavior.
 
 *  Why not use an extra parameter like `<PackageReference Include="NuGet.Packaging" Version="1.*" IncludePrerelease="true" />`
 
-A few reasons for that approach:
+There are a few reasons why we decided against that approach:
 
 1. The PackageReference opt in into prerelease version for ranges is dependant on the version requested. PackageReference allows prereleases as potential versions for dependencies due to (link issue)
 1. You can not specify which prerelease versions you want included. For  example, you can not express the following version from the proposed approach `5.1.*-rc.*`. 
