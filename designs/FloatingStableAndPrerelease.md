@@ -75,7 +75,7 @@ The behavior is best illustrated with examples
 | 1.*-rc*              | 1.1.0 <br> 1.2.0-rc.1 <br> 1.2.0-rc.2 <br> 1.2.0-rc1 <br> 2.0.0 <br> 3.0.0-beta.1 | 1.1.0 <br> 1.2.0-rc.1 <br> 1.2.0-rc.2 <br> 1.2.0-rc1 | 1.2.0-rc1 | A prerelease version with a common prefix is the highest available version |
 | 1.1*-*              | 1.1.0 <br> 1.2.0-rc.1 <br> 1.2.0-rc.2 <br> 1.2.0-rc1 <br> 1.10.0 <br> 2.0.0 <br> 3.0.0-beta.1 | 1.10.0 | 1.10.0 | A stable version is the only matching version, because the minimum stable part is 1.10.0 |
 
-For convenience, the implementation of this proposal has been uploaded to a helper service where you can try out the version parsing and the version selection. https://nugettoolsdev.azurewebsites.net/5.3.0
+For convenience, the implementation of this proposal has been uploaded to a helper service where you can try out the version parsing and the version selection. https://nugettoolsdev.azurewebsites.net/5.5.0-floating.7250/parse-version-range?versionRange=*-*
 
 You can switch the versions to compare the behavior.
 
