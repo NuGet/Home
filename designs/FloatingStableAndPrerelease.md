@@ -71,25 +71,33 @@ This section does not indicate a design change, rather summarizes the current be
 
 * If no version matches a floating version range, the lowest potential version in the range is chosen. See [example](https://nugettoolsdev.azurewebsites.net/5.5.0-floating.7250/find-best-version-match?versionRange=1.1.*&versions=1.2.1%0D%0A1.3.1). For `1.1.*` with `1.2.1` and `1.3.1` available, the selected version is 1.2.1. It's the first suitable version in the range that's considered the best version.
 
-### Examples
+### Scenarios
 
-The behavior is best illustrated with examples, you can examine the exact selection in an online tool by clicking the link in the best version column.
-Note that potential versions are sorted by priority.
+For convenience, the implementation of this proposal has been uploaded to a [helper service](https://nugettoolsdev.azurewebsites.net/5.5.0-floating.7250/parse-version-range?versionRange=*-*) where you can try out the version parsing and the version selection. 
+You can switch to published versions of NuGet to compare the behavior.
+
+#### Common Scenarios
+
+The NuGet floating version syntax allows for some pretty powerful version ranges, but it is likely that your scenario will be mostly satisfied by the following 3 floating versions
+
+* `*-*` - Float everything! Latest version available
+* `1.*-*` - Latest 1.X version, include prerelease and stable
+* `1.0.*-*` - Latest 1.0.X version, include prerelease and stable
+
+#### Detailed Scenarios
+
+The behavior is best illustrated with examples, you can examine the exact selection in an online tool by clicking the link in the best version column. Note that potential versions are sorted by priority.
 
 | Floating Version | Available Versions | Matching Versions | Potential Versions | Best version | Notes |
 | -----------------|--------------------|-------------------|--------------------|--------------|-------|
-| *                | 1.1.0 <br> 1.2.0-rc.1 <br> 1.2.0-rc.2 <br> 2.0.0 <br> 3.0.0-beta.1 | 1.1.0 <br> 2.0.0 | 2.0.0 <br> 1.0.0 | [2.0.0](https://nugettoolsdev.azurewebsites.net/5.5.0-floating.7250/find-best-version-match?versionRange=*&versions=1.1.0%0D%0A1.2.0-rc.1%0D%0A1.2.0-rc.2%0D%0A2.0.0%0D%0A3.0.0-beta.1) | Only stable versions are matched |
-| 1.*              | 1.1.0 <br> 1.2.0-rc.1 <br> 1.2.0-rc.2 <br> 2.0.0 <br> 3.0.0-beta.1 | 1.1.0 | 1.1.0 <br> 2.0.0 | [1.1.0](https://nugettoolsdev.azurewebsites.net/5.5.0-floating.7250/find-best-version-match?versionRange=1.*&versions=1.1.0%0D%0A1.2.0-rc.1%0D%0A1.2.0-rc.2%0D%0A2.0.0%0D%0A3.0.0-beta.1) | Only stable versions starting 1.* are matched |
-| 1.2.0-*          | 1.1.0 <br> 1.2.0-rc.1 <br> 1.2.0-rc.2 <br> 2.0.0 <br> 3.0.0-beta.1 | 1.2.0-rc.1 <br> 1.2.0-rc.2 | 1.2.0-rc.2 <br> 1.2.0-rc.1 <br> 2.0.0 <br> 3.0.0-beta.1 | [1.2.0-rc.2](https://nugettoolsdev.azurewebsites.net/5.5.0-floating.7250/find-best-version-match?versionRange=1.2.0-*&versions=1.1.0%0D%0A1.2.0-rc.1%0D%0A1.2.0-rc.2%0D%0A2.0.0%0D%0A3.0.0-beta.1) | The highest matching prerelease is selected |
-| *-*              | 1.1.0 <br> 1.2.0-rc.1 <br> 1.2.0-rc.2 <br> 2.0.0 <br> 3.0.0-beta.1 | 1.1.0 <br> 1.2.0-rc.1 <br> 1.2.0-rc.2 <br> 2.0.0 <br> 3.0.0-beta.1 | 3.0.0-beta.1 <br> 2.0.0 <br> 1.2.0-rc.2 <br> 1.2.0-rc.1 <br> 1.1.0  | [3.0.0-beta.1](https://nugettoolsdev.azurewebsites.net/5.5.0-floating.7250/find-best-version-match?versionRange=*-*&versions=1.1.0%0D%0A1.2.0-rc.1%0D%0A1.2.0-rc.2%0D%0A2.0.0%0D%0A3.0.0-beta.1) | 3.0.0 is the highest version |
-| 1.*-*            | 1.1.0 <br> 1.2.0-rc.1 <br> 1.2.0-rc.2 <br> 2.0.0 <br> 3.0.0-beta.1 | 1.1.0 <br> 1.2.0-rc.1 <br> 1.2.0-rc.2 | 1.2.0-rc.2 <br> 1.2.0-rc.1 <br> 1.1.0 <br> 2.0.0 <br> 3.0.0-beta.1 | [1.2.0-rc.2](https://nugettoolsdev.azurewebsites.net/5.5.0-floating.7250/find-best-version-match?versionRange=1.*-*&versions=1.1.0%0D%0A1.2.0-rc.1%0D%0A1.2.0-rc.2%0D%0A2.0.0%0D%0A3.0.0-beta.1) | A prerelease version is the highest matching version |
-| *-rc.*           | 1.1.0 <br> 1.2.0-rc.1 <br> 1.2.0-rc.2 <br> 2.0.0 <br> 3.0.0-beta.1 | 1.1.0 <br> 1.2.0-rc.1 <br> 1.2.0-rc.2 <br> 2.0.0 | 2.0.0 <br> 1.2.0-rc.2 <br> 1.2.0-rc.1 <br> 1.1.0 <br> 3.0.0-beta.1 | [2.0.0](https://nugettoolsdev.azurewebsites.net/5.5.0-floating.7250/find-best-version-match?versionRange=*-rc.*&versions=1.1.0%0D%0A1.2.0-rc.1%0D%0A1.2.0-rc.2%0D%0A2.0.0%0D%0A3.0.0-beta.1) | A stable version is the highest matching version |
-| 1.*-rc*          | 1.1.0 <br> 1.2.0-rc.1 <br> 1.2.0-rc.2 <br> 1.2.0-rc1 <br> 2.0.0 <br> 3.0.0-beta.1 | 1.1.0 <br> 1.2.0-rc.1 <br> 1.2.0-rc.2 <br> 1.2.0-rc1 | 1.2.0-rc1 <br> 1.2.0-rc.1 <br> 1.2.0-rc.2 <br> 1.1.0 <br> 2.0.0 <br> 3.0.0-beta.1 | [1.2.0-rc1](https://nugettoolsdev.azurewebsites.net/5.5.0-floating.7250/find-best-version-match?versionRange=1.*-rc*+&versions=1.1.0%0D%0A1.2.0-rc.1%0D%0A1.2.0-rc.2%0D%0A1.2.0-rc1%0D%0A2.0.0%0D%0A3.0.0-beta.1) | A prerelease version with a common prefix is the highest available version |
-| 1.1*-*           | 1.1.0 <br> 1.2.0-rc.1 <br> 1.2.0-rc.2 <br> 1.2.0-rc1 <br> 1.10.0 <br> 2.0.0 <br> 3.0.0-beta.1 | 1.10.0 | 1.10.0 <br> 2.0.0 <br> 3.0.0-beta | [1.10.0](https://nugettoolsdev.azurewebsites.net/5.5.0-floating.7250/find-best-version-match?versionRange=1.1*-*&versions=1.1.0%0D%0A1.2.0-rc.1%0D%0A1.2.0-rc.2%0D%0A1.2.0-rc1%0D%0A1.10.0%0D%0A2.0.0%0D%0A3.0.0-beta.1) | A stable version is the only matching version, because the minimum stable part is 1.10.0 |
-
-For convenience, the implementation of this proposal has been uploaded to a helper service where you can try out the version parsing and the version selection. https://nugettoolsdev.azurewebsites.net/5.5.0-floating.7250/parse-version-range?versionRange=*-*
-
-You can switch the versions to compare the behavior.
+| `*`              | 1.1.0 <br> 1.2.0-rc.1 <br> 1.2.0-rc.2 <br> 2.0.0 <br> 3.0.0-beta.1 | 1.1.0 <br> 2.0.0 | 2.0.0 <br> 1.0.0 | [2.0.0](https://nugettoolsdev.azurewebsites.net/5.5.0-floating.7250/find-best-version-match?versionRange=*&versions=1.1.0%0D%0A1.2.0-rc.1%0D%0A1.2.0-rc.2%0D%0A2.0.0%0D%0A3.0.0-beta.1) | Only stable versions are matched |
+| `1.*`            | 1.1.0 <br> 1.2.0-rc.1 <br> 1.2.0-rc.2 <br> 2.0.0 <br> 3.0.0-beta.1 | 1.1.0 | 1.1.0 <br> 2.0.0 | [1.1.0](https://nugettoolsdev.azurewebsites.net/5.5.0-floating.7250/find-best-version-match?versionRange=1.*&versions=1.1.0%0D%0A1.2.0-rc.1%0D%0A1.2.0-rc.2%0D%0A2.0.0%0D%0A3.0.0-beta.1) | Only stable versions starting 1.* are matched |
+| `1.2.0-*`        | 1.1.0 <br> 1.2.0-rc.1 <br> 1.2.0-rc.2 <br> 2.0.0 <br> 3.0.0-beta.1 | 1.2.0-rc.1 <br> 1.2.0-rc.2 | 1.2.0-rc.2 <br> 1.2.0-rc.1 <br> 2.0.0 <br> 3.0.0-beta.1 | [1.2.0-rc.2](https://nugettoolsdev.azurewebsites.net/5.5.0-floating.7250/find-best-version-match?versionRange=1.2.0-*&versions=1.1.0%0D%0A1.2.0-rc.1%0D%0A1.2.0-rc.2%0D%0A2.0.0%0D%0A3.0.0-beta.1) | The highest matching prerelease is selected |
+| `*-*`            | 1.1.0 <br> 1.2.0-rc.1 <br> 1.2.0-rc.2 <br> 2.0.0 <br> 3.0.0-beta.1 | 1.1.0 <br> 1.2.0-rc.1 <br> 1.2.0-rc.2 <br> 2.0.0 <br> 3.0.0-beta.1 | 3.0.0-beta.1 <br> 2.0.0 <br> 1.2.0-rc.2 <br> 1.2.0-rc.1 <br> 1.1.0  | [3.0.0-beta.1](https://nugettoolsdev.azurewebsites.net/5.5.0-floating.7250/find-best-version-match?versionRange=*-*&versions=1.1.0%0D%0A1.2.0-rc.1%0D%0A1.2.0-rc.2%0D%0A2.0.0%0D%0A3.0.0-beta.1) | 3.0.0 is the highest version |
+| `*-rc.*`         | 1.1.0 <br> 1.2.0-rc.1 <br> 1.2.0-rc.2 <br> 2.0.0 <br> 3.0.0-beta.1 | 1.1.0 <br> 1.2.0-rc.1 <br> 1.2.0-rc.2 <br> 2.0.0 | 2.0.0 <br> 1.2.0-rc.2 <br> 1.2.0-rc.1 <br> 1.1.0 <br> 3.0.0-beta.1 | [2.0.0](https://nugettoolsdev.azurewebsites.net/5.5.0-floating.7250/find-best-version-match?versionRange=*-rc.*&versions=1.1.0%0D%0A1.2.0-rc.1%0D%0A1.2.0-rc.2%0D%0A2.0.0%0D%0A3.0.0-beta.1) | A stable version is the highest matching version |
+| `1.*-*`          | 1.1.0 <br> 1.2.0-rc.1 <br> 1.2.0-rc.2 <br> 2.0.0 <br> 3.0.0-beta.1 | 1.1.0 <br> 1.2.0-rc.1 <br> 1.2.0-rc.2 | 1.2.0-rc.2 <br> 1.2.0-rc.1 <br> 1.1.0 <br> 2.0.0 <br> 3.0.0-beta.1 | [1.2.0-rc.2](https://nugettoolsdev.azurewebsites.net/5.5.0-floating.7250/find-best-version-match?versionRange=1.*-*&versions=1.1.0%0D%0A1.2.0-rc.1%0D%0A1.2.0-rc.2%0D%0A2.0.0%0D%0A3.0.0-beta.1) | A prerelease version is the highest matching version |
+| `1.*-rc*`        | 1.1.0 <br> 1.2.0-rc.1 <br> 1.2.0-rc.2 <br> 1.2.0-rc1 <br> 2.0.0 <br> 3.0.0-beta.1 | 1.1.0 <br> 1.2.0-rc.1 <br> 1.2.0-rc.2 <br> 1.2.0-rc1 | 1.2.0-rc1 <br> 1.2.0-rc.1 <br> 1.2.0-rc.2 <br> 1.1.0 <br> 2.0.0 <br> 3.0.0-beta.1 | [1.2.0-rc1](https://nugettoolsdev.azurewebsites.net/5.5.0-floating.7250/find-best-version-match?versionRange=1.*-rc*+&versions=1.1.0%0D%0A1.2.0-rc.1%0D%0A1.2.0-rc.2%0D%0A1.2.0-rc1%0D%0A2.0.0%0D%0A3.0.0-beta.1) | A prerelease version with a common prefix is the highest available version |
+| `1.1*-*`         | 1.1.0 <br> 1.2.0-rc.1 <br> 1.2.0-rc.2 <br> 1.2.0-rc1 <br> 1.10.0 <br> 2.0.0 <br> 3.0.0-beta.1 | 1.10.0 | 1.10.0 <br> 2.0.0 <br> 3.0.0-beta | [1.10.0](https://nugettoolsdev.azurewebsites.net/5.5.0-floating.7250/find-best-version-match?versionRange=1.1*-*&versions=1.1.0%0D%0A1.2.0-rc.1%0D%0A1.2.0-rc.2%0D%0A1.2.0-rc1%0D%0A1.10.0%0D%0A2.0.0%0D%0A3.0.0-beta.1) | A stable version is the only matching version, because the minimum stable part is 1.10.0 |
 
 ## Considerations
 
