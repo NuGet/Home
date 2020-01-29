@@ -36,7 +36,6 @@ As Noel, who uses NuGet packages in PackageReference based projects,
 
 I would like to use floating versions that only resolve to stable versions of the package (Current behavior)
 I would like to use floating versions that can resolve to the latest version even if the latest happens to be a pre-release version.
-I should be able to use both the braces/regex formats i.e. 1.* or [1.0.0, 2.0.0) that can include pre-release versions
 I would like to additionally define whether I want to resolve to rc, beta, alpha or all pre-releases.
 
 ## Goals
@@ -99,8 +98,8 @@ You can switch the versions to compare the behavior.
 There are a few reasons why we decided against that approach:
 
 1. The PackageReference opt in into prerelease version for ranges is dependant on the version requested. PackageReference allows prereleases as potential versions for dependencies due to (link issue)
-1. You can not specify which prerelease versions you want included. For  example, you can not express the following version from the proposed approach `5.1.*-rc.*`. 
-1. It adds an additional element which could realistically be added anywhere. PackageReference is integrated within MSBuild, you could easily add 
+1. You can not specify which prerelease versions you want included. For  example, you can not express the following version from the proposed approach `5.1.*-rc.*`.
+1. It adds an additional element which could realistically be added anywhere. PackageReference is integrated within MSBuild, you could easily add the attribute somewhere totally different and that'd be invisible to someone reading the csproj.
 1. It does not apply in certain situations, creating redundancies.
 
 * How will old clients behave
@@ -118,3 +117,7 @@ In general, the focus is on the user to ensure all their tooling is up to date a
 ### Open Questions
 
 ### Related issues
+
+* [9111](www.github.com/NuGet/Home/9111) - Stable part partial numeric floating behaves different from prerelease part numeric floating
+* [1861](https://github.com/NuGet/docs.microsoft.com-nuget/issues/1861) - Floating versions should not be called wildcard versions
+* [1862](https://github.com/NuGet/docs.microsoft.com-nuget/issues/1862) - Floating version selection explained
