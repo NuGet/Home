@@ -27,7 +27,7 @@ All .NET Core customers.
 * Ability to specify client certificates from external files in standard [formats](https://en.wikipedia.org/wiki/X.509#Certificate_filename_extensions)
 * Ability to configure settings with command line
 * Each source can have at most one client certificate configuration
-* If client certificate configuration returns several valid x509 certificates (fromStore for example) first instance will be used
+* If client certificate configuration returns several valid x509 certificates (storeCert for example) first instance will be used
 * Client certificate configurations can be overwritten in common way
 
 ## Solution
@@ -77,6 +77,7 @@ Can be configured with:
 ...
 </configuration>
 ```
+# NuGet.exe
 
 ## client-certificates command
 
@@ -152,9 +153,9 @@ Registered client certificates:
 
 - `-FindValue` `string` - FindValue added to a storage client certificate source.
 
-`-Path` and `-Password` options determine final certificate source type as `fromFile`
+`-Path` and `-Password` options determine final certificate source type as `fileCert`
 
-`-StoreLocation`, `-StoreName`, `-FindBy` and `-FindValue` options determine final certificate source type as `fromStorage`
+`-StoreLocation`, `-StoreName`, `-FindBy` and `-FindValue` options determine final certificate source type as `storeCert`
 
 It is denied to use options from different certificate source type at the same time.
 
@@ -178,14 +179,13 @@ If certificate does not exist tool will inform user with warning but still optio
 
 - `-FindValue` `string` - FindValue added to a storage client certificate source.
 
-`-Path` and `-Password` options determine final certificate source type as `fromFile`
+`-Path` and `-Password` options determine final certificate source type as `fileCert`
 
-`-StoreLocation`, `-StoreName`, `-FindBy` and `-FindValue` options determine final certificate source type as `fromStorage`
+`-StoreLocation`, `-StoreName`, `-FindBy` and `-FindValue` options determine final certificate source type as `storeCert`
 
 It is denied to use options from different certificate source type at the same time.
 
 Command will fail if user tries to change initial certificate source type.
-
 
 ### nuget client-certificates remove -PackageSource <name>
 
@@ -196,7 +196,7 @@ Removes any client certificate configuration that match the given package source
 ```
 nuget client-certificates Add -PackageSource Foo -Path .\MyCertificate.pfx
 
-nuget client-certificates Add -PackageSource Contoso -Path c:\MyCertificate.pfx -Password 42 -Check true
+nuget client-certificates Add -PackageSource Contoso -Path c:\MyCertificate.pfx -Password 42
 
 nuget client-certificates Add -PackageSource Foo -FindValue ca4e7b265780fc87f3cb90b6b89c54bf4341e755
 
@@ -213,6 +213,112 @@ nuget client-certificates List -Name containsInPackageSourceName
 nuget client-certificates List -SourceType storage
 ```
 
-## Implementation pull request
+# dotnet tool
 
-[3098](https://github.com/NuGet/NuGet.Client/pull/3098) Implemented fromStorage and fromCert client certificates
+## dotnet nuget <command> client-cert
+
+Bunch of commands similar to NuGet.exe client-certificates. 
+
+Gets, updates, sets or lists client certificates to the NuGet configuration.
+
+Usage
+```
+dotnet nuget <list|add|remove|update> client-cert [options]
+```
+### dotnet nuget list client-cert [options]
+
+Lists all the client certificates in the configuration. This option will include all configured client certificates that match to specified options.
+
+- `-s|--package-source` - Filter available client certificates for specific source.
+
+- `--source-type` one of `file|storage` - Filter available client certificates by it's source type.
+
+- `--name` `string` - Filter client certificates **from all sources** by string presence in package source name.
+
+- `--path` `string` - Filter client certificates **from file source** by string presence in it's Path.
+
+- `--store-location` [possible values](https://docs.microsoft.com/en-us/dotnet/api/system.security.cryptography.x509certificates.storelocation?view=netframework-4.8) - Filter client certificates **from storage source** by it's StoreLocation.
+
+- `--store-name` [possible values](https://docs.microsoft.com/en-us/dotnet/api/system.security.cryptography.x509certificates.storename?view=netframework-4.8) - Filter client certificates **from storage source** by it's StoreName.
+
+- `--find-by` [possible values](https://docs.microsoft.com/en-us/dotnet/api/system.security.cryptography.x509certificates.x509findtype?view=netframework-4.8) - Filter client certificates **from storage source** by it's FindBy.
+
+- `--find-value` `string` - Filter client certificates from storage source by string presence in it's FindValue.
+
+### dotnet nuget add client-cert [options]
+
+- `-s|--package-source` `string` - Required option. Determines to which package source client certificate will be applied to. If there are any existing client certificate configuration which points to specified source command will fail.
+
+- `--path` `string` - Path to certificate file added to a file client certificate source.
+
+- `--password` `string` - Password for the certificate, if needed. This option can be used to specify the password for the certificate. Available only for from file source types.
+
+- `--store-password-in-clear-text` `string` - Enables storing password for the certificate by disabling password encryption. Default value: false
+
+- `--store-location` [possible values](https://docs.microsoft.com/en-us/dotnet/api/system.security.cryptography.x509certificates.storelocation?view=netframework-4.8) - StoreLocation added to a storage client certificate source. Default value: CurrentUser
+
+- `--store-name` [possible values](https://docs.microsoft.com/en-us/dotnet/api/system.security.cryptography.x509certificates.storename?view=netframework-4.8) - StoreName added to a storage client certificate source. Default value: My
+
+- `--find-by` [possible values](https://docs.microsoft.com/en-us/dotnet/api/system.security.cryptography.x509certificates.x509findtype?view=netframework-4.8) - FindBy added to a storage client certificate source. Default value: Thumbprint
+
+- `--find-value` `string` - FindValue added to a storage client certificate source.
+
+`--path` and `--password` options determine final certificate source type as `fileCert`
+
+`--store-location`, `--store-name`, `--find-by` and `--find-value` options determine final certificate source type as `storeCert`
+
+It is denied to use options from different certificate source type at the same time.
+
+If certificate does not exist tool will inform user with warning but still option will be added.
+
+### dotnet nuget update client-cert [options]
+
+- `-s|--package-source` `string` - Required option. Determines to which existing package source client certificate will be applied to.
+
+- `--path` `string` - Path to certificate file added to a file client certificate source.
+
+- `--password` `string` - Password for the certificate, if needed. This option can be used to specify the password for the certificate. Available only for from file source types.
+
+- `--store-password-in-clear-text` `string` - Enables storing password for the certificate by disabling password encryption. Default value: false
+
+- `--store-location` [possible values](https://docs.microsoft.com/en-us/dotnet/api/system.security.cryptography.x509certificates.storelocation?view=netframework-4.8) - StoreLocation added to a storage client certificate source. Default value: CurrentUser
+
+- `--store-name` [possible values](https://docs.microsoft.com/en-us/dotnet/api/system.security.cryptography.x509certificates.storename?view=netframework-4.8) - StoreName added to a storage client certificate source. Default value: My
+
+- `--find-by` [possible values](https://docs.microsoft.com/en-us/dotnet/api/system.security.cryptography.x509certificates.x509findtype?view=netframework-4.8) - FindBy added to a storage client certificate source. Default value: Thumbprint
+
+- `--find-value` `string` - FindValue added to a storage client certificate source.
+
+`--path` and `--password` options determine final certificate source type as `fileCert`
+
+`--store-location`, `--store-name`, `--find-by` and `--find-value` options determine final certificate source type as `storeCert`
+
+It is denied to use options from different certificate source type at the same time.
+
+Command will fail if user tries to change initial certificate source type.
+
+### dotnet nuget update client-cert [options]
+
+- `-s|--package-source` `string` - Required option. Determines to which existing package source client certificate will be applied to.
+
+Removes any client certificate configuration that match the given package source name.
+
+### Examples
+
+```
+dotnet nuget add client-cert --package-source Foo --path .\MyCertificate.pfx
+
+dotnet nuget add client-cert --package-source Contoso --path c:\MyCertificate.pfx --password 42
+
+dotnet nuget add client-cert --package-source Foo --find-value ca4e7b265780fc87f3cb90b6b89c54bf4341e755
+
+dotnet nuget add client-cert -s Contoso --store-location localMachine --store-name my --find-by thumbprint --find-value ca4e7b265780fc87f3cb90b6b89c54bf4341e755
+
+dotnet nuget update client-cert --package-source Foo --find-value ca4e7b265780fc87f3cb90b6b89c54bf4341e755
+
+dotnet nuget remove client-cert -s certificateName
+
+dotnet nuget list client-cert --name containsInPackageSourceName
+
+dotnet nuget list client-cert -source-type storage
+```
