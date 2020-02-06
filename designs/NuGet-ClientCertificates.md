@@ -79,18 +79,18 @@ Can be configured with:
 ```
 # NuGet.exe
 
-## client-certificates command
+## client-certs command
 
 Gets, updates, sets or lists client certificates to the NuGet configuration.
 
 Usage
 ```
-nuget client-certificates <list|add|remove|update> [options]
+nuget client-certs <list|add|remove|update> [options]
 ```
 
 if none of `list|add|remove|update` is specified, the command will default to `list`.
 
-### nuget client-certificates list [options]
+### nuget client-certs list [options]
 
 Lists all the client certificates in the configuration. This option will include all configured client certificates that match to specified options.
 
@@ -135,7 +135,7 @@ Registered client certificates:
       Certificate: Not found
 ```
 
-### nuget client-certificates add [options]
+### nuget client-certs add [options]
 
 - `-PackageSource` `string` - Required option. Determines to which package source client certificate will be applied to. If there are any existing client certificate configuration which points to specified source command will fail.
 
@@ -161,7 +161,7 @@ It is denied to use options from different certificate source type at the same t
 
 If certificate does not exist tool will inform user with warning but still option will be added.
 
-### nuget client-certificates update [options]
+### nuget client-certs update [options]
 
 - `-PackageSource` `string` - Required option. Determines to which existing package source client certificate will be applied to.
 
@@ -187,37 +187,37 @@ It is denied to use options from different certificate source type at the same t
 
 Command will fail if user tries to change initial certificate source type.
 
-### nuget client-certificates remove -PackageSource <name>
+### nuget client-certs remove -PackageSource <name>
 
 Removes any client certificate configuration that match the given package source name.
 
 ### Examples
 
 ```
-nuget client-certificates Add -PackageSource Foo -Path .\MyCertificate.pfx
+nuget client-certs Add -PackageSource Foo -Path .\MyCertificate.pfx
 
-nuget client-certificates Add -PackageSource Contoso -Path c:\MyCertificate.pfx -Password 42
+nuget client-certs Add -PackageSource Contoso -Path c:\MyCertificate.pfx -Password 42
 
-nuget client-certificates Add -PackageSource Foo -FindValue ca4e7b265780fc87f3cb90b6b89c54bf4341e755
+nuget client-certs Add -PackageSource Foo -FindValue ca4e7b265780fc87f3cb90b6b89c54bf4341e755
 
-nuget client-certificates Add -PackageSource Contoso -StoreLocation LocalMachine -StoreName My -FindBy Thumbprint -FindValue ca4e7b265780fc87f3cb90b6b89c54bf4341e755
+nuget client-certs Add -PackageSource Contoso -StoreLocation LocalMachine -StoreName My -FindBy Thumbprint -FindValue ca4e7b265780fc87f3cb90b6b89c54bf4341e755
 
-nuget client-certificates Update -PackageSource Foo -FindValue ca4e7b265780fc87f3cb90b6b89c54bf4341e755
+nuget client-certs Update -PackageSource Foo -FindValue ca4e7b265780fc87f3cb90b6b89c54bf4341e755
 
-nuget client-certificates Remove -PackageSource certificateName
+nuget client-certs Remove -PackageSource certificateName
 
-nuget client-certificates
+nuget client-certs
 
-nuget client-certificates List -Name containsInPackageSourceName
+nuget client-certs List -Name containsInPackageSourceName
 
-nuget client-certificates List -SourceType storage
+nuget client-certs List -SourceType storage
 ```
 
 # dotnet tool
 
 ## dotnet nuget <command> client-cert
 
-Bunch of commands similar to NuGet.exe client-certificates. 
+Bunch of commands similar to NuGet.exe client-certs. 
 
 Gets, updates, sets or lists client certificates to the NuGet configuration.
 
