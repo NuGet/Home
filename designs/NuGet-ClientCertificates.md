@@ -51,7 +51,10 @@ Can be configured with:
 Can be configured with:
     - Attribute `packageSource`. Required. `packageSources` source name reference.
     - Attribute `path`. Absolute or relative path to certificate file. Required.
-    - Attribute `password`. Plain or encrypted password string. Optional. Encrypted in same manner as [PackageSourceCredential](https://docs.microsoft.com/en-us/nuget/reference/nuget-config-file#packagesourcecredentials) password.
+    - Attribute `password`. Encrypted password string. Optional. Encrypted in same manner as [PackageSourceCredential](https://docs.microsoft.com/en-us/nuget/reference/nuget-config-file#packagesourcecredentials) password.
+    - Attribute `clearTextPassword`. The unencrypted password string. Optional.
+
+It is denied to use `password` and `clearTextPassword` attributes at the same time.
 
 ## Configuration example
 
@@ -73,6 +76,9 @@ Can be configured with:
         <fileCert packageSource="Foo"
                   path=".\certificate.pfx" 
                   password="..." />
+        <fileCert packageSource="Bar"
+                  path=".\certificate.pfx" 
+                  clearTextPassword="..." />
     </clientCertificates>
 ...
 </configuration>
