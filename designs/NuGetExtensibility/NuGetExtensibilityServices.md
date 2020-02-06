@@ -21,7 +21,7 @@ Given that most of our code is already asynchronous, there's no need why we cann
 
 ## Who are the customers
 
-All Visual Studio users wil reap the benefits.
+All Visual Studio users will reap the benefits.
 The primary users of these new APIs will be extension authors and Visual Studio components like Roslyn.
 
 ## Requirements
@@ -32,7 +32,7 @@ The primary users of these new APIs will be extension authors and Visual Studio 
 ## Goals
 
 * Define a guideline for designing asynchronous NuGet services
-* Introduce a new NuGet.VisualStudio.Contracts
+* Introduce a new assembly/package called `NuGet.VisualStudio.Contracts`
 * Expose them through an extensibility mechanism to allow out of process invocation
 
 ## Non-Goals
@@ -111,7 +111,7 @@ On the client side one would do:
     INuGetPackageInstaller client = await sb.GetProxyAsync<INuGetPackageInstaller>(NuGetPackageInstallerServiceDescriptor, this.DisposalToken);
 ```
 
-### Free threadedness
+### Free threaded services considerations
 
 Performance is always one of the primary considerations.
 Whether it's a service we expose for extensibility purposes, or just an internal NuGet bit, we should always strive to write async code, and minimize the UI thread dependencies if at all possible.
@@ -153,7 +153,8 @@ The old services should be marked as obsolete when the replacement ones are crea
 
 ## Considerations
 
-* **Do not** use ValueTask/ValueTask<TResult> in our extensibility services. ValueTask/ValueTask<TResult> has an advantage of Task/Task<TResult> in that it incurs fewer allocations, but the reality is that our code despite being asynchronous, maybe be invoked from some synchronous code paths. Furthermore, our response will frequently be serialized, defeating the allocation savings from ValueTask/ValueTask<TRest>
+* **Do not** use ValueTask/ValueTask<TResult> in our extensibility services. ValueTask/ValueTask<TResult> has an advantage of Task/Task<TResult> in that it incurs fewer allocations, but the reality is that our code despite being asynchronous, maybe be invoked from some synchronous code paths. Furthermore, our response will frequently be serialized, defeating the allocation savings from ValueTask/ValueTask<TRest>.
+For reference see:
 [Understanding the whys whats and whens of valuetask](https://devblogs.microsoft.com/dotnet/understanding-the-whys-whats-and-whens-of-valuetask/
 )
 Design discussion [issue](https://github.com/dotnet/corefx/issues/27445)
