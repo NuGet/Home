@@ -127,11 +127,11 @@ Registered client certificates:
       Find value: ba4d3cc1f011388626a23af5627bb4721d44db6e
       Certificate: BA4D3CC1F011388626A23AF5627BB4721D44DB6E
       
- 3.   Hooli inc [storeCert]
+ 3.   Fabrikam inc [storeCert]
       Store location: LocalMachine
       Store name: Root
       Find value: IssuerName
-      Find value: hooli
+      Find value: Fabrikam
       Certificate: Not found
 ```
 
