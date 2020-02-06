@@ -153,9 +153,7 @@ The old services should be marked as obsolete when the replacement ones are crea
 
 ## Considerations
 
-* Should we use ValueTask over Task in all of our interfaces?
-
-ValueTask/ValueTask<TResult> has an advantage of Task/Task<TResult> in that it incurs fewer allocations, but the reality is that our code despite being asynchronous, maybe be invoked from some synchronous code paths. Furthermore, our response will frequently be serialized, defeating the allocation savings from ValueTask/ValueTask<TRest>
+* **Do not** use ValueTask/ValueTask<TResult> in our extensibility services. ValueTask/ValueTask<TResult> has an advantage of Task/Task<TResult> in that it incurs fewer allocations, but the reality is that our code despite being asynchronous, maybe be invoked from some synchronous code paths. Furthermore, our response will frequently be serialized, defeating the allocation savings from ValueTask/ValueTask<TRest>
 [Understanding the whys whats and whens of valuetask](https://devblogs.microsoft.com/dotnet/understanding-the-whys-whats-and-whens-of-valuetask/
 )
 Design discussion [issue](https://github.com/dotnet/corefx/issues/27445)
