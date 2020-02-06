@@ -1,6 +1,6 @@
 # `dotnet nuget <add|remove|enable|disable|update|list> source`
 
-* Status: **Draft**
+* Status: **Reviewed**
 * Author(s): [Rob Relyea](https://github.com/rrelyea)
 
 ## Issue
