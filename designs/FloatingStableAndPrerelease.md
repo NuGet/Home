@@ -131,3 +131,4 @@ In general, the focus is on the user to ensure all their tooling is up to date a
 * [9111](www.github.com/NuGet/Home/9111) - Stable part partial numeric floating behaves different from prerelease part numeric floating
 * [1861](https://github.com/NuGet/docs.microsoft.com-nuget/issues/1861) - Floating versions should not be called wildcard versions
 * [1862](https://github.com/NuGet/docs.microsoft.com-nuget/issues/1862) - Floating version selection explained
+* [5097](https://github.com/NuGet/Home/issues/5097) - Floating version patterns like '1.*` are treated as ranges without a max, `1.*` is [1.*, )
