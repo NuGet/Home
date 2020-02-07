@@ -45,6 +45,7 @@ I would like to additionally define whether I want to resolve to rc, beta, alpha
 ## Non-Goals
 
 * Support for more than 1 prerelease label in floating versions. This is out of scope, because there is no way today with the prerelease only floating versions. As such it can be treated as a separate feature.
+* Floating versions are only supported for top level packages in the project, not in the nuspec. This is not going to change.
 
 ## Solution
 
