@@ -63,13 +63,15 @@ For example:
 
 This section does not indicate a design change, rather summarizes the current behavior for clarity.
 
-* Floating versions are not regex, despite the usage of `*` in the floating version grammar. Floating version ranges have a semantic meaning that's applied at selection that's different from what a regex would do.
+* Floating versions are not regex, despite the usage of `*` in the floating version grammar. Likewise, calling them wild card versions can be misleading as well. Floating version ranges have a semantic meaning that's applied at selection that's different from what a regex would do.
 
 * When specifying a floating version, stable versions are *always* allowed. See [example](https://nugettoolsdev.azurewebsites.net/5.5.0-floating.7611/find-best-version-match?versionRange=1.1.0-*&versions=1.1.0-beta%0D%0A1.1.0). For `1.1.0-*` with `1.1.0-beta` and `1.1.0` available, the selected version is `1.1.0`.
 
-* Floating versions are only allowed when the floating part of a version is `floated`. Specifically `*`, `1.*`, `1.0.*` do not include prerelease versions.
+* Prerelease versions are only allowed when the floating part of a version is `floated`. Specifically `*`, `1.*`, `1.0.*` do not include prerelease versions.
 
 * If no version matches a floating version range, the lowest potential version in the range is chosen. See [example](https://nugettoolsdev.azurewebsites.net/5.5.0-floating.7611/find-best-version-match?versionRange=1.1.*&versions=1.2.1%0D%0A1.3.1). For `1.1.*` with `1.2.1` and `1.3.1` available, the selected version is 1.2.1. It's the first suitable version in the range that's considered the best version.
+
+* The best way to think about floating versions are still a range, but instead of choosing lowest first based on the version ordering, there is a set of prefferred versions that take precendence. Just because a version is not a preferred one, it's not excluded from the range. 
 
 ### Scenarios
 
@@ -88,7 +90,7 @@ The NuGet floating version syntax allows for some pretty powerful version ranges
 
 The behavior is best illustrated with examples, you can examine the exact selection in an online tool by clicking the link in the best version column. Note that potential versions are sorted by priority.
 
-| Floating Version | Available Versions | Matching Versions | Potential Versions | Best version | Notes |
+| Floating Version | Available Versions | Preferred Versions | Potential Versions | Best version | Notes |
 | -----------------|--------------------|-------------------|--------------------|--------------|-------|
 | `*`              | 1.1.0 <br> 1.2.0-rc.1 <br> 1.2.0-rc.2 <br> 2.0.0 <br> 3.0.0-beta.1 | 1.1.0 <br> 2.0.0 | 2.0.0 <br> 1.0.0 | [2.0.0](https://nugettoolsdev.azurewebsites.net/5.5.0-floating.7611/find-best-version-match?versionRange=*&versions=1.1.0%0D%0A1.2.0-rc.1%0D%0A1.2.0-rc.2%0D%0A2.0.0%0D%0A3.0.0-beta.1) | Only stable versions are matched |
 | `1.*`            | 1.1.0 <br> 1.2.0-rc.1 <br> 1.2.0-rc.2 <br> 2.0.0 <br> 3.0.0-beta.1 | 1.1.0 | 1.1.0 <br> 2.0.0 | [1.1.0](https://nugettoolsdev.azurewebsites.net/5.5.0-floating.7611/find-best-version-match?versionRange=1.*&versions=1.1.0%0D%0A1.2.0-rc.1%0D%0A1.2.0-rc.2%0D%0A2.0.0%0D%0A3.0.0-beta.1) | Only stable versions starting 1.* are matched |
