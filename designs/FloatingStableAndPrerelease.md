@@ -32,11 +32,9 @@ PackageReference customers. A popular customer issue with > 80 comments & 38+ up
 
 From the issue:
 
-As Noel, who uses NuGet packages in PackageReference based projects,
-
-I would like to use floating versions that only resolve to stable versions of the package (Current behavior)
-I would like to use floating versions that can resolve to the latest version even if the latest happens to be a pre-release version.
-I would like to additionally define whether I want to resolve to rc, beta, alpha or all pre-releases.
+* I would like to use floating versions that only resolve to stable versions of the package (Current behavior)
+* I would like to use floating versions that can resolve to the latest version even if the latest happens to be a pre-release version.
+* I would like to additionally define whether I want to resolve to rc, beta, alpha or all pre-releases.
 
 ## Goals
 
@@ -64,19 +62,21 @@ For example:
 
 This section does not indicate a design change, rather summarizes the current behavior for clarity.
 
-* Floating versions are not regex, despite the usage of `*` in the floating version grammar. Likewise, calling them wild card versions can be misleading as well. Floating version ranges have a semantic meaning that's applied at selection that's different from what a regex would do.
+* Floating versions are **not regex**, despite the usage of `*` in the floating version grammar. Likewise, calling them wild card versions can be misleading as well. Floating version ranges have a semantic meaning that's applied when determining a match that's different from what a regex would do.
+
+* Given a version `5.0.0-preview.1`, the `5.0.0` will be referred to as the `stable part` and `preview.1` will be refered to as the `prerelease part`. The first `-` in a version/version range is the separator between the stable and prerelease parts.
 
 * When specifying a floating version, stable versions are *always* allowed. See [example](https://nugettoolsdev.azurewebsites.net/5.5.0-floating.7611/find-best-version-match?versionRange=1.1.0-*&versions=1.1.0-beta%0D%0A1.1.0). For `1.1.0-*` with `1.1.0-beta` and `1.1.0` available, the selected version is `1.1.0`.
 
-* Prerelease versions are only allowed when the floating part of a version is `floated`. Specifically `*`, `1.*`, `1.0.*` do not include prerelease versions.
+* Prerelease versions are only allowed when the prerelease part of a version is `floated`. Specifically `*`, `1.*`, `1.0.*` do not include prerelease versions.
 
 * If no version matches a floating version range, the lowest potential version in the range is chosen. See [example](https://nugettoolsdev.azurewebsites.net/5.5.0-floating.7611/find-best-version-match?versionRange=1.1.*&versions=1.2.1%0D%0A1.3.1). For `1.1.*` with `1.2.1` and `1.3.1` available, the selected version is 1.2.1. It's the first suitable version in the range that's considered the best version.
 
-* The best way to think about floating versions are still a range, but instead of choosing lowest first based on the version ordering, there is a set of prefferred versions that take precendence. Just because a version is not a preferred one, it's not excluded from the range. 
+* The best way to think about floating versions is that they are still a range, but instead of choosing lowest first based on the version ordering, there is a set of preferred versions that take precendence. Just because a version is not a preferred one, it's not excluded from the range. 
 
 ### Scenarios
 
-For convenience, the implementation of this proposal has been uploaded to a [helper service](https://nugettoolsdev.azurewebsites.net/5.5.0-floating.7611/parse-version-range?versionRange=*-*) where you can try out the version parsing and the version selection. 
+For convenience, the implementation of this proposal has been uploaded to a [helper service](https://nugettoolsdev.azurewebsites.net/5.5.0-floating.7611/parse-version-range?versionRange=*-*) where you can [try out](https://nugettoolsdev.azurewebsites.net/5.5.0-floating.7611/) the version parsing and the version selection. 
 You can switch to published versions of NuGet to compare the behavior.
 
 #### Common Scenarios
@@ -89,18 +89,18 @@ The NuGet floating version syntax allows for some pretty powerful version ranges
 
 #### Detailed Scenarios
 
-The behavior is best illustrated with examples, you can examine the exact selection in an online tool by clicking the link in the best version column. Note that potential versions are sorted by priority.
+The behavior is best illustrated with examples, you can examine the exact selection in an online tool by clicking the link in the best version column. Note that the potential versions are sorted by priority.
 
 | Floating Version | Available Versions | Preferred Versions | Potential Versions | Best version | Notes |
 | -----------------|--------------------|-------------------|--------------------|--------------|-------|
 | `*`              | 1.1.0 <br> 1.2.0-rc.1 <br> 1.2.0-rc.2 <br> 2.0.0 <br> 3.0.0-beta.1 | 1.1.0 <br> 2.0.0 | 2.0.0 <br> 1.0.0 | [2.0.0](https://nugettoolsdev.azurewebsites.net/5.5.0-floating.7611/find-best-version-match?versionRange=*&versions=1.1.0%0D%0A1.2.0-rc.1%0D%0A1.2.0-rc.2%0D%0A2.0.0%0D%0A3.0.0-beta.1) | Only stable versions are matched |
 | `1.*`            | 1.1.0 <br> 1.2.0-rc.1 <br> 1.2.0-rc.2 <br> 2.0.0 <br> 3.0.0-beta.1 | 1.1.0 | 1.1.0 <br> 2.0.0 | [1.1.0](https://nugettoolsdev.azurewebsites.net/5.5.0-floating.7611/find-best-version-match?versionRange=1.*&versions=1.1.0%0D%0A1.2.0-rc.1%0D%0A1.2.0-rc.2%0D%0A2.0.0%0D%0A3.0.0-beta.1) | Only stable versions starting 1.* are matched |
 | `1.2.0-*`        | 1.1.0 <br> 1.2.0-rc.1 <br> 1.2.0-rc.2 <br> 2.0.0 <br> 3.0.0-beta.1 | 1.2.0-rc.1 <br> 1.2.0-rc.2 | 1.2.0-rc.2 <br> 1.2.0-rc.1 <br> 2.0.0 <br> 3.0.0-beta.1 | [1.2.0-rc.2](https://nugettoolsdev.azurewebsites.net/5.5.0-floating.7611/find-best-version-match?versionRange=1.2.0-*&versions=1.1.0%0D%0A1.2.0-rc.1%0D%0A1.2.0-rc.2%0D%0A2.0.0%0D%0A3.0.0-beta.1) | The highest matching prerelease is selected |
+| `1.2.0-*`        | 1.1.0 <br> 1.2.0-rc.1 <br> 1.2.0-rc.2 <br> 1.2.0| 1.2.0-rc.1 <br> 1.2.0-rc.2 | 1.2.0 <br> 1.2.0-rc.2 <br> 1.2.0-rc.1 <br> 1.2.0 | [1.2.0](https://nugettoolsdev.azurewebsites.net/5.5.0-floating.7611/find-best-version-match?versionRange=1.2.0-*&versions=1.1.0%0D%0A1.2.0-rc.1%0D%0A1.2.0-rc.2%0D%0A1.2.0) | Despite this being a version range with a prerelease floating part, stables are allowed if they match the stable part. Given that 1.2.0 > 1.2.0-rc.2, it is chosen. |
 | `*-*`            | 1.1.0 <br> 1.2.0-rc.1 <br> 1.2.0-rc.2 <br> 2.0.0 <br> 3.0.0-beta.1 | 1.1.0 <br> 1.2.0-rc.1 <br> 1.2.0-rc.2 <br> 2.0.0 <br> 3.0.0-beta.1 | 3.0.0-beta.1 <br> 2.0.0 <br> 1.2.0-rc.2 <br> 1.2.0-rc.1 <br> 1.1.0  | [3.0.0-beta.1](https://nugettoolsdev.azurewebsites.net/5.5.0-floating.7611/find-best-version-match?versionRange=*-*&versions=1.1.0%0D%0A1.2.0-rc.1%0D%0A1.2.0-rc.2%0D%0A2.0.0%0D%0A3.0.0-beta.1) | 3.0.0 is the highest version |
 | `*-rc.*`         | 1.1.0 <br> 1.2.0-rc.1 <br> 1.2.0-rc.2 <br> 2.0.0 <br> 3.0.0-beta.1 | 1.1.0 <br> 1.2.0-rc.1 <br> 1.2.0-rc.2 <br> 2.0.0 | 2.0.0 <br> 1.2.0-rc.2 <br> 1.2.0-rc.1 <br> 1.1.0 <br> 3.0.0-beta.1 | [2.0.0](https://nugettoolsdev.azurewebsites.net/5.5.0-floating.7611/find-best-version-match?versionRange=*-rc.*&versions=1.1.0%0D%0A1.2.0-rc.1%0D%0A1.2.0-rc.2%0D%0A2.0.0%0D%0A3.0.0-beta.1) | A stable version is the highest matching version |
 | `1.*-*`          | 1.1.0 <br> 1.2.0-rc.1 <br> 1.2.0-rc.2 <br> 2.0.0 <br> 3.0.0-beta.1 | 1.1.0 <br> 1.2.0-rc.1 <br> 1.2.0-rc.2 | 1.2.0-rc.2 <br> 1.2.0-rc.1 <br> 1.1.0 <br> 2.0.0 <br> 3.0.0-beta.1 | [1.2.0-rc.2](https://nugettoolsdev.azurewebsites.net/5.5.0-floating.7611/find-best-version-match?versionRange=1.*-*&versions=1.1.0%0D%0A1.2.0-rc.1%0D%0A1.2.0-rc.2%0D%0A2.0.0%0D%0A3.0.0-beta.1) | A prerelease version is the highest matching version |
 | `1.*-rc*`        | 1.1.0 <br> 1.2.0-rc.1 <br> 1.2.0-rc.2 <br> 1.2.0-rc1 <br> 2.0.0 <br> 3.0.0-beta.1 | 1.1.0 <br> 1.2.0-rc.1 <br> 1.2.0-rc.2 <br> 1.2.0-rc1 | 1.2.0-rc1 <br> 1.2.0-rc.1 <br> 1.2.0-rc.2 <br> 1.1.0 <br> 2.0.0 <br> 3.0.0-beta.1 | [1.2.0-rc1](https://nugettoolsdev.azurewebsites.net/5.5.0-floating.7611/find-best-version-match?versionRange=1.*-rc*+&versions=1.1.0%0D%0A1.2.0-rc.1%0D%0A1.2.0-rc.2%0D%0A1.2.0-rc1%0D%0A2.0.0%0D%0A3.0.0-beta.1) | A prerelease version with a common prefix is the highest available version |
-| `1.1*-*`         | 1.1.0 <br> 1.2.0-rc.1 <br> 1.2.0-rc.2 <br> 1.2.0-rc1 <br> 1.10.0 <br> 2.0.0 <br> 3.0.0-beta.1 | 1.10.0 | 1.10.0 <br> 2.0.0 <br> 3.0.0-beta | [1.10.0](https://nugettoolsdev.azurewebsites.net/5.5.0-floating.7611/find-best-version-match?versionRange=1.1*-*&versions=1.1.0%0D%0A1.2.0-rc.1%0D%0A1.2.0-rc.2%0D%0A1.2.0-rc1%0D%0A1.10.0%0D%0A2.0.0%0D%0A3.0.0-beta.1) | A stable version is the only matching version, because the minimum stable part is 1.10.0 |
 
 ## Considerations
 
@@ -108,8 +108,8 @@ The behavior is best illustrated with examples, you can examine the exact select
 
 There are a few reasons why we decided against that approach:
 
-1. The PackageReference opt in into prerelease version for ranges is dependant on the version requested. PackageReference allows prereleases as potential versions for dependencies due to (link issue)
-1. You can not specify which prerelease versions you want included. For  example, you can not express the following version from the proposed approach `5.1.*-rc.*`.
+1. The PackageReference opt in into prerelease version for ranges is dependant on the version requested. PackageReference allows prereleases as potential versions when opted in.
+1. You can not specify which prerelease versions you want included. For example, you can not express the following version from the proposed approach `5.1.*-rc.*`.
 1. It adds an additional element which could realistically be added anywhere. PackageReference is integrated within MSBuild, you could easily add the attribute somewhere totally different and that'd be invisible to someone reading the csproj.
 1. It does not apply in certain situations, creating redundancies.
 
