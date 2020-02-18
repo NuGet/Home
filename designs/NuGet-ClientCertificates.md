@@ -143,13 +143,15 @@ Registered client certificates:
 
 - `-FindValue` `string` - FindValue added to a storage client certificate source.
 
+- `-Force` - Bypass certificate validatation.
+
 `-Path` and `-Password` options determine final certificate source type as `fileCert`
 
 `-StoreLocation`, `-StoreName`, `-FindBy` and `-FindValue` options determine final certificate source type as `storeCert`
 
 It is denied to use options from different certificate source type at the same time.
 
-If certificate does not exist tool will inform user with warning but still option will be added.
+Configuration change will not be applied if certificate is not valid.
 
 ### nuget client-certs update [options]
 
@@ -169,6 +171,8 @@ If certificate does not exist tool will inform user with warning but still optio
 
 - `-FindValue` `string` - FindValue added to a storage client certificate source.
 
+- `-Force` - Bypass certificate validatation.
+
 `-Path` and `-Password` options determine final certificate source type as `fileCert`
 
 `-StoreLocation`, `-StoreName`, `-FindBy` and `-FindValue` options determine final certificate source type as `storeCert`
@@ -176,6 +180,8 @@ If certificate does not exist tool will inform user with warning but still optio
 It is denied to use options from different certificate source type at the same time.
 
 Command will fail if user tries to change initial certificate source type.
+
+Configuration change will not be applied if certificate is not valid.
 
 ### nuget client-certs remove -PackageSource <name>
 
@@ -235,6 +241,8 @@ Lists all the client certificates in the configuration. This option will include
 
 - `--find-value` `string` - FindValue added to a storage client certificate source.
 
+- `-f|--force` - Bypass certificate validatation.
+
 `--path` and `--password` options determine final certificate source type as `fileCert`
 
 `--store-location`, `--store-name`, `--find-by` and `--find-value` options determine final certificate source type as `storeCert`
@@ -242,6 +250,8 @@ Lists all the client certificates in the configuration. This option will include
 It is denied to use options from different certificate source type at the same time.
 
 If certificate does not exist tool will inform user with warning but still option will be added.
+
+Configuration change will not be applied if certificate is not valid.
 
 ### dotnet nuget update client-cert [options]
 
@@ -261,6 +271,8 @@ If certificate does not exist tool will inform user with warning but still optio
 
 - `--find-value` `string` - FindValue added to a storage client certificate source.
 
+- `-f|--force` - Bypass certificate validatation.
+
 `--path` and `--password` options determine final certificate source type as `fileCert`
 
 `--store-location`, `--store-name`, `--find-by` and `--find-value` options determine final certificate source type as `storeCert`
@@ -268,6 +280,8 @@ If certificate does not exist tool will inform user with warning but still optio
 It is denied to use options from different certificate source type at the same time.
 
 Command will fail if user tries to change initial certificate source type.
+
+Configuration change will not be applied if certificate is not valid.
 
 ### dotnet nuget update client-cert [options]
 
