@@ -120,7 +120,7 @@ Registered client certificates:
  3.   Fabrikam inc [storeCert]
       Store location: LocalMachine
       Store name: Root
-      Find value: IssuerName
+      Find by: IssuerName
       Find value: Fabrikam
       Certificate: Not found
 ```
@@ -133,13 +133,13 @@ Registered client certificates:
 
 - `-Password` `string` - Password for the certificate, if needed. This option can be used to specify the password for the certificate. Available only for from file source types.
 
-- `-StorePasswordInClearText` `string` - Enables storing password for the certificate by disabling password encryption. Default value: false
+- `-StorePasswordInClearText` `boolean` - Enables storing password for the certificate by disabling password encryption. Default value: false
 
 - `-StoreLocation` [possible values](https://docs.microsoft.com/en-us/dotnet/api/system.security.cryptography.x509certificates.storelocation?view=netframework-4.8) - StoreLocation added to a storage client certificate source. Default value: CurrentUser
 
 - `-StoreName` [possible values](https://docs.microsoft.com/en-us/dotnet/api/system.security.cryptography.x509certificates.storename?view=netframework-4.8) - StoreName added to a storage client certificate source. Default value: My
 
-- `-FindBy` [possible values](https://docs.microsoft.com/en-us/dotnet/api/system.security.cryptography.x509certificates.x509findtype?view=netframework-4.8) - FindBy added to a storage client certificate source. Default value: Thumbprint
+- `-FindBy` [possible values](https://docs.microsoft.com/en-us/dotnet/api/system.security.cryptography.x509certificates.x509findtype?view=netframework-4.8) with out FindBy prefix - FindBy added to a storage client certificate source. Default value: Thumbprint
 
 - `-FindValue` `string` - FindValue added to a storage client certificate source.
 
@@ -167,7 +167,7 @@ Configuration change will not be applied if certificate is not valid.
 
 - `-StoreName` [possible values](https://docs.microsoft.com/en-us/dotnet/api/system.security.cryptography.x509certificates.storename?view=netframework-4.8) - StoreName added to a storage client certificate source. Default value: My
 
-- `-FindBy` [possible values](https://docs.microsoft.com/en-us/dotnet/api/system.security.cryptography.x509certificates.x509findtype?view=netframework-4.8) - FindBy added to a storage client certificate source. Default value: Thumbprint
+- `-FindBy` [possible values](https://docs.microsoft.com/en-us/dotnet/api/system.security.cryptography.x509certificates.x509findtype?view=netframework-4.8) with out FindBy prefix - FindBy added to a storage client certificate source. Default value: Thumbprint
 
 - `-FindValue` `string` - FindValue added to a storage client certificate source.
 
@@ -237,7 +237,7 @@ Lists all the client certificates in the configuration. This option will include
 
 - `--store-name` [possible values](https://docs.microsoft.com/en-us/dotnet/api/system.security.cryptography.x509certificates.storename?view=netframework-4.8) - StoreName added to a storage client certificate source. Default value: My
 
-- `--find-by` [possible values](https://docs.microsoft.com/en-us/dotnet/api/system.security.cryptography.x509certificates.x509findtype?view=netframework-4.8) - FindBy added to a storage client certificate source. Default value: Thumbprint
+- `--find-by` [possible values](https://docs.microsoft.com/en-us/dotnet/api/system.security.cryptography.x509certificates.x509findtype?view=netframework-4.8) with out FindBy prefix - FindBy added to a storage client certificate source. Default value: Thumbprint
 
 - `--find-value` `string` - FindValue added to a storage client certificate source.
 
@@ -267,7 +267,7 @@ Configuration change will not be applied if certificate is not valid.
 
 - `--store-name` [possible values](https://docs.microsoft.com/en-us/dotnet/api/system.security.cryptography.x509certificates.storename?view=netframework-4.8) - StoreName added to a storage client certificate source. Default value: My
 
-- `--find-by` [possible values](https://docs.microsoft.com/en-us/dotnet/api/system.security.cryptography.x509certificates.x509findtype?view=netframework-4.8) - FindBy added to a storage client certificate source. Default value: Thumbprint
+- `--find-by` [possible values](https://docs.microsoft.com/en-us/dotnet/api/system.security.cryptography.x509certificates.x509findtype?view=netframework-4.8) with out FindBy prefix - FindBy added to a storage client certificate source. Default value: Thumbprint
 
 - `--find-value` `string` - FindValue added to a storage client certificate source.
 
