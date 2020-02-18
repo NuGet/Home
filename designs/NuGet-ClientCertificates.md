@@ -98,23 +98,7 @@ if none of `list|add|remove|update` is specified, the command will default to `l
 
 ### nuget client-certs list [options]
 
-Lists all the client certificates in the configuration. This option will include all configured client certificates that match to specified options.
-
-- `-PackageSource` - Filter available client certificates for specific source.
-
-- `-SourceType` one of `file|storage` - Filter available client certificates by it's source type.
-
-- `-Name` `string` - Filter client certificates **from all sources** by string presence in package source name.
-
-- `-Path` `string` - Filter client certificates **from file source** by string presence in it's Path.
-
-- `-StoreLocation` [possible values](https://docs.microsoft.com/en-us/dotnet/api/system.security.cryptography.x509certificates.storelocation?view=netframework-4.8) - Filter client certificates **from storage source** by it's StoreLocation.
-
-- `-StoreName` [possible values](https://docs.microsoft.com/en-us/dotnet/api/system.security.cryptography.x509certificates.storename?view=netframework-4.8) - Filter client certificates **from storage source** by it's StoreName.
-
-- `-FindBy` [possible values](https://docs.microsoft.com/en-us/dotnet/api/system.security.cryptography.x509certificates.x509findtype?view=netframework-4.8) - Filter client certificates **from storage source** by it's FindBy.
-
-- `-FindValue` `string` - Filter client certificates from storage source by string presence in it's FindValue.
+Lists all the client certificates in the configuration. This option will include all configured client certificates.
 
 Below is an example output from this command:
 
@@ -214,9 +198,7 @@ nuget client-certs Remove -PackageSource certificateName
 
 nuget client-certs
 
-nuget client-certs List -Name containsInPackageSourceName
-
-nuget client-certs List -SourceType storage
+nuget client-certs List
 ```
 
 # dotnet tool
@@ -233,23 +215,7 @@ dotnet nuget <list|add|remove|update> client-cert [options]
 ```
 ### dotnet nuget list client-cert [options]
 
-Lists all the client certificates in the configuration. This option will include all configured client certificates that match to specified options.
-
-- `-s|--package-source` - Filter available client certificates for specific source.
-
-- `--source-type` one of `file|storage` - Filter available client certificates by it's source type.
-
-- `--name` `string` - Filter client certificates **from all sources** by string presence in package source name.
-
-- `--path` `string` - Filter client certificates **from file source** by string presence in it's Path.
-
-- `--store-location` [possible values](https://docs.microsoft.com/en-us/dotnet/api/system.security.cryptography.x509certificates.storelocation?view=netframework-4.8) - Filter client certificates **from storage source** by it's StoreLocation.
-
-- `--store-name` [possible values](https://docs.microsoft.com/en-us/dotnet/api/system.security.cryptography.x509certificates.storename?view=netframework-4.8) - Filter client certificates **from storage source** by it's StoreName.
-
-- `--find-by` [possible values](https://docs.microsoft.com/en-us/dotnet/api/system.security.cryptography.x509certificates.x509findtype?view=netframework-4.8) - Filter client certificates **from storage source** by it's FindBy.
-
-- `--find-value` `string` - Filter client certificates from storage source by string presence in it's FindValue.
+Lists all the client certificates in the configuration. This option will include all configured client certificates.
 
 ### dotnet nuget add client-cert [options]
 
@@ -324,7 +290,5 @@ dotnet nuget update client-cert --package-source Foo --find-value ca4e7b265780fc
 
 dotnet nuget remove client-cert -s certificateName
 
-dotnet nuget list client-cert --name containsInPackageSourceName
-
-dotnet nuget list client-cert -source-type storage
+dotnet nuget list client-cert
 ```
