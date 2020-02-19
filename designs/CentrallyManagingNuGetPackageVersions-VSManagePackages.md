@@ -90,6 +90,19 @@ In particular, given that SDK style projects currently use file watchers to dete
 
 ## Appendix 1 : Current project system API usage by NuGet
 
-For SDK (CPS) projects, NuGet uses `Microsoft.VisualStudio.ProjectSystem.UnconfiguredProject`'s `Services.PackageReference.AddAsync`.
+For SDK (CPS) projects, NuGet's relevant code is in [`src/NuGet.Clients/NuGet.PackageManagement.VisualStudio/Projects/NetCorePackageReferenceProject.cs`](https://github.com/NuGet/NuGet.Client/blob/dev/src/NuGet.Clients/NuGet.PackageManagement.VisualStudio/Projects/NetCorePackageReferenceProject.cs). The project system APIs used are `Microsoft.VisualStudio.ProjectSystem.UnconfiguredProject`'s `GetSuggestedConfigurationprojectAsync` and `Services.PackageReference.AddAsync`.
 
-For non-SDK style projects, NuGet uses `VSLangProj150.dll`'s `VSProject4.PackageReferences` and runs on UI thread.
+* To [add or update a package reference](https://github.com/NuGet/NuGet.Client/blob/16be25216b699f48d5e4d0baed86a62c78acadbe/src/NuGet.Clients/NuGet.PackageManagement.VisualStudio/Projects/NetCorePackageReferenceProject.cs#L246-L338), NuGet has two code paths, depending if the package being installed is compatible with all project Target Framework Monikers (TFMs) or not. Ultimately, both code paths use `IPackageReferencesService.AddAsync(string packageIdentity, string version)` to try to add the package reference to the project, and if that fails, calls `IUnresolvedPackageReference.Metadata.SetPropertyValueAsync(string propertyName, string unevaluatedPropertyValue, IReadOnlyDictionary<string, string> dimensionalConditions = null)` to set the version. I couldn't find docs on any of these project system APIs. There is XML doc, but it doesn't say whether version is required or optional.
+
+  * When the package is compatible with all project TFMs, `UnconfiguredProject.GetSuggestedConfiguredProjectAsync()` is called, followed by the `AddAsync` and `SetPropertyValueAsync` as described above.
+
+  * When the package is not compatible with all project TFMs, `AddAsync` and `SetPropertyValueAsync` is called on `IConditionalPackageReferencesService` for each project TFM that is compatible with the package.
+
+* To [remove a package reference](https://github.com/NuGet/NuGet.Client/blob/16be25216b699f48d5e4d0baed86a62c78acadbe/src/NuGet.Clients/NuGet.PackageManagement.VisualStudio/Projects/NetCorePackageReferenceProject.cs#L347-L351), NuGet calls `UnconfiguredProject.GetSuggestedConfiguredProjectAsync()` to get a `ConfiguredProject` instance, then calls `.Services.PackageReferences.RemoveAsync(string packageIdentity)`. I couldn't find public docs on these APIs.
+
+For non-SDK style projects, NuGet's relevant code is in [`src/NuGet.Clients/NuGet.PackageManagement.VisualStudio/ProjectServices/VsManagedLanguagesProjectSystemServices.cs`](https://github.com/NuGet/NuGet.Client/blob/dev/src/NuGet.Clients/NuGet.PackageManagement.VisualStudio/ProjectServices/VsManagedLanguagesProjectSystemServices.cs),
+and the project system APIs used are  `VSLangProj150.dll`'s `VSProject4.PackageReferences`.
+
+* To [add or update a package reference](https://github.com/NuGet/NuGet.Client/blob/16be25216b699f48d5e4d0baed86a62c78acadbe/src/NuGet.Clients/NuGet.PackageManagement.VisualStudio/ProjectServices/VsManagedLanguagesProjectSystemServices.cs#L270-L283), NuGet calls [`AsVSProject4.PackageReferences.AddOrUpdate (string bstrName, string bstrVersion, Array pbstrMetadataElements, Array pbstrMetadataValues)`](https://docs.microsoft.com/en-us/dotnet/api/vslangproj150.packagereferences.addorupdate?view=visualstudiosdk-2017). The docs for this method are empty, so don't explain expected behavior if any of the values (such as `bstrVersion`) is null.
+
+* To [remove a package reference](https://github.com/NuGet/NuGet.Client/blob/16be25216b699f48d5e4d0baed86a62c78acadbe/src/NuGet.Clients/NuGet.PackageManagement.VisualStudio/ProjectServices/VsManagedLanguagesProjectSystemServices.cs#L285-L291), NuGet calls [`VsProject4.PackageReferences.Remove(packageName)`](https://docs.microsoft.com/en-us/dotnet/api/vslangproj150.packagereferences.remove?view=visualstudiosdk-2017). No version information is passed.
