@@ -15,6 +15,12 @@ A PM-spec for this feature is available here: https://github.com/NuGet/Home/wiki
 
    - Switch to an **open** PMUI Window when one is already open 
      - Param (optional): Switch the selected Tab (or unchanged)
+
+ #### Questions
+ 1. Should this be a public API? 
+ If yes, 
+    - do we start with internal users (Internal Preview?) before making it public?
+    - API Review Board?
     
  #### Package Selection
  Modes:
