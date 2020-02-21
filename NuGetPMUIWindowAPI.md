@@ -9,30 +9,50 @@
 A PM-spec for this feature is available here: https://github.com/NuGet/Home/wiki/%22Update...%22-Command-in-Context-Menu
 
 # API Goals
- #### Window 
-    - Create a **new** PMUI Window when one isn't open
-      - Set the Initial Tab (or default as it does, today) 
-    - Switch to an **open** PMUI Window when one is already open
-      - Switch the selected Tab (or unchanged)
+#### Window & Tabs
+   - Create a **new** PMUI Window when one isn't open
+     - Param (optional): Set the Initial Tab (or default as it does, today) 
+
+
+   - Switch to an **open** PMUI Window when one is already open 
+     - Param (optional): Switch the selected Tab (or unchanged)
     
- #### Tabs
-   - 
- #### Filters
-   - 
  #### Package Selection
-   - 
+ Modes:
+   - All - _Checkmark all packages (Selection unchanged)_
+   - PackageID - _Checkmark & Select the specific Package ID_
+   - PackageList - _Checkmark all packages specified (Selection unchanged)_
+
+Not Found: 
+   - Select nothing and do not error
+   - Perhaps record a NoOp Telemetry event?
+
+#### Filters
+_Not modifiable in this API_
+
 
 # Nexus (Internal only)
-	What do we expect to happen if someone says Update… on a menu in a LiveShare environment?
+What do we expect to happen if someone says Update… on a menu in a LiveShare environment?
+   - Design considerations for the API?
+   - Use the `IServiceBroker`?
+
 	
 # Extensibility
-	Custom Project Systems could use this API to launch PMUI.
+Custom Project Systems could use this API to launch PMUI.
+
+Do we want to support other Project Systems?
+   - Could start internal, then expose later.
 
 # Telemetry
- - Where do we measure invocations? At the API-level, or in the plumbing?
-   - Are there two metrics worth tracking? One, the API usage. And Two, the invocations of PMUI in general.
-   - Should existing telemetry be relocated or annotated differently?
-   - Theoretically changing what Telemetry means from this point forward.
- - Context Menu (New 'Update' option)
+#### Where should we measure invocations ? 
+   - At the API-level
+     -  Track API as an entry-point.
+   - At the Plumbing-level
+      - Track launches of PMUI in general (from existing entry points or this new API).
+   - Both?
+
+#### Context Menu interaction (New 'Update' option)
    - Measure the Context Menu usage (already part of VS Telemetry)
 
+#### Should existing telemetry be relocated or annotated differently?
+   - Theoretically changing what our Telemetry means from this point forward.
