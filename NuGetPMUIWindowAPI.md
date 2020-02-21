@@ -37,7 +37,7 @@ e.g., The `Object Browser` Window is accessed from Project System like this:
 `var objectBrowser = this.ProjectNode.ServiceProvider.GetService(typeof(SVsObjBrowser)) as IVsNavigationTool;` (see [ViewReferenceInObjectBrowserAsync](http://ddindex/?leftProject=Microsoft.VisualStudio.ProjectSystem.VS.Implementation&leftSymbol=wpbjeyqrr6xl&file=Package%5cCommands%5cDefaultVsUIHierarchyWindowCmdsHandler.cs))
 
 
-# Nexus (Internal only)
+# LiveShare
 What do we expect to happen if someone says Update… on a menu in a LiveShare environment?
    - Design considerations for the API?
    - Use the `IServiceBroker`?
