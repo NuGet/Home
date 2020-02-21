@@ -8,7 +8,20 @@
 # Background
 A PM-spec for this feature is available here: https://github.com/NuGet/Home/wiki/%22Update...%22-Command-in-Context-Menu
 
-# API
+# API Goals
+ #### Window 
+    - Create a **new** PMUI Window when one isn't open
+      - Set the Initial Tab (or default as it does, today) 
+    - Switch to an **open** PMUI Window when one is already open
+      - Switch the selected Tab (or unchanged)
+    
+ #### Tabs
+   - 
+ #### Filters
+   - 
+ #### Package Selection
+   - 
+
 # Nexus (Internal only)
 	What do we expect to happen if someone says Update… on a menu in a LiveShare environment?
 	
