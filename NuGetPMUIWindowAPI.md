@@ -13,7 +13,6 @@ A PM-spec for this feature is available here: https://github.com/NuGet/Home/wiki
    - Create a **new** PMUI Window when one isn't open
      - Param (optional): Set the Initial Tab (or default as it does, today) 
 
-
    - Switch to an **open** PMUI Window when one is already open 
      - Param (optional): Switch the selected Tab (or unchanged)
     
@@ -30,12 +29,18 @@ Not Found:
 #### Filters
 _Not modifiable in this API_
 
+# VS Service
+Expose our PM UI object through a VS Service?
+
+e.g., The `Object Browser` Window is accessed from Project System like this:
+
+`var objectBrowser = this.ProjectNode.ServiceProvider.GetService(typeof(SVsObjBrowser)) as IVsNavigationTool;` (see [ViewReferenceInObjectBrowserAsync](http://ddindex/?leftProject=Microsoft.VisualStudio.ProjectSystem.VS.Implementation&leftSymbol=wpbjeyqrr6xl&file=Package%5cCommands%5cDefaultVsUIHierarchyWindowCmdsHandler.cs))
+
 
 # Nexus (Internal only)
 What do we expect to happen if someone says Update… on a menu in a LiveShare environment?
    - Design considerations for the API?
    - Use the `IServiceBroker`?
-
 	
 # Extensibility
 Custom Project Systems could use this API to launch PMUI.
