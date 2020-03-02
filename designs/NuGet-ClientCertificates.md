@@ -1,7 +1,7 @@
 ## Client certificates in NuGet
 
 Implements: https://github.com/NuGet/Home/issues/5773
-* Status: **Purposed**
+* Status: **Approved, pending implementation**
 * Author(s): [Shkolka Volodymyr](https://github.com/BlackGad)
 
 ## Issue
@@ -19,7 +19,9 @@ It is necessary to add client certificate authentication feature support to NuGe
 
 ## Who are the customers
 
-All .NET Core customers.
+Developers using NuGet packages, with a private source that needs HTTPS client certificates for either or both of:
+* mutual connection security
+* certificate based authentication.
 
 ## Requirements
 
