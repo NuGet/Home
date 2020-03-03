@@ -1,6 +1,6 @@
 # NuGet Client Team Dev Process
 
-- Status: **Reviewing**
+- Status: **Implemented**
 - Author: [Kat Marchan](https://github.com/zkat)
 
 # Issue
