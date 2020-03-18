@@ -49,20 +49,66 @@ However the intuitiveness of this approach as it's analogous to [ProjectReferenc
 
 ### Solution - Technical details
 
-TODO NK - the specification. 
-TODO NK - implementation.
+In PackageReference, everything about packages is in the assets file, as such the changes are the following: 
 
-NuGet implementation: 
-SDK based projects: https://github.com/dotnet/sdk/blob/master/src/Tasks/Microsoft.NET.Build.Tasks/ResolvePackageAssets.cs
-Csproj based projects: https://github.com/dotnet/NuGet.BuildTasks/blob/master/src/Microsoft.NuGet.Build.Tasks/ResolveNuGetPackageAssets.cs
+In the csproj the specification is: 
+
+```xml
+<ItemGroup>
+    <PackageReference Include="NuGet.Contoso.Library.Signed"  Version="5.6.0" Aliases="signed" />
+</ItemGroup>
+```
+
+In the targets section of the assets file, where the compile items are listed out: 
+```json
+  "targets": {
+    ".NETCore,Version=v.3.0": {
+      "NuGet.Contoso.Library.Signed/5.6.0": {
+        "type": "package",
+        "compile": {
+          "lib/netstandard2.0/NuGet.Contoso.Library.Signed.dll": {
+            "Aliases" : "signed"
+          }
+        },
+        "runtime": {
+          "lib/netstandard2.0/NuGet.Contoso.Library.Signed.dll": {}
+        }
+      }
+    },
+```
+
+Note that only the compile items have the additional properties. 
+
+On the library side there are no changes. 
+
+The (LockFileItem)[https://github.com/NuGet/NuGet.Client/blob/4fef99532f4022504feec5f68c8501cbeadd3aed/src/NuGet.Core/NuGet.ProjectModel/LockFile/LockFileItem.cs] type which represents an element in the compile list already has a collection of properties. 
+
+Specifically:
+
+```cs
+  public string Path { get; }
+
+  public IDictionary<string, string> Properties { get; } = new Dictionary<string, string>();
+```
+
+There is no need for a change here. 
+
+The implementation of this feature spans multiple components. 
+Specifically the work items as follows: 
+
+* NuGet.Client makes the changes for processing the new metadata and adding to the project.assets.json
+* The build tasks on (.NET Core SDK side)[https://github.com/dotnet/sdk/blob/master/src/Tasks/Microsoft.NET.Build.Tasks/ResolvePackageAssets.cs] consume these changes
+* The build tasks on the (non-SDK based PackageReference)[https://github.com/dotnet/NuGet.BuildTasks/blob/master/src/Microsoft.NuGet.Build.Tasks/ResolveNuGetPackageAssets.cs] consume these changes.
+* Nomination updates on (project-system)[https://github.com/dotnet/project-system/blob/master/src/Microsoft.VisualStudio.ProjectSystem.Managed/ProjectSystem/Rules/Dependencies/PackageReference.xaml] side.
 
 ## Future Work
 
-* Package metadata for transitive package references will be considered in the future. 
+* Package metadata for transitive package references will be considered in the future. For now the recommendation is to elevate that PackageReference to a direct dependency. 
 
 ## Open Questions
 
-* None
+* Will create follow ups for the partner issues once this design has been reviewed.
+* In which version will this functionality be ready?
 
 ## Considerations
 
