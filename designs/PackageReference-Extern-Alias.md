@@ -1,4 +1,4 @@
-# Extern alias with PackageReference
+# Extern alias support with PackageReference
 
 * Status: In Review
 * Author(s): [Nikolche Kolev](https://github.com/nkolev92)
@@ -8,8 +8,8 @@
 ## Problem Background
 
 In the PackageReference world there is no way to add assembly specific metadata.
-Sometimes multiple packages might carry the same type, and in those cases the solution is use the alias feature, but there's no native way to do that in PackageReference.
-In contrast to packages.config, one can add the extra metadata to the assembly include.
+Sometimes multiple packages might carry the same type, and in those cases the solution is to use the alias feature. However, there's no native way to do that in PackageReference.
+In comparison, in packages.config, one can add the extra metadata to the assembly included because all the assembly references are written in the project file. 
 
 ## Who are the customers
 
