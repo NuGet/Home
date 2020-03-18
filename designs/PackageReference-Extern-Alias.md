@@ -93,6 +93,8 @@ Specifically:
 
 There is no need for a change here. 
 
+The value provided in the Aliases attribute will be pass through as far as NuGet is concerned. NuGet will not validate that the value provided is a valid alias, that will be done at build time. 
+
 The implementation of this feature spans multiple components. 
 Specifically the work items as follows: 
 
