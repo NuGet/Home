@@ -52,6 +52,10 @@ However the intuitiveness of this approach as it's analogous to [ProjectReferenc
 TODO NK - the specification. 
 TODO NK - implementation.
 
+NuGet implementation: 
+SDK based projects: https://github.com/dotnet/sdk/blob/master/src/Tasks/Microsoft.NET.Build.Tasks/ResolvePackageAssets.cs
+Csproj based projects: https://github.com/dotnet/NuGet.BuildTasks/blob/master/src/Microsoft.NuGet.Build.Tasks/ResolveNuGetPackageAssets.cs
+
 ## Future Work
 
 * Package metadata for transitive package references will be considered in the future. 
