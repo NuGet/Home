@@ -4,7 +4,6 @@
 * Status: In Review / Reviewed / Implementing / Implemented
 * Author(s): [NuGet](https://github.com/NuGet)
 * Issue: [1](https://github.com/NuGet/Home/issues/1) Issue Title
-* Type: Feature
 
 ## Problem Background
 
