@@ -150,7 +150,7 @@ For transitive packages we could introduce a new item type, where customers coul
 
 ```xml
 <ItemGroup>
-    <TransitivePackageReference Include="StackExchange.Redis.StrongName.Signed" Aliases="signed" NoWarn="NU1701" />
+    <TransitivePackageReference Include="NuGet.Contoso.Library.Signed" Aliases="signed" NoWarn="NU1701" />
 </ItemGroup>
 ```
 
