@@ -146,12 +146,6 @@ Cons:
 
 A future evolution of the current approach could be the addition of metadata for transitive packages. 
 
-```xml
-<ItemGroup>
-    <PackageReference Include="StackExchange.Redis.StrongName.Signed" Version="1.26.0" Aliases="signed" />
-</ItemGroup>
-```
-
 For transitive packages we could introduce a new item type, where customers could provide the transitive package alias/NoWarn at some point in the future. 
 
 ```xml
@@ -165,7 +159,6 @@ Given that we are not confident that this is how we want to address the transiti
 
 ### References
 
-* https://github.com/NuGet/Home/issues/4989
-* https://github.com/NuGet/Home/issues/5740
-* https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/extern-alias
-* https://docs.microsoft.com/en-us/dotnet/api/microsoft.codeanalysis.projectreference.aliases?view=roslyn-dotnet
+* NoWarn does not apply transitively [5740](https://github.com/NuGet/Home/issues/5740)
+* Extern alias language [docs](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/extern-alias)
+* ProjectReference.Aliases [docs](https://docs.microsoft.com/en-us/dotnet/api/microsoft.codeanalysis.projectreference.aliases?view=roslyn-dotnet)
