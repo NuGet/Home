@@ -26,6 +26,7 @@ All PackageReference customers
 ## Non-Goals
 
 * Define an approach for defining additional assembly metadata.
+* Adding metadata such `PrivateAssets`, `GeneratePathProperty` etc. is still csproj XML only, no UI exeperience will be added. 
 * Define an approach for defining aliases or any other assembly metadata for packages brought in transitively.
 
 ## Solution
@@ -37,6 +38,7 @@ As such the proposed approach is the following:
 ```xml
 <ItemGroup>
     <PackageReference Include="NuGet.Contoso.Library.Signed"  Version="1.26.0" Aliases="signed" />
+    <PackageReference Include="NuGet.Contoso.Other.Library"  Version="1.26.0" Aliases="first,second" />
 </ItemGroup>
 ```
 
@@ -72,6 +74,25 @@ In the targets section of the assets file, where the compile items are listed ou
         },
         "runtime": {
           "lib/netstandard2.0/NuGet.Contoso.Library.Signed.dll": {}
+        }
+      }
+    },
+```
+
+NuGet will not interpret this string. If multiple aliases were provided, it will look like: 
+
+```json
+  "targets": {
+    ".NETCore,Version=v.3.0": {
+      "NuGet.Contoso.Other.Library/5.6.0": {
+        "type": "package",
+        "compile": {
+          "lib/netstandard2.0/NuGet.Contoso.Other.Library.dll": {
+            "Aliases" : "first,second"
+          }
+        },
+        "runtime": {
+          "lib/netstandard2.0/NuGet.Contoso.Other.Library.dll": {}
         }
       }
     },
