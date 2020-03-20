@@ -116,14 +116,12 @@ There is no need for a change here.
 
 The value provided in the Aliases attribute will be passed through as far as NuGet is concerned. NuGet will not validate that the value provided is a valid alias, that will be done at build time. 
 
-
 The implementation of this feature spans multiple components. 
 Specifically the work items as follows: 
 
-* NuGet.Client makes the changes for processing the new metadata and adding to the project.assets.json
-* The build tasks on (.NET Core SDK side)[https://github.com/dotnet/sdk/blob/master/src/Tasks/Microsoft.NET.Build.Tasks/ResolvePackageAssets.cs] consume these changes
-* The build tasks on the (non-SDK based PackageReference)[https://github.com/dotnet/NuGet.BuildTasks/blob/master/src/Microsoft.NuGet.Build.Tasks/ResolveNuGetPackageAssets.cs] consume these changes.
-* Nomination updates on (project-system)[https://github.com/dotnet/project-system/blob/master/src/Microsoft.VisualStudio.ProjectSystem.Managed/ProjectSystem/Rules/Dependencies/PackageReference.xaml] side.
+* [dotnet/sdk/10947](https://github.com/dotnet/sdk/issues/10947) The build tasks for .NET Core SDK  [code](https://github.com/dotnet/sdk/blob/master/src/Tasks/Microsoft.NET.Build.Tasks/ResolvePackageAssets.cs)
+* [dotnet/NuGet.BuildTasks/7](https://github.com/dotnet/NuGet.BuildTasks/issues/70) The build tasks for non-SDK based PackageReference [code](https://github.com/dotnet/NuGet.BuildTasks/blob/master/src/Microsoft.NuGet.Build.Tasks/ResolveNuGetPackageAssets.cs).
+* [dotnet/project-system/6011](https://github.com/dotnet/project-system/issues/6011) Nomination updates on project-system side [code](https://github.com/dotnet/project-system/blob/master/src/Microsoft.VisualStudio.ProjectSystem.Managed/ProjectSystem/Rules/Dependencies/PackageReference.xaml).
 
 ## Future Work
 
@@ -131,7 +129,6 @@ Specifically the work items as follows:
 
 ## Open Questions
 
-* Will create follow ups for the partner issues once this design has been reviewed.
 * In which version will this functionality be ready?
 
 ## Considerations
@@ -183,3 +180,6 @@ Given that we are not confident that this is how we want to address the transiti
 * NoWarn does not apply transitively [5740](https://github.com/NuGet/Home/issues/5740)
 * Extern alias language [docs](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/extern-alias)
 * ProjectReference.Aliases [docs](https://docs.microsoft.com/en-us/dotnet/api/microsoft.codeanalysis.projectreference.aliases?view=roslyn-dotnet)
+* [dotnet/sdk/10947](https://github.com/dotnet/sdk/issues/10947) The build tasks on (.NET Core SDK side)
+* [dotnet/NuGet.BuildTasks/7](https://github.com/dotnet/NuGet.BuildTasks/issues/70) The build tasks for the non-SDK based PackageReference
+* [dotnet/project-system/6011](https://github.com/dotnet/project-system/issues/6011) Nomination updates on project-system side.
