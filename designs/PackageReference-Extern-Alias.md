@@ -1,6 +1,6 @@
 # Extern alias support with PackageReference
 
-* Status: In Review
+* Status: Reviewed
 * Author(s): [Nikolche Kolev](https://github.com/nkolev92)
 * Issue: [4989](https://github.com/NuGet/Home/issues/4989) Extern alias support for NuGet package references
 * Type: Feature
