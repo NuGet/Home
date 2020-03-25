@@ -106,9 +106,13 @@ Options:
   -h|--help                       Show help information
 
 Consider Post-MVP Improvement: target first config file found, not just one with PackageSources - [#1589](https://github.com/NuGet/Home/issues/1589)
+
 Consider Post-MVP Improvement: if config file is not found, create one.
-Consider Post-MVP Improvement: Improvement: tell which config it was added to or removed from
+
+Consider Post-MVP Improvement: tell which config it was added to or removed from
   ANDY: really important when config isn't specified.
+
+Consider Post-MVP Improvement: `dotnet nuget list source` should be able to show which config a source was defined in. [#9342]
 
 Consider Post-MVP Improvement: where do credentials get written down? is that good? should there be another flag to control? (looks like -configfile will write the source and the creds in the file pointed to????)
 ```
