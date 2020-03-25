@@ -2,21 +2,17 @@
 # Spec Name
 
 * Status: In Review / Reviewed / Implementing / Implemented
-* Author(s): [NuGet](https://github.com/NuGet)
+* Author(s): [Author Name](https://github.com/NuGet)
 * Issue: [1](https://github.com/NuGet/Home/issues/1) Issue Title
 
 ## Problem Background
 
 Present the background and the motivation for this design. 
-Present evidence why this is an important problem to tackle
+Present evidence why this is an important problem to tackle.
 
 ## Who are the customers
 
 Customers affected by this change.
-
-## Requirements
-
-Clarify the requirements in a few bullet points
 
 ## Goals
 
