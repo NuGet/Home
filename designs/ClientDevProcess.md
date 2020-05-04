@@ -13,6 +13,12 @@ For a while now, the NuGet Client team has been using [ZenHub](https://zenhub.co
 
 This proposal is aimed at overhauling the Client Team's usage of ZenHub and further streamline its public development process to increase velocity, as well as increase visibility into what's being done, and what needs to be done. It also describes existing processes, so this document may be used as a reference for development flow.
 
+# Prerequisites
+
+Easiest way to use ZenHub in context of an GitHub project is to install [ZenHub browser extension](https://help.zenhub.com/support/solutions/articles/43000507578-installing-the-zenhub-extension). If you are using Chromium-based [Microsoft Edge](https://www.microsoft.com/edge), you have to enable "Allow extensions from other stores" in [edge://extensions](edge://extensions) and install the extension from Chrome Web Store.
+
+After installing the extension, first time navigation to the link to a ZenHub board will log you in with your GitHub credentials.
+
 # Proposal
 
 ## OKR Tracking
