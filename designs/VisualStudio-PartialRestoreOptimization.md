@@ -10,8 +10,11 @@
 ### Restore and performance requirements
 
 In PackageReference the restore gesture is everything. Given a project state, a restore generates the assets file and all the outputs as necessary.
-Additionally PackageReference based projects cannot build without an assets file, which means the restore operation is invoked very frequently, as frequently as build is if one is using `dotnet.exe` or `Visual Studio` with [automatic](https://docs.microsoft.com/en-us/nuget/reference/nuget-config-file#packagerestore-section) or `On Build` restore enabled.
-As a consequence restore needs to be as fast as possible. More specifically, a point of interest is what's often referred to as no-op restore.
+PackageReference based projects cannot build without an assets file, which means the restore operation is invoked very frequently, as frequently as build is if one is using `dotnet.exe` or `Visual Studio` with [automatic](https://docs.microsoft.com/en-us/nuget/reference/nuget-config-file#packagerestore-section) or `On Build` restore enabled.
+
+As a consequence restore needs to be as fast as possible. More specifically, a point of interest is what's often referred to as no-op restore. The original design for no-op is captured in [no-op restore](https://github.com/NuGet/Home/wiki/NuGet-Restore-No-Op).
+The no-op check is a per project check that ensures the input/outputs have not changed.
+No file writes will occur when the no-op check succeeds.
 
 ## Who are the customers
 
@@ -29,7 +32,8 @@ Propose a design for a faster, more aggressive no-op check to improve the perfor
 ## Solution
 
 A lot about the restore command is incremental. From the frequently referred to [no-op restore](https://github.com/NuGet/Home/wiki/NuGet-Restore-No-Op), the global packages folder being shared across projects, to the resolution algorithm which favors the lowest applicable version and the prioritization of local sources over http sources.
-Finally all restores are project based an independent. While project A might depend on project B, it does not need project B to be restored, it merely needs the project B state, it's PackageReference, ProjectReference etc.
+
+All restores are project based and independent. While project A might depend on project B, it does not need project B to be restored, it merely needs the project B state, it's PackageReference, ProjectReference etc.
 
 The restore implementation across all NuGet restore capable products is shared. The only difference is how the information about the project is gathered. In commandline scenarios, it's MSBuild, in Visual Studio scenarios, it's the project systems.
 
@@ -38,14 +42,25 @@ The restore implementation across all NuGet restore capable products is shared. 
 Unlike command line restores, where it's 1 process, 1 restore operation, Visual Studio is a long lived process.
 All restores in Visual Studio are solution based. What this means is we just run restore for every loaded project. Every restore operation in Visual Studio has the same scope.
 
-If you refer to [no-op restore](https://github.com/NuGet/Home/wiki/NuGet-Restore-No-Op), and apply the implementation context, we could really simplify the relevant for no-op restore down to:
+If you refer to [no-op restore](https://github.com/NuGet/Home/wiki/NuGet-Restore-No-Op), we can simplify the no-op relevant information to:
 
-* Project inputs (evaluated project file, PackageReference & all ProjectReference). That includes the inputs for all children projects. The PackageSpec models contains the settings, etc.
-* Project specific restore outputs like assets file, msbuild files & the lock file
-* The needed packages on disk/packages folder.
+* Inputs
+  * Evaluated project file, PackageReference & all ProjectReference
+  * That includes the inputs for all children projects.
+  * NuGet settings, such as sources, global packages folders.
+* Outputs
+  * Project specific
+    * assets file
+    * msbuild files
+    * the lock file
+    * the cache file
+  * Shared
+    * required packages on disk
 
-The first 2 are fewer and change more frequently.
-The last one is infrequently changed. It requires customers to delete the global packages folder or any of the fallback folders.
+The inputs change quite frequently.
+The project specific outputs can be affected by common user gestures such as "git clean", removing the obj folder.
+
+The shared outputs such as the packages from the global packages folder change infrequently. It requires customers to delete the global packages folder or any of the fallback folders.
 
 The current no-op optimization can be disabled, through a force switch on the commandline and certain gestures in Visual Studio.
 
@@ -54,15 +69,15 @@ The current no-op optimization can be disabled, through a force switch on the co
 There are 2 technical ways the restores are run in.
 The `SolutionRestoreJob` which handles the command, automatic and on build restores.
 Package installation through the PM UI & PMC also runs restore, but it doesn't not run through the `SolutionRestoreJob`.
-The reference change flows will never no-op, so as such they are not the focus.
+The PMUI/PMC command flows will never no-op, so as such they are not the focus.
 
-The NuGet in Visual Studio restore is now considering 3 different gestures:
+The NuGet in Visual Studio restore has 3 different gestures:
 
 * OnBuild - Runs before build
 * Explicit - Solution restore command
 * Implicit - Auto restore
 
-All of that is captured below:
+Those can further be captured in the below table.
 
 | Gesture | OperationSource | Is no-op allowed | Notes |
 |---------|-----------------|------------------|-------|
@@ -79,17 +94,10 @@ PackageSpec represents the single project inputs.
 DependencyGraphSpec represents many project inputs. Additionally it also contains a list of projects that are being restored.
 For example the DependencyGraphSpec for project A with dependencies to projects B and C, will contain the PackageSpecs for A, B, C & A as a restore target.
 
-Reiterating from above, the 3 relevant inputs to restore are:
-
-* Project inputs
-* Project level restore outputs like assets file, msbuild files & the lock file.
-* The needed packages on disk/packages folder.
-
-In the below, we tackle each one individually and examine whether they can be tackled together.
-
 #### Project inputs
 
 When the solution restore in VS runs, the check is done for every project individually.
+
 Prior to any project restore being run, in Visual Studio (and really in all products), we generate a complete DependencyGraphSec. See [SolutionRestoreJob](https://github.com/NuGet/NuGet.Client/blob/788bc01a1b063a37841cdd6d035feb320e90e475/src/NuGet.Clients/NuGet.SolutionRestoreManager/SolutionRestoreJob.cs#L329) in VS. See [RestoreTask](https://github.com/NuGet/NuGet.Client/blob/788bc01a1b063a37841cdd6d035feb320e90e475/src/NuGet.Core/NuGet.Build.Tasks/RestoreTask.cs#L136) for MSBuild/Dotnet.exe
 Given the transitive nature of restore, the full project closure of project inputs is required.
 Today that's done by cloning the project inputs and including them in DependencyGraphSpec for the project restore.
