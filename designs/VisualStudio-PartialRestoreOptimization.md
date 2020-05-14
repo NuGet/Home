@@ -66,9 +66,11 @@ The current no-op optimization can be disabled, through a force switch on the co
 
 #### Visual Studio restore gestures
 
-There are 2 technical ways the restores are run in.
-The `SolutionRestoreJob` which handles the command, automatic and on build restores.
-Package installation through the PM UI & PMC also runs restore, but it doesn't not run through the `SolutionRestoreJob`.
+From a technical perspective, restore can be different in 2 different ways.
+
+* `SolutionRestoreJob` which handles the command, automatic and on build restores.
+* Package installation through the PM UI & PMC also runs restore, but it doesn't not run through the `SolutionRestoreJob`.
+
 The PMUI/PMC command flows will never no-op, so as such they are not the focus.
 
 The NuGet in Visual Studio restore has 3 different gestures:
@@ -89,9 +91,11 @@ Those can further be captured in the below table.
 
 ### SolutionUpToDateChecker
 
-Understanding we can't cover the complete implementation of restore here, it is notable to mention the PackageSpec and DependencyGraphSpec concepts in PackageReference restore.
+We can't cover the complete implementation of restore here, it is notable to mention the PackageSpec and DependencyGraphSpec concepts in PackageReference restore.
+
 PackageSpec represents the single project inputs.
 DependencyGraphSpec represents many project inputs. Additionally it also contains a list of projects that are being restored.
+
 For example the DependencyGraphSpec for project A with dependencies to projects B and C, will contain the PackageSpecs for A, B, C & A as a restore target.
 
 #### Project inputs
@@ -99,17 +103,19 @@ For example the DependencyGraphSpec for project A with dependencies to projects 
 When the solution restore in VS runs, the check is done for every project individually.
 
 Prior to any project restore being run, in Visual Studio (and really in all products), we generate a complete DependencyGraphSec. See [SolutionRestoreJob](https://github.com/NuGet/NuGet.Client/blob/788bc01a1b063a37841cdd6d035feb320e90e475/src/NuGet.Clients/NuGet.SolutionRestoreManager/SolutionRestoreJob.cs#L329) in VS. See [RestoreTask](https://github.com/NuGet/NuGet.Client/blob/788bc01a1b063a37841cdd6d035feb320e90e475/src/NuGet.Core/NuGet.Build.Tasks/RestoreTask.cs#L136) for MSBuild/Dotnet.exe
-Given the transitive nature of restore, the full project closure of project inputs is required.
+Given the transitive nature of restore, the full project closure of project to be restored is required.
 Today that's done by cloning the project inputs and including them in DependencyGraphSpec for the project restore.
-That can be expensive. Given that all the package specs are known before any restore is run we can attempt to do a solution based restore.
+That can be expensive. Given that all the package specs are known before any restore is run we can attempt to do a solution based restore. See [DependencyGraphSpecRequestProvider](https://github.com/NuGet/NuGet.Client/blob/253a77105feba2fdc481efc041e0f01242902087/src/NuGet.Core/NuGet.Commands/RestoreCommand/RequestFactory/DependencyGraphSpecRequestProvider.cs#L83) for reference.
 
-#### Project level restore outputs like assets file, msbuild files & the lock file
+#### Outputs
+
+##### Project specific
 
 Currently we only verify that the files exist on disk for our no-op check.
 Given the deterministic nature of the number of files, this is not the expensive part.
 Handled in the [NoOpRestoreUtilities](https://github.com/NuGet/NuGet.Client/blob/788bc01a1b063a37841cdd6d035feb320e90e475/src/NuGet.Core/NuGet.Commands/RestoreCommand/Utility/NoOpRestoreUtilities.cs#L123).
 
-#### The needed packages on disk/packages folder
+##### Shared
 
 All the packages in the closure need to be on disk, either in the global packages folder or the fallback folders.
 Currently  in the [NoOpRestoreUtilities](https://github.com/NuGet/NuGet.Client/blob/788bc01a1b063a37841cdd6d035feb320e90e475/src/NuGet.Core/NuGet.Commands/RestoreCommand/Utility/NoOpRestoreUtilities.cs#L123), in the same way as the project level restore outputs.
@@ -117,8 +123,8 @@ Given how infrequently these are deleted, the proposal is to avoid this check du
 
 ### Putting it all together - partial restore
 
-Each one of the 3 above markers represents something that defeats no-op.
-The proposal is that we do not watch for the global packages folder.
+The proposal is that we do not validate all the packages from the global packages folder.
+However we will validate the existence of the global packages folder itself.
 
 * Any inputs change affects the current project and it's parents.
 * Any outputs change affects the current project only.
@@ -126,7 +132,7 @@ The proposal is that we do not watch for the global packages folder.
 Given that we have all solution inputs, we do the PackageSpec checks individually instead of the DependencyGraphSpec level.
 This allows us to do 1 comparison for each package spec instead of N, where N is the number of closures the PackageSpec appears in.
 
-If a PackageSpec or input is `dirty` then we treat the projects referencing it as dirty as well.
+If the input is `dirty` then we treat the projects referencing it as dirty as well.
 If a output is dirty, then only said project is considered dirty.
 
 Lastly the status needs to be reported in order to ensure we are not no-op a failed project.
@@ -134,26 +140,35 @@ A project could fail due to an ambient state, such as sources or security access
 
 ### Caveats
 
-* We are not gonna watch the packages folder. A delete in the global packages folder will not defeat the partial restore optimization.
+* We are not gonna watch the packages folder. A delete in the global packages folder will not defeat the partial restore optimization. 
 * At the beginning of every Visual Studio restore operation, we remove all NuGet related errors and warnings from the error list. When a project no-ops the warnings raised during the previous restore need to replayed. Currently those are persisted in the assets and cache files. In SDK based projects, the project-system surfaces the warnings in the error list. In csproj.dll PackageReference based projects, they are written to the error log again by NuGet. So this optimization will not work with LegacyPackageReferenceProjects for now.
+* The global packages folder existence check can cause a false negative in some situations, where there are no packages required but a project is PackageReference based, but even in that case, the project level no-op check offers an out.
+
+### Success metrics
+
+Given that this is an optimization affecting the large majority of PackageReference projects, the success metrics are straightforward.
+
+* An improvement of the restore performance across the board. Specifically the difference should be noticeable for large solutions.
+* Add a metric to track the number of projects that are up to date in the solution based check. We'd normally expect the numbers to remain equivalent to the current number of projects that noop.
+* Add a metric to track the overhead of this check. Ideally this check remains minimal. The overhead added should be justified by the fact that project level restores will not be frequent (beyond solution load).
 
 ## Future Work
 
 * Replay the warnings for LegacyPackageReference projects and enable the partial restore optimization
 * Profile the allocations improvement by this change. Specifically compare 16.6 to 16.7.
 * Analyze changing the user gestures that defeat no-op. Specifically the lack of a specific gesture to reevaluate the packages lock file and floating versions. Rebuild as a gesture seems counterintuitive.
-* Analyze the frequency of restores and understand the likely root cause
+* Analyze the frequency of restores and understand the likely root cause.
+* Analyze the success of the solution based partial restore optimization
 
 ## Open Questions
 
-* TBD
+* Currently each restore reports a no-op count. Should that no-op count continue to include the projects that no-op in the solution based check?
+  * Example with the current proposal, A sln with 5 projects, 3 SDK based, 1 legacy, one packages.config. The 3 SDK based projects will have a solution level no-op &  the 1 legacy project will have a project level no-op. Should the no-op count be 1 or 4? Currently leaning to 4, because in the end it is still a no-op.
 
 ## Considerations
 
-* Checking the timestamp of all the package directories was considered but ultimately went against that adds a lot of memory overhead and decreases the wins 
+* Checking the timestamp of all the package directories was considered but ultimately went against that adds a lot of memory overhead and decreases the wins.
 
 ### References
 
-* Links to no-op, the future work, the current implementation.
-
-# TODO NK - Really focus on input/outs.
+* [Original no-op restore spec](https://github.com/NuGet/Home/wiki/NuGet-Restore-No-Op)
