@@ -154,11 +154,11 @@ Given that this is an optimization affecting the large majority of PackageRefere
 
 ## Future Work
 
-* Replay the warnings for LegacyPackageReference projects and enable the partial restore optimization
-* Profile the allocations improvement by this change. Specifically compare 16.6 to 16.7.
-* Analyze changing the user gestures that defeat no-op. Specifically the lack of a specific gesture to reevaluate the packages lock file and floating versions. Rebuild as a gesture seems counterintuitive.
-* Analyze the frequency of restores and understand the likely root cause.
-* Analyze the success of the solution based partial restore optimization
+* Replay the warnings for LegacyPackageReference projects and enable the partial restore optimization [9565](https://github.com/NuGet/Home/issues/9565)
+* Profile the allocations improvement by this change. Specifically compare 16.6 to 16.7.[314](https://github.com/NuGet/Client.Engineering/issues/314)
+* Analyze changing the user gestures that defeat no-op. Specifically the lack of a specific gesture to reevaluate the packages lock file and floating versions. Rebuild as a gesture seems counterintuitive. [6987](https://github.com/NuGet/Home/issues/6987)
+* Analyze the frequency of restores and understand the likely root cause. [9566](https://github.com/NuGet/Home/issues/9566), [9567](https://github.com/NuGet/Home/issues/9567), [9568](https://github.com/NuGet/Home/issues/9568)
+* Analyze the success of the solution based partial restore optimization [315](https://github.com/NuGet/Client.Engineering/issues/315)
 
 ## Open Questions
 
