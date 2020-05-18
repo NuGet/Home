@@ -1,4 +1,4 @@
-# Centrally managing NuGet package versions - Managing packages in Visual Studio Spec
+# Centrally managing NuGet package versions - Visual Studio NuGet/Project System APIs
 
 * Status: **In Review**
 * Author(s): [Andy Zivkovic](https://github.com/zivkan)
@@ -10,7 +10,7 @@
 
 ## Problem Background
 
-Within Visual Studio, only project systems read and manipulate project files, and provide APIs to other components, such as NuGet. This allows project systems to efficiently handle changes. Although CPVM's `Directory.Packages.props` file is not the project file itself (`csproj`, `vbproj`, and so on), it is imported by the project files and therefore contributes to project evaluation.
+Within Visual Studio, only project systems read and manipulate project files, and provide APIs to other components, such as NuGet. This allows project systems to efficiently handle changes. Although CPVM's `Directory.Packages.props` file is not the project file itself (`csproj`, `vbproj`, and so on), it is an MSBuild file and is imported by the project files and therefore contributes to project evaluation.
 
 To enable NuGet's package management functionality within Visual Studio (Package Manager UI, Package Manager Console, or NuGet's APIs to install packages), NuGet needs agreement with project systems on how APIs should behave with the new feature.
 
@@ -20,9 +20,12 @@ All customers managing packages on projects that are using central package versi
 
 ## Minimum Viable Product Goals
 
+Note: Project System APIs, and changes to NuGet's APIs, needed for restore scenarios were done as part of the restore spec & implementation. This document focuses on being able to update packages
+
 1. When installing a package in a centrally managed project, if the package already exists in the `Directory.Packages.props` file, only the project file is modified. The `PackageReference` element added must not have a version applied.
 2. When installing a package in a centrally managed project, if the package does not already exist in the `Directory.Packages.props` file, then the package version is added to `Directory.Packages.props`, in addition to goal 1 above.
 3. When updating a centrally managed package version, the `Directory.Packages.props` file is updated, and all projects that use the `Directory.Packages.props` must be restored.
+  * A future optimisation could be to restore only the projects that have either a direct or transitive dependency on the updated package. Since it is not currently easy to check if a project has a transitive dependency to a package, this is out of scope for the initial version of the feature.
 4. When uninstalling/removing a package from a centrally managed project, the `PackageReference` is removed from the project file, but the `PackageVersion` is kept in the `Directory.Packages.props` file.
 
 ## Later Phase Goals
@@ -32,7 +35,7 @@ All customers managing packages on projects that are using central package versi
 ## Non - Goals
 
 6. This spec is scoped to Visual Studio API interaction between components. Package Manager UI changes are out of scope. Command Line Interface is out of scope.
-7. `Directory.Packages.props` files that import other MSBuild files. If the customer uses this, the behavior is undefined, specifically around which `Directory.Packages.props` file gets updated.
+7. `Directory.Packages.props` files that import other MSBuild files. Only update of the first `Directory.Packages.props` file found is supported. Any `PackageVersion` items defines in different files, or any nesting of `Directory.Packages.props` is unsupported with undefined behavior.
 
 ## Scenarios
 
@@ -100,7 +103,7 @@ Customer installs `PackageA` into `Project1` using Package Manager UI.
 
 ### Install a package in a project that does not exist in `Directory.Packages.props`
 
-In this scenario, there is a `Directory.Packages.props` file, but it does not have `PackageVersion` for `PackageA`. There is a project `Project1`, which also does not currently have a reference to `PackageA`. When the customer installs `PackageA`, version `1.2.3`, into `Project1`, `Directory.Packages.props` is modified to include `<PackageVersion Include="PackageA" Version="1.2.3" />`, and the project's file is modified to include a `<PackageReference Include="PackageA" />`.
+In this scenario, there is a `Directory.Packages.props` file, but it does not have a `PackageVersion` for `PackageA`. There is a project `Project1`, which also does not currently have a reference to `PackageA`. When the customer installs `PackageA`, version `1.2.3`, into `Project1`, `Directory.Packages.props` is modified to include `<PackageVersion Include="PackageA" Version="1.2.3" />`, and the project's file is modified to include a `<PackageReference Include="PackageA" />`.
 
 #### Before
 
@@ -193,11 +196,7 @@ In this scenario, there is a `Directory.Packages.props` file which defines a ver
 
 #### Gesture
 
-There are at least 3 gestures which may meet this scenario
-
-1. Install `PackageA` using Package Manager UI. The customer will not be able to select the version.
-2. Install `PackageA` using Package Manager Console.
-3. NuGet's `InstallPackageAsync` API is called, to install `PackageA`. For example, triggered from a Roslyn analyzer code fix.
+The customer uninstalls `PackageA` from the Package Manager UI.
 
 #### After
 
@@ -230,7 +229,7 @@ There are at least 3 gestures which may meet this scenario
 
 ### Update the version
 
-In this scenario, there is a `Directory.Packages.props` file which defines a version for `PackageA` and `PackageB`. There are two projects, `Project1` has a `PackageReference` to `PackageA`, and `Project2` has a `PackageReference` to `PackageB`. The customer updates `PackageA` to a different version. The `Directory.Packages.props` must be modified to contain the new version. All projects (two in this scenario) must be restored. `Project1` must be restored as it directly references `PackageA`. `Project2` must be restored, because `PackageB` might have a dependency on `PackageA`, and therefore the `PackageA`'s version needs to be pinned.
+In this scenario, there is a `Directory.Packages.props` file which defines a version for `PackageA`. There is a project, `Project1`, which has a `PackageReference` to `PackageA`. The customer updates `PackageA` to a different version. The `Directory.Packages.props` must be modified to contain the new version. All projects (one in this scenario) must be restored.
 
 #### Before
 
@@ -240,7 +239,6 @@ In this scenario, there is a `Directory.Packages.props` file which defines a ver
 <Project>
   <ItemGroup>
     <PackageVersion Include="PackageA" Version="1.2.3" />
-    <PackageVersion Include="PackageB" Version="4.5.6" />
   </ItemGroup>
 </Project>
 ```
@@ -261,25 +259,9 @@ In this scenario, there is a `Directory.Packages.props` file which defines a ver
 </Project>
 ```
 
-`$(repo_root)\Project2\Project2.csproj`
-
-```xml
-<Project Sdk="Microsoft.NET.Sdk">
-
-  <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="PackageB" />
-  </ItemGroup>
-
-</Project>
-```
-
 #### Gesture
 
-The customer updates `PackageA` to version `2.0.0` in Package Manager UI.
+The customer updates `PackageA` to version `2.3.4` in Package Manager UI.
 
 #### After
 
@@ -288,8 +270,7 @@ The customer updates `PackageA` to version `2.0.0` in Package Manager UI.
 ```xml
 <Project>
   <ItemGroup>
-    <PackageVersion Include="PackageA" Version="2.0.0" />
-    <PackageVersion Include="PackageB" Version="4.5.6" />
+    <PackageVersion Include="PackageA" Version="2.3.4" />
   </ItemGroup>
 </Project>
 ```
@@ -305,22 +286,6 @@ The customer updates `PackageA` to version `2.0.0` in Package Manager UI.
 
   <ItemGroup>
     <PackageReference Include="PackageA" />
-  </ItemGroup>
-
-</Project>
-```
-
-`$(repo_root)\Project2\Project2.csproj`
-
-```xml
-<Project Sdk="Microsoft.NET.Sdk">
-
-  <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="PackageB" />
   </ItemGroup>
 
 </Project>
@@ -344,50 +309,90 @@ A new service should be created. This service will have multiple responsibilitie
 * Find which `Directory.Packages.props` file needs to be changed given a package install for a specific project.
 * Orchestrate efficient updating and nomination of projects. In particular, when project files and `Directory.Packages.props` files need to change due to a single customer gesture, avoid multiple project nominations and multiple restores due to multiple file changes.
 
-This new service will by used by NuGet, but only for projects that have centrally managed versions enabled. Projects that do not use CPVM will continue to work as they do today.
-
-Proposal: When a project is using `CPVM`, NuGet will only use this new service and will no longer call the existing project system APIs
-
-Proposed API. Very subject to change as we start implementing and discover better ideas:
+Proposed API.
 
 ```cs
-interface IDirectoryPackagesPropsService
+enum PackageReferenceAction
 {
   /// <summary>
-  /// Add a PackageReference to the projects provided. If the packageId does
+  /// To catch uninitialized values, but otherwise usused and invalid.
   /// </summary>
-  Task<bool> AddPackageAsync(List<string> projects, string packageId, string packageVersion);
+  Unknown = 0,
 
   /// <summary>
-  /// Remove a PackageReference from the projects listed, but do not remove the PackageVersion
-  /// from the Directory.Packages.props file.
+  /// The change should add or update PackageReference and or PackageVersion items.
   /// </summary>
-  Task<bool> RemovePackageAsync(List<string> projects, string packageId);
+  AddOrUpdate = 1,
 
   /// <summary>
+  /// The change should remove matching PackageReference items only, do not remove PackageVersion items.
   /// </summary>
-  Task<bool> UpdatePackageAsync(List<string> projects, string packageId, string packageVersion);
+  RemovePackageReference = 2,
 
   /// <summary>
-  /// Delete the PackageVersion items from any Directory.Packages.props file imported by the
-  /// provided projects. If any of the projects contain a PackageReference to the project ID,
-  /// throw an error.
+  /// This change should remove both PackageReference and PackageVersion items.
   /// </summary>
   /// <remarks>
-  /// Out of scope of the first version (minimal viable product). In scope later. Adding it now
-  // avoids changing the interface in shipped versions.
+  /// Out of scope for the initial version. It has been defined to avoid needing an API change to add this in the future.
   /// </remarks>
-  Task<bool> DeletePackageAsync(List<string> projects, string packageId);
+  Remove = 3
+}
+
+class PackageReferenceChangeRequest
+{
+  /// <summary>
+  /// The action to apply
+  /// </summary>
+  public PackageReferenceAction Action { get; set;}
+
+  /// <summary>
+  /// Which projects in the solution should apply this PackageReference action
+  /// </summary>
+  public List<string> Projects { get; set; }
+
+  /// <summary>
+  /// The package ID 
+  /// </summary>
+  public string PackageId { get; set; }
+
+  /// <summary>
+  /// The package version
+  /// </summary>
+  /// <remarks>
+  /// * If the project does not use CPVM
+  ///   * AddOrUpdate must set the PackageReference Version metadata to this value
+  ///   * RemovePackage will ignore any value in Version
+  /// * If the project uses CPVM
+  ///   * AddOrUpdate must set the Version attribute in the Directory.Packages.props fie to this version. If the Directory.Packages.props file does not already contain an item for this PackageId, then it should be added.
+  ///   * RemovePackage will ignore any value in Version
+  /// </remarks>
+  public string Version { get; set; }
+
+  /// <summary>
+  /// Additional metadata for this PackageId to set on the PackageReference item.
+  /// </summary>
+  /// <remarks>
+  /// * AddOrUpdate must create or set metadata defined by the keys of this dictionary, with the value defined by the dictionary item's value.
+  /// * AddOrUpdate must remove any metadata already defined in the PackageReference, if there is no key for that metadata in the dictionary.
+  /// * RemovePackage will ignore any value in AdditionalMetadata.
+  /// </remarks>
+  public IDictionary<string, string> AdditionalMetadata { get; set; }
+}
+
+interface IPackageReferenceUpdateService
+{
+  /// <summary>
+  /// Apply changes to the project(s) provided.
+  /// </summary>
+  Task<bool> ApplyChangesAsync(List<PackageReferenceChangeRequest> actions, CancellationToken token);
 }
 ```
 
-Open questions:
+open questions:
 
-* How to handle when a PackageReference needs `IncludeAssets`, `PrivateAssets` and/or `ExcludeAssets`?
+* The convention in .NET is to add `CancellationToken` to async APIs. However, what is the expected behaviour if cancellation is requested in the middle of processing a single change request?
+* Which project types will this service support? C# and VB only?  f#? c++? non-Microsoft project systems?
 
-* If NuGet knows that a project's `Directory.Packages.props` file already contains a `PackageVersion` item for the package ID, NuGet could call the project system directly instead of the service, since the `Directory.Packages.props` file does not need modification. Pros/cons?
-
-* How big of a problem is it really when a new package is installed, if `Directory.Packages.props` is modified, all projects get restored, then the project with the new package gets modified and gets restored potentially a second time?  Maybe the APIs should pass the `Directory.Packages.props` filename, instead of the list of projects? And NuGet needs to make separate calls to update the two files?
 
 ## References
 
