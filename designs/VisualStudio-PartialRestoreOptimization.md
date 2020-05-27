@@ -148,7 +148,7 @@ A project could fail due to an ambient state, such as sources or security access
 
 Given that this is an optimization affecting the large majority of PackageReference projects, the success metrics are straightforward.
 
-* An improvement of the restore performance across the board. Specifically the difference should be noticeable for large solutions.
+* An improvement of the restore no-op performance across the board. Specifically the difference should be noticeable for large solutions.
 * Add a metric to track the number of projects that are up to date in the solution based check. We'd normally expect the numbers to remain equivalent to the current number of projects that noop.
 * Add a metric to track the overhead of this check. Ideally this check remains minimal. The overhead added should be justified by the fact that project level restores will not be frequent (beyond solution load).
 
