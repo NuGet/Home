@@ -315,7 +315,7 @@ Proposed API.
 enum PackageReferenceAction
 {
   /// <summary>
-  /// To catch uninitialized values, but otherwise usused and invalid.
+  /// To catch bugs where values are left uninitialized, but otherwise usused and invalid.
   /// </summary>
   Unknown = 0,
 
@@ -348,7 +348,7 @@ class PackageReferenceChangeRequest
   /// <summary>
   /// Which projects in the solution should apply this PackageReference action
   /// </summary>
-  public List<string> Projects { get; set; }
+  public IReadOnlyList<string> Projects { get; set; }
 
   /// <summary>
   /// The package ID 
@@ -359,12 +359,8 @@ class PackageReferenceChangeRequest
   /// The package version
   /// </summary>
   /// <remarks>
-  /// * If the project does not use CPVM
-  ///   * AddOrUpdate must set the PackageReference Version metadata to this value
-  ///   * RemovePackage will ignore any value in Version
-  /// * If the project uses CPVM
-  ///   * AddOrUpdate must set the Version attribute in the Directory.Packages.props fie to this version. If the Directory.Packages.props file does not already contain an item for this PackageId, then it should be added.
-  ///   * RemovePackage will ignore any value in Version
+  /// * AddOrUpdate must set the Version attribute in the Directory.Packages.props fie to this version. If the Directory.Packages.props file does not already contain an item for this PackageId, then it should be added.
+  /// * Remove and RemovePackageReference will ignore any value in Version
   /// </remarks>
   public string Version { get; set; }
 
@@ -376,7 +372,7 @@ class PackageReferenceChangeRequest
   /// * AddOrUpdate must remove any metadata already defined in the PackageReference, if there is no key for that metadata in the dictionary.
   /// * RemovePackage will ignore any value in AdditionalMetadata.
   /// </remarks>
-  public IDictionary<string, string> AdditionalMetadata { get; set; }
+  public IReadOnlyDictionary<string, string> AdditionalMetadata { get; set; }
 }
 
 interface IPackageReferenceUpdateService
@@ -384,7 +380,7 @@ interface IPackageReferenceUpdateService
   /// <summary>
   /// Apply changes to the project(s) provided.
   /// </summary>
-  Task<bool> ApplyChangesAsync(List<PackageReferenceChangeRequest> actions, CancellationToken token);
+  Task ApplyChangesAsync(IReadOnlyList<PackageReferenceChangeRequest> actions, CancellationToken token);
 }
 ```
 
