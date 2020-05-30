@@ -117,7 +117,7 @@ Options:
   --config &lt;CONFIG_FILE&gt;                    The path to the NuGet config file to use. Requires the '--outdated' or '--deprecated' option.
   --source &lt;SOURCE&gt;                         The NuGet sources to use when searching for newer packages. Requires the '--outdated' or '--deprecated' option.
   --interactive                             Allows the command to stop and wait for user input or action (for example to complete authentication).
-  <b>-v, --verbosity &lt;LEVEL&gt;</b>            <b>Set the MSBuild verbosity level. Allowed values are q[uiet], m[inimal], n[ormal], d[etailed], and diag[nostic].</b>
+  <b>-v, --verbosity &lt;LEVEL&gt;</b>                   <b>Set the MSBuild verbosity level. Allowed values are q[uiet], m[inimal], n[ormal], d[etailed], and diag[nostic].</b>
 </pre>
 
 ## References
