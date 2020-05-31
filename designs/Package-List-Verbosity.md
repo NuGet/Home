@@ -158,6 +158,59 @@ Options:
   <b>-v, --verbosity &lt;LEVEL&gt;</b>                   <b>Set the MSBuild verbosity level. Allowed values are q[uiet], m[inimal], n[ormal], d[etailed], and diag[nostic].</b>
 </pre>
 
+### Example output
+
+This is output of the invocation of `dotnet list package --outdated --framework netcoreapp2.1` for
+[NuGet.CommandLine.XPlat.csproj](https://github.com/NuGet/NuGet.Client/blob/05925a63fde32ab277ccaab13ed466add9ac9dc8/src/NuGet.Core/NuGet.CommandLine.XPlat/NuGet.CommandLine.XPlat.csproj).
+
+#### Default verbosity | `--verbosity mimimal` | `--verbosity quiet`
+
+```
+The following sources were used:
+   C:\Program Files (x86)\Microsoft SDKs\NuGetPackages\
+   https://api.nuget.org/v3/index.json
+
+Project `NuGet.CommandLine.XPlat` has the following updates to its packages
+   [netcoreapp2.1]:
+   Top-level Package                            Requested                 Resolved                  Latest
+   > Microsoft.Build                            16.5.0-preview-19606-01   16.5.0-preview-19606-01   16.5.0
+   > Microsoft.Build.Locator                    1.2.2                     1.2.2                     1.2.6
+   > Microsoft.CodeAnalysis.FxCopAnalyzers      2.9.8                     2.9.8                     3.0.0
+   > Microsoft.Extensions.CommandLineUtils      1.0.1                     1.0.1                     1.1.1
+   > Microsoft.SourceLink.GitHub                1.0.0-beta2-19351-01      1.0.0-beta2-19351-01      1.1.0-beta-20204-02
+```
+
+#### `--verbosity normal` | `--verbosity detailed` | `--verbosity diagnostic`
+
+```
+The following sources were used:
+   C:\Program Files (x86)\Microsoft SDKs\NuGetPackages\
+   https://api.nuget.org/v3/index.json
+
+  GET https://api.nuget.org/v3/registration5-gz-semver2/microsoft.build/index.json
+  GET https://api.nuget.org/v3/registration5-gz-semver2/microsoft.netcore.app/index.json
+  GET https://api.nuget.org/v3/registration5-gz-semver2/microsoft.extensions.commandlineutils/index.json
+  GET https://api.nuget.org/v3/registration5-gz-semver2/microsoft.codeanalysis.fxcopanalyzers/index.json
+  GET https://api.nuget.org/v3/registration5-gz-semver2/microsoft.build.locator/index.json
+  GET https://api.nuget.org/v3/registration5-gz-semver2/microsoft.sourcelink.github/index.json
+  GET https://api.nuget.org/v3/registration5-gz-semver2/system.runtime.serialization.primitives/index.json
+  OK https://api.nuget.org/v3/registration5-gz-semver2/microsoft.extensions.commandlineutils/index.json 85ms
+  OK https://api.nuget.org/v3/registration5-gz-semver2/microsoft.codeanalysis.fxcopanalyzers/index.json 116ms
+  OK https://api.nuget.org/v3/registration5-gz-semver2/microsoft.sourcelink.github/index.json 211ms
+  OK https://api.nuget.org/v3/registration5-gz-semver2/microsoft.netcore.app/index.json 234ms
+  OK https://api.nuget.org/v3/registration5-gz-semver2/system.runtime.serialization.primitives/index.json 231ms
+  OK https://api.nuget.org/v3/registration5-gz-semver2/microsoft.build/index.json 303ms
+  OK https://api.nuget.org/v3/registration5-gz-semver2/microsoft.build.locator/index.json 299ms
+Project `NuGet.CommandLine.XPlat` has the following updates to its packages
+   [netcoreapp2.1]:
+   Top-level Package                            Requested                 Resolved                  Latest
+   > Microsoft.Build                            16.5.0-preview-19606-01   16.5.0-preview-19606-01   16.5.0
+   > Microsoft.Build.Locator                    1.2.2                     1.2.2                     1.2.6
+   > Microsoft.CodeAnalysis.FxCopAnalyzers      2.9.8                     2.9.8                     3.0.0
+   > Microsoft.Extensions.CommandLineUtils      1.0.1                     1.0.1                     1.1.1
+   > Microsoft.SourceLink.GitHub                1.0.0-beta2-19351-01      1.0.0-beta2-19351-01      1.1.0-beta-20204-02
+```
+
 ## References
 
 - [MSBuild verbosity settings](https://docs.microsoft.com/en-us/visualstudio/msbuild/obtaining-build-logs-with-msbuild?view=vs-2019#verbosity-settings) - how log
