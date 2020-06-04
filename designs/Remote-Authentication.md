@@ -24,6 +24,22 @@ There are 3 authentication techniques in NuGet.
 
  When solving this problem when there is some nuget code running on the client and server, we need to decide which of those to support.
 
+## Scenarios
+
+- Azure Artifacts (existing) - Dev who uses a repo on client machine, connects to codespace from same machine. How easy could we make the auth experience given that they have already authenticated all those feeds on the client.
+  
+  - what if they used VS for auth?
+  - what if they used CLI for auth?
+
+- Azure Artifacts (fresh) - Dev connects to codespace/repo from machine which has never used that repo - thus likely hasn't authenticated to those feeds.
+
+- GPR (existing) - Dev connects to codespace/repo that needs to use PAT from some feeds on GPR (github package repository). They already have (via non-repo based nuget.config) some PATs stored.
+
+- GPR (fresh) - Dev connects to codespace/repo that needs to use PAT from some feeds on GPR (github package repository)
+
+- MyGet, Artifactory - ??? - research scenarios
+
+
 ## Possible approaches
 
 1. Remote v2 Auth call to client - When credentials are needed, the server calls to the client to authenticate via prompts, etc... Relies on NuGet CLI v2 Auth provider being installed on VS client side.
@@ -43,3 +59,5 @@ Package Consumers who are using authenticated feeds.
 * 
 
 ### Open Questions
+
+- does the existing principal from codespace creation get reused?
