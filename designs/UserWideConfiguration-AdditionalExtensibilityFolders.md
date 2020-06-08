@@ -37,8 +37,8 @@ There 2 solutions that satisfy the requirement with the least amount of friction
 
 Pros:
 
-* Simple & intuitive. Windows: %appdata%\NuGet\NuGet.Config
-Mac/Linux: ~/.config/NuGet/NuGet.Config or ~/.nuget/NuGet/NuGet.Config.
+* Simple & intuitive. Windows: %appdata%\NuGet\*.Config
+Mac/Linux: ~/.config/NuGet/*.[C|c]onfig or ~/.nuget/NuGet/*.[C|c]onfig.
 
 Cons:
 
@@ -46,7 +46,8 @@ Cons:
 
 ### Define a new folder for additiona user-wide configuration
 
-The proposal is to use `%APPDATA%\NuGet\config`.
+The proposal is to use `%APPDATA%\NuGet\config\` on Windows and `~/.config/NuGet/config/` or `~/.nuget/NuGet/config/` on Mac/Linux
+
 
 Pros:
 
