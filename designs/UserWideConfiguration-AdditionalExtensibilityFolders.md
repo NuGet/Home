@@ -1,5 +1,5 @@
 
-# Spec Name
+# Additional user wide configuration options
 
 * Status: In Review
 * Author(s): [Nikolche Kolev](https://github.com/nkolev92)
