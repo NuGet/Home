@@ -140,9 +140,22 @@ A project could fail due to an ambient state, such as sources or security access
 
 ### Caveats
 
-* We are not gonna watch the packages folder. A delete in the global packages folder will not defeat the partial restore optimization. 
+* We are not gonna watch the packages folder. A delete in the global packages folder will not defeat the partial restore optimization.
 * At the beginning of every Visual Studio restore operation, we remove all NuGet related errors and warnings from the error list. When a project no-ops the warnings raised during the previous restore need to replayed. Currently those are persisted in the assets and cache files. In SDK based projects, the project-system surfaces the warnings in the error list. In csproj.dll PackageReference based projects, they are written to the error log again by NuGet. So this optimization will not work with LegacyPackageReferenceProjects for now.
 * The global packages folder existence check can cause a false negative in some situations, where there are no packages required but a project is PackageReference based, but even in that case, the project level no-op check offers an out.
+
+### Scenarios that improve
+
+This is a far reaching change and will affect the restore experience in Visual Studio quite dramatically. In this section, we summarize the scenarios where the impact will be most noticeable.
+
+* *Frequent builds with restore enabled* - A common user workflow is, code, code, build. This is usually a complete no-op. This would reduce the overhead restore adds to the build operation. This is currently the most frequent way a restore is run.
+
+* *Unit test scenarios* - This might also be consider a subset of the above, but it's worth calling out that when a developer is writing unit tests, with all the defaults enabled, the restore overhead to the unit test execution (due to the build run) is reduced.
+
+* *Manually editing the csproj* - With the birth of .NET Core & SDK based projects, much of the tooling has evolved, so that now customers can manually edit the csproj to add/change references. With this change, the project based restore would only be run for the edited project and it's parents. Before it was run for all the projects in the solution. Example: Say you have 80 projects(NuGet.sln), and you edit the PackageReference for one project, (say NuGet.PackageManagement.UI), then the project based will be run only for maybe 5 of the 80 projects in the solution.
+Notable to mention that the overhead of the restore for the projects that actually change, would likely exceed the `savings` this improvement nets, so the overall impact is more limited.
+
+* *Start-up for extra large solutions* - When loading a large solution where the majority of the projects are SDK-based, NuGet would run a restore at a certain point. Given the size of the solution, currently, the timing of when that restore happens is not perfect, so we sometimes find ourselves doing 2, 3 or even more restores. While that on its own needs work, this change allows for the 2nd, 3rd and every subsequent restore to be significantly more efficient.
 
 ### Success metrics
 
@@ -161,9 +174,6 @@ Given that this is an optimization affecting the large majority of PackageRefere
 * Analyze the success of the solution based partial restore optimization [315](https://github.com/NuGet/Client.Engineering/issues/315)
 
 ## Open Questions
-
-* Currently each restore reports a no-op count. Should that no-op count continue to include the projects that no-op in the solution based check?
-  * Example with the current proposal, A sln with 5 projects, 3 SDK based, 1 legacy, one packages.config. The 3 SDK based projects will have a solution level no-op &  the 1 legacy project will have a project level no-op. Should the no-op count be 1 or 4? Currently leaning to 4, because in the end it is still a no-op.
 
 ## Considerations
 
