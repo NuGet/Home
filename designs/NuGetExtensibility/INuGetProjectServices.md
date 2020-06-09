@@ -38,7 +38,7 @@ public interface INuGetProjectServices
     /// The list of packages in the project.
     /// If the project does not exist in the solution, or the project is unloaded, throws ArgumentException.
     /// </return>
-    Task<GetInstalledPackagesResult> GetInstalledPackagesAsync(string project, GetInstalledPackagesOptions options, CancellationToken cancellationToken);
+    Task<GetInstalledPackagesResult> GetInstalledPackagesAsync(string project, CancellationToken cancellationToken);
 }
 
 /// <summary>Result of a call to INuGetProjectServices.GetInstalledPackagesAsync</summary>
@@ -49,16 +49,12 @@ public sealed class GetInstalledPackagesResult
 
     /// <summary>List of packages in the project</summary>
     /// <remarks></remarks>
-    public IReadOnlyCollection<NuGetPackage> Packages { get; }
+    public IReadOnlyCollection<InstalledPackage> Packages { get; }
 }
 
 /// <summary>The status of the result</summary>
 public enum  GetInstalledPackageResultStatus
 {
-    /// <summary>Unknown status</summary>
-    /// <remarks>Probably represents a bug in the method that created the result.</remarks>
-    Unknown = 0,
-
     /// <summary>Successful</summary>
     Successful,
 
@@ -72,7 +68,7 @@ public enum  GetInstalledPackageResultStatus
 }
 
 /// <summary>Basic information about a package</summary>
-public sealed class NuGetInstalledPackage
+public sealed class InstalledPackage
 {
     /// <summary>The package id.</summary>
     public string Id { get; }
@@ -84,32 +80,15 @@ public sealed class NuGetInstalledPackage
     /// </remarks>
     public string Version { get; }
 
-    /// <summary>The package's relationship to the project</summary>
-    /// <remarks>false means it's a transitive dependency</remarks>
-    public NuGetInstalledPackageRelationship Relationship { get; }
+    /// <summary>Is the package a direct dependency of the project.</summary>
+    /// <remarks>
+    /// False means it's a transitive dependency.
+    /// All packages in a packages.config project are direct dependencies.
+    /// </remarks>
+    public bool IsDirectDependency { get; }
 
     // I'd love this class to be replaced with a record type once that feature is available in the language. Can we design this class to be forwards compatible with record types so it can be replaced in a future version?
     internal NuGetPackage(string id, string version, NuGetInstalledPackageRelationship relationship);
-}
-
-public enum NuGetInstalledPackageRelationship
-{
-    Unknown = 0,
-
-    Direct,
-
-    Transitive,
-
-    Implicit,
-
-    // PackageDownload? FrameworkReference?
-}
-
-public sealed class GetInstalledPackagesOptions
-{
-    public static GetInstalledPackageOptions Default { get; }
-
-    // in the future may include options such as WaitForNomination, WaitForRestore.
 }
 ```
 
