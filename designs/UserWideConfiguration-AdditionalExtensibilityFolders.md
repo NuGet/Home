@@ -59,6 +59,60 @@ Cons:
 
 Worth to mention that while there have been instances of additional configs in the current user wide directory, it's impossible for us to determine the exact indicidence. We are likely talking about very few customers.
 
+### Reading and writing priority
+
+In both solutions the reading and writing priority proposal is the same.
+
+Say we have 1 solution configuration file and 2 user-wide configuration files.
+
+* Local - solution file.
+* User - The default user wide file from %APPDATA%\NuGet
+* AdditionalUser - The additional user file from whichever the new location is.
+
+The contents of the files are as follows respectively:
+
+Local
+
+```xml
+<configuration>
+    <SectionName>
+        <add key="key1" value="local" />
+        <add key="key2" value="local" />
+    </SectionName>
+</configuration>
+```
+
+User
+
+```xml
+<configuration>
+    <SectionName>
+        <add key="key2" value="user" />
+        <add key="key3" value="user" />
+    </SectionName>
+</configuration>
+```
+
+AdditionalUser
+
+```xml
+<configuration>
+    <SectionName>
+        <add key="key3" value="additional" />
+        <add key="key4" value="additional" />
+    </SectionName>
+</configuration>
+```
+
+### Reading priority
+
+Given that the local file is the closest and the additional user configuration is considered the furthest, when reading `key2` for example will have the value `local`.
+
+### Writing priority
+
+Conversely, when writing we write to the furthest available config file.
+Specifically if we were to write `key5`, it would be written to the `AdditionalUser` config file.
+
 ## Future Work
 
 None
@@ -66,6 +120,8 @@ None
 ## Open Questions
 
 * Which of the 2 approaches do we prefer? Personally I was leaning toward re-using the same folder, but if we want to be risk averse, we can just take the new folder approach.
+* Do we like the writing priority? We can reverse the order to preserve writing compatibility to user-wide folder, but that will potentially allow for additional configs that are supposed to be installed by 3rd party components to overwrite the user wide selections.
+* A potential answer to this ask could be we do nothing.
 
 ## Considerations
 
