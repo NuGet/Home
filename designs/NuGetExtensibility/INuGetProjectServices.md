@@ -27,6 +27,7 @@ Visual Studio component and extension developers.
 ## Solution
 
 ```cs
+/// <summary>Service to interact with projects in a solution</summary>
 public interface INuGetProjectServices
 {
     /// <summary>Gets the list of packages installed in a project.</summmry>
@@ -35,12 +36,42 @@ public interface INuGetProjectServices
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>
     /// The list of packages in the project.
-    /// If the project does not exist in the solution, throws ArgumentException.
-    /// If the project is not ready, throws NuGetProjectNotReadyException.
+    /// If the project does not exist in the solution, or the project is unloaded, throws ArgumentException.
     /// </return>
-    Task<IReadOnlyList<NuGetPackage>> GetInstalledPackagesAsync(string project, GetInstalledPackagesOptions options, CancellationToken cancellationToken);
+    Task<GetInstalledPackagesResult> GetInstalledPackagesAsync(string project, GetInstalledPackagesOptions options, CancellationToken cancellationToken);
 }
 
+/// <summary>Result of a call to INuGetProjectServices.GetInstalledPackagesAsync</summary>
+public sealed class GetInstalledPackagesResult
+{
+    /// <summary>The status of the result</summary>
+    public GetInstalledPackageResultStatus Status { get; }
+
+    /// <summary>List of packages in the project</summary>
+    /// <remarks></remarks>
+    public IReadOnlyCollection<NuGetPackage> Packages { get; }
+}
+
+/// <summary>The status of the result</summary>
+public enum  GetInstalledPackageResultStatus
+{
+    /// <summary>Unknown status</summary>
+    /// <remarks>Probably represents a bug in the method that created the result.</remarks>
+    Unknown = 0,
+
+    /// <summary>Successful</summary>
+    Successful,
+
+    /// <summary>The project is not yet ready</summary>
+    /// <remarks>This typically happens shortly after the project is loaded, but the project system has not yet informed NuGet about package references</remarks>
+    ProjectNotReady,
+
+    /// <summary>Package information could not be retrieved because the project is in an invalid state</summary>
+    /// <remarks>If a project has an invalid target framework value, or a package reference has a version value, NuGet may be unable to generate basic project information, such as requested packages.</remarks>
+    ProjectInvalid
+}
+
+/// <summary>Basic information about a package</summary>
 public sealed class NuGetPackage
 {
     /// <summary>The package id.</summary>
@@ -53,6 +84,7 @@ public sealed class NuGetPackage
     /// </remarks>
     string Version { get; }
 
+    // I'd love this class to be replaced with a record type once that feature is available in the language. Can we design this class to be forwards compatible with record types so it can be replaced in a future version?
     internal NuGetPackage(string id, string version);
 }
 
@@ -62,11 +94,6 @@ public sealed class GetInstalledPackagesOptions
 
     // in the future may include options such as WaitForNomination, WaitForRestore.
 }
-
-public sealed class NuGetProjectNotReadyException : InvalidOperationException
-{
-}
-
 ```
 
 ## Future Work
