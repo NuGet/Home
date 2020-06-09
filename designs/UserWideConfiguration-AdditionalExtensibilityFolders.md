@@ -31,7 +31,7 @@ The solution to start detecting additional configs from the user specific direct
 Given that these are additional configs, they will be merged with lower priority than the default user specific config. The rest are merged deterministically in alphabetical order because they are not expected to confict.
 The determinism allows an out in case something really goes wrong.
 
-There 2 solutions that satisfy the requirement with the least amount of friction.
+There are 2 solutions that satisfy the requirement with the least amount of friction.
 
 ### Re-use the existing %APPDATA%\NuGet directory
 
