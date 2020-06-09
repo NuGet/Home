@@ -72,20 +72,37 @@ public enum  GetInstalledPackageResultStatus
 }
 
 /// <summary>Basic information about a package</summary>
-public sealed class NuGetPackage
+public sealed class NuGetInstalledPackage
 {
     /// <summary>The package id.</summary>
-    string Id { get; }
+    public string Id { get; }
 
     /// <summary>The package version</summary>
     /// <remarks>
     /// If the project uses packages.config, this will be the installed package version.
     /// If the project uses PackageReference, this would ideally be the resolved package version, but may be the requested package version.
     /// </remarks>
-    string Version { get; }
+    public string Version { get; }
+
+    /// <summary>The package's relationship to the project</summary>
+    /// <remarks>false means it's a transitive dependency</remarks>
+    public NuGetInstalledPackageRelationship Relationship { get; }
 
     // I'd love this class to be replaced with a record type once that feature is available in the language. Can we design this class to be forwards compatible with record types so it can be replaced in a future version?
-    internal NuGetPackage(string id, string version);
+    internal NuGetPackage(string id, string version, NuGetInstalledPackageRelationship relationship);
+}
+
+public enum NuGetInstalledPackageRelationship
+{
+    Unknown = 0,
+
+    Direct,
+
+    Transitive,
+
+    Implicit,
+
+    // PackageDownload? FrameworkReference?
 }
 
 public sealed class GetInstalledPackagesOptions
