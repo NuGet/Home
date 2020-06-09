@@ -44,7 +44,7 @@ Cons:
 
 * This is an existing folder. There are some known instances of unexpected NuGet.config files there. Examples include: NuGet_backup.config found by the OP of the linked issue. It's also likely there are some additional copies of NuGet.config in there.
 
-### Define a new folder for additiona user-wide configuration
+### Define a new folder for additional user-wide configuration
 
 The proposal is to use `%APPDATA%\NuGet\config\` on Windows and `~/.config/NuGet/config/` or `~/.nuget/NuGet/config/` on Mac/Linux
 
