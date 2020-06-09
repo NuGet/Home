@@ -26,28 +26,14 @@ All NuGet customers are affected. Primary consumers are the WPF and WinForms cus
 
 ## Solution
 
-The solution to start detecting additional configs from the user specific directory similar to the extensibility from machine wide configs.
+We will start detecting additional configs from the user specific directory similar to the extensibility from machine wide configs.
 
 Given that these are additional configs, they will be merged with lower priority than the default user specific config. The rest are merged deterministically in lexicographical order because they are not expected to conflict.
 The determinism allows an out in case something really goes wrong.
 
-There are 2 solutions that satisfy the requirement with the least amount of friction.
+### A new folder for additional user-wide configuration
 
-### Re-use the existing %APPDATA%\NuGet directory
-
-Pros:
-
-* Simple & intuitive. Windows: %appdata%\NuGet\*.Config
-Mac/Linux: ~/.config/NuGet/*.[C|c]onfig or ~/.nuget/NuGet/*.[C|c]onfig.
-
-Cons:
-
-* This is an existing folder. There are some known instances of unexpected NuGet.config files there. Examples include: NuGet_backup.config found by the OP of the linked issue. It's also likely there are some additional copies of NuGet.config in there.
-
-### Define a new folder for additional user-wide configuration
-
-The proposal is to use `%APPDATA%\NuGet\config\` on Windows and `~/.config/NuGet/config/` or `~/.nuget/NuGet/config/` on Mac/Linux
-
+Use %APPDATA%\NuGet\config\` on Windows and `~/.config/NuGet/config/` or `~/.nuget/NuGet/config/` on Mac/Linux
 
 Pros:
 
@@ -55,13 +41,11 @@ Pros:
 
 Cons:
 
-* Arguably not as intuitive as the first proposal, but it doesn't suffer from the same potential issues with unexpected configuration files. Given the difficulty one could have identifying which config brings in what source or fallback folder. The trade off might be good enough.
+* Arguably not as intuitive as some other proposals, but it doesn't suffer from the same potential issues with unexpected configuration files. Given the difficulty one could have identifying which config brings in what source or fallback folder. The trade off might be good enough.
 
 Worth to mention that while there have been instances of additional configs in the current user wide directory, it's impossible for us to determine the exact indicidence. We are likely talking about very few customers.
 
 ### Reading and writing priority
-
-In both solutions the reading and writing priority proposal is the same.
 
 Say we have 1 solution configuration file and 2 user-wide configuration files.
 
@@ -111,7 +95,8 @@ Given that the local file is the closest and the additional user configuration i
 ### Writing priority
 
 Conversely, when writing we write to the furthest available config file.
-Specifically if we were to write `key5`, it would be written to the `AdditionalUser` config file.
+In order to preserve backwards compatibility on the writing side, we will consider this additional user config as `read only`. The configuration commands will not write to the additional configuration files.
+Specifically if we were to write `key5`, it would be written to the `User` config file.
 
 ## Future Work
 
@@ -119,13 +104,20 @@ None
 
 ## Open Questions
 
-* Which of the 2 approaches do we prefer? Personally I was leaning toward re-using the same folder, but if we want to be risk averse, we can just take the new folder approach.
-* Do we like the writing priority? We can reverse the order to preserve writing compatibility to user-wide folder, but that will potentially allow for additional configs that are supposed to be installed by 3rd party components to overwrite the user wide selections.
-* A potential answer to this ask could be we do nothing.
-
 ## Considerations
 
-None
+The considered but ultimately not accepted proposal is detailed below. 
+
+### Re-use the existing %APPDATA%\NuGet directory
+
+Pros:
+
+* Simple & intuitive. Windows: %appdata%\NuGet\*.Config
+Mac/Linux: ~/.config/NuGet/*.[C|c]onfig or ~/.nuget/NuGet/*.[C|c]onfig.
+
+Cons:
+
+* This is an existing folder. There are some known instances of unexpected NuGet.config files there. Examples include: NuGet_backup.config found by the OP of the linked issue. It's also likely there are some additional copies of NuGet.config in there.
 
 ### References
 
