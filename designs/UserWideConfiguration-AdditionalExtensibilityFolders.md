@@ -28,7 +28,7 @@ All NuGet customers are affected. Primary consumers are the WPF and WinForms cus
 
 The solution to start detecting additional configs from the user specific directory similar to the extensibility from machine wide configs.
 
-Given that these are additional configs, they will be merged with lower priority than the default user specific config. The rest are merged deterministically in alphabetical order because they are not expected to confict.
+Given that these are additional configs, they will be merged with lower priority than the default user specific config. The rest are merged deterministically in lexicographical order because they are not expected to conflict.
 The determinism allows an out in case something really goes wrong.
 
 There are 2 solutions that satisfy the requirement with the least amount of friction.
