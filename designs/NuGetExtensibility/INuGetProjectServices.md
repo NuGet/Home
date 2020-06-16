@@ -17,7 +17,7 @@ Visual Studio component and extension developers.
 ## Goals
 
 * Can be called on any thread (ideally background thread, but work if called on UI thread).
-* Quickly return incomplete task to unblock thread.
+* Do not block caller (implement async properly, return incomplete task instead).
 * Works with Visual Studio Codespaces, and hopefully Live Share.
 
 ## Non-Goals
@@ -30,15 +30,14 @@ Visual Studio component and extension developers.
 /// <summary>Service to interact with projects in a solution</summary>
 public interface INuGetProjectServices
 {
-    /// <summary>Gets the list of packages installed in a project.</summmry>
-    /// <param name="project">Path and filename to project file.</param>
-    /// <param name="options">Options to use. If null, uses GetInstalledPakcagesOptions.Default.</param>
+    /// <Summary>Gets the list of packages installed in a project.</Summary>
+    /// <param name="projectId">Project ID (GUID).</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>
     /// The list of packages in the project.
-    /// If the project does not exist in the solution, or the project is unloaded, throws ArgumentException.
-    /// </return>
-    Task<GetInstalledPackagesResult> GetInstalledPackagesAsync(string project, CancellationToken cancellationToken);
+    /// </returns>
+    /// <exception cref="System.ArgumentException">When projectId is not a guid.</exception>
+    Task<GetInstalledPackagesResult> GetInstalledPackagesAsync(string projectId, CancellationToken cancellationToken);
 }
 
 /// <summary>Result of a call to INuGetProjectServices.GetInstalledPackagesAsync</summary>
@@ -48,13 +47,20 @@ public sealed class GetInstalledPackagesResult
     public GetInstalledPackageResultStatus Status { get; }
 
     /// <summary>List of packages in the project</summary>
-    /// <remarks></remarks>
-    public IReadOnlyCollection<InstalledPackage> Packages { get; }
+    /// <remarks>May be null if <see cref="Status"/> was not successful</remarks>
+    public IReadOnlyCollection<NuGetInstalledPackage> Packages { get; }
+
+    // To maximize the chance this class can be converted to a C#9 record type without breaking changes, constructor is not public
+    internal GetInstalledPackagesResult();
 }
 
 /// <summary>The status of the result</summary>
-public enum  GetInstalledPackageResultStatus
+public enum GetInstalledPackageResultStatus
 {
+    /// <summary>Unknown status</summary>
+    /// <remarks>Probably represents a bug in the method that created the result.</remarks>
+    Unknown = 0,
+
     /// <summary>Successful</summary>
     Successful,
 
@@ -68,7 +74,7 @@ public enum  GetInstalledPackageResultStatus
 }
 
 /// <summary>Basic information about a package</summary>
-public sealed class InstalledPackage
+public sealed class NuGetInstalledPackage
 {
     /// <summary>The package id.</summary>
     public string Id { get; }
@@ -80,41 +86,51 @@ public sealed class InstalledPackage
     /// </remarks>
     public string Version { get; }
 
-    /// <summary>Is the package a direct dependency of the project.</summary>
-    /// <remarks>
-    /// False means it's a transitive dependency.
-    /// All packages in a packages.config project are direct dependencies.
-    /// </remarks>
-    public bool IsDirectDependency { get; }
+    // To maximize the chance this class can be converted to a C#9 record type without breaking changes, constructor is not public
+    internal NuGetInstalledPackage();
+}
 
-    // I'd love this class to be replaced with a record type once that feature is available in the language. Can we design this class to be forwards compatible with record types so it can be replaced in a future version?
-    internal NuGetPackage(string id, string version, NuGetInstalledPackageRelationship relationship);
+/// <summary>Factory to create types</summary>
+/// <remarks>Trying to be forwards compatible with what C#9 records are going to be</remarks>
+public static class ContractsFactory
+{
+    /// <summary>Create a <see cref="NuGetInstalledPackage"/></summary>
+    /// <param name="id"></param>
+    /// <param name="version"></param>
+    /// <param name="isDirectDependency"></param>
+    /// <returns></returns>
+    public static NuGetInstalledPackage CreateNuGetInstalledPackage(string id, string version, bool isDirectDependency);
+
+    /// <summary>Create a <see cref="GetInstalledPackageResultStatus"/></summary>
+    /// <param name="status"></param>
+    /// <param name="packages"></param>
+    /// <returns></returns>
+    public static GetInstalledPackagesResult CreateGetInstalledPackagesResult(GetInstalledPackageResultStatus status, IReadOnlyCollection<NuGetInstalledPackage> packages);
 }
 ```
 
 ## Future Work
 
-* APIs for:
+* Add direct/transitive dependency information to `NuGetInstalledPackage`.
+
+* Other required APIs: (incomplete list)
   * InstallPackageAsync
   * UninstallPackageAsync
 
 ## Open Questions
 
-* How to handle errors
-  * CPS projects (SDK-style .NET projects) work by: On project load, CPS sends NuGet a "nomination" with project/package information. Therefore, NuGet can't return packages in GetPackagesAsync until CPS nomination complete. With IVsPackageInstallerServices, we throw InvalidOperationException if we haven't got nomination info. Given that the new API needs to work over remoting scenarios, how should it be done?  There are multiple options
-    1. Throw exception (task in faulted state). This might appear as a RemotingException to callers, so maybe hard to distinguish between different types of exceptions?
-    2. Return additional error information. This might be a tuple or a result class. Should we use a type extending `Exception` (stack trace probably wouldn't transport), or have `string Code` and `string Message`?  Or just a `bool Success`, without details about why it was unsuccessful?
 * GetInstalledPackagesAsync
   * Should returned package version be the resolved version, or the requested range, or the lower bound of the requested range? Leaning towards requested range. It means 
-    * Should we return both requested and resolved versions?  Leaning to no: most components & extensions wouldn't care. If wanted, a PackageReference (PR) specific service could be added, which allows it to provide PR specific properties.
-  * Should there be options to wait for nomination, rather than throwing an exception?
-  * If `NuGetPackage.Version` is the resolved version, do we distinguish between project not nominated vs restore not complete?  What about if restore failed?
-* NuGetPackage could have property saying if package is direct or transitive. (future work)
-* Test Explorer uses IVsPackageMetadata.PackagePath. Check if this actually works for PackageReference projects, and consider adding to NuGetPackage. (future work)
+    * Should we return both requested and resolved versions?  Leaning to no: most components & extensions wouldn't care, plus it doesn't make sense in `packages.config` projects. If wanted, a PackageReference (PR) specific service could be added, which allows it to provide PR specific properties.
+  * Should there be options to wait for nomination, rather than returning error?
+  * If `NuGetInstalledPackage.Version` is the resolved version, do we distinguish between project not nominated vs restore not complete?  What about if restore failed?
+* Test Explorer uses `IVsPackageMetadata.PackagePath`, via `GetInstalledPackages`. Check if this actually works for PackageReference projects, and consider adding to `NuGetInstalledPackage`. (future work)
 
 ## Considerations
 
-TODO: document outcomes of Open Questions
+* Error handling:
+  * Use common practise of using exceptions for input validation (things caller should know before calling the API), and exceptional circumstances. Do not throw exceptions for expected scenarios.
+
 
 ### References
 
