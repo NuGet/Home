@@ -6,7 +6,7 @@
 
 ## Problem Background
 
-Customers want to add the latest version of a package to their project, even tough it is a prerelease version.
+Customers want to add the latest version of a package to their project, even if the latest version is prerelease.
 
 ## Who are the customers
 
@@ -14,15 +14,22 @@ All dotnet.exe customers
 
 ## Goals
 
-Add an option to the command `add package` enable installing latest prerelease version.
+Add an option to the command `add package` to enable installing latest prerelease version.
 
 ## Non-Goals
 
 ## Solution
 
-Add the option `--prerelease` in the command `add package`. This command should get the latest version of the packet available even if it is not a stable version.
+Add the option `--prerelease` in the command `add package`. This command will get the latest version of the package available even if it is not a stable version.
 
-```package 2.0.0
+When searching for the latest version available, only listed packages will be considered.
+
+### Scenarios
+
+Packages available
+
+```
+package 2.0.0
 package 3.0.0
 package 3.3.1-preview.3
 ```
@@ -33,7 +40,10 @@ package 3.3.1-preview.3
 | `dotnet.exe add package --prerelease` | 3.3.1-preview.3 | latest version of package |
 | `dotnet.exe add package --prerelease --version 3.0.0` | error | The user cannot use this commands at the same time |
 
-```package 2.0.0
+Packages available
+
+```
+package 2.0.0
 package 3.0.0
 package 3.3.1-preview.3
 package 3.4.0
@@ -48,8 +58,10 @@ package 3.4.0
 
 ## Open Questions
 
+* Do we need to add a shorthand version for prerelease? `--p`
+
 ## Considerations
 
 ### References
 
-* <https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-add-reference>
+* [dotnet add package reference](https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-add-reference)
