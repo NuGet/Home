@@ -56,6 +56,8 @@ package 3.4.0
 
 ## Future Work
 
+* When the design has been approved, we will create an issue with the [dotnet.exe team](https://github.com/dotnet/sdk)
+
 ## Open Questions
 
 * Do we need to add a shorthand version for prerelease? `--p`
