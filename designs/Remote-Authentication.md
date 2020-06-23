@@ -49,7 +49,7 @@ JM: AAD - conditional access policies ... may only work on the same machine...
 
 ### dotnet.exe/nuget.exe/msbuild.exe running in VS Terminal
 - msbuild.exe /restore /p:NuGetInteractive=true
-  - works via codeflow today, if you ask for interactive
+  - works via device flow today, if you ask for interactive
     - integrated windows auth doesn't work w/o interaction, unlike normal CLIs and AACP on a client. (see "could it remote..." below)
   - device flow prompts once per feed, where it should be able to use the same creds, in most cases, if same AAD Tenant. [artifacts-credprovider#195](https://github.com/microsoft/artifacts-credprovider/issues/195)
 - nuget.exe
@@ -59,6 +59,9 @@ JM: AAD - conditional access policies ... may only work on the same machine...
   - Longer term: should dotnet.exe be able to use full framework copy of AACP? Or should dotnet.exe copy of AACP be able to replace full framework copy.
 - all
   - [nuget/home#9688](https://github.com/NuGet/Home/issues/9688) improve error experience with NUXXXX errors when auth fails, or auth fails and no cred provider is there, etc...
+### During initial devinit run, will the right creds be there
+
+- work with VS Identity and devinit team to figure it out.
 
 #### Could it remote back to client to get client auth info
 
