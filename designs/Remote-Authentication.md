@@ -40,21 +40,21 @@ nk: wouldn't it be nice if CLI's and VS shared credential caches. (likely easier
 
 ## Scenarios
 
-### Azure Artifacts
+### VS & Azure Artifacts
 - If the dev uses the same account to auth to the codespace as they will use to get packages from azure artifacts, no additional auth is required.
 - If the dev uses a 2nd account to get packages from azure artifacts, that account must be authenticated for that feed.
-    - TODO: part of that problem is we don't have an anchor for authenticated sources. Perhaps we improve the error experience, and provide an anchor in the UI, so they can figure out how to do this.
+    - Part of that problem is we don't have an anchor for authenticated sources. Perhaps we improve the error experience, and provide an anchor in the UI, so they can figure out how to do this. Tracking issue: [nuget/home#7814](https://github.com/NuGet/Home/issues/7814)
 
 JM: AAD - conditional access policies ... may only work on the same machine...
 
 ### dotnet.exe/nuget.exe/msbuild.exe running in VS Terminal
-- msbuild.exe /restore
+- msbuild.exe /restore /p:NuGetInteractive=true
   - works via codeflow today, if you ask for interactive
     - integrated windows auth doesn't work w/o interaction, unlike normal CLIs and AACP on a client. (see "could it remote..." below)
   - device flow prompts once per feed, where it should be able to use the same creds, in most cases, if same AAD Tenant. [artifacts-credprovider#195](https://github.com/microsoft/artifacts-credprovider/issues/195)
 - nuget.exe
   - NuGet.exe should detect execution on codespace, and send canPrompt to plugin as false. [nuget/home#9687](https://github.com/NuGet/Home/issues/9687) 
-- dotnet.exe
+- dotnet.exe restore --interactive
   - make install of AACP (dotnet core flavor) installable easily [client.engineering#360](https://github.com/NuGet/Client.Engineering/issues/360)
   - Longer term: should dotnet.exe be able to use full framework copy of AACP? Or should dotnet.exe copy of AACP be able to replace full framework copy.
 - all
