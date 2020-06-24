@@ -309,7 +309,9 @@ A new service should be created. This service will have multiple responsibilitie
 * Find which `Directory.Packages.props` file needs to be changed given a package install for a specific project.
 * Orchestrate efficient updating and nomination of projects. In particular, when project files and `Directory.Packages.props` files need to change due to a single customer gesture, avoid multiple project nominations and multiple restores due to multiple file changes.
 
-Proposed API.
+## Proposal
+
+This is the proposed API, to be used as a starting point, but it is subject to change as the Project System team own implementing it and may adapt it to their own coding standards.
 
 ```cs
 enum PackageReferenceAction
@@ -383,12 +385,6 @@ interface IPackageReferenceUpdateService
   Task ApplyChangesAsync(IReadOnlyList<PackageReferenceChangeRequest> actions, CancellationToken token);
 }
 ```
-
-open questions:
-
-* The convention in .NET is to add `CancellationToken` to async APIs. However, what is the expected behaviour if cancellation is requested in the middle of processing a single change request?
-* Which project types will this service support? C# and VB only?  f#? c++? non-Microsoft project systems?
-
 
 ## References
 
