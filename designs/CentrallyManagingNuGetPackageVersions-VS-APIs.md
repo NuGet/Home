@@ -314,75 +314,78 @@ A new service should be created. This service will have multiple responsibilitie
 This is the proposed API, to be used as a starting point, but it is subject to change as the Project System team own implementing it and may adapt it to their own coding standards.
 
 ```cs
-enum PackageReferenceAction
+public abstract class PackageReferenceChangeRequest
 {
-  /// <summary>
-  /// To catch bugs where values are left uninitialized, but otherwise usused and invalid.
-  /// </summary>
-  Unknown = 0,
+    /// <summary>
+    /// GUIDs for the projects in the solution to which a package reference change should be applied.
+    /// </summary>
+    public IReadOnlyList<Guid> ProjectGuids { get; }
 
-  /// <summary>
-  /// The change should add or update PackageReference and or PackageVersion items.
-  /// </summary>
-  AddOrUpdate = 1,
+    /// <summary>
+    /// The package identity.
+    /// </summary>
+    public string PackageIdentity { get; }
 
-  /// <summary>
-  /// The change should remove matching PackageReference items only, do not remove PackageVersion items.
-  /// </summary>
-  RemovePackageReference = 2,
-
-  /// <summary>
-  /// This change should remove both PackageReference and PackageVersion items.
-  /// </summary>
-  /// <remarks>
-  /// Out of scope for the initial version. It has been defined to avoid needing an API change to add this in the future.
-  /// </remarks>
-  Remove = 3
+    /// <summary>
+    /// Initializes a new <see cref="PackageReferenceChangeRequest" /> instance.
+    /// </summary>
+    public PackageReferenceChangeRequest(IReadOnlyList<Guid> projectGuids, string packageIdentity)
+    {
+        this.ProjectGuids = projectGuids;
+        this.PackageIdentity = packageIdentity;
+    }
 }
 
-class PackageReferenceChangeRequest
+public class AddOrUpdatePackageReferenceChangeRequest : PackageReferenceChangeRequest
 {
-  /// <summary>
-  /// The action to apply
-  /// </summary>
-  public PackageReferenceAction Action { get; set;}
+    /// <summary>
+    /// The version of the package to add.
+    /// </summary>
+    public string Version { get; }
 
-  /// <summary>
-  /// Which projects in the solution should apply this PackageReference action
-  /// </summary>
-  public IReadOnlyList<string> Projects { get; set; }
+    /// <summary>
+    /// Additional metadata to set on the PackageReference item for the given package identity.
+    /// </summary>
+    /// <remarks>
+    /// The package must create or set metadata defined by the keys of this dictionary, with the value defined by the dictionary item's value.
+    /// It must also remove any metadata already defined in the PackageReference if the value for that metadata key is null or empty.
+    /// </remarks>
+    public IReadOnlyDictionary<string, string> AdditionalMetadata { get; }
 
-  /// <summary>
-  /// The package ID 
-  /// </summary>
-  public string PackageId { get; set; }
-
-  /// <summary>
-  /// The package version
-  /// </summary>
-  /// <remarks>
-  /// * AddOrUpdate must set the Version attribute in the Directory.Packages.props fie to this version. If the Directory.Packages.props file does not already contain an item for this PackageId, then it should be added.
-  /// * Remove and RemovePackageReference will ignore any value in Version
-  /// </remarks>
-  public string Version { get; set; }
-
-  /// <summary>
-  /// Additional metadata for this PackageId to set on the PackageReference item.
-  /// </summary>
-  /// <remarks>
-  /// * AddOrUpdate must create or set metadata defined by the keys of this dictionary, with the value defined by the dictionary item's value.
-  /// * AddOrUpdate must remove any metadata already defined in the PackageReference, if there is no key for that metadata in the dictionary.
-  /// * RemovePackage will ignore any value in AdditionalMetadata.
-  /// </remarks>
-  public IReadOnlyDictionary<string, string> AdditionalMetadata { get; set; }
+    /// <summary>
+    /// Initializes a new <see cref="AddOrUpdatePackageReferenceChangeRequest" /> instance.
+    /// </summary>
+    public AddOrUpdatePackageReferenceChangeRequest(IReadOnlyList<Guid> projectGuids, string packageIdentity, string version, IReadOnlyDictionary<string, string> additionalMetadata)
+        : base(projectGuids, packageIdentity)
+    {
+        this.Version = version;
+        this.AdditionalMetadata = additionalMetadata;
+    }
 }
 
-interface IPackageReferenceUpdateService
+public class RemovePackageReferenceChangeRequest : PackageReferenceChangeRequest
 {
-  /// <summary>
-  /// Apply changes to the project(s) provided.
-  /// </summary>
-  Task ApplyChangesAsync(IReadOnlyList<PackageReferenceChangeRequest> actions, CancellationToken token);
+    /// <summary>
+    /// Whether PackageVersion items should be removed (in addition to PackageReference items).
+    /// </summary>
+    public bool RemovePackageVersionItems { get; }
+
+    /// <summary>
+    /// Initializes a new <see cref="PackageReferenceChangeRequest" /> instance.
+    /// </summary>
+    public RemovePackageReferenceChangeRequest(IReadOnlyList<Guid> projectGuids, string packageIdentity, bool removePackageVersionItems = false)
+        : base(projectGuids, packageIdentity)
+    {
+        this.RemovePackageVersionItems = removePackageVersionItems;
+    }
+}
+
+public interface IPackageReferenceManager
+{
+    /// <summary>
+    /// Apply package reference changes to the projects provided.
+    /// </summary>
+    Task ApplyChangesAsync(IReadOnlyList<PackageReferenceChangeRequest> actions, CancellationToken token);
 }
 ```
 
