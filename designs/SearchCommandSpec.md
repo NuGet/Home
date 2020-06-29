@@ -10,89 +10,87 @@ Search functionality from the command line for NuGet.exe and the .NET Core CLI h
 
 ## Who are the customers
 
-All NuGet.exe and .NET CLI users.
+This targets all NuGet.exe and .NET users that want to be able to search for packages from the command line, rather than using NuGet Gallery or VS PMUI. Also, while `nuget.exe list` allows users to search different package sources for packages with a search query, the results are returned sorted by the package Id, rather than by relevance, as proposed for this Search command. Further, the Search command would provide more information on the packages than List currently does.
 
 ## Goals
 
-* Providing search functionality for NuGet packages through the commandline
-* Displaying the search results to users in a way that maximizes the visibility of the most relevant results.
+* Providing search functionality for NuGet packages through the commandline for NuGet.exe
+* Implementing a prototype of this feature for dotnet.exe
+* Displaying the search results to users in a way that maximizes the visibility of the most relevant results
 
 ## Solution
 
-Th search feature leverages the search service provided by the NuGet API. Search targets multiple sources and displays all of their results one after the other. The command line interface is simple: __./NuGet.exe search \<query\>__.
+The search feature leverages the search service provided by the NuGet API. Search targets multiple sources and displays all of their results one after the other. The command line interface is simple: __./NuGet.exe search \<query\>__.
+
 ```
 PS C:\> ./NuGet.exe search logging
 ```
 
-Each search result displays the name, version, number of downloads, and description of the package. Additionally, Search uses pagination to provide a clean viewing experience for users as they look at the results of their search. This ensures that users have access to the search results in order of decreasing relevance. A single page of results is shown at a time, and the user can look at the next page by pressing the __space__ key.
+Each search result displays the name, version, number of downloads, and a preview of the description of the package.
 
 ```
 ====================
 Source: NuGet.org
 --------------------
-> Microsoft.Extensions.Logging.Abstractions | v5.0.0-preview.6.20305.6 | DLs: 345145935
+> Microsoft.Extensions.Logging.Abstractions | 5.0.0-preview.6.20305.6 | Downloads: 345,145,935
 Logging abstractions for Microsoft.Extensions.Logging.
 
 Commonly Used Types:
-Microsoft.Extensions.Logging.ILogger
-Microsoft.Extensions.Logging.ILoggerFactory
-Microsoft.Extensions.Logging.ILogger&lt;TCategoryName&gt;
-Microsoft.Extensions.Logging.LogLevel
-Microsoft.Extensions.Logging.Logger&lt;T&gt;
-Microsoft.Extensions.Logging.LoggerMessage
-Microsoft.Extensions.Logging.Abstractions.NullLogger
-
-When using NuGet 3.x this package requires at least version 3.4.
+Microsoft.Extensions.Lo...
 
 --------------------
-> Microsoft.Extensions.Logging | v5.0.0-preview.6.20305.6 | DLs: 243186566
+> Microsoft.Extensions.Logging | 5.0.0-preview.6.20305.6 | Downloads: 243,186,566
 Logging infrastructure default implementation for Microsoft.Extensions.Logging.
-When using NuGet 3.x this package requires at least version 3.4.
+When using NuGet 3....
 
 --------------------
-> Microsoft.IdentityModel.Logging | v6.6.0 | DLs: 120177247
+> Microsoft.IdentityModel.Logging | 6.6.0 | Downloads: 120,177,247
 Includes Event Source based logging support.
 
 --------------------
-> Microsoft.Extensions.Logging.Configuration | v5.0.0-preview.6.20305.6 | DLs: 63205816
-Configuration support for Microsoft.Extensions.Logging.
-When using NuGet 3.x this package requires at least version 3.4.
-
---------------------
-> Microsoft.Extensions.Logging.Console | v5.0.0-preview.6.20305.6 | DLs: 61796431
-Console logger provider implementation for Microsoft.Extensions.Logging.
-When using NuGet 3.x this package requires at least version 3.4.
-
---------------------
-> Microsoft.Extensions.Logging.Debug | v5.0.0-preview.6.20305.6 | DLs: 58643995
-Debug output logger provider implementation for Microsoft.Extensions.Logging. This logger logs messages to a debugger monitor by writing messages with System.Diagnostics.Debug.WriteLine().
-When using NuGet 3.x this package requires at least version 3.4.
-
---------------------
-> Microsoft.Extensions.Logging.EventSource | v5.0.0-preview.6.20305.6 | DLs: 32121683
-EventSource/EventListener logger provider implementation for Microsoft.Extensions.Logging.
-When using NuGet 3.x this package requires at least version 3.4.
-
---------------------
-> Serilog.Extensions.Logging | v3.0.2-dev-10280 | DLs: 43115462
--- More  --
+> Microsoft.Extensions.Logging.Configuration | 5.0.0-preview.6.20305.6 | Downloads: 63,205,816
 ```
+
+If a particular source returns no results for a query, it will display output that indicates this.
+
+```
+====================
+Source: dotnet-msbuild
+--------------------
+No results found.
+```
+
+### Optional Arguments
+
+Search provides users with some optional arguments that they can use to customize their search queries:
+
+| Name | Description | Usage |
+| ---  |     ---     |  :-:  |
+| PreRelease | `true` or `false` determining whether to include pre-release packages | -PreRelease `<true/false>` |
+| PackageTypes | The package type to use to filter packages. If the provided package type is not a valid package type as defined by the [Package Type document](https://github.com/NuGet/Home/wiki/Package-Type-%5BPacking%5D), an empty result will returned. | -PackageType `<Package Type>`|
+| Source | Specific package source(s) to search instead of querying the default sources in __nuget.config__ | -Source `<Source URL>`|
+| Take | The number of results to return | -Take `<positive integer>` |
+| Help | Displays help information for the command | -Help |
 
 ## Future Work
 
-* Enabling cross-platform functionality for the search feature
-* Adding optional arguments that allow users to customize their search queries
+* Integrating the Search feature into dotnet.exe
+* Adding further optional arguments that allow users to customize their search queries
+* Using columns rather than `|` to display results
+* Consider using pagination to display the search results
 
 ## Open Questions
 
 * What represents the most effective design choice for displaying the search results, in terms of spacing, demarcation, truncating package descriptions, and so on?
+* Would pagination (using the 'more' or 'less' commands) provide a better viewing experience for users? Would users prefer to pipe the search results to these commands themselves, or have Search do it for them? See _Considerations_ for more. 
+* What, if any, additional information should be included for the packages returned by Search?
 
 ## Considerations
 
 ### 1. Combining the results from different sources
 
-Initially, we considered consolidating all search results from the various sources and displaying them together, rather than separating them based on their source. However, users may wish to know where a particular package is located. Also, combining the search results for different sources leads to the complex problem of how to combine these results most effectively.
+Initially, we considered consolidating all search results from the various sources and interleaving them together, rather than separating them based on their source. However, users may wish to know where a particular package is located. Also, combining the search results for different sources leads to the complex problem of how to combine these results most effectively.
 
-### 2. Displaying results by printing the output stream to the console without pagination
+### 2. Displaying results using pagination
 
-If we were to simply print the output to the console as a regular stream, the most visible results would be the ones at the end of the output stream, since these would be located right above the next command prompt in the terminal. Pagination, as proposed in this document, ensures that the most relevant results are shown to the users first.
+Rather than simply printing the output to the console as a regular stream, using pagination (with the 'more' or 'less' commands) would ensure that users have access to the search results in order of decreasing relevance. They would see the most relevant results (at the top/beginning of the results) first. A single page of results would be shown at a time, and the user could look at the next page by pressing the __space__ key. If we were to simply print the output to the console as a regular stream, the most visible results would be the ones at the end of the output stream, since these would be located right above the next command prompt in the terminal.
