@@ -87,6 +87,7 @@ Verbosity Levels:
 * Adding further optional arguments that allow users to customize their search queries
 * Using columns rather than `|` to display results
 * Consider using pagination to display the search results
+* Allow multiple/no query terms
 
 ## Open Questions
 
