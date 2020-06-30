@@ -20,7 +20,7 @@ This targets all NuGet.exe and .NET users that want to be able to search for pac
 
 ## Solution
 
-The search feature leverages the search service provided by the NuGet API. Search targets multiple sources and displays all of their results one after the other. The command line interface is simple: __./NuGet.exe search \<query\>__.
+The search feature leverages the search service provided by the NuGet API. Search targets multiple sources and displays all of their results, sorted by relevance, one source after another. The command line interface is simple: __./NuGet.exe search \<query\>__.
 
 ```
 PS C:\> ./NuGet.exe search logging
@@ -33,19 +33,19 @@ Each search result displays the name, version, number of downloads, and a previe
 Source: NuGet.org
 --------------------
 > Microsoft.Extensions.Logging.Abstractions | 5.0.0-preview.6.20305.6 | Downloads: 345,145,935
-Logging abstractions for Microsoft.Extensions.Logging.
+  Logging abstractions for Microsoft.Extensions.Logging.
 
 Commonly Used Types:
 Microsoft.Extensions.Lo...
 
 --------------------
 > Microsoft.Extensions.Logging | 5.0.0-preview.6.20305.6 | Downloads: 243,186,566
-Logging infrastructure default implementation for Microsoft.Extensions.Logging.
+  Logging infrastructure default implementation for Microsoft.Extensions.Logging.
 When using NuGet 3....
 
 --------------------
 > Microsoft.IdentityModel.Logging | 6.6.0 | Downloads: 120,177,247
-Includes Event Source based logging support.
+  Includes Event Source based logging support.
 
 --------------------
 > Microsoft.Extensions.Logging.Configuration | 5.0.0-preview.6.20305.6 | Downloads: 63,205,816
@@ -66,11 +66,20 @@ Search provides users with some optional arguments that they can use to customiz
 
 | Name | Description | Usage |
 | ---  |     ---     |  :-:  |
-| PreRelease | `true` or `false` determining whether to include pre-release packages | -PreRelease `<true/false>` |
-| PackageTypes | The package type to use to filter packages. If the provided package type is not a valid package type as defined by the [Package Type document](https://github.com/NuGet/Home/wiki/Package-Type-%5BPacking%5D), an empty result will returned. | -PackageType `<Package Type>`|
+| PackageTypes | The package type to use to filter packages (if supported by the source). If the provided package type is not a valid package type as defined by the [Package Type document](https://github.com/NuGet/Home/wiki/Package-Type-%5BPacking%5D), an empty result will returned. | -PackageType `<Package Type>`|
+| PreRelease | Pre-release packages are not included by default, but can be included by using this argument | -PreRelease |
 | Source | Specific package source(s) to search instead of querying the default sources in __nuget.config__ | -Source `<Source URL>`|
-| Take | The number of results to return | -Take `<positive integer>` |
+| Take | The number of results to return. The default value is 20. | -Take `<positive integer>` |
+| Verbosity | The level of detail to display in the output. The default is _normal_. (See the note below)  | -Verbosity `<quiet\|normal\|detailed>` |
 | Help | Displays help information for the command | -Help |
+
+__NOTE__
+
+Verbosity Levels:
+
+* _quiet_ - Package ID, Version
+* _normal_ - Package ID, Version, Downloads, Preview of Description
+* _detailed_ - Package ID, Version, Downloads, Full Description
 
 ## Future Work
 
