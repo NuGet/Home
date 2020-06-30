@@ -26,33 +26,14 @@ When searching for the latest version available, only listed packages will be co
 
 ### Scenarios
 
-Packages available
 
-```
-Contoso.Library 2.0.0
-Contoso.Library 3.0.0
-Contoso.Library 3.3.1-preview.3
-```
-
-| Command | Result | Description |
-|---------|--------|--------------|
-| `dotnet.exe add Contoso.Library` | 3.0.0 | latest stable version of package |
-| `dotnet.exe add Contoso.Library --prerelease` | 3.3.1-preview.3 | latest version of package |
-| `dotnet.exe add Contoso.Library --prerelease --version 3.0.0` | error | The user cannot use this commands at the same time |
-
-Packages available
-
-```
-Contoso.Library 2.0.0
-Contoso.Library 3.0.0
-Contoso.Library 3.3.1-preview.3
-Contoso.Library 3.4.0
-```
-
-| Command | Result | Description |
-|---------|--------|--------------|
-| `dotnet.exe add Contoso.Library` | 3.4.0 | latest stable version of package |
-| `dotnet.exe add Contoso.Library --prerelease` | 3.4.0 | latest version of package |
+| Command | Available Versions | Output Version | Description |
+|---------|--------------------|------------------|-------------|
+| `dotnet.exe add Contoso.Library` | Contoso.Library 2.0.0 <br> Contoso.Library 3.0.0 <br> Contoso.Library 3.3.1-preview.3 <br> | 3.0.0 | latest stable version of package |
+| `dotnet.exe add Contoso.Library --prerelease` | Contoso.Library 2.0.0 <br> Contoso.Library 3.0.0 <br> Contoso.Library 3.3.1-preview.3 <br> | 3.3.1-preview.3 | latest version of package |
+| `dotnet.exe add Contoso.Library --prerelease --version 3.0.0` | Contoso.Library 2.0.0 <br> Contoso.Library 3.0.0 <br> Contoso.Library 3.3.1-preview.3 <br> | error | The user cannot use the `--prerelease` and `--version` commands at the same time |
+| `dotnet.exe add Contoso.Library` | Contoso.Library 2.0.0 <br> Contoso.Library 3.0.0 <br> Contoso.Library 3.3.1-preview.3 <br> Contoso.Library 3.4.0 <br> | 3.4.0 | latest stable version of package |
+| `dotnet.exe add Contoso.Library --prerelease` | Contoso.Library 2.0.0 <br> Contoso.Library 3.0.0 <br> Contoso.Library 3.3.1-preview.3 <br> Contoso.Library 3.4.0 <br> | 3.4.0 | latest version of package |
 
 ## Future Work
 
