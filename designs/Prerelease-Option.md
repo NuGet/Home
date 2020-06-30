@@ -14,7 +14,7 @@ All dotnet.exe customers
 
 ## Goals
 
-Add an option to the command `add package` to enable installing latest prerelease version.
+Allow dotnet CLI users to install the latest version of a NuGet package, including prerelease versions. This can be accomplished by adding an option to the existing command `add package` that enables installing the last version, including prerelease versions.
 
 ## Non-Goals
 
@@ -29,30 +29,30 @@ When searching for the latest version available, only listed packages will be co
 Packages available
 
 ```
-package 2.0.0
-package 3.0.0
-package 3.3.1-preview.3
+Contoso.Library 2.0.0
+Contoso.Library 3.0.0
+Contoso.Library 3.3.1-preview.3
 ```
 
 | Command | Result | Description |
 |---------|--------|--------------|
-| `dotnet.exe add package` | 3.0.0 | latest stable version of package |
-| `dotnet.exe add package --prerelease` | 3.3.1-preview.3 | latest version of package |
-| `dotnet.exe add package --prerelease --version 3.0.0` | error | The user cannot use this commands at the same time |
+| `dotnet.exe add Contoso.Library` | 3.0.0 | latest stable version of package |
+| `dotnet.exe add Contoso.Library --prerelease` | 3.3.1-preview.3 | latest version of package |
+| `dotnet.exe add Contoso.Library --prerelease --version 3.0.0` | error | The user cannot use this commands at the same time |
 
 Packages available
 
 ```
-package 2.0.0
-package 3.0.0
-package 3.3.1-preview.3
-package 3.4.0
+Contoso.Library 2.0.0
+Contoso.Library 3.0.0
+Contoso.Library 3.3.1-preview.3
+Contoso.Library 3.4.0
 ```
 
 | Command | Result | Description |
 |---------|--------|--------------|
-| `dotnet.exe add package` | 3.4.0 | latest stable version of package |
-| `dotnet.exe add package --prerelease` | 3.4.0 | latest version of package |
+| `dotnet.exe add Contoso.Library` | 3.4.0 | latest stable version of package |
+| `dotnet.exe add Contoso.Library --prerelease` | 3.4.0 | latest version of package |
 
 ## Future Work
 
