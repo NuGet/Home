@@ -79,7 +79,7 @@ Verbosity Levels:
 
 * _quiet_ - Package ID, Version
 * _normal_ - Package ID, Version, Downloads, Preview of Description
-* _detailed_ - Package ID, Version, Downloads, Full Description
+* _detailed_ - Package ID, Version, Downloads, Full Description, Other information regarding the arguments and filters applied to the search
 
 ## Future Work
 
