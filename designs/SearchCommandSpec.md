@@ -40,7 +40,7 @@ Source: NuGet.org
 --------------------
 > Microsoft.Extensions.Logging | 5.0.0-preview.6.20305.6 | Downloads: 243,186,566
   Logging infrastructure default implementation for Microsoft.Extensions.Logging.
-When using NuGet 3....
+  When using NuGet 3....
 --------------------
 > Microsoft.IdentityModel.Logging | 6.6.0 | Downloads: 120,177,247
   Includes Event Source based logging support.
