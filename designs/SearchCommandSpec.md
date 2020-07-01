@@ -35,18 +35,15 @@ Source: NuGet.org
 > Microsoft.Extensions.Logging.Abstractions | 5.0.0-preview.6.20305.6 | Downloads: 345,145,935
   Logging abstractions for Microsoft.Extensions.Logging.
 
-Commonly Used Types:
-Microsoft.Extensions.Lo...
-
+  Commonly Used Types:
+  Microsoft.Extensions.Lo...
 --------------------
 > Microsoft.Extensions.Logging | 5.0.0-preview.6.20305.6 | Downloads: 243,186,566
   Logging infrastructure default implementation for Microsoft.Extensions.Logging.
 When using NuGet 3....
-
 --------------------
 > Microsoft.IdentityModel.Logging | 6.6.0 | Downloads: 120,177,247
   Includes Event Source based logging support.
-
 --------------------
 > Microsoft.Extensions.Logging.Configuration | 5.0.0-preview.6.20305.6 | Downloads: 63,205,816
 ```
@@ -79,7 +76,7 @@ Verbosity Levels:
 
 * _quiet_ - Package ID, Version
 * _normal_ - Package ID, Version, Downloads, Preview of Description
-* _detailed_ - Package ID, Version, Downloads, Full Description, Other information regarding the arguments and filters applied to the search
+* _detailed_ - Package ID, Version, Downloads, Full Description, Other information such as the query URL, and the arguments and filters applied to the search
 
 ## Future Work
 
