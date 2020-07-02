@@ -1,8 +1,8 @@
-# Search CLI Tool for NuGet.exe and Dotnet.exe
+# Search CLI Tool for NuGet.exe
 
 * Status: **Implementing**
 * Author(s): [Advay Tandon](https://github.com/advay26)
-* Issue: [9704](https://github.com/NuGet/Home/issues/9704) - Search CLI Tool for NuGet.exe and Dotnet.exe
+* Issue: [9704](https://github.com/NuGet/Home/issues/9704) - Search CLI Tool for NuGet.exe
 
 ## Problem Background
 
@@ -10,17 +10,18 @@ Search functionality from the command line for NuGet.exe and the .NET Core CLI h
 
 ## Who are the customers
 
-This targets all NuGet.exe and .NET users that want to be able to search for packages from the command line, rather than using NuGet Gallery or VS PMUI. Also, while `nuget.exe list` allows users to search different package sources for packages with a search query, the results are returned sorted by the package Id, rather than by relevance, as proposed for this Search command. Further, the Search command would provide more information on the packages than List currently does.
+This targets all NuGet.exe users that want to be able to search for packages from the command line, rather than using NuGet Gallery or VS PMUI. Also, while `nuget.exe list` allows users to search different package sources for packages with a search query, the results are returned sorted by the package Id, rather than by relevance, as proposed for this Search command. Further, the Search command would provide more information on the packages than List currently does.
 
 ## Goals
 
 * Providing search functionality for NuGet packages through the commandline for NuGet.exe
 * Implementing a prototype of this feature for dotnet.exe
 * Displaying the search results to users in a way that maximizes the visibility of the most relevant results
+* Eventually replacing `list` with `search`
 
 ## Solution
 
-The search feature leverages the search service provided by the NuGet API. Search targets multiple sources and displays all of their results, sorted by relevance, one source after another. The command line interface is simple: __./NuGet.exe search \<query\>__.
+The search feature leverages the search service provided by the NuGet API. Search targets multiple sources and displays all of their results, sorted by relevance, one source after another. The command line interface is simple: __./NuGet.exe search \<query terms\>__.
 
 ```
 PS C:\> ./NuGet.exe search logging
@@ -63,7 +64,6 @@ Search provides users with some optional arguments that they can use to customiz
 
 | Name | Description | Usage |
 | ---  |     ---     |  :-:  |
-| PackageTypes | The package type to use to filter packages (if supported by the source). If the provided package type is not a valid package type as defined by the [Package Type document](https://github.com/NuGet/Home/wiki/Package-Type-%5BPacking%5D), an empty result will returned. | -PackageType `<Package Type>`|
 | PreRelease | Pre-release packages are not included by default, but can be included by using this argument | -PreRelease |
 | Source | Specific package source(s) to search instead of querying the default sources in __nuget.config__ | -Source `<Source URL>`|
 | Take | The number of results to return. The default value is 20. | -Take `<positive integer>` |
@@ -81,10 +81,10 @@ Verbosity Levels:
 ## Future Work
 
 * Integrating the Search feature into dotnet.exe
+* Plan for the deprecation of `list`. Start redirecting users from `list` to `search`
 * Adding further optional arguments that allow users to customize their search queries
 * Using columns rather than `|` to display results
 * Consider using pagination to display the search results
-* Allow multiple/no query terms
 
 ## Open Questions
 
