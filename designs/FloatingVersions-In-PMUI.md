@@ -26,7 +26,7 @@ With the current behavior even if the user indicated a floating version, such as
 ![Project UI](../resources/FloatingVersionsInPMUI/PackageManagerForSolution.png)
 
 ```
-The requested and installed versions are not correct because dotnet list package shows a different installed version.
+The requested and resolved versions are not correct because dotnet list package shows a different resolved version.
 ```
 
 ## Who are the customers
@@ -35,7 +35,7 @@ All customers that use the Package Manager UI to install or update packages.
 
 ## Goals
 
-* Allow users see the correct version of the package installed while using floating versions in the Package Manager UI in Project View.
+* Allow users see the correct version of the package resolved while using floating versions in the Package Manager UI in Project View.
 
 * Allow users to input floating versions to install in the Package Manager UI.
 
@@ -79,7 +79,6 @@ We will add a new column to show the requested version to match the behavior of 
 
 ## Future Work
 
-* Indicate the resolved version in the solution explorer.
 
 ## Open Questions
 
