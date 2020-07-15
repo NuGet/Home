@@ -7,27 +7,47 @@
 
 ## Problem Background
 
-Currently the user can specify a version range or a floating version, but the current behavior of the package manager UI has poor support for this, displaying an incorrect installed version. If the user indicates a floating version in any package (eg `5.*`) the PM UI will display the minimum version possible (`5.0.0`) as installed even though the resolved version could be different of the resolved version in the command `dotnet list package`. Furthermore the user cannot specify a version range free hand.
+In PackageReference the user can specify a version range or a floating version, but the package manager UI has poor support for this, displaying an incorrect installed version.
+
+If the user indicates a floating version for any package (eg `5.*`) the PM UI will display the minimum version possible (`5.0.0`) as installed even though the resolved version could be different of the resolved version in the command `dotnet list package`.
+
+Furthermore the user cannot specify a version range free hand.
 
 ### Current behavior
-
-### Updates Tab
-
-With the current behavior even if the user indicated a floating version, such as `*`, for the package version, the UI will tell the user that there is an update available which is misleading.
 
 #### Project File and Solution Explorer
 
 ![SolutionExplorer](../resources/FloatingVersionsInPMUI/ProjectFile&SolutionExplorer.png)
 
-#### Project Manager UI
+### Project Level PM UI
 
-![Package UI](../resources/FloatingVersionsInPMUI/PackageManagerUI.png)
+#### Installed Tab
 
-![Project UI](../resources/FloatingVersionsInPMUI/PackageManagerForSolution.png)
+In the installed tab we show a list of packages installed. In this list the resolved version is not the correct one when using floating versions.
+
+![Project Updates](../resources/FloatingVersionsInPMUI/ProjectPMUIInstalled.png)
+
+#### Updates Tab
+
+With the current behavior even if the user indicated a floating version, such as `*`, for the package version, the UI will tell the user that there is an update available which is misleading.
+
+![Project Updates](../resources/FloatingVersionsInPMUI/ProjectPMUIUpdates.png)
+
+### Solution level PM UI
+
+#### Installed Tab
+
+The Solution PM UI also has the list of packages installed but it's unclear for what project the resolved version is. Even tough when looking in the details of the package it is visible that the resolved version when using floating versions is wrong.
+
+![Solution Installed](../resources/FloatingVersionsInPMUI/PackageManagerForSolution.png)
 
 ```
 The requested and resolved versions are not correct because dotnet list package shows a different resolved version.
 ```
+
+#### Updates Tab
+
+![Solution Updates](../resources/FloatingVersionsInPMUI/SolutionPMUIUpdates.png)
 
 ## Who are the customers
 
