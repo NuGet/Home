@@ -64,6 +64,8 @@ All customers that use the Package Manager UI to install or update packages.
 ## Non-Goals
 
 * Any multi targeting improvements overall.
+* packages.config are not in the scope as they work different, version ranges doesn't work.
+* No special support is being added for lock-files.
 
 ## Solution
 
@@ -91,6 +93,11 @@ This feature will enable the option `*` and ranges to be selected while installi
 
 ![Combo Box Gif](../resources/FloatingVersionsInPMUI/ComboBoxGif.gif)
 
+![ComboBox Error](../resources/FloatingVersionsInPMUI/ComboBox_Error.png)
+
+* The versions will be displayed in NuGetVersion ordering.
+* The version will be validated it when the user selects or hits enter.
+
 ### Floating Version Display in Solution View
 
 We will add a new column to show the requested version to match the behavior of `dotnet list package` command. Show correct highest resolved version in the solution in the package list view.
@@ -98,7 +105,6 @@ We will add a new column to show the requested version to match the behavior of 
 ![Solution View](../resources/FloatingVersionsInPMUI/SolutionView.png)
 
 ## Future Work
-
 
 ## Open Questions
 
@@ -113,6 +119,10 @@ Should we show available updates for packages that use custom version ranges or 
 Should we allow people to install package versions within a custom range without overwriting the project file?
 
 We will not allow users to install package versions within a custom range without overwriting the project file. The project file version is a statement of intent and the version resolved should be resolved the same regardless whether you are installing it through the Package Manager UI, the command line or hand editing.
+
+Currently we don’t display any package related warning in the PM UI.
+
+During the implementation we will ensure that the UI is properly accessible as suggested in (<https://github.com/NuGet/NuGet.Client/blob/dev/docs/feature-guide.md#visual-studio-ui-considerations>)
 
 ### References
 
