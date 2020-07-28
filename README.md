@@ -29,7 +29,7 @@ The NuGet Blog is where we announce new features, write engineering blog posts, 
 There are many ways in which you can participate in the project, for example:
 
 * [Submit bugs and feature requests, and help us verify as they are checked in](https://github.com/NuGet/Home/wiki/Submitting-Bugs-and-Suggestions)
-* [Review source code changes](https://github.com/NuGet/Home/pulls)
+* [Review NuGet proposals](https://github.com/NuGet/Home/pulls)
 * [Review the documentation and make pull requests for anything from typos to new content](https://github.com/NuGet/docs.microsoft.com-nuget)
 
 If you are interested in fixing issues and contributing directly to the code base, please see the document [Contribute To NuGet](https://github.com/NuGet/Home/wiki/Contribute-to-NuGet), which covers the following:
