@@ -22,6 +22,7 @@ NuGet customers that use the commandline to publish their packages, and want to 
 ## Non-Goals
 
 * Server side functionality
+* Parsing the readme as a valid markdown file
 
 ## Solution
 
