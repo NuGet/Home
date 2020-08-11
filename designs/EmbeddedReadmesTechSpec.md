@@ -22,7 +22,7 @@ NuGet customers that use the commandline to publish their packages, and want to 
 ## Non-Goals
 
 * Server side functionality
-* Parsing the readme as a valid markdown file
+* Parsing the readme as a valid markdown file on the Client side
 
 ## Solution
 
@@ -50,53 +50,35 @@ After this, a `ManifestMetadata` object is used to create the output *nuspec* fi
 AddElementIfNotNull(elem, ns, "readme", metadata.Readme);
 ```
 
-**If no Readme property is present in the source file, but a readme.md file exists in the base directory**
-
-Once the properties and files have been processed, if the PackageBuilder object's Readme property is null, we need to look through the base directory for a "readme.md" file. If such a file exists, we must include it in the package and and populate the Readme property with "readme.md".
-
-```
-public void CheckForReadme(string basePath)
-{
-    string readmeName = "readme.md";
-    List<PhysicalPackageFile> searchFiles = ResolveSearchPattern(basePath, readmeName, string.Empty, false).ToList();
-
-    if (searchFiles.Any())
-    {
-        Readme = readmeName;
-
-        if (!Files.Contains(searchFiles[0]))
-        {
-            Files.Add(searchFiles[0]);
-        }
-    }
-}
-```
-
-This CheckForReadme method in [PackageBuilder.cs](https://github.com/NuGet/NuGet.Client/blob/0f8ad8263539cb9bc69c441569453c1da98fb4cc/src/NuGet.Core/NuGet.Packaging/PackageCreation/Authoring/PackageBuilder.cs) is called [here](https://github.com/NuGet/NuGet.Client/blob/0f8ad8263539cb9bc69c441569453c1da98fb4cc/src/NuGet.Core/NuGet.Packaging/PackageCreation/Authoring/PackageBuilder.cs#L725) and [here](https://github.com/NuGet/NuGet.Client/blob/0f8ad8263539cb9bc69c441569453c1da98fb4cc/src/NuGet.Core/NuGet.Commands/CommandRunners/PackCommandRunner.cs#L726), based on whether the package is being built using a *nuspec* or *csproj* file.
-
 **Validation and Errors**
 
 To validate the Readme property and the corresponding file when `pack` is called, the ValidateReadmeFile method in [PackageBuilder.cs](https://github.com/NuGet/NuGet.Client/blob/0f8ad8263539cb9bc69c441569453c1da98fb4cc/src/NuGet.Core/NuGet.Packaging/PackageCreation/Authoring/PackageBuilder.cs) checks that:
 * The file extension matches a Markdown file
 * The file specified in the Readme property exists in the package's files
-* The file can be opened
 * The file size does not exceed 1 MB
 * The file is not empty
 
 Each of these errors has a corresponding log code (NU5038 - NU5042) and error message defined in [NuGetLogCode.cs](https://github.com/NuGet/NuGet.Client/blob/0f8ad8263539cb9bc69c441569453c1da98fb4cc/src/NuGet.Core/NuGet.Common/Errors/NuGetLogCode.cs) and [NuGetResources.resx](https://github.com/NuGet/NuGet.Client/blob/0f8ad8263539cb9bc69c441569453c1da98fb4cc/src/NuGet.Core/NuGet.Packaging/PackageCreation/Resources/NuGetResources.resx) respectively, and the appropriate support must be added in [NuGetResources.Designer.cs](https://github.com/NuGet/NuGet.Client/blob/0f8ad8263539cb9bc69c441569453c1da98fb4cc/src/NuGet.Core/NuGet.Packaging/PackageCreation/Resources/NuGetResources.Designer.cs).
 
+**NOTE:** The Server team will parse and validate the markdown contents of the Readme file when it is uploaded.
+
 ## Future Work
 
-* Adding readme support through the VS Project Properties UI
-* Adding a `View Documentation` link to the package readme in the PM UI
-
+* Adding readme support through the VS Project Properties UI (Project System)
+* Adding a `View README` link in the PM UI that points to the package's readme file
 ## Open Questions
 
-* Should we warn users if the Readme property is empty?
 * Are there any other validation checks to do when packing a Readme?
 
 ## Considerations
 
+### 1. Should we warn users if the Readme property is empty?
+
+Based on feedback from both the NuGet team and customers, we should not do this. The goal of encouraging user adoption of Embedded Readmes can be pursued as part of a separate Package Quality endeavor.
+
+### 2. Automatically packing a Readme file from the base directory
+
+Similar to the above point, this functionality is not something that we will look to add right now. Relying on explicit user input for the metadata is more desirable, and avoids springing any surprises on customers.
 
 ### References
 
