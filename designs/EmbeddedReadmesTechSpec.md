@@ -15,8 +15,9 @@ NuGet customers that use the commandline to publish their packages, and want to 
 ## Goals
 
 * Implement the Client side functionality for Embedded Readmes:
-    * nuget pack support
-    * dotnet pack support
+    * `nuget pack` support
+    * `dotnet pack` support
+    * `msbuild /t:pack` support
     * Validation of readme files
 
 ## Non-Goals
@@ -26,7 +27,7 @@ NuGet customers that use the commandline to publish their packages, and want to 
 
 ## Solution
 
-**NOTE:** To see the code described in this section, you can look at the edited files [here](https://github.com/NuGet/NuGet.Client/compare/dev-advay26-readme).
+**NOTE:** To see the code described in this section, you can look at the edited files [here](https://github.com/NuGet/NuGet.Client/pull/3573/files).
 
 First, we need to add a `readme` string element to the [*nuspec* schema](https://github.com/NuGet/NuGet.Client/blob/64ed0cb4054226f6060752757d29c50287b312b3/src/NuGet.Core/NuGet.Packaging/compiler/resources/nuspec.xsd) to ensure that the readme property is recognized and parsed from the *nuspec* file. We also need to ensure that the `PackageReadmeFile` property is parsed from a *csproj* file by editing [NuGet.Build.Tasks.Pack.targets](https://github.com/NuGet/NuGet.Client/blob/64ed0cb4054226f6060752757d29c50287b312b3/src/NuGet.Core/NuGet.Build.Tasks.Pack/NuGet.Build.Tasks.Pack.targets#L198) to include this line:
 
@@ -34,17 +35,19 @@ First, we need to add a `readme` string element to the [*nuspec* schema](https:/
 Readme="$(PackageReadmeFile)"
 ```
 
+Further, a `GetReadme` method must be added to the [NuspecReader.cs](https://github.com/NuGet/NuGet.Client/blob/fa61e76d296b4b37ef4226277e77f7f227e878d9/src/NuGet.Core/NuGet.Packaging/NuspecReader.cs#L20) file to facilitate the reading of the Readme element from a nuspec file.
+
 Next, we need to add `Readme` member variables to multiple relevant classes and interfaces, and ensure that the Readme property is transmitted from one class to another when `pack` is called. These are:
-* [IPackTaskRequest](https://github.com/NuGet/NuGet.Client/blob/64ed0cb4054226f6060752757d29c50287b312b3/src/NuGet.Core/NuGet.Build.Tasks.Pack/IPackTaskRequest.cs#L16)
-* [PackTask](https://github.com/NuGet/NuGet.Client/blob/64ed0cb4054226f6060752757d29c50287b312b3/src/NuGet.Core/NuGet.Build.Tasks.Pack/PackTask.cs#L14)
-* [PackTaskRequest](https://github.com/NuGet/NuGet.Client/blob/64ed0cb4054226f6060752757d29c50287b312b3/src/NuGet.Core/NuGet.Build.Tasks.Pack/PackTaskRequest.cs#L10)
-* [IPackageMetadata](https://github.com/NuGet/NuGet.Client/blob/64ed0cb4054226f6060752757d29c50287b312b3/src/NuGet.Core/NuGet.Packaging/PackageCreation/Authoring/IPackageMetadata.cs#L11)
-* [ManifestMetadata](https://github.com/NuGet/NuGet.Client/blob/64ed0cb4054226f6060752757d29c50287b312b3/src/NuGet.Core/NuGet.Packaging/PackageCreation/Authoring/ManifestMetadata.cs#L18)
-* [PackageBuilder](https://github.com/NuGet/NuGet.Client/blob/64ed0cb4054226f6060752757d29c50287b312b3/src/NuGet.Core/NuGet.Packaging/PackageCreation/Authoring/PackageBuilder.cs#L25)
+* [IPackTaskRequest](https://github.com/NuGet/NuGet.Client/blob/fa61e76d296b4b37ef4226277e77f7f227e878d9/src/NuGet.Core/NuGet.Build.Tasks.Pack/IPackTaskRequest.cs#L16)
+* [PackTask](https://github.com/NuGet/NuGet.Client/blob/fa61e76d296b4b37ef4226277e77f7f227e878d9/src/NuGet.Core/NuGet.Build.Tasks.Pack/PackTask.cs#L14)
+* [PackTaskRequest](https://github.com/NuGet/NuGet.Client/blob/fa61e76d296b4b37ef4226277e77f7f227e878d9/src/NuGet.Core/NuGet.Build.Tasks.Pack/PackTaskRequest.cs#L10)
+* [IPackageMetadata](https://github.com/NuGet/NuGet.Client/blob/fa61e76d296b4b37ef4226277e77f7f227e878d9/src/NuGet.Core/NuGet.Packaging/PackageCreation/Authoring/IPackageMetadata.cs#L11)
+* [ManifestMetadata](https://github.com/NuGet/NuGet.Client/blob/fa61e76d296b4b37ef4226277e77f7f227e878d9/src/NuGet.Core/NuGet.Packaging/PackageCreation/Authoring/ManifestMetadata.cs#L18)
+* [PackageBuilder](https://github.com/NuGet/NuGet.Client/blob/fa61e76d296b4b37ef4226277e77f7f227e878d9/src/NuGet.Core/NuGet.Packaging/PackageCreation/Authoring/PackageBuilder.cs#L25)
 
 In order to transmit the `Readme` value from the source file (*nuspec* or *csproj*) to the final output *nuspec* file, the appropriate assignment statements are needed at the relevant locations.
 
-After this, a `ManifestMetadata` object is used to create the output *nuspec* file that is included in the nupkg. For this step, we need to edit the [ToXElement](https://github.com/NuGet/NuGet.Client/blob/64ed0cb4054226f6060752757d29c50287b312b3/src/NuGet.Core/NuGet.Packaging/PackageCreation/Xml/PackageMetadataXmlExtensions.cs#L32) method in PackageMetadataXmlExtensions.cs to include this line:
+After this, a `ManifestMetadata` object is used to create the output *nuspec* file that is included in the nupkg. For this step, we need to edit the [ToXElement](https://github.com/NuGet/NuGet.Client/blob/fa61e76d296b4b37ef4226277e77f7f227e878d9/src/NuGet.Core/NuGet.Packaging/PackageCreation/Xml/PackageMetadataXmlExtensions.cs#L32) method in PackageMetadataXmlExtensions.cs to include this line:
 
 ```
 AddElementIfNotNull(elem, ns, "readme", metadata.Readme);
