@@ -24,6 +24,7 @@ NuGet customers that use the commandline to publish their packages, and want to 
 
 * Server side functionality
 * Parsing the readme as a valid markdown file on the Client side
+* Enabling readme selection through the VS Project Properties UI (Project System)
 
 ## Solution
 
@@ -69,6 +70,7 @@ Each of these errors has a corresponding log code (NU5038 - NU5042) and error me
 
 * Adding readme support through the VS Project Properties UI (Project System)
 * Adding a `View README` link in the PM UI that points to the package's readme file
+
 ## Open Questions
 
 * Are there any other validation checks to do when packing a Readme?
