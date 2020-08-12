@@ -6,7 +6,7 @@
 
 ## Problem Background
 
-Users of NuGet want to be able to include Readme files as part of the package when they `pack` and `push` their project through the commandline. The [design document](https://github.com/NuGet/Home/wiki/Packaging-READMEs-within-the-nupkg) outlines the work needed for this feature and the intended results.
+Users of NuGet want to be able to include Readme files as part of the package when they `pack` and `push` their project through the commandline. The [design document](https://github.com/NuGet/Home/wiki/Embedding-and-displaying-NuGet-READMEs) outlines the work needed for this feature and the intended results.
 
 ## Who are the customers
 
@@ -85,4 +85,4 @@ Similar to the above point, this functionality is not something that we will loo
 
 ### References
 
-[Packaging READMEs within the nupkg](https://github.com/NuGet/Home/wiki/Packaging-READMEs-within-the-nupkg)
+[Embedding and displaying NuGet READMEs](https://github.com/NuGet/Home/wiki/Embedding-and-displaying-NuGet-READMEs)
