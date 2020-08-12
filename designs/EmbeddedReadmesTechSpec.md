@@ -28,7 +28,7 @@ NuGet customers that use the commandline to publish their packages, and want to 
 
 ## Solution
 
-**NOTE:** To see the code described in this section, you can look at the edited files [here](https://github.com/NuGet/NuGet.Client/pull/3573/files).
+**NOTE:** To see the code described in this section, you can look at the edited files [here](https://github.com/NuGet/NuGet.Client/pull/3575/files).
 
 First, we need to add a `readme` string element to the [*nuspec* schema](https://github.com/NuGet/NuGet.Client/blob/64ed0cb4054226f6060752757d29c50287b312b3/src/NuGet.Core/NuGet.Packaging/compiler/resources/nuspec.xsd) to ensure that the readme property is recognized and parsed from the *nuspec* file. We also need to ensure that the `PackageReadmeFile` property is parsed from a *csproj* file by editing [NuGet.Build.Tasks.Pack.targets](https://github.com/NuGet/NuGet.Client/blob/64ed0cb4054226f6060752757d29c50287b312b3/src/NuGet.Core/NuGet.Build.Tasks.Pack/NuGet.Build.Tasks.Pack.targets#L198) to include this line:
 
