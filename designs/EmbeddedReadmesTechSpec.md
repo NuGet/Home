@@ -84,6 +84,10 @@ Based on feedback from both the NuGet team and customers, we should not do this.
 
 Similar to the above point, this functionality is not something that we will look to add right now. Relying on explicit user input for the metadata is more desirable, and avoids springing any surprises on customers.
 
+### 3. Enforcing a size limit on Readme files on `pack`
+
+Originally, we intended to enforce a 1 MB size limit on Embedded Readme files both while running `pack` on the Client-side and while using `push` to upload to NuGet.org. However, since we do not want to impose such size restrictions on users looking to upload packages to private or local feeds, we decided against throwing an error for this on `pack`. Now, the user can run `pack` to create packages with Readme files over 1 MB, but will receive an error if they try to upload such a package to NuGet.org, which enforces a strict 1 MB limit.
+
 ### References
 
 [Embedding and displaying NuGet READMEs](https://github.com/NuGet/Home/wiki/Embedding-and-displaying-NuGet-READMEs)
