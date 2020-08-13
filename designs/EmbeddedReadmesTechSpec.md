@@ -59,10 +59,9 @@ AddElementIfNotNull(elem, ns, "readme", metadata.Readme);
 To validate the Readme property and the corresponding file when `pack` is called, the ValidateReadmeFile method in [PackageBuilder.cs](https://github.com/NuGet/NuGet.Client/blob/0f8ad8263539cb9bc69c441569453c1da98fb4cc/src/NuGet.Core/NuGet.Packaging/PackageCreation/Authoring/PackageBuilder.cs) checks that:
 * The file extension matches a Markdown file
 * The file specified in the Readme property exists in the package's files
-* The file size does not exceed 1 MB
 * The file is not empty
 
-Each of these errors has a corresponding log code (NU5038 - NU5042) and error message defined in [NuGetLogCode.cs](https://github.com/NuGet/NuGet.Client/blob/0f8ad8263539cb9bc69c441569453c1da98fb4cc/src/NuGet.Core/NuGet.Common/Errors/NuGetLogCode.cs) and [NuGetResources.resx](https://github.com/NuGet/NuGet.Client/blob/0f8ad8263539cb9bc69c441569453c1da98fb4cc/src/NuGet.Core/NuGet.Packaging/PackageCreation/Resources/NuGetResources.resx) respectively, and the appropriate support must be added in [NuGetResources.Designer.cs](https://github.com/NuGet/NuGet.Client/blob/0f8ad8263539cb9bc69c441569453c1da98fb4cc/src/NuGet.Core/NuGet.Packaging/PackageCreation/Resources/NuGetResources.Designer.cs).
+Each of these errors has a corresponding log code and error message defined in [NuGetLogCode.cs](https://github.com/NuGet/NuGet.Client/blob/0f8ad8263539cb9bc69c441569453c1da98fb4cc/src/NuGet.Core/NuGet.Common/Errors/NuGetLogCode.cs) and [NuGetResources.resx](https://github.com/NuGet/NuGet.Client/blob/0f8ad8263539cb9bc69c441569453c1da98fb4cc/src/NuGet.Core/NuGet.Packaging/PackageCreation/Resources/NuGetResources.resx) respectively, and the appropriate support must be added in [NuGetResources.Designer.cs](https://github.com/NuGet/NuGet.Client/blob/0f8ad8263539cb9bc69c441569453c1da98fb4cc/src/NuGet.Core/NuGet.Packaging/PackageCreation/Resources/NuGetResources.Designer.cs).
 
 **NOTE:** The Server team will parse and validate the markdown contents of the Readme file when it is uploaded.
 
