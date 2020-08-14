@@ -67,8 +67,8 @@ Each of these errors has a corresponding log code and error message defined in [
 
 ## Future Work
 
-* Adding readme support through the VS Project Properties UI (Project System)
-* Adding a `View README` link in the PM UI that points to the package's readme file
+* Adding readme support through the VS Project Properties UI (Project System) - [dotnet/project-system#6457](https://github.com/dotnet/project-system/issues/6457)
+* Adding a `View README` link in the PM UI that points to the package's readme file - [NuGet/Home#9890](https://github.com/nuget/home/issues/9890)
 
 ## Open Questions
 
