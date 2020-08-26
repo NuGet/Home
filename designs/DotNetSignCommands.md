@@ -68,9 +68,9 @@ OPTIONS:
 
 EXAMPLES:
 
-    dotnet nuget sign MyPackage.nupkg --timestamper https://foo.bar
+    dotnet nuget sign --timestamper https://foo.bar MyPackage.nupkg
 
-    dotnet nuget sign ../MyPackage.nupkg --timestamper https://foo.bar --output-directory ../signed
+    dotnet nuget sign --timestamper https://foo.bar --output ../signed ../MyPackage.nupkg
 ```
 
 Notable deviations from `nuget.exe` version:
