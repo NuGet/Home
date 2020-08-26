@@ -50,7 +50,7 @@ USAGE:
     dotnet nuget sign [OPTIONS] <package-path>
 
 OPTIONS:
-        --output-directory              Directory where the signed package should be saved. By default, the original package is overwritten by the signed package.
+    -o, --output* <output-directory>    Directory where the signed package should be saved. By default, the original package is overwritten by the signed package.
         --certificate-path              File path to the certificate to be used while signing the package.
         --certificate-store-name        Name of the X.509 certificate store. (...)
         --certificate-store-location    Name of the X.509 certificate store to use to search for the certificate.
@@ -64,6 +64,7 @@ OPTIONS:
     -h, --help                          Prints help information.
     -v, --verbosity* <LEVEL>            Set the MSBuild verbosity level. Allowed values are q[uiet], m[inimal], n[ormal], d[etailed], and diag[nostic].
         --interactive*                  Allows command to stop and wait for user input or action.
+        --configfile                    The NuGet configuration file. If specified, only the settings from this file will be used. If not specified, the hierarchy of configuration files from the current directory will be used.
 
 EXAMPLES:
 
@@ -74,10 +75,10 @@ EXAMPLES:
 
 Notable deviations from `nuget.exe` version:
 
-- No `-ConfigFile` equivalent. `dotnet.exe` doesn't seem to do this at all.
 - No `-ForceEnglishOutput` equivalent. `dotnet.exe` doesn't seem to do this at all.
 - Use MSBuild verbosity levels for `--verbosity` instead of NuGet levels.
 - Use `--interactive` instead of `--non-interactive`, because that's how `dotnet.exe` does it.
+- Use `--output` instead of `--output-directory` for consistency with `dotnet.exe`.
 
 ### `dotnet nuget verify`
 
@@ -88,17 +89,17 @@ USAGE:
     dotnet nuget verify [OPTIONS] <package-path>...*
 
 OPTIONS:
-        --all-verifications*                    Specifies that all verifications possible should be performed on the package(s). By default, only signatures are verified.
+        --all*                                  Specifies that all verifications possible should be performed on the package(s). By default, only signatures are verified.
         --certificate-fingerprint <fingerprint> Verify that the signer certificate matches with one of the specified SHA256 fingerprints. This option may be supplied multiple times to provide multiple fingerprints.
     -h, --help                                  Prints help information.
         --interactive*                          Allows command to stop and wait for user input or action.
+        --configfile                    The NuGet configuration file. If specified, only the settings from this file will be used. If not specified, the hierarchy of configuration files from the current directory will be used.
 ```
 
 Notable deviations from `nuget.exe` version:
 
-- `-Signatures` has been removed and is now default. Use `--all-verifications` to perform `-All`.
+- `-Signatures` has been removed and is now default. Use `--all` to perform `-All`.
 - Multiple position arguments can be passed in to verify multiple packages, instead of only supporting globbing.
-- No `-ConfigFile` equivalent. `dotnet.exe` doesn't seem to do this at all.
 - No `-ForceEnglishOutput` equivalent. `dotnet.exe` doesn't seem to do this at all.
 - Use MSBuild verbosity levels for `--verbosity` instead of NuGet levels.
 - Use `--interactive` instead of `--non-interactive`, because that's how `dotnet.exe` does it.
