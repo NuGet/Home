@@ -38,7 +38,7 @@ Introduce a new warning when attempting to pack a package with improper casing o
 
 ```
 NU0000: The license file 'LICENSE.txt' does not exist in the package. (Did you mean 'License.txt'?)
-NU0000: The icon file 'Icon.png' does not exist in the package. (Did you mean 'icon.png'?)
+NU0001: The icon file 'Icon.png' does not exist in the package. (Did you mean 'icon.png'?)
 ```
 
 ## Future Work
