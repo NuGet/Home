@@ -96,8 +96,7 @@ The particular capability name is up for discussion at this point.
 
 * What should be the capability name?
 
-`PackageReferences` was something I considered, but unfortunately having a project-system declare `PackageReferences` would make a project end up in the NET Core/CPS based PackageReference codepaths, which rely on nomination for getting the reference data.
-These projects need to continue to work in the legacy codepath.
+`PackageReferences` is a capability we can consider. I am not confident whether `PackageReference` suggests a communication method with NuGet (ie. push vs pull for getting the references). Is redefining a meaning of a capability acceptable?
 
 ## Considerations
 
