@@ -54,8 +54,7 @@ Given that VS loads projects in the order in which they are defined in the proje
 
 While, there's many csproj.dll projects supporting PackageReference, we have so far identified that Xamarin and VSIX projects are the ones that do call nomination on solution load.
 
-
-### What are the consequences 
+### What are the consequences
 
 Talk about the time wasted.
 
@@ -82,16 +81,23 @@ The reference data will still be read through the poll model. The reason for thi
 
 Project-systems have capability model. Whenever NuGet detects a project that's csproj.dll-based PackageReference, it can check for an additional capability that will indicate that a project is expected to call nominate at solution load.
 
-### What's the capability name
-??
+### What capability in particular
 
-Talk about the capability name, otions, considerations
+We *might* be able to re-use some existing capabilities, but we need to be able to correctly identify and bucketize the right groups of project.
+The particular capability name is up for discussion at this point.
+
+[See Open Questions](#open-questions)
 
 ## Future Work
+
+* Once the design has been agreed on, this will require changes in potentially multiple project-systems. The changes should be minimal and low effort.
 
 ## Open Questions
 
 * What should be the capability name?
+
+`PackageReferences` was something I considered, but unfortunately having a project-system declare `PackageReferences` would make a project end up in the NET Core/CPS based PackageReference codepaths, which rely on nomination for getting the reference data.
+These projects need to continue to work in the legacy codepath.
 
 ## Considerations
 
@@ -101,4 +107,5 @@ We can argue inaction as the extra restore are not going to happen consistently.
 
 ### References
 
-Add link to partial restore, capabilities docs etc.
+* [Visual Studio partial restore optimization](https://github.com/NuGet/Home/blob/756e168725e720491f3a1e013e30a73281b224c2/designs/VisualStudio-PartialRestoreOptimization.md)
+* [Project Capabilities](https://github.com/microsoft/VSProjectSystem/blob/master/doc/overview/project_capabilities.md)
