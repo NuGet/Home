@@ -22,9 +22,13 @@ Specifically call out the goals for this proposed design.
 
 Call out things that are not in consideration for this design. 
 
-## Solution
+## Solution Overview
 
 Describe the proposed solution in as much detail as you deem necessary.
+
+## Test Strategy
+
+Other than Unit Tests, which automated and manual integration, component, and end-to-end tests will be needed to validate the implementation? Is a special roll-out strategy (including kill-switch, opt-in flag, etc.) needed?
 
 ## Future Work
 
