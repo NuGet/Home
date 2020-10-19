@@ -32,6 +32,14 @@ Therefore, showing and hiding lists that are maintained in memory results in a m
 * Current commit on branch as of this writing: https://github.com/NuGet/NuGet.Client/commit/420e1d12fa418089f1f299b981d1ed409ee59cc4
 * _(I've included links throughout this spec to specific lines)_
 
+#### Active work
+* [Loading Status Indicator refactoring for new tab lists paradigm #10150](https://github.com/NuGet/Home/issues/10150)
+* [Updating in PMUI causes Object reference not set to an instance of an object #9882](https://github.com/NuGet/Home/issues/9882)
+* [Refresh button should work in new tabbing paradigm #10147](https://github.com/NuGet/Home/issues/10147)
+* [Store the search terms on each tab independently & Installed data is searched in UI #10148](https://github.com/NuGet/Home/issues/10148)
+* [Details Pane needs to reselect appropriate package #10145](https://github.com/NuGet/Home/issues/10145)
+* [Details Pane Versions Dropdown default selection should be Installed/LatestStable on Installed/Updates tabs #9887](https://github.com/NuGet/Home/issues/9887)
+
 ### Core Concepts
 * From a user's point-of-view, there has traditionally been only one list of packages. My solution adds a **second Listbox** that I show and hide depending on selected tab. 
 
@@ -93,36 +101,13 @@ The screen capture shows how snappy it is to change this visibility and apply UI
 
 ## Future Work
 
+* [Browse Tab search terms can be filtered in UI prior to querying sources #10149](https://github.com/NuGet/Home/issues/10149)
+* [Should Refresh button apply to all tabs? #10155](https://github.com/NuGet/Home/issues/10155)
+
 ## Open Questions
 
-1. The right-side Details pane traditionally preserved the selected package, if shown in the newly selected Tab (otherwise, it was cleared). 
-    * Is this important going forward? 
-    * Switching tabs will be somewhat slower if it is responsible for switching selected packages
-    * If I do nothing, this solution will cause the selected package to persist and be untouched while switching tabs.
+None
 
-1. Refresh button historically only refreshed the current tab. It will now technically refresh all Installed-data tabs (Installed, Updates, Consolidate). Should it also refresh Browse tab for any reason? Or in reverse, should refreshing Browse also refresh packages stored in Installed-data tabs?
-
-1. Searchbox traditionally applied across all tabs so that when switched-to, it reloaded, and picked up the search term already entered. Should the searchbox continue to be global (spans all tabs), or should it be based per-tab? 
-Note: Refresh Button will always do a hard-refresh from Source(s).
-Here are the approaches I initially see:  
-
-    1. Store the search terms on each tab independently.
-        1. Design/UX Change 
-        1. Cost: 10
-        1. Summary: Searching "Newtonsoft" on Browse only affects Browse packages. Then switching to Updates, the search term is cleared (or whatever previously entered when on that tab). This may either be frustrating or helpful, depending on customer's needs.
-
-    1. Search terms affect all tabs globally, with pending refreshes. 
-        1. Nearly same as existing UX
-        1. Cost: 10 (some re-hooking/bug fixing)
-        1. Summary: If the searchbox is touched, I could set all tabs to do a hard reload when switched-to so that the entered term can be applied and reloaded from source.
-	
-    1. Search terms affect all tabs globally / simultaneously, and are "Smart" about it.
-        1. Nearly same as existing UX + more performant
-        1. Cost: (ii) + 25
-        1. Summary:  
-      **Installed**: we already have all packages, so we could simply UI-Filter based on the search term. This will cascade to Updates and Consolidate tabs for free.
-      **Browse**: probably should keep this as a hard refresh as in (ii), as there are many complexities and Server implementations where I couldn't reliably depend on a "superset/subset" strategy. 
-        1. Future: On Browse, I could "UI filter while you're waiting" on those fresh packages. If we already have the target package in the list, why wait on an entire refresh to show it?
 ## Considerations
 
 1. I attempted to dynamically add/remove child controls from the DockPanel. The result was nearly no improvement, as the time to repopulate the visual tree made it feel much less snappy.
