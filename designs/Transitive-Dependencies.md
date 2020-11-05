@@ -2,7 +2,7 @@
 # Transitive Dependencies
 
 * Status: Reviewed
-* Author(s): [Jon Douglas](https://github.com/NuGet)
+* Author(s): [Jon Douglas](https://github.com/JonDouglas)
 * Issue: [5887](https://github.com/NuGet/Home/issues/5887)
 
 ## Description: What is it?
@@ -11,7 +11,7 @@ When a developer uses NuGet in a CLI or IDE environment, they want to be able to
 
 ## Problem: What problem is this solving?
 
-Developers are often confused with top-level & transitive dependencies in their project. A developer should be able to see all the transitive packages for their project or solution & understand where they originated from. A user should be able to promote a transitive dependency quickly & easily to a top-level dependency in the case there is a security concern on the package version depended on or if promoting a top-level package will resolve a conflict. 
+Developers are often confused with top-level & transitive dependencies in their project. A developer should be able to see all the transitive packages for their project or solution & understand where they originated from. A user should be able to promote a transitive dependency quickly & easily to a top-level dependency in the case there is a security concern on the package version depended on or if promoting to a top-level package will resolve a conflict. 
 
 ## Why: How do we know this is a real problem and worth solving?
 
