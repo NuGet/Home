@@ -1,7 +1,7 @@
 
-# Warn on improper file name case
+# Error on improper file name case
 
-* Status: In Review
+* Status: [Implemented](https://github.com/NuGet/NuGet.Client/pull/3754)
 * Author(s): [David Maas](https://github.com/PathogenDavid)
 * Issue: [9817](https://github.com/NuGet/Home/issues/9817) NU5030 license file existence check should always use a case-sensitive comparison
 
