@@ -34,12 +34,14 @@ Changing the behavior of packing on Linux is a non-goal.
 
 ## Solution
 
-Introduce a new warning when attempting to pack a package with improper casing on the `PackageLicenseFile`/`PackageIcon`:
+Expand the scope of existing errors to cover attempting to pack a package with improper casing on the `PackageLicenseFile`/`PackageIcon`:
 
 ```
-NU0000: The license file 'LICENSE.txt' does not exist in the package. (Did you mean 'License.txt'?)
-NU0001: The icon file 'Icon.png' does not exist in the package. (Did you mean 'icon.png'?)
+NU5030: The license file 'LICENSE.txt' does not exist in the package. (Did you mean 'License.txt'?)
+NU5046: The icon file 'Icon.png' does not exist in the package. (Did you mean 'icon.png'?)
 ```
+
+As shown above, in the situation NuGet will give a hint to the user with the correct casing.
 
 ## Future Work
 
@@ -47,15 +49,19 @@ A warning is specified to avoid breaking packages which previously packed succes
 
 ## Open Questions
 
-Should this be an error that reuses the existing errors (NU5030 for licenses and NU5046 for icons) instead?
+None.
 
 ## Considerations
 
-It was considered to make the issue an error, but this would cause backward compatibility issues with packages which historically packed with no error.
+It was considered to make the issue a warning, but this would expose the user to a pit of failure.
 
-I considered that packing could silently update `PackageLicenseFile` to the correct value, but this behavior seems like it has the potential to be confusing.
+It was considered to make new error codes for this case, but was deemed unecessary.
 
-I considered changing the behavior on Linux to use a case-insensitive string comparison as well in order to make these malformed packages packable there, but that seems unecessary to me. (And it turns what is an error today into a warning.)
+It was considered that packing could silently update `PackageLicenseFile` to the correct value, but this behavior seems like it has the potential to be confusing.
+
+If this were to be a warning, it was considered changing the behavior on Linux to use a case-insensitive string comparison as well in order to make these malformed packages packable there, but that was deemed unecessary. (And it turns what is an error today into a warning.)
+
+It was considered that when the file was found but in a different directory that the hint could appear in that situation too, but this situation was deemed to be out of scope.
 
 ### References
 
