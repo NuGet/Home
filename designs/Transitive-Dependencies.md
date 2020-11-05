@@ -97,7 +97,7 @@ There are three primary elements that will be added as part of this design to th
 1.	ScrollViewer – To show transitive dependency nodes.
 2.	Expander – To collapse transitive dependency nodes by default & expand upon user action. To collapse top-level dependency nodes.
 3.	Tooltip – To show the transitive dependency’s origin.
-
+The above elements will be checked against Accessibility Insights. We'll ensure screen-readers can differentiate Top versus Transitive dependencies, and the scrolling and expansion functionality will be accessible with the keyboard.
 ## Customer Development
 
 ### Pain Points
