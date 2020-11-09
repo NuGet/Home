@@ -56,7 +56,8 @@ While, there's many csproj.dll projects supporting PackageReference, we have so 
 
 ### What are the consequences
 
-Talk about the time wasted.
+Wasted resources. Reasoning about `solution load` is very difficult and because VS loads projects in parallel and in order in which they were declared in the solution, this means that not all legacy projects are guaranteed to nominate in that window, so we're likely to do restores that have no effective impact. 
+Note that this now means that we're running an extra optimized partial restore, but for legacy projects this can still be expensive.
 
 ## Who are the customers
 
