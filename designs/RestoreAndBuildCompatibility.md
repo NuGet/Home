@@ -3,7 +3,7 @@
 
 * Status: In Review
 * Author(s): [Nikolche Kolev](https://github.com/nkolev92)
-* Issue: [TBD](https://github.com/NuGet/Home/issues/) No GH issue
+* Issue: [10259](https://github.com/NuGet/Home/issues/10259) Improving the experience when incompatible versions of the restore/build tooling are used
 
 ## Problem Background
 
