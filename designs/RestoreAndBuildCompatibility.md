@@ -51,7 +51,8 @@ Starting with VS 2017 and now VS 2019, there 3 different tooling options one can
 * MSBuild.exe
   * Ships with Visual Studio
   * Supports PackageReference
-  * Starting with VS 2019, Update 5, packages.config scenarios in an opt-in fashion through -p:RestorePackagesConfig=true`
+  * Starting with VS 2019, Update 5, packages.config scenarios in an opt-in fashion through -p:RestorePackagesConfig=true`.
+    * We recommend you set `RestorePackagesConfig` to `true` in a [Directory.Build.Props](https://docs.microsoft.com/en-us/visualstudio/msbuild/customize-your-build?view=vs-2019#directorybuildprops-and-directorybuildtargets).
 
 * dotnet.exe
   * Ships with the .NET SDK
