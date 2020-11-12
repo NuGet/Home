@@ -12,7 +12,7 @@
 NuGet as a product has grown its importance in the .NET ecosystem over the years.
 What started with NuGet.exe & Visual Studio support has led to a first class experience in **the CLI**, dotnet.exe.
 
-With packages.config, NuGet was built on top of the build experience, NuGet functions as an add on.
+With packages.config, NuGet was built on top of the build experience, and functions as an add on.
 NuGet used concept such as `Reference` to add package dependencies. These references were written in the project file directly, with a relative path to a `known` packages folder.
 This meant that you can use NuGet.exe 3.4.4 with VS 2015 & VS 2013 as the build tooling.
 
@@ -46,7 +46,7 @@ On the CI, the story is a little bit different.
 
 #### Tooling options
 
-Starting with VS 2017 and now VS 2019, there 3 different tooling options on can use to run a restore on their CI.
+Starting with VS 2017 and now VS 2019, there 3 different tooling options one can use to run a restore on their CI.
 
 * MSBuild.exe
   * Ships with Visual Studio
@@ -68,7 +68,7 @@ Starting with VS 2017 and now VS 2019, there 3 different tooling options on can 
 
 GitHub Actions and Azure Pipelines are the most commonly used (and Microsoft run) automation services.
 Usually customers will have a `yaml build file` that specifies the list of steps to run, and the machines with the build tooling are often provided by these services. For example, Azure pipelines provides [Microsoft-hosted agents](https://docs.microsoft.com/en-us/azure/devops/pipelines/agents/hosted?view=azure-devops&tabs=yaml), which handle maintenance and upgrade of these agents.
-In that maintenance, VS upgrades are on of those included things.
+In that maintenance, VS upgrades are one of those included things.
 
 Given all those tooling options, there are a few *common* ways customers build their repos.
 
@@ -221,4 +221,3 @@ Furthemore this increases the testing and support matrix significantly. It is no
 * Forward compatibility case [issue](https://developercommunity2.visualstudio.com/t/vsbuild-msbuild-task-failing-since-2020-11-10/1249432).
 * [GitHub Actions](https://docs.github.com/en/free-pro-team@latest/actions)
 * Note that the complete implementation of the aliases feature in [NuGet/Home#5154](https://github.com/nuget/home/issues/5154) will definitely cause a problem if mismatched tooling is used. While we'd like the scenarios to work as often as possible, certain features do require big changes.
-
