@@ -102,6 +102,8 @@ PackageReference customers
 
 ## Non-Goals
 
+* Introducing explicit backwards/forward compatibility. That's a lateral effort.
+
 ## Solution Overview
 
 In the 2 particular problems described above the experience when things go wrong is inconsistent. It's not *always* apparent why something goes wrong.
@@ -159,6 +161,9 @@ The SDK is already considering adding tests for the cross version scenarios in t
 None
 
 ## Open Questions
+
+* Should the warnings/errors that the SDK raises could be context aware?
+For example, if the versions are missmatched, but the SDK is still able to find the assets, it can do a best effort and raise a warning. If the assets cannot be found, fail with an error *clearly* indicating the problem is the mismatched tooling versions.
 
 ## Considerations
 
