@@ -212,7 +212,7 @@ For example, if the versions are missmatched, but the SDK is still able to find 
 * Should NuGet restore output always be backward/forward compatible?
 
 No. The build tooling shipped today, which NuGet is a part of, is self contained. NuGet.exe customers are the only ones likely to run this mismatched scenario and we have done work to help them migrate, through MSBuild.exe restore and packages.config support for restore.
-Furthemore this increases the testing and support matrix significantly. It is not something we have promised customers.
+Furthermore this increases the testing and support matrix significantly. It is not something we have promised customers.
 
 ### References
 
