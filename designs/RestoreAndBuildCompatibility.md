@@ -3,7 +3,7 @@
 
 * Status: In Review
 * Author(s): [Nikolche Kolev](https://github.com/nkolev92)
-* Issue: [1](https://github.com/NuGet/Home/issues/1) Issue Title
+* Issue: [TBD](https://github.com/NuGet/Home/issues/) No GH issue
 
 ## Problem Background
 
