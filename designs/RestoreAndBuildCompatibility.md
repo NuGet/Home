@@ -156,7 +156,7 @@ Given that the implied compatibility exists, the proposal is for the SDK build t
 * Warn when the restore output is from an older tool than anticipated.
 * Warn when the restore output is from a newer tool than anticipated.
 
-There are 2 technical options and each might have a different effect on the frequency in which this warning is raised.
+There are 3 technical options and each might have a different effect on the frequency in which this warning is raised.
 
 #### Option 1 - Use assets file version
 
