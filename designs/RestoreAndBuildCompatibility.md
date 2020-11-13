@@ -7,10 +7,10 @@
 
 ## Problem Background
 
-### NuGet packages.config
-
 NuGet as a product has grown its importance in the .NET ecosystem over the years.
 What started with NuGet.exe & Visual Studio support has led to a first class experience in **the CLI**, dotnet.exe.
+
+### NuGet packages.config
 
 With packages.config, NuGet was built on top of the build experience, and functions as an add on.
 NuGet used concept such as `Reference` to add package dependencies. These references were written in the project file directly, with a relative path to a `known` packages folder.
@@ -38,7 +38,7 @@ The `restore` and `build` operations have a contract expressed through 3 files:
 At build-time these files are loaded and interpreted as necessary.
 This means that the NuGet and build tooling version have an implied compatibility matrix.
 
-### Restore, Build and Continue Integration
+### Restore, Build and Continuous Integration
 
 When developing in Visual Studio or any other editor, the restore and build steps are integrated and things normally just work.  
 
@@ -51,12 +51,12 @@ Starting with VS 2017 and now VS 2019, there 3 different tooling options one can
 * MSBuild.exe
   * Ships with Visual Studio
   * Supports PackageReference
-  * Starting with VS 2019, Update 5, packages.config scenarios in an opt-in fashion through -p:RestorePackagesConfig=true`.
-    * We recommend you set `RestorePackagesConfig` to `true` in a [Directory.Build.Props](https://docs.microsoft.com/en-us/visualstudio/msbuild/customize-your-build?view=vs-2019#directorybuildprops-and-directorybuildtargets).
+  * Starting with VS 2019, Update 5, packages.config scenarios in an opt-in fashion through `-p:RestorePackagesConfig=true`.
+    * Consider setting `RestorePackagesConfig` to `true` in a [Directory.Build.Props](https://docs.microsoft.com/en-us/visualstudio/msbuild/customize-your-build?view=vs-2019#directorybuildprops-and-directorybuildtargets).
 
 * dotnet.exe
   * Ships with the .NET SDK
-    * Bundled in Visual Studio
+    * Bundled in Visual Studio with the Cross Platform .NET Development workload
     * Standalone.
   * Supports PackageReference, .NET SDK based projects only.
 
@@ -100,7 +100,7 @@ The steps are normally:
 * NuGet.exe restore
 * MSBuild.exe /t:build
 
-In packages.config, this usually just works because he build tooling can be oblivious to NuGet.
+In packages.config, this usually just works because the build tooling is oblivious to NuGet.
 In PackageReference, there's nuance, because now you have a restore and build steps that can use different versions of the tooling--`NuGet.exe` will write assets that may differ from what the MSBuild-embedded tooling expects.
 
 Due to the fact that `NuGet.exe` is acquired standalone, it's considerably more difficult to ensure restore & build compatibility.
@@ -146,7 +146,7 @@ This proposal covers improving that warning/error experience.
 
 When PackageReference restore is run, NuGet writes out the 3 files mentioned above. 2 of those files have a `version`.
 
-* The `project.assets.json` has a version that has historically been used for `reading`, not tooling compatibility checks.
+* The `project.assets.json` has a version that has historically been used for schema changes, not tooling compatibility checks. For example, aliases addition involved adding more information to the assets file, but not a schema change so this number was not incremented.
 * The `nuget.g.props` contains a `NuGetToolVersion` property.
 
 ### Build Tasks warning (SDK)
@@ -164,7 +164,7 @@ NuGet increments the `project.assets.json` version every time there's a function
 
 Cons:
 
-* This version was not used with tooling/restore meaning compatibility in mind, but rather for writing/reading purposes. While unlikely, it's possible that other tooling depends on it.
+* Thas version that has historically been used for schema changes, not tooling compatibility checks. For example, aliases addition involved adding more information to the assets file, but not a schema change so this number was not incremented.
 
 Pros:
 
