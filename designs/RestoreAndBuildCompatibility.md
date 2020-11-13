@@ -127,7 +127,7 @@ In this design, we are trying to improve the general mismatched tooling experien
 
 ## Who are the customers
 
-PackageReference customers
+PackageReference customers using NuGet.exe to restore separately from build tooling.
 
 ## Goals
 
