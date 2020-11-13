@@ -183,6 +183,7 @@ Cons:
 Pros:
 
 * The flip side is that we prefer that customers use consistent versions of the tooling, so going this direction has the added benefit of consolidating tooling for our customers.
+* We can get the warning with only a build tasks change.
 
 #### Option 3 - Define a new compatibility version
 
