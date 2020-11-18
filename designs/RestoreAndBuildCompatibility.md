@@ -125,6 +125,25 @@ A recent example is the following Developer Community [issue](https://developerc
 
 In this design, we are trying to improve the general mismatched tooling experience, but also consider alternatives for the particular issues customers are hitting with VS 16.8/NuGet 5.8/ SDK 5.0.100.
 
+### Restore, Build, Visual Studio global.json
+
+When developing in Visual Studio or any other editor, the restore and build steps are integrated and things normally just work.  
+Unless you are using a global.json.
+
+#### NuGet restore in Visual Studio vs Commandline
+
+NuGet has restore support in NuGet.exe, dotnet.exe, MSBuild.exe and Visual Studio.
+While the `core` is the same, there are slight differences in the restore behavior.
+
+#### dotnet SDK and global.json in Visual Studio
+
+The [global.json](https://docs.microsoft.com/en-us/dotnet/core/tools/global-json) is used to specify which SDK version should be used.
+Given the implied compatibility between NuGet and the build tasks, the compatibility questions now are between `Visual Studio` (or MSBuild) and `dotnet SDK`.
+
+A further complication is the fact that the .NET SDK is selected on a project basis, but the NuGet implementation in VS will always be one.
+
+Finally, the .NET SDK has a minimumMSBuildVersion that limits the versions of MSBuild.exe and in turn Visual Studio that the .NET SDK requires to succesfully work.
+
 ## Who are the customers
 
 PackageReference customers using NuGet.exe to restore separately from build tooling.
@@ -156,44 +175,13 @@ Given that the implied compatibility exists, the proposal is for the SDK build t
 * Warn when the restore output is from an older tool than anticipated.
 * Warn when the restore output is from a newer tool than anticipated.
 
-There are 3 technical options and each might have a different effect on the frequency in which this warning is raised.
-
-#### Option 1 - Use assets file version
+### Assets file version
 
 NuGet increments the `project.assets.json` version every time there's a functional change in behavior. The build tasks in the SDK are built with a specific version of NuGet, and the SDK could raise a warning when the `project.assets.json` version is not the one it expects.
 
-Cons:
+This version that has historically been used for schema changes, not tooling compatibility checks. For example, aliases addition involved adding more information to the assets file, but not a schema change so this number was not incremented.
 
-* Thas version that has historically been used for schema changes, not tooling compatibility checks. For example, aliases addition involved adding more information to the assets file, but not a schema change so this number was not incremented.
-
-Pros:
-
-* We would only increment this when a functional restore change is made.
-
-Alternatively we could add a new version property, but that's probably unnecessary.
-
-#### Option 2 - Use NuGet tool version
-
-The nuget.g.props write out a `NuGetToolVersion` property which contains the version of the NuGet tooling that generated it.
-
-Cons:
-
-* This has the potential to be too noisy. Just because the version change that doesn't mean it's not compatible.
-
-Pros:
-
-* The flip side is that we prefer that customers use consistent versions of the tooling, so going this direction has the added benefit of consolidating tooling for our customers.
-* We can get the warning with only a build tasks change.
-
-#### Option 3 - Define a new compatibility version
-
-Pros:
-
-* We would only increment this when a functional restore change is made.
-
-Cons:
-
-* Both NuGet and SDK tooling require changes to add the initial warning.
+< TODO NK > Handle the complexity of an alternative .NET SDK?
 
 ## Test Strategy
 
@@ -216,6 +204,31 @@ For example, if the versions are missmatched, but the SDK is still able to find 
 No. The build tooling shipped today, which NuGet is a part of, is self contained. NuGet.exe customers are the only ones likely to run this mismatched scenario and we have done work to help them migrate, through MSBuild.exe restore and packages.config support for restore.
 Furthermore this increases the testing and support matrix significantly. It is not something we have promised customers.
 
+* Any implementation alternatives?
+
+Option 2 - Use NuGet tool version
+
+The nuget.g.props write out a `NuGetToolVersion` property which contains the version of the NuGet tooling that generated it.
+
+Cons:
+
+* This has the potential to be too noisy. Just because the version change that doesn't mean it's not compatible.
+
+Pros:
+
+* The flip side is that we prefer that customers use consistent versions of the tooling, so going this direction has the added benefit of consolidating tooling for our customers.
+* We can get the warning with only a build tasks change.
+
+Option 3 - Define a new compatibility version
+
+Pros:
+
+* We would only increment this when a functional restore change is made.
+
+Cons:
+
+* Both NuGet and SDK tooling require changes to add the initial warning.
+
 ### References
 
 * NuGet restore build [issues](https://developercommunity2.visualstudio.com/t/NuGet-Restore-build-issues---projectass/1190427)
@@ -223,3 +236,4 @@ Furthermore this increases the testing and support matrix significantly. It is n
 * Forward compatibility case [issue](https://developercommunity2.visualstudio.com/t/vsbuild-msbuild-task-failing-since-2020-11-10/1249432).
 * [GitHub Actions](https://docs.github.com/en/free-pro-team@latest/actions)
 * Note that the complete implementation of the aliases feature in [NuGet/Home#5154](https://github.com/nuget/home/issues/5154) will definitely cause a problem if mismatched tooling is used. While we'd like the scenarios to work as often as possible, certain features do require big changes.
+* [global.json](https://docs.microsoft.com/en-us/dotnet/core/tools/global-json)
