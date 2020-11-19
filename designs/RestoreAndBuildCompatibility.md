@@ -125,15 +125,15 @@ A recent example is the following Developer Community [issue](https://developerc
 
 In this design, we are trying to improve the general mismatched tooling experience, but also consider alternatives for the particular issues customers are hitting with VS 16.8/NuGet 5.8/ SDK 5.0.100.
 
-### Restore, Build, Visual Studio global.json
-
-When developing in Visual Studio or any other editor, the restore and build steps are integrated and things normally just work.  
-Unless you are using a global.json.
-
 #### NuGet restore in Visual Studio vs Commandline
 
 NuGet has restore support in NuGet.exe, dotnet.exe, MSBuild.exe and Visual Studio.
 While the `core` is the same, there are slight differences in the restore behavior.
+
+### Restore, Build, Visual Studio global.json
+
+When developing in Visual Studio or any other editor, the restore and build steps are integrated and things normally just work.  
+Unless you are using a global.json.
 
 #### dotnet SDK and global.json in Visual Studio
 
@@ -143,6 +143,8 @@ Given the implied compatibility between NuGet and the build tasks, the compatibi
 A further complication is the fact that the .NET SDK is selected on a project basis, but the NuGet implementation in VS will always be one.
 
 Finally, the .NET SDK has a minimumMSBuildVersion that limits the versions of MSBuild.exe and in turn Visual Studio that the .NET SDK requires to succesfully work.
+
+At this point, we do not have a lot of feedback about this problem, but any potential change needs to account for this scenario.
 
 ## Who are the customers
 
@@ -158,30 +160,65 @@ PackageReference customers using NuGet.exe to restore separately from build tool
 
 ## Solution Overview
 
-In the 2 particular problems described above the experience when things go wrong is inconsistent. It's not *always* apparent why something goes wrong.
-This proposal covers improving that warning/error experience.
+In the 3 particular problems described above the experience when things go wrong is inconsistent. It's not *always* apparent why something goes wrong.
+This proposal tries to address that warning/error experience.
 
 ### NuGet output versioning
 
 When PackageReference restore is run, NuGet writes out the 3 files mentioned above. 2 of those files have a `version`.
 
-* The `project.assets.json` has a version that has historically been used for schema changes, not tooling compatibility checks. For example, aliases addition involved adding more information to the assets file, but not a schema change so this number was not incremented.
+* The `project.assets.json` has a version that has been sporadically used for schema changes, not tooling compatibility checks. For example, aliases addition involved adding more information to the assets file, but not a schema change so this number was not incremented.
+In retrospect, the changes in 5.8 could have probably used a schema version bump, but the lack of any sort of application of this schema version would've made inconsequential. The version has remained at `3` since the addition of logs in the assets file in `4.3`.
 * The `nuget.g.props` contains a `NuGetToolVersion` property.
 
-### Build Tasks warning (SDK)
+#### Challenges
 
-Given that the implied compatibility exists, the proposal is for the SDK build tasks raise a suppressible warning when the output is not in the expected shape.
+* NuGet in Visual Studio carries one implementation. The SDK selection is project based.
+* Ideally, any solution should steer the customers in the right direction, but not break their workflows unless absolutely necessary.
 
-* Warn when the restore output is from an older tool than anticipated.
-* Warn when the restore output is from a newer tool than anticipated.
+#### Potential approaches
 
-### Assets file version
+* Major/Minor version approach
 
-NuGet increments the `project.assets.json` version every time there's a functional change in behavior. The build tasks in the SDK are built with a specific version of NuGet, and the SDK could raise a warning when the `project.assets.json` version is not the one it expects.
+The SDK would support a specific version of the assets file. For each unexpected minor version bump, the SDK would warn. When the assets file differs by a major version, the SDK can error. If the SDK can support a previous major version, it can do so. That backwards compatibility would cover the `Older NuGet tooling, newer build tooling` approach.
+Alternatively, the *minor* version can be expressed through a capability, which could provide a more actionable message about what *might* not work correctly.
 
-This version that has historically been used for schema changes, not tooling compatibility checks. For example, aliases addition involved adding more information to the assets file, but not a schema change so this number was not incremented.
+* Example #1
 
-< TODO NK > Handle the complexity of an alternative .NET SDK?
+This is how the above scenarios above would've behaved if we had this approach in place when the alias feature was shipped in 5.7 and 3.1.400.
+The `alias` feature would've been a minor version bump.
+
+| Scenario | Behavior |
+|----------|----------|
+| 5.6 NuGet, 3.1.400 SDK | Warning: Restore was run with an older version of the tooling. Certain features may not work as expected. |
+| 5.7 NuGet, 3.1.300 | Warning: Restore was run with a newer version of the tooling. Certain features may not work as expected. |
+| VS 16.7, SDK pinned to 3.1.300 |  Warning: Restore was run with a newer version of the tooling. Certain features may not work as expected. |
+| VS 16.6, SDK pinned to 3.1.400 |  Warning: Restore was run with an older version of the tooling. Certain features may not work as expected. |
+
+Note that this approach doesn't solve the current compatibility problems, but rather it makes customers more aware of them.
+
+* Example #2
+
+This is how the above scenarios would have if we had this approach when the .NET 5 frameworks change was implemented.
+Given what we know today, the `5.0.10*` SDK will support older versions of the assets file. If we had bumped the major version, the behavior would've been the following:
+
+| Scenario | Behavior |
+|----------|----------|
+| 5.7 NuGet, 5.0.100 SDK | Error: Restore was run with an older version of the tooling. Please restore with the 5.0.100 dotnet.exe version. (Work in progress message) |
+| 5.8 NuGet, 3.1.400 | Error: Restore was run with a newer version of the tooling. |
+| VS 16.8, SDK pinned to 3.1.400 |  Error: Restore was run with an older version of the tooling. Please restore with the equivalent version of the tooling. |
+| VS 16.7, SDK pinned to 5.0.100 |  Error: The 5.0.100 SDK version has a minimum MSBuild version of 16.8 |
+
+Additionally, the SDK *may* choose to bump it's minimum MSBuild version alongside NuGet, when NuGet bumps it's assets file major version.
+
+* Decoupling of the NuGet and SDK dependencies
+
+No concrete approach yet. The engineering cost here might be too high to pull off.
+
+* Eliminating the differences between NuGet commandline restore and NuGet Visual Studio restore.
+
+As an approach this would only address the Visual Studio <-> non-default SDK version scenarios.
+This would probably require NuGet restore in Visual Studio to work out of process and to potentially hold multiple implementations of restore based on a switch.
 
 ## Test Strategy
 
@@ -206,7 +243,7 @@ Furthermore this increases the testing and support matrix significantly. It is n
 
 * Any implementation alternatives?
 
-Option 2 - Use NuGet tool version
+Use NuGet tool version
 
 The nuget.g.props write out a `NuGetToolVersion` property which contains the version of the NuGet tooling that generated it.
 
@@ -219,7 +256,7 @@ Pros:
 * The flip side is that we prefer that customers use consistent versions of the tooling, so going this direction has the added benefit of consolidating tooling for our customers.
 * We can get the warning with only a build tasks change.
 
-Option 3 - Define a new compatibility version
+Define a new compatibility version
 
 Pros:
 
