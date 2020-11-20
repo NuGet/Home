@@ -64,8 +64,8 @@ To understand the proposed changes, here's a mapping of all `C++` project types 
 
 | Project type | TargetFrameworkMoniker | TargetPlatformMoniker | CLRSupport | Effective NuGet framework | Notes | Open questions |
 
-|--------------|---------------------------|--------------------------|------------|---------------------------|-------|----------------|
-| Native C++ | .NETFramework,Version=v4.0 | Windows,Version=10.0.19041.0 | false | native | NuGet will continue special casing vcxproj. |
+|--------------|---------------------------|--------------------|------------|---------------------------|-------|----------------|
+| Native C++ | .NETFramework,Version=v4.0 | Windows,Version=10.0.19041.0 | false | native | NuGet will continue special casing vcxproj. | |
 | C++ UWP App | | UAP,Version=10.0.18362.0 | false | native | NuGet will continue special casing vcxproj. |
 | CLR C++ | .NETFramework,Version=v4.7.2 | Windows,Version=10.0.19041.0 | true | ??? | This project has .NET Framework CLR support | Are these projects expected to be PackageReference or packages.config? What's the effective target framework |
 | Core CLR C++ | .NETCoreApp,Version=v5.0 | Windows,Version=10.0.19041.0 | NetCore | ??? | What's the effective framework? Is it `net5.0-windows`? |
@@ -79,18 +79,16 @@ If a package supports .NET Core or .NET Standard, it's fully compatible with a .
 
 The `Asset Target Fallback` implementation currently suffers from a bug where the dependencies are not pulled in correctly, see [5957](https://github.com/NuGet/Home/issues/5957).
 
-Whatever the effective frameworks turn out to be, there are 2 approaches that we can take.
-
-* Utilize AssetTargetFallback
-
-This would require project type changes. The project type would specify which target framework to fall back to. This likely requires fixing [5957](https://github.com/NuGet/Home/issues/5957).
+Asset Target Fallback would require project type changes. The project type would specify which target framework to fall back to. This likely requires fixing [5957](https://github.com/NuGet/Home/issues/5957).
 Note that this would *generate* a warning when managed packages are used.
 
-* Introduce a `dedicated dual compatibility` framework
+The likely solution is to introduce a `dedicated dual compatibility` framework
 
 Similar to how `.NET Core` implements `.NET Standard` and supports `.NET Core` as a same family framework, we can add a framework type that's only allowed in projects, and not packages. This framework could define it's compatible as both `native` and `managed`.
 
 The downside here is that NuGet does not have a framework that's only supported in projects. Given that this is not a real `target`, it is counter to what NuGet frameworks are supposed to represent.
+
+An open question is whether packing of these projects is supported. 
 
 ## Test Strategy
 
@@ -106,7 +104,7 @@ TBD
 
 * Which frameworks are going to be supported with .NET Core C++/CLI? Will net5.0-windows be supported eventually? Asset Target Fallback becomes tricky if so.
 
-* Which framework changes should we adopt? Asset Target Fallback or a `dedicated dual compatibility framework`.
+* Can these projets be packaged? Are they distributing native or managed assets? Both?
 
 ## Considerations
 
