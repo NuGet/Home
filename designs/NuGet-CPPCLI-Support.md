@@ -63,7 +63,6 @@ Currently the steps for NuGet framework inference for project types still active
 To understand the proposed changes, here's a mapping of all `C++` project types and the property value for the appropriate ones.
 
 | Project type | TargetFrameworkMoniker | TargetPlatformMoniker | CLRSupport | Effective NuGet framework | Notes | Open questions |
-
 |--------------|---------------------------|--------------------|------------|---------------------------|-------|----------------|
 | Native C++ | .NETFramework,Version=v4.0 | Windows,Version=10.0.19041.0 | false | native | NuGet will continue special casing vcxproj. | |
 | C++ UWP App | | UAP,Version=10.0.18362.0 | false | native | NuGet will continue special casing vcxproj. | |
