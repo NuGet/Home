@@ -66,7 +66,6 @@ To understand the proposed changes, here's a mapping of all `C++` project types 
 
 |--------------|---------------------------|--------------------|------------|---------------------------|-------|----------------|
 | Native C++ | .NETFramework,Version=v4.0 | Windows,Version=10.0.19041.0 | false | native | NuGet will continue special casing vcxproj. | |
-
 | C++ UWP App | | UAP,Version=10.0.18362.0 | false | native | NuGet will continue special casing vcxproj. | |
 | CLR C++ | .NETFramework,Version=v4.7.2 | Windows,Version=10.0.19041.0 | true | ??? | This project has .NET Framework CLR support | Are these projects expected to be PackageReference or packages.config? What's the effective target framework |
 | Core CLR C++ | .NETCoreApp,Version=v5.0 | Windows,Version=10.0.19041.0 | NetCore | ??? | | What's the effective framework? Is it `net5.0-windows`? |
