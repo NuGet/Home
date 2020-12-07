@@ -7,7 +7,8 @@
 
 ## Problem Background
 
-On Linux/Mac, NuGet has inconsistent paths of user wide NuGet.Config file for different NuGet tools. Dotnet CLI uses hard coded `~/.nuget` folder (`~/.nuget/NuGet/NuGet.Config`), while Mono uses the folder from environment variable `APPDATA`, (by default, it's `~/.config/NuGet/NuGet.Config`). This is confusing and we should consolidate the two into one location. 
+On Linux/Mac, NuGet has inconsistent paths of user wide NuGet.Config file for different NuGet tools. Dotnet CLI uses hard coded `~/.nuget` folder, so the user wide NuGet.Config path is `~/.nuget/NuGet/NuGet.Config`). While Mono uses the folder name from environment variable `APPDATA`, so by default, the user wide NuGet.Config file path is `~/.config/NuGet/NuGet.Config`). This is confusing and we should consolidate the two into one location. 
+
 After discussing in NuGet team and checking with Visual Studio Mac/Mono team, we believe we should change the dotnet CLI path to match that of Mono’s, for the following reasons:
  * On Linux/Mac, users usually get application data from environment variable APPDATA, which has the default value of ~/.config. Getting application data from ~/.nuget will cause inconsistency user experience between NuGet and other applications.
  * Getting application data from environment variable APPDATA on Linux/Mac will make it consistent with the behavior on Windows.
@@ -35,34 +36,34 @@ Check if the following conditions are satisfied.
 If yes, NuGet will get user wide NuGet.Config path from consolidated path.
 If above condition is not satisfied, it should be in one of the following conditions:
 
-** 1.Neither legacy path nor consolidated exists.**
+**1. Neither legacy path nor consolidated exists.**
 In this scenario, user has never called NuGet in dotnet CLI or Mono before.
 NuGet will create a default NuGet.Config file in consolidated path.
 NuGet will get user wide NuGet.Config file from consolidated path. 
 
-** 2.Legacy path exist, but consolidated path does not exist.**
+**2. Legacy path exist, but consolidated path does not exist.**
 In this scenario, user has called NuGet in dotnet CLI before, but has never called NuGet in Mono.
 NuGet will copy the NuGet.Config file from legacy path to consolidated path, then delete the one in legacy path. 
 NuGet will get user wide NuGet.Config file from consolidated path.
 
-** 3.Both legacy path and consolidated path exist.**
+**3. Both legacy path and consolidated path exist.**
 In this scenario, user has called NuGet in both dotnet CLI and Mono before.
 NuGet could not determine for users to consolidate the contents of the two NuGet.Config files, as there might be conflicting config.
 NuGet will get user wide NuGet.Config file from legacy path, as dotnet CLI users do not expect the location of NuGet.Config file changes when dotnet version changes.
 NuGet will also show a warning about the existence of NuGet.Config file in legacy path, encouraging users to consolidate the contents of the two and only keep the one in consolidated path.
 
 ### Scenarios from the developer side
-** 1.Visual Studio for Mac** 
+**1. Visual Studio for Mac** 
   It's in .NET Framework code path so it will not be affected by this change.
 
-** 2.Mono CLI (NuGet)**
+**2. Mono CLI (NuGet)**
   It's in .NET Framework code path so it will not be affected by this change.
 
-** 3.dotnet CLI (NuGet)**
+**3. dotnet CLI (NuGet)**
   On windows, it will not be affected by this change.
   On Linux/Mac, this change will be applied.
 
-** 4.CI/CD (Headless CLI)**
+**4. CI/CD (Headless CLI)**
   On windows, it will not be affected by this change.
   On Linux/Mac, this change will be applied. But considering most users will put the URLs in a NuGet.config file in the repository, so the user wide NuGet.Conifg in both legacy path and consolidated path should be the default content in most cases. Not sure if there is any data we could use to prove this assumption.
 
