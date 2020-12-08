@@ -37,16 +37,19 @@ If yes, NuGet will get user wide NuGet.Config path from consolidated path.
 If above condition is not satisfied, it should be in one of the following conditions:
 
 **1. Neither legacy path nor consolidated exists.**
+
 In this scenario, user has never called NuGet in dotnet CLI or Mono before.
 NuGet will create a default NuGet.Config file in consolidated path.
 NuGet will get user wide NuGet.Config file from consolidated path. 
 
 **2. Legacy path exist, but consolidated path does not exist.**
+
 In this scenario, user has called NuGet in dotnet CLI before, but has never called NuGet in Mono.
 NuGet will copy the NuGet.Config file from legacy path to consolidated path, then delete the one in legacy path. 
 NuGet will get user wide NuGet.Config file from consolidated path.
 
 **3. Both legacy path and consolidated path exist.**
+
 In this scenario, user has called NuGet in both dotnet CLI and Mono before.
 NuGet could not determine for users to consolidate the contents of the two NuGet.Config files, as there might be conflicting config.
 NuGet will get user wide NuGet.Config file from legacy path, as dotnet CLI users do not expect the location of NuGet.Config file changes when dotnet version changes.
@@ -54,23 +57,27 @@ NuGet will also show a warning about the existence of NuGet.Config file in legac
 
 ### Scenarios from the developer side
 **1. Visual Studio for Mac** 
+
   It's in .NET Framework code path so it will not be affected by this change.
 
 **2. Mono CLI (NuGet)**
+
   It's in .NET Framework code path so it will not be affected by this change.
 
 **3. dotnet CLI (NuGet)**
+
   On windows, it will not be affected by this change.
   On Linux/Mac, this change will be applied.
 
 **4. CI/CD (Headless CLI)**
+
   On windows, it will not be affected by this change.
   On Linux/Mac, this change will be applied. But considering most users will put the URLs in a NuGet.config file in the repository, so the user wide NuGet.Conifg in both legacy path and consolidated path should be the default content in most cases. Not sure if there is any data we could use to prove this assumption.
 
 
 ### Challenges
 
-* For users working with multiple versions of .NET SDK, and use global.json to pin different versions of dotnet dynamically, will they be affected?
+#### For users working with multiple versions of .NET SDK, and use global.json to pin different versions of dotnet dynamically, will they be affected?
 Old versions of .NET SDK will generate the default user wide NuGet.Config file in legacy path, if it does not exist.
 For dotnet CLI users who just follows the instructions to consolidate the two NuGet.Config files and only keep the one in consolidated path, they'll be confused. As they might not aware calling old dotnet CLI will create the NuGet.Config in legacy path again, which triggers the warning again (warn about the existence of NuGet.Config file in legacy path, encouraging users to consolidate the contents of the two and only keep the one in consolidated path). 
 What's more, the lower version of dotnet CLI might break if the default user wide NuGet.Config doesn't work.
@@ -96,7 +103,7 @@ But we don't have .NET APIs for non-Windows platform for now, so we need to impl
 We'd better know how many users are in this situation(use global.json to pin different versions of dotnet dynamically). 
 Then we can determine if the extra work is worth doing, just to make their experience better, that is, do not receive warning every time about legacy path still exists because lower version of dotnet CLI) needs it.
 
-* Users having both the legacy path and the consolidated path, users have to consolidate manually. Can we help them better?
+#### Users having both the legacy path and the consolidated path, users have to consolidate manually. Can we help them better?
 e.g. If one of the user wide NuGet.Config file is a default NuGet.Config file, can we override it with the other one to consolidate?
      If NuGet.Config files in legacy path and consolidated path are the same, can we just delete the one in legacy path?
   The comparison between two xml files might be tricky. We need to consider the space, and the comments could be ignored, and the lines with same values but with different key names will be treated as the same.
@@ -107,25 +114,25 @@ Get rid of the legacy path completely.
 
 ## Open Questions
 
-* Which dotnet version are we going to bring in this change? 
+### Which dotnet version are we going to bring in this change? 
 Is .NET 5 good?
 The version of .NET with this change will show warning to users who still have NuGet.Config in legacy path, encouraging them to move it to consolidated path.
 So it's good if more people could get this warning and get prepared.
 
-* Shall we insert this change into dotnet 2.x, 3.x as servicing patch? 
+### Shall we insert this change into dotnet 2.x, 3.x as servicing patch? 
 The bar for servicing patch should be high and for fixing security issues. So it won't be insert into dotnet 2.x, 3.x as servicing patch.  
 
-* When can we get rid of the legacy path completely? 
+### When can we get rid of the legacy path completely? 
 The version of .NET with this change will show warning to users who still have NuGet.Config in legacy path, encouraging them to move it to consolidated path.
 Since all old versions of dotnet still need the legacy path, we could not get rid of the legacy path if old versions are still in service.
 The next major version should be able to remove legacy path completely if all the previous .NET versions are out of support.
 
 
 ## Considerations
-* Is there a way to know how many users are using global.json to pin different versions of dotnet dynamically? 
+### Is there a way to know how many users are using global.json to pin different versions of dotnet dynamically? 
 Then we can determine if the extra work is worth doing, to make their experience better, that is, do not receive warning every time about the existence of legacy path, because lower version of dotnet CLI) needs it.
 
-* Are we going to help users to consolidate the two NuGet.Config files in the following cases? How complex is it?
+### Are we going to help users to consolidate the two NuGet.Config files in the following cases? How complex is it?
 Any of the NuGet.Config file of the legacy path and consolidated path is a default config file.
 The two NuGet.Config files are the same. 
 
