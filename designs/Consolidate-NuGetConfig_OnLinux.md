@@ -9,9 +9,8 @@
 
 On Linux/Mac, NuGet has inconsistent paths of user wide NuGet.Config file for different NuGet tools. Dotnet CLI uses hard coded `~/.nuget` folder, so the user wide NuGet.Config path is `~/.nuget/NuGet/NuGet.Config`). While Mono uses the folder name from environment variable `APPDATA`, so by default, the user wide NuGet.Config file path is `~/.config/NuGet/NuGet.Config`). This is confusing and we should consolidate the two into one location. 
 
-After discussing in NuGet team and checking with Visual Studio Mac/Mono team, we believe we should change the dotnet CLI path to match that of Mono’s, for the following reasons:
- * On Linux/Mac, users usually get application data from environment variable APPDATA, which has the default value of ~/.config. Getting application data from ~/.nuget will cause inconsistency user experience between NuGet and other applications.
- * Getting application data from environment variable APPDATA on Linux/Mac will make it consistent with the behavior on Windows.
+After discussing in NuGet team and checking with Visual Studio Mac/Mono team, we believe we should change the dotnet CLI path to match that of Mono’s, for the following reason:
+ * On Linux/Mac, users usually get application data from environment variable XDG_DATA_HOME, which has the default value of ~/.config. Getting application data from ~/.nuget will cause inconsistency user experience between NuGet and other applications.
 
 For the sake of simplicity, we will refer to `~/.nuget/NuGet/NuGet.Config` as legacy path, and refer to `~/.config/NuGet/NuGet.Config` as consolidated path in the following.
 
