@@ -89,4 +89,4 @@ Follow up on:
 
 ### References
 
-- Clear one package on StackOverflow. [Link](https://stackoverflow.com/questions/49935118/clear-just-one-package-from-npm-cache)
+- Clear one package in node.js, StackOverflow.com [Link](https://stackoverflow.com/questions/49935118/clear-just-one-package-from-npm-cache)
