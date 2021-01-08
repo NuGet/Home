@@ -4,18 +4,16 @@
 
 ## Details about Problem
 
-NuGet tool used (NuGet.exe | VS | MSBuild | dotnet.exe):
+NuGet product used (NuGet.exe | VS | MSBuild | dotnet.exe):
 
-NuGet tool version: 
+Product version: 
 
-Worked before? If so, when:
+Is this a regression? Which version: 
 
 ## Repro steps and/or sample project
 
-1.
-
-1.
+<!-- Please as much details as possible to help us to reproduce your problem. -->
 
 ### Verbose Logs
 
-Please include verbose logs (NuGet.exe <COMMAND> -verbosity detailed | dotnet.exe <COMMAND> --verbosity diag | etc...)
+<!-- Please include verbose logs (NuGet.exe <COMMAND> -verbosity detailed | dotnet.exe <COMMAND> --verbosity diag | etc...) -->
