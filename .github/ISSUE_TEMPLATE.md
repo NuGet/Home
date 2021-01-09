@@ -12,7 +12,7 @@ Is this a regression? Which version:
 
 ## Repro steps and/or sample project
 
-<!-- Please as much details as possible to help us to reproduce your problem. -->
+<!-- Please add as much details as possible to help us to reproduce your problem. -->
 
 ### Verbose Logs
 
