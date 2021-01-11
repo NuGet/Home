@@ -65,8 +65,8 @@ If you're having trouble with the NuGet client tools (the Visual Studio extensio
 [NuGet.org](https://www.nuget.org/) is backed by several core services:
 
 * [NuGetGallery](https://github.com/NuGet/NuGetGallery) - the current NuGet Gallery
-* [NuGet.Services.Metadata](https://github.com/NuGet/NuGet.Services.Metadata) - NuGet's Metadata Service
-* [NuGet.Jobs](https://github.com/NuGet/NuGet.Jobs) - NuGet's back-end jobs
+* [NuGet.Jobs](https://github.com/NuGet/NuGet.Jobs) - NuGet's back-end jobs and service
+* [ServerCommon](https://github.com/NuGet/ServerCommon) - shared libraries for running NuGet.org
 
 [NuGet.Server](https://github.com/NuGet/NuGet.Server) is a lightweight standalone NuGet server.
 
