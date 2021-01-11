@@ -4,7 +4,7 @@
 
 ## Details about Problem
 
-NuGet product used (NuGet.exe | VS | MSBuild | dotnet.exe):
+NuGet product used (NuGet.exe | Visual Studio | MSBuild.exe | dotnet.exe):
 
 Product version: 
 
