@@ -8,7 +8,7 @@ NuGet product used (NuGet.exe | Visual Studio | MSBuild.exe | dotnet.exe):
 
 Product version: 
 
-Is this a regression? Which version: 
+Worked before? If so, with which NuGet version: 
 
 ## Repro steps and/or sample project
 
