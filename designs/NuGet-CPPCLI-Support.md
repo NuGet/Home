@@ -32,6 +32,8 @@ TargetFramework is only defined for C++/CLI .NET Core projects.
 TargetFrameworkIdentifier/Version/Moniker properties are defined for C++/CLI .NET Framework projects. Note, that they are also confusingly defined for pure native ones too (in msbuild common targets, at least, they used to be), so you need to check other properties first (i.e. TargetPlatformIdentifier and CLRSupport). You can also use project capabilities: “native” vs “managed”
 ```
 
+Note that C++/CLI projects produce `managed` binaries.
+
 ## Who are the customers
 
 Customers using C++/CLI projects.
@@ -71,6 +73,9 @@ To understand the proposed changes, here's a mapping of all `C++` project types 
 
 In the background, it is said that C++/CLI projects are supposed to support installing both managed and native packages. This would require some amendments to NuGet's framework model.
 
+* When a package supports both managed and native assemblies (unlikely), NuGet will pick the managed assemblies first.
+* NuGet will *only* observe CLRSupport when it is `NetCore`, .NET Framework C++/CLI is not the target at this point.
+
 `native` framework is not compatible with anything but `native` and that will remain.
 NuGet has a fallback compatibility mode as well.
 For example: .NET Core projects have a fallback to .NET Framework with a warning. This is also callled `Asset Target Fallback`.
@@ -91,19 +96,11 @@ An open question is whether packing of these projects is supported.
 
 ## Test Strategy
 
-TBD
-
 ## Future Work
 
 ## Open Questions
 
-* Is PackageReference support being added for .NET Framework C++/CLI as well? Or only .NET Core C++/CLI projects?
-
-* When a package contains both `native` and `managed` assets, which ones are preferred?
-
-* Which frameworks are going to be supported with .NET Core C++/CLI? Will net5.0-windows be supported eventually? Asset Target Fallback becomes tricky if so.
-
-* Can these projets be packaged? Are they distributing native or managed assets? Both?
+* Can these projets be packaged? These projects produce managed assemblies. What's the framework generated?
 
 ## Considerations
 
