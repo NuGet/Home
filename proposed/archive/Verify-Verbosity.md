@@ -30,6 +30,21 @@ Currently, the default verbosity for `dotnet` commands is [`LogLevel.Information
 
 The details that should be displayed on each verbosity level are described below. Each level should display the same as the level below plus whatever is specified in that level. In that sense, `quiet` will be give the less amount of information, while `diagnostic` the most.
 
+​                                  | `q[uiet]` | `m[inimal]` | `n[ormal]` | `d[etails]` | `diag[nostic]`
+----------------------------------| --------- | ----------- | ---------- | -----------| --------------
+`Certificate chain Information`   | ❌       | ❌          | ❌         | ✔️         | ✔️   
+`Package name`                    | ❌       | ❌          | ✔️         | ✔️         | ✔️   
+`Path to package being verified`  | ❌       | ❌          | ✔️         | ✔️         | ✔️   
+`Type of signature (author or repository)`| ❌       | ❌          | ✔️         | ✔️         | ✔️   
+`Hashing algorithm used for signature`        | ❌       | ❌          | ✔️         | ✔️         | ✔️   
+`Certificate -> SHA1 hash`| ❌       | ✔️          | ✔️         | ✔️         | ✔️   
+`Certificate -> Subject`| ❌       | ✔️          | ✔️         | ✔️         | ✔️   
+`Certificate -> SHA-256 hash`| ❌       | ✔️          | ✔️         | ✔️         | ✔️   
+`Certificate -> Issued By`| ❌       | ✔️          | ✔️         | ✔️         | ✔️   
+`Certificate -> Validity period`| ❌       | ✔️          | ✔️         | ✔️         | ✔️   
+`Certificate -> Service index URL (If applicable)`| ❌       | ✔️          | ✔️         | ✔️         | ✔️   
+
+
 ### Log level mapping - The following details are copied from [here](https://github.com/NuGet/Home/blob/dev/designs/Package-List-Verbosity.md#log-level-mapping). Thanks to [Joel Verhagen](https://github.com/joelverhagen) for the detailed information
 
 The provided `--verbosity` value will include to NuGet log messages with the following levels:
@@ -46,7 +61,7 @@ The provided `--verbosity` value will include to NuGet log messages with the fol
 Note that MSBuild itself has the following mapping for it's own "log levels"
 ([source](https://docs.microsoft.com/en-us/visualstudio/msbuild/obtaining-build-logs-with-msbuild?view=vs-2019#verbosity-settings)):
 
-​                                     | `q[uiet]` | `m[inimal]` | `n[ormal]` | `d[etails]` | `diag[nostic]`
+​                                     | `q[uiet]` | `m[inimal]` | `n[ormal]` | `d[etailed]` | `diag[nostic]`
 ------------------------------------- | --------- | ----------- | ---------- | ----------- | --------------
 Errors                                | ✔️        | ✔️         | ✔️         | ✔️         | ✔️   
 Warnings                              | ✔️        | ✔️         | ✔️         | ✔️         | ✔️   
