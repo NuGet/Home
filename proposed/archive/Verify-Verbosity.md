@@ -33,17 +33,16 @@ The details that should be displayed on each verbosity level are described below
 ​                                  | `q[uiet]` | `m[inimal]` | `n[ormal]` | `d[etails]` | `diag[nostic]`
 ----------------------------------| --------- | ----------- | ---------- | -----------| --------------
 `Certificate chain Information`   | ❌       | ❌          | ❌         | ✔️         | ✔️   
-`Package name`                    | ❌       | ❌          | ✔️         | ✔️         | ✔️   
 `Path to package being verified`  | ❌       | ❌          | ✔️         | ✔️         | ✔️   
-`Type of signature (author or repository)`| ❌       | ❌          | ✔️         | ✔️         | ✔️   
 `Hashing algorithm used for signature`        | ❌       | ❌          | ✔️         | ✔️         | ✔️   
-`Certificate -> SHA1 hash`| ❌       | ✔️          | ✔️         | ✔️         | ✔️   
+`Certificate -> SHA1 hash`| ❌       | ❌          | ✔️         | ✔️         | ✔️   
+`Certificate -> Issued By`| ❌       | ❌          | ✔️         | ✔️         | ✔️   
+`Package name being verified`                    | ❌       | ✔️          | ✔️         | ✔️         | ✔️   
+`Type of signature (author or repository)`| ❌       | ✔️          | ✔️         | ✔️         | ✔️   
 `Certificate -> Subject`| ❌       | ✔️          | ✔️         | ✔️         | ✔️   
 `Certificate -> SHA-256 hash`| ❌       | ✔️          | ✔️         | ✔️         | ✔️   
-`Certificate -> Issued By`| ❌       | ✔️          | ✔️         | ✔️         | ✔️   
 `Certificate -> Validity period`| ❌       | ✔️          | ✔️         | ✔️         | ✔️   
 `Certificate -> Service index URL (If applicable)`| ❌       | ✔️          | ✔️         | ✔️         | ✔️   
-
 
 ### Log level mapping - The following details are copied from [here](https://github.com/NuGet/Home/blob/dev/designs/Package-List-Verbosity.md#log-level-mapping). Thanks to [Joel Verhagen](https://github.com/joelverhagen) for the detailed information
 
