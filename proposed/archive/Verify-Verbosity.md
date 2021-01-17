@@ -105,11 +105,12 @@ Timestamp: 12/9/2020 2:32:12 PM
 Verifying repository countersignature's timestamp with timestamping service certificate:
   SHA256 hash: C474CE76007D02394E0DA5E4DE7C14C680F9E282013CFEF653EF5DB71FDF61F8
   Valid from: 12/22/2017 4:00:00 PM to 3/22/2029 4:59:59 PM
+Successfully verified package 'NuGet.Common.5.9.0-preview.2'.
 ```
 
 #### `--verbosity quiet`
 
-- No output unless if there are any `errors` or `warnings`.
+- No output unless there are any `errors` or `warnings`.
 
 #### `--verbosity normal`
 
