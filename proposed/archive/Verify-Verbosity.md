@@ -1,6 +1,6 @@
 # `dotnet nuget verify --verbosity`
 
-* Status: **Draft**
+* Status: **In Review**
 * Author: [Kartheek Penagamuri](https://github.com/kartheekp-ms)
 * Issue: [#10316](https://github.com/NuGet/Home/issues/10316) - dotnet nuget verify is too quiet
 
@@ -43,6 +43,9 @@ The details that should be displayed on each verbosity level are described below
 `Certificate -> SHA-256 hash`| ❌       | ✔️          | ✔️         | ✔️         | ✔️   
 `Certificate -> Validity period`| ❌       | ✔️          | ✔️         | ✔️         | ✔️   
 `Certificate -> Service index URL (If applicable)`| ❌       | ✔️          | ✔️         | ✔️         | ✔️   
+
+> [!Note]
+Once this spec has been implemented the output of `nuget.exe verify` command for various verbosity levels will change and be in sync with `dotnet nuget verify` command.
 
 ### Log level mapping - The following details are copied from [here](https://github.com/NuGet/Home/blob/dev/designs/Package-List-Verbosity.md#log-level-mapping). Thanks to [Joel Verhagen](https://github.com/joelverhagen) for the detailed information
 
