@@ -46,8 +46,6 @@ On the client side, when trying to Fetch the Icon, we call RemoteFileService.Get
 
 On the service side, we then retrieve the appropriate file from the appropriate location based on the entries in the MemoryCache.
 
-TODO: is the memory cache always going to have the content when the client wants it. If not, what should we do?
-
 ### Other Changes
 
 Several classes had a PackageReader property that was of type Func<PackageReader>.
@@ -55,9 +53,7 @@ Func<PackageReader> wasn't designed to be remoted nicely. In serveral places, i 
 
 ## Test Strategy
 
-TODO 
-
-Other than Unit Tests, which automated and manual integration, component, and end-to-end tests will be needed to validate the implementation? Is a special roll-out strategy (including kill-switch, opt-in flag, etc.) needed?
+Added unit tests for NuGetRemoteFileService and updated many existing tests for this new implemenation of icons/licenses.
 
 ## Future Work
 
