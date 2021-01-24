@@ -6,7 +6,7 @@
 
 ## Problem background
 
-`--verbosity` option available on the `dotnet nuget verify` command doesn't provide any output by default due to logical error in the code. Customers need information about packages’ signatures to [manage package trust boundaries](https://docs.microsoft.com/en-us/nuget/consume-packages/installing-signed-packages).
+`dotnet nuget verify` command doesn't provide any output by default due to logical error in the implementation. If the user didn't pass value for `--verbosity` option, then the log level is set to [`LogLevel.Minimal`](https://github.com/NuGet/NuGet.Client/blob/dev/src/NuGet.Core/NuGet.CommandLine.XPlat/Commands/Signing/VerifyCommand.cs#L58). Customers need information about packages’ signatures to [manage package trust boundaries](https://docs.microsoft.com/en-us/nuget/consume-packages/installing-signed-packages).
 
 ## Who are the customers
 
@@ -21,12 +21,6 @@ Package consumers that use the `dotnet nuget verify` command to verify package s
 * Add `--verbosity` option to `dotnet nuget verify` command.
 
 ## Solution
-
-### Situation before this design
-
-Currently, the default verbosity for `dotnet` commands is [`LogLevel.Information`](https://github.com/NuGet/NuGet.Client/blob/dev/src/NuGet.Core/NuGet.CommandLine.XPlat/Program.cs#L31). If the user didn't pass value for `--verbosity` option, then the log level is set to [`LogLevel.Minimal`](https://github.com/NuGet/NuGet.Client/blob/dev/src/NuGet.Core/NuGet.CommandLine.XPlat/Commands/Signing/VerifyCommand.cs#L58) due to logical error in the `dotnet nuget verify` command implementation. Hence by default this command does not display any log messages.
-
-### Changes required
 
 The details that should be displayed on each verbosity level are described below. Each level should display the same as the level below plus whatever is specified in that level. In that sense, `quiet` will be give the less amount of information, while `diagnostic` the most.
 
@@ -43,11 +37,11 @@ The details that should be displayed on each verbosity level are described below
 `Certificate -> SHA-256 hash`| ❌       | ✔️          | ✔️         | ✔️         | ✔️   
 `Certificate -> Validity period`| ❌       | ✔️          | ✔️         | ✔️         | ✔️   
 `Certificate -> Service index URL (If applicable)`| ❌       | ✔️          | ✔️         | ✔️         | ✔️   
-
-> [!Note]
+```
 Once this spec has been implemented the output of `nuget.exe verify` command for various verbosity levels will change and be in sync with `dotnet nuget verify` command.
+```
 
-### Log level mapping - The following details are copied from [here](https://github.com/NuGet/Home/blob/dev/designs/Package-List-Verbosity.md#log-level-mapping). Thanks to [Joel Verhagen](https://github.com/joelverhagen) for the detailed information
+### Log level mapping - The following details are copied from [here](https://github.com/NuGet/Home/blob/dev/designs/Package-List-Verbosity.md#log-level-mapping). Thanks to [Joel Verhagen](https://github.com/joelverhagen) for the detailed information.
 
 The provided `--verbosity` value will include to NuGet log messages with the following levels:
 
