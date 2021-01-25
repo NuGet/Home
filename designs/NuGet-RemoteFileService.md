@@ -3,7 +3,7 @@
 
 * Status: In Review
 * Author(s): [Rob Relyea](https://github.com/rrelyea)
-* Issue: [10151](https://github.com/NuGet/Home/issues/10151) INuGetRemoteFileService - Fetch Images and embedded licenses for codespaces and normal execution
+* Issue: [10151](https://github.com/NuGet/Home/issues/10151) INuGetPackageFileService - Fetch Images and embedded licenses for codespaces and normal execution
 
 ## Problem Background
 
@@ -38,7 +38,7 @@ Defined a new interface for this service:
 ```C#
 namespace NuGet.VisualStudio.Internal.Contracts
 {
-    public interface INuGetRemoteFileService : IDisposable
+    public interface INuGetPackageFileService : IDisposable
     {
         ValueTask<Stream?> GetPackageIconAsync(PackageIdentity packageIdentity, CancellationToken cancellationToken);
         ValueTask<Stream?> GetEmbeddedLicenseAsync(PackageIdentity packageIdentity, CancellationToken cancellationToken);
@@ -46,17 +46,17 @@ namespace NuGet.VisualStudio.Internal.Contracts
 }
 ```
 
-On the service side, in [SearchObject.CacheBackgroundData()](https://github.com/NuGet/NuGet.Client/blob/b5b44526dea0379ebd6c8e51e8a041c06d5845ca/src/NuGet.Clients/NuGet.PackageManagement.VisualStudio/Services/SearchObject.cs#L218-L236), beyond the packageSearchMetadata caching that was already done, we call a NuGetRemoteFileService instance to AddIconToCache() and to AddLicenseToCache(). These calls cause a PackageIdentity key and a URI value to be stored in a MemoryCache.
+On the service side, in [SearchObject.CacheBackgroundData()](https://github.com/NuGet/NuGet.Client/blob/b5b44526dea0379ebd6c8e51e8a041c06d5845ca/src/NuGet.Clients/NuGet.PackageManagement.VisualStudio/Services/SearchObject.cs#L218-L236), beyond the packageSearchMetadata caching that was already done, we call a NuGetPackageFileService instance to AddIconToCache() and to AddLicenseToCache(). These calls cause a PackageIdentity key and a URI value to be stored in a MemoryCache.
 
-On the client side, when trying to fetch the icon, we call RemoteFileService.GetPackageIconAsync, passing in the package identity.
+On the client side, when trying to fetch the icon, we call PackageFileService.GetPackageIconAsync, passing in the package identity.
 
-On the client side, when trying to fetch an embedded license, we call RemoteFileService.GetEmbeddedLicenseAsync.
+On the client side, when trying to fetch an embedded license, we call PackageFileService.GetEmbeddedLicenseAsync.
 
 On the service side, we then retrieve the appropriate file from the appropriate location based on the Uri stored in the MemoryCache and return the stream to the caller.
 
 #### IdentityToUri Memory Cache notes
 
-The settings of the IdentityToUri memory cache that the NuGetRemoteFileService class hosts and maintains are identical to the metadata MemoryCache that the search service uses as part of it codespaces rebuilding:
+The settings of the IdentityToUri memory cache that the NuGetPackageFileService class hosts and maintains are identical to the metadata MemoryCache that the search service uses as part of it codespaces rebuilding:
 - 4 MB memory limit
 - 0 physical memory limit percentage
 - 2min polling interval
@@ -83,7 +83,7 @@ Func<PackageReader> wasn't designed to be remoted nicely. In several places, I r
 
 ## Test Strategy
 
-Added unit tests for NuGetRemoteFileService and updated many existing tests for this new implementation of icons/licenses.
+Added unit tests for NuGetPackageFileService and updated many existing tests for this new implementation of icons/licenses.
 
 ## Future Work
 
