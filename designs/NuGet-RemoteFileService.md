@@ -46,6 +46,17 @@ On the client side, when trying to Fetch the Icon, we call RemoteFileService.Get
 
 On the service side, we then retrieve the appropriate file from the appropriate location based on the entries in the MemoryCache.
 
+Issue: should GetEmbeddedLicenseAsync be more generic. (question from zkat)
+    zkat - I guess this is fine for now, but I'd really like it if now-or-eventually, this is abstracted away into a set of supported "Well Known Files"--for example, if we want to add Changelog or docs support in the future.
+
+    rrelyea - thought a bit about it... i'd imagine we could pass an enum into a method... packageIdentity, wellKnownEmbeddedFile
+
+    where wellKnownEmbeddedFiles might be readme, license and what else?
+    maybe icon...but that isn't always embedded, can also be a url outside of the package.
+    i lean towards not doing this in a generic way yet...as we don't know the full set of needs yet...and since the nuspec is on the server, we cannot just take a relative path, etc...
+
+    would love to discuss, hear other thoughts.
+
 ### Other Changes
 
 Several classes had a PackageReader property that was of type Func<PackageReader>.
