@@ -7,14 +7,18 @@
 
 ## Problem Background
 
-With Codespaces support added to NuGet client, our code needs to be able to handle all packages and communication with feeds happening on a server node. This is architected as async method calls to services that are remoted. In most cases, we also have chosen to have 1 code path, for normal execution and remoted execution. These services are still used in the normal execution, however, the service runs in the same process, as opposed to being remoted across the network.
+With Codespaces support added to NuGet client, our code needs to be able to handle all packages and communication with feeds happening on a server node. This is architected as async method calls to services that are remoted. In most cases, we also have chosen to have 1 code path, for standalone execution and Codespaces-connected execution. These services are still used in the standalone execution, however, the service runs in the same process, as opposed to being remoted across the network, as in the Codespaces-connected execution.
 
 Package Icons can either come from:
 - a package feeds search service
-- (old style) or a URI to an arbitrary place on the web
-- embedded in a package
+- (old style) or a URI to an arbitrary place on the web (specified in the NuSpec via now deprecated [iconUrl](https://docs.microsoft.com/en-us/nuget/reference/nuspec#iconurl) element.)
+- embedded in a package (specified in the NuSpec via [icon](https://docs.microsoft.com/en-us/nuget/reference/nuspec#icon) element.)
 
-Licenses can also come from a few places, including a license file embedded in a package.
+Licenses can also come from a few places:
+- a package feeds search service
+- a [licenseUrl](https://docs.microsoft.com/en-us/nuget/reference/nuspec#licenseurl) (deprecated)
+- a [license expression](https://docs.microsoft.com/en-us/nuget/reference/nuspec#license)
+- an [embedded license file](https://docs.microsoft.com/en-us/nuget/reference/nuspec#license) in the package
 
 ## Who are the customers
 
@@ -22,7 +26,7 @@ All PM UI customers.
 
 ## Goals
 
-Support remote and normal fetching of icons and licenses.
+Support Codespaces-connected and standalone fetching of icons and licenses.
 
 ## Non-Goals
 
@@ -31,6 +35,7 @@ Support remote and normal fetching of icons and licenses.
 ### Fetching Files
 Defined a new interface for this service:
 
+```C#
 namespace NuGet.VisualStudio.Internal.Contracts
 {
     public interface INuGetRemoteFileService : IDisposable
@@ -39,8 +44,9 @@ namespace NuGet.VisualStudio.Internal.Contracts
         ValueTask<Stream?> GetEmbeddedLicenseAsync(PackageIdentity packageIdentity, CancellationToken cancellationToken);
     }
 }
+```
 
-On the service side, in SearchObject.CacheBackgroundData(), beyond the packageSearchMetadata caching that was already done, we call a RemoteFileService instance to AddIconToCache() and to AddLicenseToCache().
+On the service side, in [SearchObject.CacheBackgroundData()](https://github.com/NuGet/NuGet.Client/blob/b5b44526dea0379ebd6c8e51e8a041c06d5845ca/src/NuGet.Clients/NuGet.PackageManagement.VisualStudio/Services/SearchObject.cs#L218-L236), beyond the packageSearchMetadata caching that was already done, we call a RemoteFileService instance to AddIconToCache() and to AddLicenseToCache().
 
 On the client side, when trying to Fetch the Icon, we call RemoteFileService.GetPackageIconAsync, passing in the package identity.
 
@@ -60,11 +66,11 @@ Issue: should GetEmbeddedLicenseAsync be more generic. (question from zkat)
 ### Other Changes
 
 Several classes had a PackageReader property that was of type Func<PackageReader>.
-Func<PackageReader> wasn't designed to be remoted nicely. In serveral places, i replaced the PackageReader property with a PackagePath property, to be used when appropriate for loading files from a Package.
+Func<PackageReader> wasn't designed to be remoted nicely. In several places, I replaced the PackageReader property with a PackagePath property, to be used when appropriate for loading files from a package.
 
 ## Test Strategy
 
-Added unit tests for NuGetRemoteFileService and updated many existing tests for this new implemenation of icons/licenses.
+Added unit tests for NuGetRemoteFileService and updated many existing tests for this new implementation of icons/licenses.
 
 ## Future Work
 
