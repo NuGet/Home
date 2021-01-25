@@ -86,4 +86,8 @@ Any open questions not specifically called out in the design.
 
 At one point, the design of this interface passed in URIs...we moved to PackageIdentity and storing in the MemoryCache to tighten security of the feature.
 
+We also, chose to only key off of PackageIdentity, instead of PackageIdentity and a package source...staying consistent with our treatment of unique package idenities as the same, regardless of where they come from.
+
+Performance - we've discussed whether the quantity of calls we make for search, icons, licenses is a problem in standalone or Codespaces-connected scenarios. As these calls are async, and in similar quantity to earlier codepaths (for search tab scenarios at least), my impression is that this won't be a bottleneck. I've not done a profiling exercise to confirm.
+
 ### References
