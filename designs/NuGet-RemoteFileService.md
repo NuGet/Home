@@ -46,7 +46,7 @@ namespace NuGet.VisualStudio.Internal.Contracts
 }
 ```
 
-On the service side, in [SearchObject.CacheBackgroundData()](https://github.com/NuGet/NuGet.Client/blob/b5b44526dea0379ebd6c8e51e8a041c06d5845ca/src/NuGet.Clients/NuGet.PackageManagement.VisualStudio/Services/SearchObject.cs#L218-L236), beyond the packageSearchMetadata caching that was already done, we call a RemoteFileService instance to AddIconToCache() and to AddLicenseToCache().
+On the service side, in [SearchObject.CacheBackgroundData()](https://github.com/NuGet/NuGet.Client/blob/b5b44526dea0379ebd6c8e51e8a041c06d5845ca/src/NuGet.Clients/NuGet.PackageManagement.VisualStudio/Services/SearchObject.cs#L218-L236), beyond the packageSearchMetadata caching that was already done, we call a NuGetRemoteFileService instance to AddIconToCache() and to AddLicenseToCache(). These calls cause a PackageIdentity key and a URI value to be stored in a MemoryCache.
 
 On the client side, when trying to fetch the icon, we call RemoteFileService.GetPackageIconAsync, passing in the package identity.
 
@@ -54,7 +54,18 @@ On the client side, when trying to fetch an embedded license, we call RemoteFile
 
 On the service side, we then retrieve the appropriate file from the appropriate location based on the Uri stored in the MemoryCache and return the stream to the caller.
 
-Issue: should GetEmbeddedLicenseAsync be more generic. (question from zkat)
+#### IdentityToUri Memory Cache notes
+
+The settings of the IdentityToUri memory cache that the NuGetRemoteFileService class hosts and maintains are identical to the metadata MemoryCache that the search service uses as part of it codespaces rebuilding:
+- 4 MB memory limit
+- 0 physical memory limit percentage
+- 2min polling interval
+
+Given those settings, we don't expect to frequently not find an entry that should be available in the memory cache...we have a Telemetry call to record how often this does happen.
+
+Details of how the memory cache gets populated is overed in the "paragraph above that starts with "On the service side".
+
+#### Issue: should GetEmbeddedLicenseAsync be more generic. (question from zkat)
     zkat - I guess this is fine for now, but I'd really like it if now-or-eventually, this is abstracted away into a set of supported "Well Known Files"--for example, if we want to add Changelog or docs support in the future.
 
     rrelyea - thought a bit about it... i'd imagine we could pass an enum into a method... packageIdentity, wellKnownEmbeddedFile
