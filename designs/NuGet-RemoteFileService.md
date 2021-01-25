@@ -48,9 +48,11 @@ namespace NuGet.VisualStudio.Internal.Contracts
 
 On the service side, in [SearchObject.CacheBackgroundData()](https://github.com/NuGet/NuGet.Client/blob/b5b44526dea0379ebd6c8e51e8a041c06d5845ca/src/NuGet.Clients/NuGet.PackageManagement.VisualStudio/Services/SearchObject.cs#L218-L236), beyond the packageSearchMetadata caching that was already done, we call a RemoteFileService instance to AddIconToCache() and to AddLicenseToCache().
 
-On the client side, when trying to Fetch the Icon, we call RemoteFileService.GetPackageIconAsync, passing in the package identity.
+On the client side, when trying to fetch the icon, we call RemoteFileService.GetPackageIconAsync, passing in the package identity.
 
-On the service side, we then retrieve the appropriate file from the appropriate location based on the entries in the MemoryCache.
+On the client side, when trying to fetch an embedded license, we call RemoteFileService.GetEmbeddedLicenseAsync.
+
+On the service side, we then retrieve the appropriate file from the appropriate location based on the Uri stored in the MemoryCache and return the stream to the caller.
 
 Issue: should GetEmbeddedLicenseAsync be more generic. (question from zkat)
     zkat - I guess this is fine for now, but I'd really like it if now-or-eventually, this is abstracted away into a set of supported "Well Known Files"--for example, if we want to add Changelog or docs support in the future.
