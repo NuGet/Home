@@ -61,9 +61,11 @@ The settings of the IdentityToUri memory cache that the NuGetPackageFileService 
 - 0 physical memory limit percentage
 - 2min polling interval
 
-Given those settings, we don't expect to frequently not find an entry that should be available in the memory cache...we have a Telemetry call to record how often this does happen.
+Note: the data in this memory cache never times out. So if you left VS open for days, and used PM UI alot, it might turn into a 4mb usage that isn't released until you close VS.
 
-Details of how the memory cache gets populated is overed in the "paragraph above that starts with "On the service side".
+Given those settings, we expect to always find an entry that should be available in the memory cache...we have a Telemetry call to record how often this does happen.
+
+Details of how the memory cache gets populated is covered in the paragraph above that starts with "On the service side".
 
 #### Issue: should GetEmbeddedLicenseAsync be more generic. (question from zkat)
     zkat - I guess this is fine for now, but I'd really like it if now-or-eventually, this is abstracted away into a set of supported "Well Known Files"--for example, if we want to add Changelog or docs support in the future.
@@ -97,7 +99,7 @@ Any open questions not specifically called out in the design.
 
 At one point, the design of this interface passed in URIs...we moved to PackageIdentity and storing in the MemoryCache to tighten security of the feature.
 
-We also, chose to only key off of PackageIdentity, instead of PackageIdentity and a package source...staying consistent with our treatment of unique package idenities as the same, regardless of where they come from.
+We also chose to only key off of PackageIdentity, instead of PackageIdentity and a package source...staying consistent with our treatment of unique package identities as the same, regardless of where they come from.
 
 Performance - we've discussed whether the quantity of calls we make for search, icons, licenses is a problem in standalone or Codespaces-connected scenarios. As these calls are async, and in similar quantity to earlier codepaths (for search tab scenarios at least), my impression is that this won't be a bottleneck. I've not done a profiling exercise to confirm.
 
