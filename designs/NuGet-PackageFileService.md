@@ -54,6 +54,12 @@ On the client side, when trying to fetch an embedded license, we call PackageFil
 
 On the service side, we then retrieve the appropriate file from the appropriate location based on the Uri stored in the MemoryCache and return the stream to the caller.
 
+#### Differences in behavior from current client
+
+Icon fetching has a layer of indirection that may change timing a bit. In the past, the icon fetch would get a stream via http(s). Now, a service fetches that stream, and it is passed back over the service boundary. Given that we've enabled our icons to handle rendering in a more asyncronous way in the last few months, if there is a slight change in behavior, it is unlikely to be very impactful.
+
+Embedded license fetching is used much less, only when somebody clicks on the link which shows the license in a window in the client. As such, it is unlikely to have any change in behavior.
+
 #### IdentityToUri Memory Cache notes
 
 The settings of the IdentityToUri memory cache that the NuGetPackageFileService class hosts and maintains are identical to the metadata MemoryCache that the search service uses as part of it codespaces rebuilding:
