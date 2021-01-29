@@ -82,45 +82,51 @@ NuGet log level    | MSBuild verbosity switch | MSBuild message type
 `Verbose`, `Debug` | `d[etailed]`             | Low-importance Messages
 ​                   | `diag[nostic]`           | Additional MSBuild-engine information
 
-### Example output
+### Example output in success scenarios
 
 This is output of the invocation of `dotnet nuget verify nuget.common.5.9.0-preview.2.nupkg`
 
 #### Default verbosity | `--verbosity mimimal`
+<details>
+<summary>output</summary>
 
 ```
 Verifying NuGet.Common.5.9.0-preview.2
+
 Signature type: Author
-Verifying the author primary signature with certificate:
   SHA256 hash: 3F9001EA83C560D712C24CF213C3D312CB3BFF51EE89435D3430BD06B5D0EECE
   Valid from: 2/25/2018 4:00:00 PM to 1/27/2021 4:00:00 AM
 Timestamp: 11/17/2020 7:23:10 AM
-Verifying author primary signature's timestamp with timestamping service certificate:
   SHA256 hash: C474CE76007D02394E0DA5E4DE7C14C680F9E282013CFEF653EF5DB71FDF61F8
   Valid from: 12/22/2017 4:00:00 PM to 3/22/2029 4:59:59 PM
+
 Signature type: Repository
 nuget-v3-service-index-url: https://api.nuget.org/v3/index.json
 nuget-package-owners: Microsoft, nuget
-Verifying the repository countersignature with certificate:
   SHA256 hash: 0E5F38F57DC1BCC806D8494F4F90FBCEDD988B46760709CBEEC6F4219AA6157D
   Valid from: 4/9/2018 5:00:00 PM to 4/14/2021 5:00:00 AM
 Timestamp: 12/9/2020 2:32:12 PM
-Verifying repository countersignature's timestamp with timestamping service certificate:
   SHA256 hash: C474CE76007D02394E0DA5E4DE7C14C680F9E282013CFEF653EF5DB71FDF61F8
   Valid from: 12/22/2017 4:00:00 PM to 3/22/2029 4:59:59 PM
+
 Successfully verified package 'NuGet.Common.5.9.0-preview.2'.
 ```
+
+</details>
 
 #### `--verbosity quiet`
 
-- No output unless there are any `errors` or `warnings`.
+* No output unless there are any `errors` or `warnings`.
 
 #### `--verbosity normal`
+<details>
+<summary>output</summary>
 
 ```
 Verifying NuGet.Common.5.9.0-preview.2
 <PATH>\nuget.common.5.9.0-preview.2.nupkg
 Signature Hash Algorithm: SHA256
+
 Signature type: Author
 Verifying the author primary signature with certificate: 
   Subject Name: CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US
@@ -135,6 +141,7 @@ Verifying author primary signature's timestamp with timestamping service certifi
   SHA256 hash: C474CE76007D02394E0DA5E4DE7C14C680F9E282013CFEF653EF5DB71FDF61F8
   Issued by: CN=Symantec SHA256 TimeStamping CA, OU=Symantec Trust Network, O=Symantec Corporation, C=US
   Valid from: 12/22/2017 4:00:00 PM to 3/22/2029 4:59:59 PM
+
 Signature type: Repository
 nuget-v3-service-index-url: https://api.nuget.org/v3/index.json
 nuget-package-owners: Microsoft, nuget
@@ -151,15 +158,22 @@ Verifying repository countersignature's timestamp with timestamping service cert
   SHA256 hash: C474CE76007D02394E0DA5E4DE7C14C680F9E282013CFEF653EF5DB71FDF61F8
   Issued by: CN=Symantec SHA256 TimeStamping CA, OU=Symantec Trust Network, O=Symantec Corporation, C=US
   Valid from: 12/22/2017 4:00:00 PM to 3/22/2029 4:59:59 PM
+
 Successfully verified package 'NuGet.Common.5.9.0-preview.2'.
 ```
+
+</details>
 
 #### `--verbosity detailed`
 
+<details>
+<summary>output</summary>
+
 ```
 Verifying NuGet.Common.5.9.0-preview.2
 <PATH>\nuget.common.5.9.0-preview.2.nupkg
 Signature Hash Algorithm: SHA256
+
 Signature type: Author
 Verifying the author primary signature with certificate: 
   Subject Name: CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US
@@ -197,7 +211,7 @@ trace:             SHA1 hash: 3679CA35668772304D30A5FB873B0FA77BB70D54
 trace:             SHA256 hash: 2399561127A57125DE8CEFEA610DDF2FA078B5C8067F4E828290BFB860E84B3C
 trace:             Issued by: CN=VeriSign Universal Root Certification Authority, OU="(c) 2008 VeriSign, Inc. - For authorized use only", OU=VeriSign Trust Network, O="VeriSign, Inc.", C=US
 trace:             Valid from: 4/1/2008 5:00:00 PM to 12/1/2037 3:59:59 PM
-trace: 
+
 Signature type: Repository
 nuget-v3-service-index-url: https://api.nuget.org/v3/index.json
 nuget-package-owners: Microsoft, nuget
@@ -237,10 +251,58 @@ trace:             SHA1 hash: 3679CA35668772304D30A5FB873B0FA77BB70D54
 trace:             SHA256 hash: 2399561127A57125DE8CEFEA610DDF2FA078B5C8067F4E828290BFB860E84B3C
 trace:             Issued by: CN=VeriSign Universal Root Certification Authority, OU="(c) 2008 VeriSign, Inc. - For authorized use only", OU=VeriSign Trust Network, O="VeriSign, Inc.", C=US
 trace:             Valid from: 4/1/2008 5:00:00 PM to 12/1/2037 3:59:59 PM
-trace: 
+
 Successfully verified package 'NuGet.Common.5.9.0-preview.2'.
 ```
 
+</details>
+
 #### `--verbosity diagnostic`
 
-- Same output as `--verbosity detailed`
+* Same output as `--verbosity detailed`
+
+### Example output in failure scenarios
+
+* Errors and Warnings are displayed to the console irrespective of `verbosity` level.
+
+#### `Verifying tampered package`
+
+<details>
+<summary>output</summary>
+
+```
+dotnet nuget verify tampered.12.0.1.nupkg -v -detailed
+error: NU3008: The package integrity check failed.
+error: Package signature validation failed.
+```
+
+</details>
+
+#### `Verifying author signed package with no timestamp and untrusted certificate root`
+
+<details>
+<summary>output</summary>
+
+```
+dotnet nuget verify "package.nupkg" -v n
+Verifying packageA.1.0.0
+C:\Users\kapenaga\Downloads\package.nupkg
+Signature Hash Algorithm: SHA256
+
+Signature type: Author
+Verifying the author primary signature with certificate:
+  Subject Name: CN=test
+  SHA1 hash: B0A2B3B1695AB8361B1D2B14A9F5D64136E26380
+  SHA256 hash: 89A2B6EB529E0AEBF0D11C8A18A846C7B8D1290791B6BF494BAFEC299F2EAAB2
+  Issued by: CN=test
+  Valid from: 1/29/2021 12:28:11 PM to 1/29/2021 1:28:11 PM
+error: NU3018: The author primary signature found a chain building
+issue: UntrustedRoot: A certificate chain processed, but terminated in a root certificate which is not trusted by the trust provider.
+error: NU3037: The author primary signature validity period has expired.
+warn : NU3027: The signature should be timestamped to enable long-term signature validity after the certificate has expired.
+Finished with 2 errors and 1 warnings.
+
+error: Package signature validation failed.
+```
+
+</details>
