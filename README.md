@@ -10,6 +10,10 @@ NuGet is being actively developed by the .NET Foundation. NuGet is the package m
 
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/). For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
 
+## NuGet Design Proposals
+
+This repo contains [design proposals](meta/README.md) for NuGet. It focuses on designs for the NuGet client tooling, NuGet.org public repository, and NuGet Package Manager inside Visual Studio.
+
 ## Documentation and Further Learning
 
 ### [NuGet Docs](http://docs.microsoft.com/en-us/nuget)
