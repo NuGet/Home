@@ -26,6 +26,12 @@ Once a proposal has been reviewed on GitHub with all interested parties having a
 
 ## What happens when a proposal is accepted?
 
+When a proposal is reviewed and accepted, it will be moved from `proposed` to `accepted`. Once accepted, it will be scheduled by the NuGet contributors to be implemented or put up for grabs for anyone to implement by making a PR in the appropriate repository.
+
 ## What happens when a proposal is withdrawn?
 
+When a proposal is reviewed for it's accuracy and relevance and no longer fits the goals of the project or is no longer a candidate for implementation, a proposal will be moved from `accepted` to `withdrawn` with a clear reason as to why it was moved. 
+
 ## What happens when a proposal is implemented?
+
+When the changes described in the proposal have been implemented and merged into the relevant repository and due for release the corresponding proposal will be moved from `accepted` to `implemented`. If you'd like to implement an `accepted` proposal, please make a PR in the appropriate repository and mention the proposal in the PR. 
