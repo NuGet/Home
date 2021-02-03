@@ -18,7 +18,7 @@ All discussions surrounding a proposal are covered by the [.NET Foundation code 
 
 When there is consensus among the NuGet contributors and .NET community of the direction of the proposal, it will go into one of three states.
 
-- `accepted` - The proposal will be accepted and work will be scheduled to implement it.
+- `accepted` - The proposal has been accepted and work will be scheduled to implement it.
 - `withdrawn` - The proposal has been rejected or withdrawn by the author.
 - `implemented` - The proposal has already been accepted and implemented into the product.
 
