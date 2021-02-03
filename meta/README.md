@@ -30,7 +30,7 @@ When a proposal is reviewed and accepted, it will be moved from `proposed` to `a
 
 ## What happens when a proposal is withdrawn?
 
-When a proposal is reviewed for it's accuracy and relevance and no longer fits the goals of the project or is no longer a candidate for implementation, a proposal will be moved from `accepted` to `withdrawn` with a clear reason as to why it was moved. 
+When a proposal is reviewed for its accuracy and relevance and no longer fits the goals of the project or is no longer a candidate for implementation, a proposal will be moved from `accepted` to `withdrawn` with a clear reason as to why it was moved. 
 
 ## What happens when a proposal is implemented?
 
