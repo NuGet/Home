@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Commands>
+  <Verb Name="add">
+    <Noun Name="package">
+      <Argument Name="packageId" />
+      <SingleValueOption Name="version" Shortcut="v" Help="The version of the package to add." />
+      <SingleValueOption Name="framework" Shortcut="f" Help="Add the reference only when targeting a specific framework." />
+      <SingleValueOption Name="no-restore" Shortcut="n" Help="Add the reference without performing restore preview and compatibility check." />
+      <SingleValueOption Name="source" Shortcut="s" Help="The NuGet package source to use during the restore." />
+      <SingleValueOption Name="package-directory" Help="The directory to restore packages to." />
+      <SwitchOption Name="interactive" Help="Allows the command to stop and wait for user input or action (for example to complete authentication)."/>
+    </Noun>
+    <Noun Name="source">
+      <SingleValueOption Name="name" Shortcut="n" Required="true" />
+      <SingleValueOption Name="source" Shortcut="s" Required="true" />
+      <SingleValueOption Name="username" Shortcut="u" />
+      <SingleValueOption Name="password" Shortcut="p" />
+      <SwitchOption Name="storePasswordInClearText" />
+    </Noun>
+    <Noun Name="trustedsigner">
+    </Noun>
+  </Verb>
+  <Verb Name="clean">
+    <Noun Name="locals">
+      <SwitchOption Name="all" />
+      <SwitchOption Name="http-cache" />
+      <SwitchOption Name="global-packages" />
+      <SwitchOption Name="temp" />
+    </Noun>
+  </Verb>
+  <Verb Name="disable">
+    <Noun Name="source">
+      <SingleValueOption Name="name" Shortcut="n" Required="true" />
+    </Noun>
+  </Verb>
+  <Verb Name="enable">
+    <Noun Name="source">
+      <SingleValueOption Name="name" Shortcut="n" Required="true" />
+    </Noun>
+  </Verb>
+  <Verb Name="get">
+    <Noun Name="config">
+      <SingleValueOption Name="name" Shortcut="n" Required="true" />
+    </Noun>
+  </Verb>
+  <Verb Name="set">
+    <Noun Name="config">
+      <SingleValueOption Name="name" Shortcut="n" Required="true" />
+      <SingleValueOption Name="value" Shortcut="v" Required="true" />
+    </Noun>
+  </Verb>
+  <Verb Name="list">
+    <Noun Name="locals">
+    </Noun>
+    <Noun Name="package">
+      <Argument Name="projectOrSolution" Text="PROJECT | SOLUTION" />
+    </Noun>
+    <Noun Name="source">
+    </Noun>
+  </Verb>
+  <Verb Name="remove">
+    <Noun Name="package">
+      <Argument Name="packageId" />
+    </Noun>
+    <Noun Name="source">
+      <SingleValueOption Name="name" Shortcut="n" Required="true" />
+    </Noun>
+    <Noun Name="trustedsigner">
+    </Noun>
+  </Verb>
+  <Verb Name="search">
+    <Noun Name="package">
+    </Noun>
+  </Verb>
+  <Verb Name="sync">
+    <Noun Name="trustedsigner">
+    </Noun>
+  </Verb>
+  <Verb Name="update">
+    <Noun Name="package">
+    </Noun>
+    <Noun Name="source">
+      <SingleValueOption Name="name" Shortcut="n" Required="true" />
+      <SingleValueOption Name="source" Shortcut="s" Required="true" />
+      <SingleValueOption Name="username" Shortcut="n" />
+      <SingleValueOption Name="password" Shortcut="s" />
+      <SwitchOption Name="storePasswordInClearText" />
+    </Noun>
+  </Verb>
+
+  <Command Name="delete">
+    <Argument Name="packageId" Required="true" />
+    <Argument Name="version" Required="true" />
+    <SingleValueOption Name="source" Shortcut="s" />
+  </Command>
+  <Command Name="pack">
+    <Argument Name="projectOrSolution" Text="PROJECT | SOLUTION" />
+  </Command>
+  <Command Name="push">
+    <Argument Name="packagePath" />
+    <SingleValueOption Name="source" Shortcut="s" Required="true" />
+  </Command>
+  <Command Name="restore">
+    <Argument Name="projectOrSolution" Text="PROJECT | SOLUTION" />
+    <SingleValueOption Name="source" Shortcut="s"/>
+    <SingleValueOption Name="runtime" Shortcut="r"/>
+    <SingleValueOption Name="packages" />
+    <SwitchOption Name="disable-parallel" />
+    <SingleValueOption Name="configfile" />
+    <SwitchOption Name="ignore-failed-sources" />
+    <SwitchOption Name="no-dependencies" />
+    <SwitchOption Name="force" Shortcut="f" />
+    <SwitchOption Name="use-lock-file" />
+    <SwitchOption Name="locked-mode" />
+    <SingleValueOption Name="lock-file-path" />
+    <SwitchOption Name="force-evaluate" />
+  </Command>
+  <Command Name="sign">
+    <Argument Name="packagePath" />
+    <SingleValueOption Name="hash-algorithm" Shortcut="h" />
+    <SingleValueOption Name="timestamper" Shortcut="t" />
+    <SingleValueOption Name="timestamp-hash-algorithm" />
+    <SingleValueOption Name="certificate-path" />
+    <SingleValueOption Name="certificate-store-name" />
+    <SingleValueOption Name="certificate-store-location" />
+    <SingleValueOption Name="certificate-subject-name" />
+    <SingleValueOption Name="certificate-fingerprint" />
+    <SingleValueOption Name="certificate-password" />
+    <SingleValueOption Name="output-directory" Shortcut="o" />
+    <SwitchOption Name="overwrite" />
+  </Command>
+  <Command Name="verify">
+    <Argument Name="packagePath" />
+    <SingleValueOption Name="type" />
+    <SingleValueOption Name="certificate-fingerprint" />
+  </Command>
+</Commands>
