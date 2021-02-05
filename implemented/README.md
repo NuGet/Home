@@ -1,3 +1,3 @@
-# Implemented
 
-When a proposal has been `implemented`, it will be scheduled for an upcoming release and work is considered complete.
+
+For more information, see the [NuGet proposal process](https://github.com/NuGet/Home/tree/proposals-cleanup/meta#nuget-proposal-process).
