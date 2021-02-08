@@ -1,48 +1,36 @@
 
-# Spec Name
+# Title: A human-readable title for this proposal
 
-* Status: In Review / Reviewed / Implementing / Implemented
-* Author(s): [Author Name](https://github.com/NuGet)
-* Issue: [1](https://github.com/NuGet/Home/issues/1) Issue Title
+## Description: What is it?
 
-## Problem Background
+A concise, one-paragraph description of the proposal.
 
-Present the background and the motivation for this design. 
-Present evidence why this is an important problem to tackle.
+## Problem: What problem is this solving?
 
-## Who are the customers
+A short background of the problem and how your solution will solve it.
 
-Customers affected by this change.
+## Why: How do we know this is a real problem and worth solving?
 
-## Goals
+A few details on why we're doing this, and what pain points this solves. Use real, concrete examples to make your case.
 
-Specifically call out the goals for this proposed design.
+## Success: How do we know if we've solved this problem?
 
-## Non-Goals
+A couple ways on how we might measure the success or outcome of this proposal. 
 
-Call out things that are not in consideration for this design. 
+## Audience: Who are we building for?
 
-## Solution Overview
+A brief description to help everyone understand who this proposal is for.
 
-Describe the proposed solution in as much detail as you deem necessary.
+## What: What does this look like in the product?
 
-## Test Strategy
+A low-fidelity mockup or pseduocode that shows how this proposal would look.
 
-Other than Unit Tests, which automated and manual integration, component, and end-to-end tests will be needed to validate the implementation? Is a special roll-out strategy (including kill-switch, opt-in flag, etc.) needed?
+## How: How should it be implemented?
 
-## Future Work
+A design or implementation for bringing the proposal to life. 
 
-Declare any future work if applicable.
+## When: When does this ship and what are the milestones?
 
-## Open Questions
+A timeline including ideal dates to ship the proposal & any key milestones (if any).
 
-Any open questions not specifically called out in the design.
 
-## Considerations
-
-Any other solutions or approaches considered? 
-The rejected designs are often just as important as the proposed ones!
-
-### References
-
-References to related issues, features
