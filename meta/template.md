@@ -1,6 +1,8 @@
 
 # Title: A human-readable title for this proposal
 
+[Author Name](https://github.com/<username>) | [GitHub Issue](https://github.com/NuGet/Home/issues/<issue>)
+
 ## Description: What is it?
 
 A concise, one-paragraph description of the proposal.
