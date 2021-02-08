@@ -25,7 +25,7 @@ A brief description to help everyone understand who this proposal is for.
 
 ## What: What does this look like in the product?
 
-A low-fidelity mockup or pseduocode that shows how this proposal would look.
+A low-fidelity mockup or pseudocode that shows how this proposal would look.
 
 ## How: How should it be implemented?
 
@@ -34,5 +34,4 @@ A design or implementation for bringing the proposal to life.
 ## When: When does this ship and what are the milestones?
 
 A timeline including ideal dates to ship the proposal & any key milestones (if any).
-
 
