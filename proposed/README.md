@@ -8,4 +8,4 @@ When there is consensus among the NuGet contributors and .NET community of the d
 - `withdrawn` - The proposal has been rejected or withdrawn by the author.
 - `implemented` - The proposal has already been accepted and implemented into the product.
 
-For more information, see the [NuGet proposal process](https://github.com/NuGet/Home/tree/proposals-cleanup/meta#nuget-proposal-process).
+For more information, see the [NuGet proposal process](../meta#nuget-proposal-process).
