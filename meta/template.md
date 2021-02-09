@@ -1,37 +1,52 @@
+# Title
 
-# Title: A human-readable title for this proposal
+- Author Name (GitHub username link)
+- Start Date (YYYY-MM-DD)
+- GitHub Issue (GitHub Issue link)
+- GitHub PR (GitHub PR link)
 
-[Author Name](https://github.com/<username>) | [GitHub Issue](https://github.com/NuGet/Home/issues/<issue>)
+## Summary
 
-## Description: What is it?
+<!-- One-paragraph description of the proposal. -->
 
-A concise, one-paragraph description of the proposal.
+## Motivation 
 
-## Problem: What problem is this solving?
+<!-- Why are we doing this? What pain points does this solve? What is the expected outcome? -->
 
-A short background of the problem and how your solution will solve it.
+## Explanation
 
-## Why: How do we know this is a real problem and worth solving?
+### Functional explanation
 
-A few details on why we're doing this, and what pain points this solves. Use real, concrete examples to make your case.
+<!-- Explain the proposal as if it were already implemented and you're teaching it to another person. -->
+<!-- Introduce new concepts, functional designs with real life examples, and low-fidelity mockups or  pseudocode to show how this proposal would look. -->
 
-## Success: How do we know if we've solved this problem?
+### Technical explanation
 
-A couple ways on how we might measure the success or outcome of this proposal. 
+<!-- Explain the proposal in sufficient detail with implementation details, interaction models, and clarification of corner cases. -->
 
-## Audience: Who are we building for?
+## Drawbacks
 
-A brief description to help everyone understand who this proposal is for.
+<!-- Why should we not do this? -->
 
-## What: What does this look like in the product?
+## Rationale and alternatives
 
-A low-fidelity mockup or pseudocode that shows how this proposal would look.
+<!-- Why is this the best design compared to other designs? -->
+<!-- What other designs have been considered and why weren't they chosen? -->
+<!-- What is the impact of not doing this? -->
 
-## How: How should it be implemented?
+## Prior Art
 
-A design or implementation for bringing the proposal to life. 
+<!-- What prior art, both good and bad are related to this proposal? -->
+<!-- Do other features exist in other ecosystems and what experience have their community had? -->
+<!-- What lessons from other communities can we learn from? -->
+<!-- Are there any resources that are relevent to this proposal? -->
 
-## When: When does this ship and what are the milestones?
+## Unresolved Questions
 
-A timeline including ideal dates to ship the proposal & any key milestones (if any).
+<!-- What parts of the proposal do you expect to resolve before this gets accepeted? -->
+<!-- What parts of the proposal need to be resolved before the proposal is stabilized? -->
+<!-- What related issues would you consider out of scope for this proposal but can be addressed in the future? -->
 
+## Future Possibilities
+
+<!-- What future possibilities can you think of that this proposal would help with? -->
