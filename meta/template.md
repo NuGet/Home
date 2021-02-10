@@ -43,7 +43,7 @@
 
 ## Unresolved Questions
 
-<!-- What parts of the proposal do you expect to resolve before this gets accepeted? -->
+<!-- What parts of the proposal do you expect to resolve before this gets accepted? -->
 <!-- What parts of the proposal need to be resolved before the proposal is stabilized? -->
 <!-- What related issues would you consider out of scope for this proposal but can be addressed in the future? -->
 
