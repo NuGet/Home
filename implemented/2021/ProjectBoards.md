@@ -8,22 +8,22 @@ We can use a simple or extended kanban column sets with automations (these are s
 
 ...and there's nothing stopping us from a complete rework of columns for any given project if that's helpful. Let's keep in mind simplicity where we can, and kanban columns are a pretty well-known approach. Here's a very simple example with automations, and additional status columns could be added if useful:
 
-![](../resources/ProjectBoards/kanban.png)
+![](../../meta/resources/ProjectBoards/kanban.png)
 
 Automations can extend to reviewing columns as well, e.g.:
 
-![](../resources/ProjectBoards/fullkanban.png)
+![](../../meta/resources/ProjectBoards/fullkanban.png)
 
 ## A project per feature area
 Because issues can belong to multiple projects, and because automation in project boards will cause issues to move through various kanban columns, the overhead is low in tracking them separate locations.
 
-![](../resources/ProjectBoards/featureareas.png)
+![](../../meta/resources/ProjectBoards/featureareas.png)
 
 
 ## Release Tracking
 We can track releases in projects too, adding issues to release that we intend to target. 
 
-![](../resources/ProjectBoards/releaseprojects.png)
+![](../../meta/resources/ProjectBoards/releaseprojects.png)
 
 ## Epics, Wikis and Specs
 Our epics will continue to be our landing points for customers. In the case of PVA, it's [here](https://github.com/NuGet/Home/issues/8087) and will have links to project boards. Wikis can be linked to from epics also.

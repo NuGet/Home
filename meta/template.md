@@ -1,48 +1,52 @@
+# Title
 
-# Spec Name
+- Author Name (GitHub username link)
+- Start Date (YYYY-MM-DD)
+- GitHub Issue (GitHub Issue link)
+- GitHub PR (GitHub PR link)
 
-* Status: In Review / Reviewed / Implementing / Implemented
-* Author(s): [Author Name](https://github.com/NuGet)
-* Issue: [1](https://github.com/NuGet/Home/issues/1) Issue Title
+## Summary
 
-## Problem Background
+<!-- One-paragraph description of the proposal. -->
 
-Present the background and the motivation for this design. 
-Present evidence why this is an important problem to tackle.
+## Motivation 
 
-## Who are the customers
+<!-- Why are we doing this? What pain points does this solve? What is the expected outcome? -->
 
-Customers affected by this change.
+## Explanation
 
-## Goals
+### Functional explanation
 
-Specifically call out the goals for this proposed design.
+<!-- Explain the proposal as if it were already implemented and you're teaching it to another person. -->
+<!-- Introduce new concepts, functional designs with real life examples, and low-fidelity mockups or  pseudocode to show how this proposal would look. -->
 
-## Non-Goals
+### Technical explanation
 
-Call out things that are not in consideration for this design. 
+<!-- Explain the proposal in sufficient detail with implementation details, interaction models, and clarification of corner cases. -->
 
-## Solution Overview
+## Drawbacks
 
-Describe the proposed solution in as much detail as you deem necessary.
+<!-- Why should we not do this? -->
 
-## Test Strategy
+## Rationale and alternatives
 
-Other than Unit Tests, which automated and manual integration, component, and end-to-end tests will be needed to validate the implementation? Is a special roll-out strategy (including kill-switch, opt-in flag, etc.) needed?
+<!-- Why is this the best design compared to other designs? -->
+<!-- What other designs have been considered and why weren't they chosen? -->
+<!-- What is the impact of not doing this? -->
 
-## Future Work
+## Prior Art
 
-Declare any future work if applicable.
+<!-- What prior art, both good and bad are related to this proposal? -->
+<!-- Do other features exist in other ecosystems and what experience have their community had? -->
+<!-- What lessons from other communities can we learn from? -->
+<!-- Are there any resources that are relevent to this proposal? -->
 
-## Open Questions
+## Unresolved Questions
 
-Any open questions not specifically called out in the design.
+<!-- What parts of the proposal do you expect to resolve before this gets accepted? -->
+<!-- What parts of the proposal need to be resolved before the proposal is stabilized? -->
+<!-- What related issues would you consider out of scope for this proposal but can be addressed in the future? -->
 
-## Considerations
+## Future Possibilities
 
-Any other solutions or approaches considered? 
-The rejected designs are often just as important as the proposed ones!
-
-### References
-
-References to related issues, features
+<!-- What future possibilities can you think of that this proposal would help with? -->
