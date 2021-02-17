@@ -17,7 +17,7 @@ Furthermore the user cannot specify a version range free hand.
 
 #### Project File and Solution Explorer
 
-![SolutionExplorer](../resources/FloatingVersionsInPMUI/ProjectFile&SolutionExplorer.png)
+![SolutionExplorer](https://github.com/NuGet/Home/tree/dev/meta/resources/FloatingVersionsInPMUI/ProjectFile&SolutionExplorer.png)
 
 ### Project Level PM UI
 
