@@ -17,7 +17,7 @@ Furthermore the user cannot specify a version range free hand.
 
 #### Project File and Solution Explorer
 
-![SolutionExplorer](../resources/FloatingVersionsInPMUI/ProjectFile&SolutionExplorer.png)
+![SolutionExplorer](/meta/resources/FloatingVersionsInPMUI/ProjectFile&SolutionExplorer.png)
 
 ### Project Level PM UI
 
@@ -25,13 +25,13 @@ Furthermore the user cannot specify a version range free hand.
 
 In the installed tab we show a list of packages installed. In this list the resolved version is not the correct one when using floating versions.
 
-![Project Updates](../resources/FloatingVersionsInPMUI/ProjectPMUIInstalled.png)
+![Project Updates](/meta/resources/FloatingVersionsInPMUI/ProjectPMUIInstalled.png)
 
 #### Updates Tab
 
 With the current behavior even if the user indicated a floating version, such as `*`, for the package version, the UI will tell the user that there is an update available which is misleading.
 
-![Project Updates](../resources/FloatingVersionsInPMUI/ProjectPMUIUpdates.png)
+![Project Updates](/meta/resources/FloatingVersionsInPMUI/ProjectPMUIUpdates.png)
 
 ### Solution level PM UI
 
@@ -39,7 +39,7 @@ With the current behavior even if the user indicated a floating version, such as
 
 The Solution PM UI also has the list of packages installed but it's unclear for what project the resolved version is. Even tough when looking in the details of the package it is visible that the resolved version when using floating versions is wrong.
 
-![Solution Installed](../resources/FloatingVersionsInPMUI/PackageManagerForSolution.png)
+![Solution Installed](/meta/resources/FloatingVersionsInPMUI/PackageManagerForSolution.png)
 
 ```
 The requested and resolved versions are not correct because dotnet list package shows a different resolved version.
@@ -47,7 +47,7 @@ The requested and resolved versions are not correct because dotnet list package 
 
 #### Updates Tab
 
-![Solution Updates](../resources/FloatingVersionsInPMUI/SolutionPMUIUpdates.png)
+![Solution Updates](/meta/resources/FloatingVersionsInPMUI/SolutionPMUIUpdates.png)
 
 ## Who are the customers
 
@@ -81,19 +81,19 @@ This feature will enable the option `*` and ranges to be selected while installi
 
 #### Floating Version
 
-![Floating Version](../resources/FloatingVersionsInPMUI/FloatingVersionInPMUI.png)
+![Floating Version](/meta/resources/FloatingVersionsInPMUI/FloatingVersionInPMUI.png)
 
 #### Range Version
 
-![Range Version](../resources/FloatingVersionsInPMUI/RangesInPMUI.png)
+![Range Version](/meta/resources/FloatingVersionsInPMUI/RangesInPMUI.png)
 
 #### ComboBox
 
-![Combo Box](../resources/FloatingVersionsInPMUI/ComboBox1.png)
+![Combo Box](/meta/resources/FloatingVersionsInPMUI/ComboBox1.png)
 
-![Combo Box Gif](../resources/FloatingVersionsInPMUI/ComboBoxGif.gif)
+![Combo Box Gif](/meta/resources/FloatingVersionsInPMUI/ComboBoxGif.gif)
 
-![ComboBox Error](../resources/FloatingVersionsInPMUI/ComboBox_Error.png)
+![ComboBox Error](/meta/resources/FloatingVersionsInPMUI/ComboBox_Error.PNG)
 
 * The versions will be displayed in NuGetVersion ordering.
 * The version will be validated it when the user selects or hits enter.
@@ -102,7 +102,7 @@ This feature will enable the option `*` and ranges to be selected while installi
 
 We will add a new column to show the requested version to match the behavior of `dotnet list package` command. Show correct highest resolved version in the solution in the package list view.
 
-![Solution View](../resources/FloatingVersionsInPMUI/SolutionView.png)
+![Solution View](/meta/resources/FloatingVersionsInPMUI/SolutionView.png)
 
 ## Future Work
 
@@ -112,7 +112,7 @@ Should we show available updates for packages that use custom version ranges or 
 
 ### Example
 
-![Update](../resources/FloatingVersionsInPMUI/ShouldUpdateRanges.png)
+![Update](/meta/resources/FloatingVersionsInPMUI/ShouldUpdateRanges.png)
 
 ## Considerations
 
