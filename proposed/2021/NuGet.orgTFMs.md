@@ -13,7 +13,7 @@ When a developer opens the package details page or tab on NuGet.org, they will s
 
 ### Problem: What problem is this solving? 
 
-Developers cannot use the package details page to determine what frameworks a NuGet package can support. In 2021, we live in a world where there are three evolutions of .NET coexisting on NuGet; .NET Framework, .NET Core, and .NET 5.  
+Developers cannot use the package details page to determine what frameworks a NuGet package can support. In 2021, we live in a world where there are many evolutions of .NET coexisting on NuGet, such as .NET Framework and .NET 5.
 
 Developers should be able to determine whether a package works for their project without having to first download it or rely on the author’s documentation. 
 
