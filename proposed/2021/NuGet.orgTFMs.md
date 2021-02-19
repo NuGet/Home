@@ -23,7 +23,8 @@ Finding a package that is compatible with your project is a challenge for the av
 
 ### Success: How do we know if we’ve solved this problem? 
 
-- By gauging excitement/disappointment after blogging about this feature & analyzing sentiment on Twitter/GitHub/DevCom/etc. 
+- By gauging excitement/disappointment after blogging about this feature & analyzing sentiment on Twitter/GitHub/DevCom/etc.
+- Compare the before and after numbers for error messages due to TFM incompatibility. Is there a noticeable decrease? If so, how long after the feature was rolled out for the decrease?
 
 ### Audience: Who are we building for? 
 
@@ -81,14 +82,20 @@ Let's link to an explanatory document for any frameworks we expose here, for exa
 - We would need to focus on compatibility with PackageReference and not packages.config projects, as these two support compatibility in different ways.
 
 ## Rationale and alternatives
-(As we resolve questions, let's document answers here)
+Q: I think build/{packageid}.[props|targets] poses a problem, because from NuGet's point of view this package is compatible with all TFMs, .NET, native/c++, or anything else. For packages like Nerdbank.GitVersioning, or SourceLink, this makes sense. But many .NET packages incorrectly use this, rather than build\{tfm}\{packageid}.[props|targets]. I think it's worthwhile pointing this out and explaining what our plan is for these packages.
+A: Let's consider putting a link to a document which can call out corner cases such as this, and respond to direct customer concerns with advice on nupkg construction conducive to correct supprted TFM assessment.
+
+Q: Will the "Frameworks" section be expanded by default? Should the "Frameworks" section explain how the customer should use this information? Should we add a link to docs? Consider moving up the "Frameworks" section. I would suggest "Documentation" first, followed by "Frameworks". The "Version History" table is noisy and it can be difficult to see what's below it. The "Dependencies" and "Used By" sections are useful information, but would claim "Frameworks" is more important.
+A: Let's not expand by default--this will give us the option of trackiong the popularity of the section by tracking expansion clicks.
 
 ### Unresolved questions
 
-- Will the "Frameworks" section be expanded by default? Should the "Frameworks" section explain how the customer should use this information? Should we add a link to docs? Consider moving up the "Frameworks" section. I would suggest "Documentation" first, followed by "Frameworks". The "Version History" table is noisy and it can be difficult to see what's below it. The "Dependencies" and "Used By" sections are useful information, but would claim "Frameworks" is more important.
-- I think build/{packageid}.[props|targets] poses a problem, because from NuGet's point of view this package is compatible with all TFMs, .NET, native/c++, or anything else. For packages like Nerdbank.GitVersioning, or SourceLink, this makes sense. But many .NET packages incorrectly use this, rather than build\{tfm}\{packageid}.[props|targets]. I think it's worthwhile pointing this out and explaining what our plan is for these packages.
+- Potentials for modelling our UX on:
+  - https://docs.microsoft.com/en-us/dotnet/api/system.text.stringbuilder?view=net-5.0#applies-to
+  - https://apisof.net/catalog/e40ef6ad-bd6e-9f29-7864-b942e37be11f
+  - https://docs.microsoft.com/en-us/dotnet/standard/frameworks#latest-versions
 
 ## Future Possibilities
 
 - Filtering NuGet.org search by TFM
-- TM display in Visual Studio
+- TFM display in Visual Studio
