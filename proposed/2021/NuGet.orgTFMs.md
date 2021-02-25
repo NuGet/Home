@@ -88,12 +88,19 @@ A: Let's consider putting a link to a document which can call out corner cases s
 Q: Will the "Frameworks" section be expanded by default? Should the "Frameworks" section explain how the customer should use this information? Should we add a link to docs? Consider moving up the "Frameworks" section. I would suggest "Documentation" first, followed by "Frameworks". The "Version History" table is noisy and it can be difficult to see what's below it. The "Dependencies" and "Used By" sections are useful information, but would claim "Frameworks" is more important.
 A: Let's not expand by default--this will give us the option of trackiong the popularity of the section by tracking expansion clicks.
 
+Q: Potentials for modelling our UX on:
+ - https://docs.microsoft.com/en-us/dotnet/api/system.text.stringbuilder?view=net-5.0#applies-to
+ - https://apisof.net/catalog/e40ef6ad-bd6e-9f29-7864-b942e37be11f
+ - https://docs.microsoft.com/en-us/dotnet/standard/frameworks#latest-versions
+
+A: From a sample of 100,000 package/versions, we have:
+ - Only 445 have more than 5 supported TFMs
+ - Only 16 have more than 10
+ - Only 1 more than 15 (and it has 16)
+ So, we'll go with a flat list for now and look at other options for subsequent work if desired.
+
 ### Unresolved questions
 
-- Potentials for modelling our UX on:
-  - https://docs.microsoft.com/en-us/dotnet/api/system.text.stringbuilder?view=net-5.0#applies-to
-  - https://apisof.net/catalog/e40ef6ad-bd6e-9f29-7864-b942e37be11f
-  - https://docs.microsoft.com/en-us/dotnet/standard/frameworks#latest-versions
 
 ## Future Possibilities
 
