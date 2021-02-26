@@ -19,15 +19,15 @@ Knowing how a package is being included in a project helps a developer diagnose 
 There is not a great solution that exists to understand the nature of top-level packages and their transitive dependencies.
 The solution explorer in Visual Studio does the best job at allowing a user to dive into each NuGet package & see all transitive dependencies from the top-level dependency.
 
-![](../resources/TransitiveDependencies/SolutionView.png)
+![](../../meta/resources/TransitiveDependencies/SolutionView.png)
 
 The dotnet CLI does not provide the insight into “why” a transitive dependency is listed, although it does list everything that has been resolved.
 
-![](../resources/TransitiveDependencies/DotNetCLI.png)
+![](../../meta/resources/TransitiveDependencies/DotNetCLI.png)
 
 The Visual Studio Package Manager UI does not support the concept of showing transitive packages in any fashion.
 
-![](../resources/TransitiveDependencies/VSPMUI.png)
+![](../../meta/resources/TransitiveDependencies/VSPMUI.png)
 
 ## Success: How do we know if we have solved this problem?
 
@@ -41,7 +41,7 @@ We are building this for .NET users, both old and new, to be successful with und
 
 ## What: What does this look like in the product?
 
-![](../resources/TransitiveDependencies/TransitiveVSPMUI.png)
+![](../../meta/resources/TransitiveDependencies/TransitiveVSPMUI.png)
 
 ## Context and Scope
 
@@ -61,7 +61,7 @@ We are building this for .NET users, both old and new, to be successful with und
 
 We should consider a minor tweak to the existing experience of “dotnet list package --include-transitive” to provide the user with a sense of where the package came from. This could be a new column next to “Resolved” which says “Transitively Referenced” or “Referenced” and has a list of the top-level packages that requested the dependency.
 
-![](../resources/TransitiveDependencies/TransitiveDotNetCLI.png)
+![](../../meta/resources/TransitiveDependencies/TransitiveDotNetCLI.png)
 
 ### Visual Studio
 
@@ -71,7 +71,7 @@ Within Visual Studio, there will be a new panel within the Visual Studio Package
 
 When a user highlights a transitive package, they will see a pop-up that displays how the transitive dependency originated & what top-level package(s) are bringing it in.
 
-![](../resources/TransitiveDependencies/TransitiveVSPMUI.png)
+![](../../meta/resources/TransitiveDependencies/TransitiveVSPMUI.png)
 
 Finally, selecting a transitive dependency will provide the user the ability to “Install” the package as you normally would a top-level dependency. This will promote the transitive dependency to a top-level dependency, and the transitive dependency will now be placed in the top-level packages list instead.
 
