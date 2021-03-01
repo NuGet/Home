@@ -37,7 +37,8 @@ We are building this for the .NET developer who is browsing & making decisions a
 Context and Scope: When a developer accesses the details page for a NuGet package, they will see information on target frameworks in an expandable section. The framework information will be surfaced from the package.
 
 Minimal Requirements:
-- List of Target Frameworks on NuGet.org's package details page.
+- List of Target Frameworks on NuGet.org's package details page. The Frameworks node will be expanded by default.
+- A series of tiles near package Id and version indicating supported platform--this will become more populated when .NET5.0's (TargetPlatformIdenitifiers)[https://github.com/NuGet/Home/issues/9240] are in the TFM (which we can display versionless with full details in Frameworks node), but for now we can have `.NET`, `.NET Core`, `.NET standard`, `Portable`, etc. TargetPlatformIdentifiers will give us iOS, Android, tvOS etc., perhaps grouped alongside .NET (which will be visibly 5.0 when the Frameworks node is viewed).
 - Runtime, Content Build assets and Tools packages will display TFM details.
 - Support for PackageReference project restore compatibility only.
 
