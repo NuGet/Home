@@ -38,7 +38,6 @@ Context and Scope: When a developer accesses the details page for a NuGet packag
 
 Minimal Requirements:
 - List of Target Frameworks on NuGet.org's package details page. The Frameworks node will be expanded by default.
-- A series of tiles near package Id and version indicating supported platform--this will become more populated when .NET5.0's (TargetPlatformIdenitifiers)[https://github.com/NuGet/Home/issues/9240] are in the TFM (which we can display versionless with full details in Frameworks node), but for now we can have `.NET`, `.NET Core`, `.NET standard`, `Portable`, etc. TargetPlatformIdentifiers will give us iOS, Android, tvOS etc., perhaps grouped alongside .NET (which will be visibly 5.0 when the Frameworks node is viewed).
 - Runtime, Content Build assets and Tools packages will display TFM details.
 - Support for PackageReference project restore compatibility only.
 
@@ -53,7 +52,7 @@ Example: iOS, Android, Windows are platforms.
 - A .NET developer can view Frameworks of a package on NuGet.org: 
 ![](../../meta/resources/NuGet.orgTFMs/PackageDetailsWithTFMs.png)
 
-- We will have the list collapsed by default in order to track popularity.
+- We will have the list collapsed by default in order to track popularity. (See unresolved question on this.)
 
 ### Goals and Non-Goals 
 
@@ -102,8 +101,12 @@ A: From a sample of 100,000 package/versions, we have:
 
 ### Unresolved questions
 
+Q: Should the TM node be expanded or collapsed by default?
+A: Driving this question is customer convenience. The tiles idea in Future Possibilities will also address this concern, and for now we may indeed decide to expand by default.
 
 ## Future Possibilities
 
 - Filtering NuGet.org search by TFM
 - TFM display in Visual Studio
+- A series of tiles near package Id and version indicating supported platform--this is more populated when .NET5.0's (TargetPlatformIdenitifiers)[https://github.com/NuGet/Home/issues/9240] are in the TFM (which we can display versionless with full details in Frameworks node), and for earlier platforms we can have `.NET`, `.NET Core`, `.NET standard`, `Portable` (we can determine generational vs shared platform displays later), etc. TargetPlatformIdentifiers give us `iOS`, `Android`, `tvOS` etc., perhaps grouped alongside .NET (which will be visibly 5.0 when the Frameworks node is viewed).
+
