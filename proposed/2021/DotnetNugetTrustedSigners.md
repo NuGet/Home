@@ -28,10 +28,9 @@ USAGE:
 
 COMMANDS:
     list (default)
-    add-repository <name> <repository> [<package>...]
-    add-author <name> <author> [<package>...]
-    add-service-index <name> <index>
-    add-certificate <name> <fingerprint>
+    trust-package <name> <package>...
+    trust-source <name> [source-url]
+    trust-certificate <name> <fingerprint>
     remove <name>
     sync <name>
 ```
