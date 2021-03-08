@@ -31,7 +31,7 @@ The details that should be displayed on each verbosity level are described below
 `Hashing algorithm used for signature`        | ❌       | ❌          | ✔️         | ✔️         | ✔️   
 `Certificate -> SHA1 hash`| ❌       | ❌          | ✔️         | ✔️         | ✔️   
 `Certificate -> Issued By`| ❌       | ❌          | ✔️         | ✔️         | ✔️   
-`Certificate -> Subject`| ❌       | ❌          | ✔️         | ✔️         | ✔️   
+`Certificate -> Subject`| ❌       | ✔️          | ✔️         | ✔️         | ✔️   
 `Package name being verified`                    | ❌       | ✔️          | ✔️         | ✔️         | ✔️   
 `Type of signature (author or repository)`| ❌       | ✔️          | ✔️         | ✔️         | ✔️   
 `Certificate -> SHA-256 hash`| ❌       | ✔️          | ✔️         | ✔️         | ✔️   
@@ -88,18 +88,22 @@ This is output of the invocation of `dotnet nuget verify nuget.common.5.9.0-prev
 Verifying NuGet.Common.5.9.0-preview.2
 
 Signature type: Author
+  Subject Name: CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US
   SHA256 hash: 3F9001EA83C560D712C24CF213C3D312CB3BFF51EE89435D3430BD06B5D0EECE
   Valid from: 2/25/2018 4:00:00 PM to 1/27/2021 4:00:00 AM
 Timestamp: 11/17/2020 7:23:10 AM
+  Subject Name: CN=Symantec SHA256 TimeStamping Signer - G3, OU=Symantec Trust Network, O=Symantec Corporation, C=US
   SHA256 hash: C474CE76007D02394E0DA5E4DE7C14C680F9E282013CFEF653EF5DB71FDF61F8
   Valid from: 12/22/2017 4:00:00 PM to 3/22/2029 4:59:59 PM
 
 Signature type: Repository
 nuget-v3-service-index-url: https://api.nuget.org/v3/index.json
 nuget-package-owners: Microsoft, nuget
+  Subject Name: CN=NuGet.org Repository by Microsoft, O=NuGet.org Repository by Microsoft, L=Redmond, S=Washington, C=US
   SHA256 hash: 0E5F38F57DC1BCC806D8494F4F90FBCEDD988B46760709CBEEC6F4219AA6157D
   Valid from: 4/9/2018 5:00:00 PM to 4/14/2021 5:00:00 AM
 Timestamp: 12/9/2020 2:32:12 PM
+  Subject Name: CN=Symantec SHA256 TimeStamping Signer - G3, OU=Symantec Trust Network, O=Symantec Corporation, C=US
   SHA256 hash: C474CE76007D02394E0DA5E4DE7C14C680F9E282013CFEF653EF5DB71FDF61F8
   Valid from: 12/22/2017 4:00:00 PM to 3/22/2029 4:59:59 PM
 
@@ -266,13 +270,13 @@ Successfully verified package 'NuGet.Common.5.9.0-preview.2'.
 
 ```
 dotnet nuget verify tampered.12.0.1.nupkg -v -detailed
-error: NU3008: The package integrity check failed.
+error: NU3008: The package integrity check failed. Please ensure the package has not been tampered since it was signed.
 error: Package signature validation failed.
 ```
 
 </details>
 
-#### `Verifying author signed package with no timestamp and untrusted certificate root`
+#### `Verifying author signed package with no timestamp and untrusted signing certificate root`
 
 <details>
 <summary>output</summary>
@@ -284,19 +288,19 @@ C:\Users\kapenaga\Downloads\package.nupkg
 Signature Hash Algorithm: SHA256
 
 Signature type: Author
-Verifying the author primary signature with certificate:
+Verifying the author primary signature with signing certificate:
   Subject Name: CN=test
   SHA1 hash: B0A2B3B1695AB8361B1D2B14A9F5D64136E26380
   SHA256 hash: 89A2B6EB529E0AEBF0D11C8A18A846C7B8D1290791B6BF494BAFEC299F2EAAB2
   Issued by: CN=test
   Valid from: 1/29/2021 12:28:11 PM to 1/29/2021 1:28:11 PM
-error: NU3018: The author primary signature found a chain building
-issue: UntrustedRoot: A certificate chain processed, but terminated in a root certificate which is not trusted by the trust provider.
-error: NU3037: The author primary signature validity period has expired.
-warn : NU3027: The signature should be timestamped to enable long-term signature validity after the certificate has expired.
-Finished with 2 errors and 1 warnings.
 
+error: NU3018: The author primary signature's signing certificate is not trusted by the trust provider.
+error: NU3037: The author primary signature validity period has expired.
+warn : NU3027: The signature should be timestamped to enable long-term signature validity after the signing certificate has expired.
 error: Package signature validation failed.
+
+Finished with 2 errors and 1 warnings.
 ```
 
 </details>
