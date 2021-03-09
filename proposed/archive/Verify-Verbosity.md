@@ -45,7 +45,7 @@ Once this spec has been implemented the output of `nuget.exe verify` command for
 
 The provided `--verbosity` value will include to NuGet log messages with the following levels:
 
-​             | `q[uiet]` | `m[inimal]` | `n[ormal]` | `d[etails]` | `diag[nostic]`
+​             | `q[uiet]` | `m[inimal]` | `n[ormal]` | `d[etailed]` | `diag[nostic]`
 ------------- | --------- | ----------- | ---------- | ----------- | --------------
 `Error`       | ✔️        | ✔️         | ✔️         | ✔️         | ✔️   
 `Warning`     | ✔️        | ✔️         | ✔️         | ✔️         | ✔️   
