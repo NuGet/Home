@@ -1,18 +1,18 @@
-# Title
+# dotnet nuget trusted-signers command
 
 - Author Name [Kat Marchan (@zkat)](https://github.com/zkat)
 - Start Date 2021-03-04
-- GitHub Issue (GitHub Issue link)
-- GitHub PR (GitHub PR link)
+- GitHub Issue: https://github.com/NuGet/Home/issues/10634
+- GitHub PR: https://github.com/NuGet/Home/pull/10628
 
 ## Summary
 
-This specifies the syntax and behavior for the `dotnet.exe nuget trusted-signers` command.
+This specifies the syntax and behavior for the `dotnet nuget trusted-signers` command.
 
 ## Motivation
 
-This is part of a larger effort to reach full parity between `nuget.exe` and
-`dotnet.exe` for NuGet-related operations.
+This is part of a larger effort to reach full parity between `nuget` and
+`dotnet` for NuGet-related operations.
 
 ## Explanation
 
@@ -24,7 +24,7 @@ This is part of a larger effort to reach full parity between `nuget.exe` and
 Provides the ability to manage the list of trusted signers.
 
 USAGE:
-    dotnet nuget trusted-signer [OPTIONS] [COMMAND]
+    dotnet nuget trusted-signers [OPTIONS] [COMMAND]
 
 COMMANDS:
     list (default)
@@ -143,16 +143,16 @@ OPTIONS:
 ```
 Adds a trusted signer based on a given source.
 
-If only `<name>` is provided, and it's an existing configured source, this command will add a trusted signer with the same name as that source to the trusted list.
+If only `<name>` is provided without `<source-url>`, the package source from your NuGet configuration files with the same name will be added to the trusted list.
 
-If a `source-url` is provided, it MUST be a v3 source URL (like https://api.nuget.org/v3/index.json). Other source types are not supported.
+If a `<source-url>` is provided, it MUST be a v3 package source URL (like https://api.nuget.org/v3/index.json). Other source types are not supported.
 
 USAGE:
     dotnet nuget trusted-signers trust-source <name> [source-url]
 
 OPTIONS:
         --allow-untrusted-root          Specifies if the certificate for the trusted signer should be allowed to chain to an untrusted root.
-        --owners                        Semi-colon separated list of trusted owners to further restrict the trust of a repository. Only valid when using the --repository option.
+        --owners                        Semi-colon separated list of trusted owners to further restrict the trust of a repository.
     -h, --help                          Prints help information.
     -v, --verbosity <LEVEL>             Set the MSBuild verbosity level. Allowed values are q[uiet], m[inimal], n[ormal], d[etailed], and diag[nostic].
         --interactive                   Allows command to stop and wait for user input or action.
@@ -162,7 +162,7 @@ OPTIONS:
 
 ### Technical explanation
 
-For the most part, these commands map pretty directly to their nuget.exe
+For the most part, these commands map pretty directly to their nuget
 counterparts, and most of their implementations should be reusable (removing
 `#if IS_DESKTOP` as needed, from the various TrustedSigners classes).
 
@@ -170,7 +170,7 @@ The exception here is the `add` command, which has been split into the various
 `trust-*` commands that otherwise have the same behaviors.
 
 I don't know if there's any significant implementation above just remapping
-command invocations for dotnet.exe.
+command invocations for dotnet.
 
 ## Drawbacks
 
@@ -181,16 +181,16 @@ This whole feature is very complicated, but it's important for parity.
 I think the only one that might have a reasonable alternative here would be
 the `add` command. I found the command as a whole to be inscrutable, and thus
 decided splitting its behavior to be the best way forward. We could have, of
-course, mostly just copied the behavior from `nuget.exe trusted-signers add`.
+course, mostly just copied the behavior from `nuget trusted-signers add`.
 
 ## Prior Art
 
-This spec is based on `nuget.exe trusted-signers`.
+This spec is based on [`nuget trusted-signers`](https://docs.microsoft.com/en-us/nuget/reference/cli-reference/cli-ref-trusted-signers).
 
 ## Unresolved Questions
 
-Is this the right UX? Does the naming make sense? This is a fairly complex/complicated feature and we want to make sure we
+Is this the right UX? Does the naming make sense? This is a fairly complex/complicated feature and we want to make sure we deliver something to customers that makes sense and gives an overall good experience.
 
 ## Future Possibilities
 
-I don't know.
+N/A
