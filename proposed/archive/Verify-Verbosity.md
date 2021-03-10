@@ -22,7 +22,7 @@ Package consumers that use the `dotnet nuget verify` command to verify package s
 
 ## Solution
 
-The details that should be displayed on each verbosity level are described below. Each level should display the same as the level below plus whatever is specified in that level. In that sense, `quiet` will be give the less amount of information, while `diagnostic` the most.
+The details that should be displayed on each verbosity level are described below. Each level should display the same as the level below plus whatever is specified in that level. In that sense, `quiet` will be give the least amount of information, while `diagnostic` the most.
 
 ​                                  | `q[uiet]` | `m[inimal]` | `n[ormal]` | `d[etailed]` | `diag[nostic]`
 ----------------------------------| --------- | ----------- | ---------- | -----------| --------------
@@ -264,7 +264,7 @@ Successfully verified package 'NuGet.Common.5.9.0-preview.2'.
 
 ```
 dotnet nuget verify tampered.12.0.1.nupkg -v -detailed
-error: NU3008: The package integrity check failed. Please ensure the package has not been tampered since it was signed.
+error: NU3008: The package integrity check failed. The package has been tampered with since being signed.
 error: Package signature validation failed.
 ```
 
