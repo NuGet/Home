@@ -24,19 +24,24 @@ Package consumers that use the `dotnet nuget verify` command to verify package s
 
 The details that should be displayed on each verbosity level are described below. Each level should display the same as the level below plus whatever is specified in that level. In that sense, `quiet` will be give the less amount of information, while `diagnostic` the most.
 
-​                                  | `q[uiet]` | `m[inimal]` | `n[ormal]` | `d[etails]` | `diag[nostic]`
+​                                  | `q[uiet]` | `m[inimal]` | `n[ormal]` | `d[etailed]` | `diag[nostic]`
 ----------------------------------| --------- | ----------- | ---------- | -----------| --------------
 `Certificate chain Information`   | ❌       | ❌          | ❌         | ✔️         | ✔️
 `Path to package being verified`  | ❌       | ❌          | ✔️         | ✔️         | ✔️
 `Hashing algorithm used for signature`        | ❌       | ❌          | ✔️         | ✔️         | ✔️
-`Certificate -> SHA1 hash`| ❌       | ❌          | ✔️         | ✔️         | ✔️
-`Certificate -> Issued By`| ❌       | ❌          | ✔️         | ✔️         | ✔️
-`Certificate -> Subject`| ❌       | ✔️          | ✔️         | ✔️         | ✔️
+`Author/Repository Certificate -> SHA1 hash`| ❌       | ❌          | ✔️         | ✔️         | ✔️
+`Author/Repository Certificate -> Issued By`| ❌       | ❌          | ✔️         | ✔️         | ✔️
+`Timestamp Certificate -> Issued By`| ❌       | ❌          | ✔️         | ✔️         | ✔️
+`Timestamp Certificate -> SHA-256 hash`| ❌       | ❌          | ✔️         | ✔️         | ✔️
+`Timestamp Certificate -> Validity period`| ❌       | ❌          | ✔️         | ✔️         | ✔️
+`Timestamp Certificate -> SHA1 hash`| ❌       | ❌          | ✔️         | ✔️         | ✔️
+`Timestamp Certificate -> Subject name`| ❌       | ❌          | ✔️         | ✔️         | ✔️
+`Author/Repository Certificate -> Subject name`| ❌       | ✔️          | ✔️         | ✔️         | ✔️
+`Author/Repository Certificate -> SHA-256 hash`| ❌       | ✔️          | ✔️         | ✔️         | ✔️
+`Author/Repository Certificate -> Validity period`| ❌       | ✔️          | ✔️         | ✔️         | ✔️
+`Author/Repository Certificate -> Service index URL (If applicable)`| ❌       | ✔️          | ✔️         | ✔️         | ✔️
 `Package name being verified`                    | ❌       | ✔️          | ✔️         | ✔️         | ✔️
 `Type of signature (author or repository)`| ❌       | ✔️          | ✔️         | ✔️         | ✔️
-`Certificate -> SHA-256 hash`| ❌       | ✔️          | ✔️         | ✔️         | ✔️
-`Certificate -> Validity period`| ❌       | ✔️          | ✔️         | ✔️         | ✔️
-`Certificate -> Service index URL (If applicable)`| ❌       | ✔️          | ✔️         | ✔️         | ✔️
 
 ```
 Once this spec has been implemented the output of `nuget.exe verify` command for various verbosity levels will change and be in sync with `dotnet nuget verify` command.
@@ -82,6 +87,7 @@ NuGet log level    | MSBuild verbosity switch | MSBuild message type
 This is output of the invocation of `dotnet nuget verify nuget.common.5.9.0-preview.2.nupkg`
 
 #### Default verbosity | `--verbosity mimimal`
+
 <details>
 <summary>output</summary>
 
@@ -92,10 +98,6 @@ Signature type: Author
   Subject name: CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US
   SHA256 hash: 3F9001EA83C560D712C24CF213C3D312CB3BFF51EE89435D3430BD06B5D0EECE
   Valid from: 2/25/2018 4:00:00 PM to 1/27/2021 4:00:00 AM
-Timestamp: 11/17/2020 7:23:10 AM
-  Subject name: CN=Symantec SHA256 TimeStamping Signer - G3, OU=Symantec Trust Network, O=Symantec Corporation, C=US
-  SHA256 hash: C474CE76007D02394E0DA5E4DE7C14C680F9E282013CFEF653EF5DB71FDF61F8
-  Valid from: 12/22/2017 4:00:00 PM to 3/22/2029 4:59:59 PM
 
 Signature type: Repository
 Service index: https://api.nuget.org/v3/index.json
@@ -103,10 +105,6 @@ Owners: Microsoft, nuget
   Subject name: CN=NuGet.org Repository by Microsoft, O=NuGet.org Repository by Microsoft, L=Redmond, S=Washington, C=US
   SHA256 hash: 0E5F38F57DC1BCC806D8494F4F90FBCEDD988B46760709CBEEC6F4219AA6157D
   Valid from: 4/9/2018 5:00:00 PM to 4/14/2021 5:00:00 AM
-Timestamp: 12/9/2020 2:32:12 PM
-  Subject name: CN=Symantec SHA256 TimeStamping Signer - G3, OU=Symantec Trust Network, O=Symantec Corporation, C=US
-  SHA256 hash: C474CE76007D02394E0DA5E4DE7C14C680F9E282013CFEF653EF5DB71FDF61F8
-  Valid from: 12/22/2017 4:00:00 PM to 3/22/2029 4:59:59 PM
 
 Successfully verified package 'NuGet.Common.5.9.0-preview.2'.
 ```
@@ -118,6 +116,7 @@ Successfully verified package 'NuGet.Common.5.9.0-preview.2'.
 * No output unless there are any `errors` or `warnings`.
 
 #### `--verbosity normal`
+
 <details>
 <summary>output</summary>
 
@@ -379,10 +378,9 @@ error:
 error: Package signature validation failed.
 ```
 
-[Damon Tivel](https://github.com/dtivel) created an issue https://github.com/NuGet/Home/issues/10535
+[Damon Tivel](https://github.com/dtivel) created an issue <https://github.com/NuGet/Home/issues/10535>
 
 </details>
-
 
 <details>
 <summary>After incident output</summary>
@@ -414,4 +412,5 @@ error: Package signature validation failed.
 
 Finished with 2 errors and 0 warnings.
 ```
+
 </details>
