@@ -221,7 +221,7 @@ trace:       Subject name: CN=DigiCert SHA2 Assured ID Code Signing CA, OU=www.d
 trace:       SHA1 hash: 92C1588E85AF2201CE7915E8538B492F605B80C6
 trace:       SHA256 hash: 51044706BD237B91B89B781337E6D62656C69F0FCFFBE8E43741367948127862
 trace:       Issued by: CN=DigiCert Assured ID Root CA, OU=www.digicert.com, O=DigiCert Inc, C=US
-trace:       Valid from: 10/22/2013 5:00:00 AM to 10/22/2028 5:00:00 AMtrace: 
+trace:       Valid from: 10/22/2013 5:00:00 AM to 10/22/2028 5:00:00 AM
 trace:             Subject name: CN=DigiCert Assured ID Root CA, OU=www.digicert.com, O=DigiCert Inc, C=US
 trace:             SHA1 hash: 0563B8630D62D75ABBC8AB1E4BDFB5A899B24D43
 trace:             SHA256 hash: 3E9099B5015E8F486C00BCEA9D111EE721FABA355A89BCF1DF69561E3DC6325C
