@@ -184,14 +184,12 @@ trace:       Subject name: CN=DigiCert SHA2 Assured ID Code Signing CA, OU=www.d
 trace:       SHA1 hash: 92C1588E85AF2201CE7915E8538B492F605B80C6
 trace:       SHA256 hash: 51044706BD237B91B89B781337E6D62656C69F0FCFFBE8E43741367948127862
 trace:       Issued by: CN=DigiCert Assured ID Root CA, OU=www.digicert.com, O=DigiCert Inc, C=US
-trace:       Valid from: 10/22/2013 5:00:00 AM to 10/22/2028 5:00:00 AM
-trace: 
+trace:       Valid from: 10/22/2013 5:00:00 AM to 10/22/2028 5:00:00 AM 
 trace:             Subject name: CN=DigiCert Assured ID Root CA, OU=www.digicert.com, O=DigiCert Inc, C=US
 trace:             SHA1 hash: 0563B8630D62D75ABBC8AB1E4BDFB5A899B24D43
 trace:             SHA256 hash: 3E9099B5015E8F486C00BCEA9D111EE721FABA355A89BCF1DF69561E3DC6325C
 trace:             Issued by: CN=DigiCert Assured ID Root CA, OU=www.digicert.com, O=DigiCert Inc, C=US
 trace:             Valid from: 11/9/2006 4:00:00 PM to 11/9/2031 4:00:00 PM
-trace: 
 Timestamp: 11/17/2020 7:23:10 AM
 Verifying author primary signature's timestamp with timestamping service certificate: 
   Subject name: CN=Symantec SHA256 TimeStamping Signer - G3, OU=Symantec Trust Network, O=Symantec Corporation, C=US
@@ -204,7 +202,6 @@ trace:       SHA1 hash: 6FC9EDB5E00AB64151C1CDFCAC74AD2C7B7E3BE4
 trace:       SHA256 hash: F3516DDCC8AFC808788BD8B0E840BDA2B5E23C6244252CA3000BB6C87170402A
 trace:       Issued by: CN=VeriSign Universal Root Certification Authority, OU="(c) 2008 VeriSign, Inc. - For authorized use only", OU=VeriSign Trust Network, O="VeriSign, Inc.", C=US
 trace:       Valid from: 1/11/2016 4:00:00 PM to 1/11/2031 3:59:59 PM
-trace: 
 trace:             Subject name: CN=VeriSign Universal Root Certification Authority, OU="(c) 2008 VeriSign, Inc. - For authorized use only", OU=VeriSign Trust Network, O="VeriSign, Inc.", C=US
 trace:             SHA1 hash: 3679CA35668772304D30A5FB873B0FA77BB70D54
 trace:             SHA256 hash: 2399561127A57125DE8CEFEA610DDF2FA078B5C8067F4E828290BFB860E84B3C
@@ -224,14 +221,12 @@ trace:       Subject name: CN=DigiCert SHA2 Assured ID Code Signing CA, OU=www.d
 trace:       SHA1 hash: 92C1588E85AF2201CE7915E8538B492F605B80C6
 trace:       SHA256 hash: 51044706BD237B91B89B781337E6D62656C69F0FCFFBE8E43741367948127862
 trace:       Issued by: CN=DigiCert Assured ID Root CA, OU=www.digicert.com, O=DigiCert Inc, C=US
-trace:       Valid from: 10/22/2013 5:00:00 AM to 10/22/2028 5:00:00 AM
-trace: 
+trace:       Valid from: 10/22/2013 5:00:00 AM to 10/22/2028 5:00:00 AMtrace: 
 trace:             Subject name: CN=DigiCert Assured ID Root CA, OU=www.digicert.com, O=DigiCert Inc, C=US
 trace:             SHA1 hash: 0563B8630D62D75ABBC8AB1E4BDFB5A899B24D43
 trace:             SHA256 hash: 3E9099B5015E8F486C00BCEA9D111EE721FABA355A89BCF1DF69561E3DC6325C
 trace:             Issued by: CN=DigiCert Assured ID Root CA, OU=www.digicert.com, O=DigiCert Inc, C=US
-trace:             Valid from: 11/9/2006 4:00:00 PM to 11/9/2031 4:00:00 PM
-trace: 
+trace:             Valid from: 11/9/2006 4:00:00 PM to 11/9/2031 4:00:00 PM 
 Timestamp: 12/9/2020 2:32:12 PM
 Verifying repository countersignature's timestamp with timestamping service certificate: 
   Subject name: CN=Symantec SHA256 TimeStamping Signer - G3, OU=Symantec Trust Network, O=Symantec Corporation, C=US
@@ -243,8 +238,7 @@ trace:       Subject name: CN=Symantec SHA256 TimeStamping CA, OU=Symantec Trust
 trace:       SHA1 hash: 6FC9EDB5E00AB64151C1CDFCAC74AD2C7B7E3BE4
 trace:       SHA256 hash: F3516DDCC8AFC808788BD8B0E840BDA2B5E23C6244252CA3000BB6C87170402A
 trace:       Issued by: CN=VeriSign Universal Root Certification Authority, OU="(c) 2008 VeriSign, Inc. - For authorized use only", OU=VeriSign Trust Network, O="VeriSign, Inc.", C=US
-trace:       Valid from: 1/11/2016 4:00:00 PM to 1/11/2031 3:59:59 PM
-trace: 
+trace:       Valid from: 1/11/2016 4:00:00 PM to 1/11/2031 3:59:59
 trace:             Subject name: CN=VeriSign Universal Root Certification Authority, OU="(c) 2008 VeriSign, Inc. - For authorized use only", OU=VeriSign Trust Network, O="VeriSign, Inc.", C=US
 trace:             SHA1 hash: 3679CA35668772304D30A5FB873B0FA77BB70D54
 trace:             SHA256 hash: 2399561127A57125DE8CEFEA610DDF2FA078B5C8067F4E828290BFB860E84B3C
