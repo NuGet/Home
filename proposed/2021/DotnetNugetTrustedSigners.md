@@ -21,7 +21,7 @@ This is part of a larger effort to reach full parity between `nuget` and
 #### `> dotnet nuget trust`
 
 ```
-Provides the ability to manage the list of trusted signers.
+Manage the trusted signers. By default, NuGet accepts all authors and repositories. You can restrict this to just authors or repositories you trust using this command.
 
 USAGE:
     dotnet nuget trust [COMMAND] [OPTIONS]
