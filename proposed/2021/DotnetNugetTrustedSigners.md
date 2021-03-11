@@ -121,6 +121,12 @@ OPTIONS:
         --configfile                    The NuGet configuration file. If specified, only the settings from this file will be used. If not specified, the hierarchy of configuration files from the current directory will be used.
 ```
 
+##### NOTE
+
+For `trust author` and `trust repository`, `<package>` may be a glob/wildcard.
+This must be consistent across platforms, so the Windows version must expand
+these wildcards when it receives them as arguments.
+
 #### `> dotnet nuget trust repository`
 
 ```
@@ -141,6 +147,12 @@ OPTIONS:
         --interactive                   Allows command to stop and wait for user input or action.
         --configfile                    The NuGet configuration file. If specified, only the settings from this file will be used. If not specified, the hierarchy of configuration files from the current directory will be used.
 ```
+
+##### NOTE
+
+For `trust author` and `trust repository`, `<package>` may be a glob/wildcard.
+This must be consistent across platforms, so the Windows version must expand
+these wildcards when it receives them as arguments.
 
 #### `> dotnet nuget trust certificate`
 
@@ -197,6 +209,11 @@ can vary significantly.
 
 I don't know if there's any significant implementation above just remapping
 command invocations for dotnet.
+
+Additionally, `trust author` and `trust repository` must both not just accept
+multiple `<package>` arguments, but must manually expand globbed arguments on
+Windows, since powershell and cmd.exe don't do glob/wildcard expansions at the
+shell level like \*nix shells do.
 
 ## Drawbacks
 
