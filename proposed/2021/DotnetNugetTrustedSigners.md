@@ -1,4 +1,4 @@
-# dotnet nuget trusted-signers command
+# dotnet nuget trust command
 
 - Author Name [Kat Marchan (@zkat)](https://github.com/zkat)
 - Start Date 2021-03-04
@@ -7,7 +7,7 @@
 
 ## Summary
 
-This specifies the syntax and behavior for the `dotnet nuget trusted-signers` command.
+This specifies the syntax and behavior for the `dotnet nuget trust` command.
 
 ## Motivation
 
@@ -18,43 +18,39 @@ This is part of a larger effort to reach full parity between `nuget` and
 
 ### Functional explanation
 
-#### `dotnet nuget trusted-signers`
+#### `> dotnet nuget trust`
 
 ```
 Provides the ability to manage the list of trusted signers.
 
 USAGE:
-    dotnet nuget trusted-signers [OPTIONS] [COMMAND]
+    dotnet nuget trust [COMMAND] [OPTIONS]
 
 COMMANDS:
-    list (default)
-    trust-package <name> <package>...
-    trust-source <name> [source-url]
-    trust-certificate <name> <fingerprint>
+    list
+    author <name> <package>...
+    repository <name> <package>...
+    source <name> [source-url]
+    certificate <name> <fingerprint>
     remove <name>
     sync <name>
 ```
 
-#### `dotnet nuget trusted-signers list`
+#### `> dotnet nuget trust list`
 
 ```
 Lists all the trusted signers in the configuration. This option will include all the certificates (with fingerprint and fingerprint algorithm) each signer has. If a certificate has a preceding [U], it means that certificate entry has allowUntrustedRoot set as true.
 
 USAGE:
-    dotnet nuget trusted-signers [OPTIONS] list
-
-OPTIONS:
-    -h, --help                          Prints help information.
-    -v, --verbosity <LEVEL>             Set the MSBuild verbosity level. Allowed values are q[uiet], m[inimal], n[ormal], d[etailed], and diag[nostic].
-        --interactive                   Allows command to stop and wait for user input or action.
-        --configfile                    The NuGet configuration file. If specified, only the settings from this file will be used. If not specified, the hierarchy of configuration files from the current directory will be used.
+    dotnet nuget trust list [OPTIONS]
 
 EXAMPLE:
-    $ dotnet nuget trusted-signers list
+    $ dotnet nuget trust list
     Registered trusted signers:
 
     1.   nuget.org [repository]
         Service Index: https://api.nuget.org/v3/index.json
+        Owners: microsoft, aspnet, nuget
         Certificate fingerprint(s):
             SHA256 - 0E5F38F57DC1BCC806D8494F4F90FBCEDD988B46760709CBEEC6F4219AA6157D
 
@@ -66,9 +62,15 @@ EXAMPLE:
     3.   myUntrustedAuthorSignature [author]
         Certificate fingerprint(s):
             [U] SHA256 - 518F9CF082C0872025EFB2587B6A6AB198208F63EA58DD54D2B9FF6735CA4434
+
+OPTIONS:
+    -h, --help                          Prints help information.
+    -v, --verbosity <LEVEL>             Set the MSBuild verbosity level. Allowed values are q[uiet], m[inimal], n[ormal], d[etailed], and diag[nostic].
+        --interactive                   Allows command to stop and wait for user input or action.
+        --configfile                    The NuGet configuration file. If specified, only the settings from this file will be used. If not specified, the hierarchy of configuration files from the current directory will be used.
 ```
 
-#### `dotnet nuget trusted-signers sync`
+#### `> dotnet nuget trust sync`
 
 ```
 Requests the latest list of certificates used in a currently trusted repository to update the the existing certificate list in the trusted signer.
@@ -76,7 +78,7 @@ Requests the latest list of certificates used in a currently trusted repository 
 Note: This gesture will delete the current list of certificates and replace them with an up-to-date list from the repository.
 
 USAGE:
-    dotnet nuget trusted-signers sync [OPTIONS] <name>
+    dotnet nuget trust sync [OPTIONS] <name>
 
 OPTIONS:
     -h, --help                          Prints help information.
@@ -85,13 +87,13 @@ OPTIONS:
         --configfile                    The NuGet configuration file. If specified, only the settings from this file will be used. If not specified, the hierarchy of configuration files from the current directory will be used.
 ```
 
-#### `dotnet nuget trusted-signers remove`
+#### `> dotnet nuget trust remove`
 
 ```
 Removes any trusted signers that match the given name.
 
 USAGE:
-    dotnet nuget trusted-signers remove [OPTIONS] <name>
+    dotnet nuget trust remove [OPTIONS] <name>
 
 OPTIONS:
     -h, --help                          Prints help information.
@@ -100,26 +102,47 @@ OPTIONS:
         --configfile                    The NuGet configuration file. If specified, only the settings from this file will be used. If not specified, the hierarchy of configuration files from the current directory will be used.
 ```
 
-#### `dotnet nuget trusted-signers trust-package`
+#### `> dotnet nuget trust author`
 
 ```
-Adds a trusted signer with the given name to the config, based on one or more packages.
+Adds a trusted signer with the given name to the config, based on the author signature(s) of one or more packages. If <name> already exists in the configuration, the signature(s) will be appended.
 
 USAGE:
-    dotnet nuget trusted-signers trust-package [OPTIONS] <name> <package>...
+    dotnet nuget trust author [OPTIONS] <name> <package>...
+
+EXAMPLE:
+    dotnet nuget trust author Contoso ./contoso.library.nupkg
 
 OPTIONS:
         --allow-untrusted-root          Specifies if the certificate for the trusted signer should be allowed to chain to an untrusted root.
-        --author                        Specifies that the author signature of the package(s) should be trusted. This option is mutually exclusive with --repository.
-        --repository                    Specifies that the repository signature or countersignature of the package(s) should be trusted. This option is mutually exclusive with --author.
-        --owners                        Semi-colon separated list of trusted owners to further restrict the trust of a repository. Only valid when using the --repository option.
     -h, --help                          Prints help information.
     -v, --verbosity <LEVEL>             Set the MSBuild verbosity level. Allowed values are q[uiet], m[inimal], n[ormal], d[etailed], and diag[nostic].
         --interactive                   Allows command to stop and wait for user input or action.
         --configfile                    The NuGet configuration file. If specified, only the settings from this file will be used. If not specified, the hierarchy of configuration files from the current directory will be used.
 ```
 
-#### `dotnet nuget trusted-signers trust-certificate`
+#### `> dotnet nuget trust repository`
+
+```
+Adds a trusted signer with the given name to the config, based on the repository signature(s) or countersignature(s) of one or more packages. If <name> already exists in the configuration, the signature(s) will be appended.
+
+
+USAGE:
+    dotnet nuget trust repository [OPTIONS] <name> <package>...
+
+EXAMPLE:
+    dotnet nuget trust repository Contoso ./contoso.library.nupkg
+
+OPTIONS:
+        --allow-untrusted-root          Specifies if the certificate for the trusted signer should be allowed to chain to an untrusted root.
+        --owners                        Semi-colon separated list of trusted owners to further restrict the trust of a repository.
+    -h, --help                          Prints help information.
+    -v, --verbosity <LEVEL>             Set the MSBuild verbosity level. Allowed values are q[uiet], m[inimal], n[ormal], d[etailed], and diag[nostic].
+        --interactive                   Allows command to stop and wait for user input or action.
+        --configfile                    The NuGet configuration file. If specified, only the settings from this file will be used. If not specified, the hierarchy of configuration files from the current directory will be used.
+```
+
+#### `> dotnet nuget trust certificate`
 
 ```
 Adds a trusted signer with the given name to the config, based on a certificate fingerprint.
@@ -127,7 +150,7 @@ Adds a trusted signer with the given name to the config, based on a certificate 
 Note: If a trusted signer with the given name already exists, the certificate item will be added to that signer. Otherwise a trusted author will be created with a certificate item from given certificate information.
 
 USAGE:
-    dotnet nuget trusted-signers trust-certificate [OPTIONS] <name> <fingerprint>
+    dotnet nuget trust certificate [OPTIONS] <name> <fingerprint>
 
 OPTIONS:
         --allow-untrusted-root          Specifies if the certificate for the trusted signer should be allowed to chain to an untrusted root.
@@ -138,17 +161,19 @@ OPTIONS:
         --configfile                    The NuGet configuration file. If specified, only the settings from this file will be used. If not specified, the hierarchy of configuration files from the current directory will be used.
 ```
 
-#### `dotnet nuget trusted-signers trust-source`
+#### `> dotnet nuget trust source`
 
 ```
-Adds a trusted signer based on a given source.
+Adds a trusted signer based on a given package source.
 
 If only `<name>` is provided without `<source-url>`, the package source from your NuGet configuration files with the same name will be added to the trusted list.
 
-If a `<source-url>` is provided, it MUST be a v3 package source URL (like https://api.nuget.org/v3/index.json). Other source types are not supported.
+If a `<source-url>` is provided, it MUST be a v3 package source URL (like https://api.nuget.org/v3/index.json). Other package source types are not supported.
+
+If <name> already exists in the configuration, the signature(s) will be appended.
 
 USAGE:
-    dotnet nuget trusted-signers trust-source <name> [source-url]
+    dotnet nuget trust source <name> [source-url]
 
 OPTIONS:
         --allow-untrusted-root          Specifies if the certificate for the trusted signer should be allowed to chain to an untrusted root.
@@ -166,8 +191,9 @@ For the most part, these commands map pretty directly to their nuget
 counterparts, and most of their implementations should be reusable (removing
 `#if IS_DESKTOP` as needed, from the various TrustedSigners classes).
 
-The exception here is the `add` command, which has been split into the various
-`trust-*` commands that otherwise have the same behaviors.
+The exception here is the `add` command, which has been split into separate
+commands that otherwise have the same behaviors, since options and semantics
+can vary significantly.
 
 I don't know if there's any significant implementation above just remapping
 command invocations for dotnet.
