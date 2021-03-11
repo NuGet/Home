@@ -182,7 +182,7 @@ If only `<name>` is provided without `<source-url>`, the package source from you
 
 If a `<source-url>` is provided, it MUST be a v3 package source URL (like https://api.nuget.org/v3/index.json). Other package source types are not supported.
 
-If <name> already exists in the configuration, the signature(s) will be appended.
+If <name> already exists in the configuration, the package source will be appended to it.
 
 USAGE:
     dotnet nuget trust source <name> [source-url]
