@@ -263,9 +263,47 @@ Successfully verified package 'NuGet.Common.5.9.0-preview.2'.
 <summary>output</summary>
 
 ```
-dotnet nuget verify tampered.12.0.1.nupkg -v -detailed
+dotnet nuget verify tampered.12.0.1.nupkg -v -n
+
+Verifying Newtonsoft.Json.12.0.3
+C:\Users\kapenaga\Downloads\tampered.12.0.1.nupkg
+Signature Hash Algorithm: SHA256
+
+Signature type: Author
+Verifying the author primary signature with certificate:
+  Subject Name: CN=Json.NET (.NET Foundation), O=Json.NET (.NET Foundation), L=Redmond, S=wa, C=US, SERIALNUMBER=603 389 068
+  SHA1 hash: 4CFB89FAA49539A58968D81960B3C1258E8F6A34
+  SHA256 hash: A3AF7AF11EBB8EF729D2D91548509717E7E0FF55A129ABC3AEAA8A6940267641
+  Issued by: CN=.NET Foundation Projects Code Signing CA, O=.NET Foundation, C=US
+  Valid from: 10/24/2018 5:00:00 PM to 10/29/2021 5:00:00 AM
+Timestamp: 11/8/2019 4:56:46 PM
+Verifying author primary signature's timestamp with timestamping service certificate:
+  Subject Name: CN=TIMESTAMP-SHA256-2019-10-15, O="DigiCert, Inc.", C=US
+  SHA1 hash: 0325BD505EDA96302DC22F4FA01E4C28BE2834C5
+  SHA256 hash: 481F4373272D98586C5364B6C115E82425675AEBFD9FACF7ADC464FA2FFFB8F0
+  Issued by: CN=DigiCert SHA2 Assured ID Timestamping CA, OU=www.digicert.com, O=DigiCert Inc, C=US
+  Valid from: 9/30/2019 5:00:00 PM to 10/16/2030 5:00:00 PM
+
+Signature type: Repository
+nuget-v3-service-index-url: https://api.nuget.org/v3/index.json
+nuget-package-owners: jamesnk, newtonsoft
+Verifying the repository countersignature with certificate:
+  Subject Name: CN=NuGet.org Repository by Microsoft, O=NuGet.org Repository by Microsoft, L=Redmond, S=Washington, C=US
+  SHA1 hash: 8FB6D7FCF7AD49EB774446EFE778B33365BB7BFB
+  SHA256 hash: 0E5F38F57DC1BCC806D8494F4F90FBCEDD988B46760709CBEEC6F4219AA6157D
+  Issued by: CN=DigiCert SHA2 Assured ID Code Signing CA, OU=www.digicert.com, O=DigiCert Inc, C=US
+  Valid from: 4/9/2018 5:00:00 PM to 4/14/2021 5:00:00 AM
+Timestamp: 11/8/2019 5:28:02 PM
+Verifying repository countersignature's timestamp with timestamping service certificate:
+  Subject Name: CN=Symantec SHA256 TimeStamping Signer - G3, OU=Symantec Trust Network, O=Symantec Corporation, C=US
+  SHA1 hash: A9A4121063D71D48E8529A4681DE803E3E7954B0
+  SHA256 hash: C474CE76007D02394E0DA5E4DE7C14C680F9E282013CFEF653EF5DB71FDF61F8
+  Issued by: CN=Symantec SHA256 TimeStamping CA, OU=Symantec Trust Network, O=Symantec Corporation, C=US
+  Valid from: 12/22/2017 4:00:00 PM to 3/22/2029 4:59:59 PM
+
+Finished with 1 errors and 0 warnings.
 error: NU3008: The package integrity check failed. The package has been tampered with since being signed.
-error: Package signature validation failed.
+Package signature validation failed.
 ```
 
 </details>
@@ -289,12 +327,12 @@ Verifying the author primary signature with signing certificate:
   Issued by: CN=test
   Valid from: 1/29/2021 12:28:11 PM to 1/29/2021 1:28:11 PM
 
+Finished with 2 errors and 1 warnings.
 error: NU3018: The author primary signature's signing certificate is not trusted by the trust provider.
 error: NU3037: The author primary signature validity period has expired.
 warn : NU3027: The signature should be timestamped to enable long-term signature validity after the signing certificate has expired.
-error: Package signature validation failed.
 
-Finished with 2 errors and 1 warnings.
+Package signature validation failed.
 ```
 
 </details>
@@ -347,10 +385,10 @@ Verifying author primary signature's timestamp with timestamping service certifi
   Issued by: CN=NuGet Test Root Certificate Authority (40998d55-3d73-4a3b-a689-55e30c1fac3c), O=NuGet, L=Redmond, S=WA, C=US
   Valid from: 2/3/2021 3:36:11 PM to 12/31/2099 4:00:00 PM
 
-error: NU3028: The author primary signature's timestamp signature's certificate is not trusted by the trust provider.
-error: Package signature validation failed.
-
 Finished with 1 errors and 0 warnings.
+error: NU3028: The author primary signature's timestamp signature's certificate is not trusted by the trust provider.
+
+Package signature validation failed.
 ```
 
 </details>
@@ -406,11 +444,11 @@ Verifying author primary signature's timestamp with timestamping service certifi
   Issued by: CN=NuGet Test Root Certificate Authority (40998d55-3d73-4a3b-a689-55e30c1fac3c), O=NuGet, L=Redmond, S=WA, C=US
   Valid from: 2/3/2021 3:36:11 PM to 12/31/2099 4:00:00 PM
 
+Finished with 2 errors and 0 warnings.
 error: NU3018: The author primary signature's signing certificate is not trusted by the trust provider.
 error: NU3028: The author primary signature's timestamp signature's certificate is not trusted by the trust provider.
-error: Package signature validation failed.
 
-Finished with 2 errors and 0 warnings.
+Package signature validation failed.
 ```
 
 </details>
