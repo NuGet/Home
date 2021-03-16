@@ -101,6 +101,7 @@ An open question is whether packing of these projects is supported.
 ## Open Questions
 
 * Can these projets be packaged? These projects produce managed assemblies. What's the framework generated?
+* How about C# -> C#/CLI -> native.
 
 ## Considerations
 
