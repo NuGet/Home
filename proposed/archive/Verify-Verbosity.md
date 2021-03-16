@@ -285,8 +285,8 @@ Verifying author primary signature's timestamp with timestamping service certifi
   Valid from: 9/30/2019 5:00:00 PM to 10/16/2030 5:00:00 PM
 
 Signature type: Repository
-nuget-v3-service-index-url: https://api.nuget.org/v3/index.json
-nuget-package-owners: jamesnk, newtonsoft
+Service index: https://api.nuget.org/v3/index.json
+Owners: jamesnk, newtonsoft
 Verifying the repository countersignature with certificate:
   Subject Name: CN=NuGet.org Repository by Microsoft, O=NuGet.org Repository by Microsoft, L=Redmond, S=Washington, C=US
   SHA1 hash: 8FB6D7FCF7AD49EB774446EFE778B33365BB7BFB
