@@ -141,7 +141,7 @@ A few other important concepts:
 
 - global packages folder - The installation directory for all packages in PackageReference. Think of this as the `Program Files` equivalent. All packages are consumed from this location. A single package installation can be shared safely among many different builds. A project *does not own* a specific package installation.
 The global packages folder is an *append only* resource. This means NuGet only ever installs a new package. There is **no** refreshing, or overriding, or `re-installing` packages of any kind.
-- When requesting an exact version, local, file sources are currently preferred - When installing a package, NuGet checks local sources independently before checking http sources.
+- When requesting a particular version (not floating), local, file sources are currently preferred - When installing a package, NuGet checks local sources independently before checking http sources.
 - Package installation is operation based - If 3 projects are being restored during that operation, and all those projects have a dependency to `Newtonsoft.Json`, version `9.0.1`, in regular scenarios, only 1 project will *actually* download and install the package. The other projects will use the already installed version.
 - `.nupkg.metadata` - Each package installation directory contains a `.nupkg.metadata` file which signify that a package installation is complete. This is expected to be the last file written in the package directory. This file is *not* use during build. NuGet.Client writes the package source information inside this file.
 
