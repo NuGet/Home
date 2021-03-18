@@ -340,29 +340,7 @@ Package signature validation failed.
 #### `Debian case - Verifying author signed package with untrusted timestamping signing certificate`
 
 <details>
-<summary>Before incident output</summary>
-
-```
-dotnet nuget verify "package.nupkg" -v n
-Verifying packageA.1.0.0
-C:\Users\kapenaga\Downloads\package.nupkg
-Signature Hash Algorithm: SHA256
-Timestamp: 2/3/2021 3:36:12 PM
-Verifying author primary signature's timestamp with timestamping service certificate:
-  Subject name: CN=NuGet Test Root Certificate Authority (40998d55-3d73-4a3b-a689-55e30c1fac3c), O=NuGet, L=Redmond, S=WA, C=US
-  SHA1 hash: 6B2378A3DC9CA185252BB66F24F262D129165B5B
-  SHA256 hash: 61B18DE3D814FA7960C6ED62DB20BEA6D0F8D65F678464D7D7C9227E7D5DEFBD
-  Issued by: CN=NuGet Test Root Certificate Authority (40998d55-3d73-4a3b-a689-55e30c1fac3c), O=NuGet, L=Redmond, S=WA, C=US
-  Valid from: 2/3/2021 3:36:11 PM to 12/31/2099 4:00:00 PM
-error: NU3028: The author primary signature's timestamp found a chain building issue: UntrustedRoot: A certificate chain processed, but terminated in a root certificate which is not trusted by the trust provider.
-Finished with 1 errors and 0 warnings.
-error: Package signature validation failed.
-```
-
-</details>
-
-<details>
-<summary>After incident output</summary>
+<summary>output</summary>
 
 ```
 dotnet nuget verify "package.nupkg" -v n
@@ -376,17 +354,19 @@ Verifying the author primary signature with signing certificate:
   SHA1 hash: B0A2B3B1695AB8361B1D2B14A9F5D64136E26380
   SHA256 hash: 89A2B6EB529E0AEBF0D11C8A18A846C7B8D1290791B6BF494BAFEC299F2EAAB2
   Issued by: CN=test
-  Valid from: 1/29/2021 12:28:11 PM to 02/29/2021 1:28:11 PM
+  Valid from: 1/29/2021 12:28:11 PM to 02/29/2022 1:28:11 PM
 Timestamp: 2/3/2021 3:36:12 PM
 Verifying author primary signature's timestamp with timestamping service certificate:
-  Subject name: CN=NuGet Test Root Certificate Authority (40998d55-3d73-4a3b-a689-55e30c1fac3c), O=NuGet, L=Redmond, S=WA, C=US
-  SHA1 hash: 6B2378A3DC9CA185252BB66F24F262D129165B5B
-  SHA256 hash: 61B18DE3D814FA7960C6ED62DB20BEA6D0F8D65F678464D7D7C9227E7D5DEFBD
-  Issued by: CN=NuGet Test Root Certificate Authority (40998d55-3d73-4a3b-a689-55e30c1fac3c), O=NuGet, L=Redmond, S=WA, C=US
-  Valid from: 2/3/2021 3:36:11 PM to 12/31/2099 4:00:00 PM
+  Subject Name: CN=Entrust Timestamp Authority - TSA1, O="Entrust, Inc.", L=Ottawa, S=Ontario, C=CA
+  SHA1 hash: 94A59549D6E7CE926ED8D2625E1C2ADEBA04C37F
+  SHA256 hash: 950A26FDC7C02018E9F791A95C38F26EEF3DA43267CAB0CD15A555AF631072C9
+  Issued by: CN=Entrust Timestamping CA - TS1, OU="(c) 2015 Entrust, Inc. - for authorized use only", OU=See www.entrust.net/legal-terms, O="Entrust, Inc.", C=US
+  Valid from: 7/22/2020 3:33:29 PM to 12/29/2030 4:29:23 PM
 
-Finished with 1 errors and 0 warnings.
-error: NU3028: The author primary signature's timestamp signature's certificate is not trusted by the trust provider.
+Finished with 1 errors and 2 warnings.
+error: NU3028: The author primary signature's timestamping certificate is not trusted by the trust provider.
+warn : NU3028: The author primary signature's timestamp found a chain building issue: The revocation function was unable to check revocation because the revocation server could not be reached. For more information, visit https://aka.ms/certificateRevocationMode.
+warn : NU3028: The author primary signature's timestamp found a chain building issue: RevocationStatusUnknown: The revocation function was unable to check revocation for the certificate.
 
 Package signature validation failed.
 ```
@@ -396,32 +376,7 @@ Package signature validation failed.
 #### `Debian case - Verifying expired author signed package with untrusted timestamping signing certificate`
 
 <details>
-<summary>Before incident output</summary>
-
-```
-dotnet nuget verify "AuthorExpired.1.0.0.nupkg" -v n
-Verifying AuthorExpired.1.0.0
-C:\Users\kapenaga\Downloads\signed-packages\AuthorExpired.1.0.0.nupkg
-Signature Hash Algorithm: SHA256
-Timestamp: 2/3/2021 3:36:12 PM
-Verifying author primary signature's timestamp with timestamping service certificate:
-  Subject name: CN=NuGet Test Root Certificate Authority (40998d55-3d73-4a3b-a689-55e30c1fac3c), O=NuGet, L=Redmond, S=WA, C=US
-  SHA1 hash: 6B2378A3DC9CA185252BB66F24F262D129165B5B
-  SHA256 hash: 61B18DE3D814FA7960C6ED62DB20BEA6D0F8D65F678464D7D7C9227E7D5DEFBD
-  Issued by: CN=NuGet Test Root Certificate Authority (40998d55-3d73-4a3b-a689-55e30c1fac3c), O=NuGet, L=Redmond, S=WA, C=US
-  Valid from: 2/3/2021 3:36:11 PM to 12/31/2099 4:00:00 PM
-error: NU3028: The author primary signature's timestamp found a chain building issue: UntrustedRoot: A certificate chain processed, but terminated in a root certificate which is not trusted by the trust provider.
-Finished with 1 errors and 0 warnings.
-error:
-error: Package signature validation failed.
-```
-
-[Damon Tivel](https://github.com/dtivel) created an issue <https://github.com/NuGet/Home/issues/10535>
-
-</details>
-
-<details>
-<summary>After incident output</summary>
+<summary>output</summary>
 
 ```
 dotnet nuget verify "AuthorExpired.1.0.0.nupkg" -v n
@@ -446,7 +401,7 @@ Verifying author primary signature's timestamp with timestamping service certifi
 
 Finished with 2 errors and 0 warnings.
 error: NU3018: The author primary signature's signing certificate is not trusted by the trust provider.
-error: NU3028: The author primary signature's timestamp signature's certificate is not trusted by the trust provider.
+error: NU3028: The author primary signature's timestamping certificate is not trusted by the trust provider.
 
 Package signature validation failed.
 ```
