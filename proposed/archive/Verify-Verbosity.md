@@ -15,7 +15,7 @@ Package consumers that use the `dotnet nuget verify` command to verify package s
 ## Goals
 
 * Change the output of `dotnet nuget verify` command for various `--verbosity` options.
-* Improve log messages & error codes in docs based on the customer experience due to the recent Debian incident.
+* Improve log messages & error codes in docs to improve the customer experience based upon the learnings from the recent Debian incident.
 
 ## Non-goals
 
