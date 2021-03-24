@@ -32,8 +32,6 @@ TargetFramework is only defined for C++/CLI .NET Core projects.
 TargetFrameworkIdentifier/Version/Moniker properties are defined for C++/CLI .NET Framework projects. Note, that they are also confusingly defined for pure native ones too (in msbuild common targets, at least, they used to be), so you need to check other properties first (i.e. TargetPlatformIdentifier and CLRSupport). You can also use project capabilities: “native” vs “managed”
 ```
 
-Note that C++/CLI projects produce `managed` binaries.
-
 ## Who are the customers
 
 Customers using C++/CLI projects.
@@ -64,17 +62,14 @@ Currently the steps for NuGet framework inference for project types still active
 
 To understand the proposed changes, here's a mapping of all `C++` project types and the property value for the appropriate ones.
 
-| Project type | TargetFrameworkMoniker | TargetPlatformMoniker | CLRSupport | Effective NuGet framework | Notes | Open questions |
-|--------------|---------------------------|--------------------|------------|---------------------------|-------|----------------|
-| Native C++ | .NETFramework,Version=v4.0 | Windows,Version=10.0.19041.0 | false | native | NuGet will continue special casing vcxproj. | |
-| C++ UWP App | | UAP,Version=10.0.18362.0 | false | native | NuGet will continue special casing vcxproj. | |
+| Project type | TargetFrameworkIdentifier | TargetPlatformIdentifier | CLRSupport | Effective NuGet framework | Notes | Open questions |
+|--------------|---------------------------|--------------------------|------------|---------------------------|-------|----------------|
+| Native C++ | .NETFramework,Version=v4.0 | Windows,Version=10.0.19041.0 | false | native | NuGet will continue special casing vcxproj. |
+| C++ UWP App | | UAP,Version=10.0.18362.0 | false | native | NuGet will continue special casing vcxproj. |
 | CLR C++ | .NETFramework,Version=v4.7.2 | Windows,Version=10.0.19041.0 | true | ??? | This project has .NET Framework CLR support | Are these projects expected to be PackageReference or packages.config? What's the effective target framework |
-| Core CLR C++ | .NETCoreApp,Version=v5.0 | Windows,Version=10.0.19041.0 | NetCore | ??? | | What's the effective framework? Is it `net5.0-windows`? |
+| Core CLR C++ | .NETCoreApp,Version=v5.0 | Windows,Version=10.0.19041.0 | NetCore | ??? | What's the effective framework? Is it `net5.0-windows`? |
 
 In the background, it is said that C++/CLI projects are supposed to support installing both managed and native packages. This would require some amendments to NuGet's framework model.
-
-* When a package supports both managed and native assemblies (unlikely), NuGet will pick the managed assemblies first.
-* NuGet will *only* observe CLRSupport when it is `NetCore`, .NET Framework C++/CLI is not the target at this point.
 
 `native` framework is not compatible with anything but `native` and that will remain.
 NuGet has a fallback compatibility mode as well.
@@ -83,25 +78,34 @@ If a package supports .NET Core or .NET Standard, it's fully compatible with a .
 
 The `Asset Target Fallback` implementation currently suffers from a bug where the dependencies are not pulled in correctly, see [5957](https://github.com/NuGet/Home/issues/5957).
 
-Asset Target Fallback would require project type changes. The project type would specify which target framework to fall back to. This likely requires fixing [5957](https://github.com/NuGet/Home/issues/5957).
+Whatever the effective frameworks turn out to be, there are 2 approaches that we can take.
+
+* Utilize AssetTargetFallback
+
+This would require project type changes. The project type would specify which target framework to fall back to. This likely requires fixing [5957](https://github.com/NuGet/Home/issues/5957).
 Note that this would *generate* a warning when managed packages are used.
 
-The likely solution is to introduce a `dedicated dual compatibility` framework
+* Introduce a `dedicated dual compatibility` framework
 
 Similar to how `.NET Core` implements `.NET Standard` and supports `.NET Core` as a same family framework, we can add a framework type that's only allowed in projects, and not packages. This framework could define it's compatible as both `native` and `managed`.
 
 The downside here is that NuGet does not have a framework that's only supported in projects. Given that this is not a real `target`, it is counter to what NuGet frameworks are supposed to represent.
 
-An open question is whether packing of these projects is supported. 
-
 ## Test Strategy
+
+TBD
 
 ## Future Work
 
 ## Open Questions
 
-* Can these projets be packaged? These projects produce managed assemblies. What's the framework generated?
-* How about C# -> C#/CLI -> native.
+* Is PackageReference support being added for .NET Framework C++/CLI as well? Or only .NET Core C++/CLI projects?
+
+* When a package contains both `native` and `managed` assets, which ones are preferred?
+
+* Which frameworks are going to be supported with .NET Core C++/CLI? Will net5.0-windows be supported eventually? Asset Target Fallback becomes tricky if so.
+
+* Which framework changes should we adopt? Asset Target Fallback or a `dedicated dual compatibility framework`.
 
 ## Considerations
 
