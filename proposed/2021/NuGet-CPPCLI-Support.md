@@ -43,6 +43,8 @@ Support the C++ team as necessary to provide NuGet PackageReference support for 
 At this point focused to:
 
 * Ensure NuGet is interpreting the correct framework.
+* Only .NET Core C++/CLI projects will support PackageReference.
+* From the onset only net5.0-windows C++/CLI projects will be supported.
 
 ## Non-Goals
 
@@ -76,38 +78,29 @@ NuGet has a fallback compatibility mode as well.
 For example: .NET Core projects have a fallback to .NET Framework with a warning. This is also callled `Asset Target Fallback`.
 If a package supports .NET Core or .NET Standard, it's fully compatible with a .NET Core project. Otherwise if a package has .NET Framework assets, the package is installed, but with a *warning*.
 
-The `Asset Target Fallback` implementation currently suffers from a bug where the dependencies are not pulled in correctly, see [5957](https://github.com/NuGet/Home/issues/5957).
-
-Whatever the effective frameworks turn out to be, there are 2 approaches that we can take.
-
-* Utilize AssetTargetFallback
-
-This would require project type changes. The project type would specify which target framework to fall back to. This likely requires fixing [5957](https://github.com/NuGet/Home/issues/5957).
-Note that this would *generate* a warning when managed packages are used.
-
-* Introduce a `dedicated dual compatibility` framework
+Introduce a `dedicated dual compatibility` framework
 
 Similar to how `.NET Core` implements `.NET Standard` and supports `.NET Core` as a same family framework, we can add a framework type that's only allowed in projects, and not packages. This framework could define it's compatible as both `native` and `managed`.
 
 The downside here is that NuGet does not have a framework that's only supported in projects. Given that this is not a real `target`, it is counter to what NuGet frameworks are supposed to represent.
 
-## Test Strategy
+When a package contains `managed` and `native` assets, the managed ones will be preferred.
 
-TBD
+## Test Strategy
 
 ## Future Work
 
 ## Open Questions
 
-* Is PackageReference support being added for .NET Framework C++/CLI as well? Or only .NET Core C++/CLI projects?
-
-* When a package contains both `native` and `managed` assets, which ones are preferred?
-
-* Which frameworks are going to be supported with .NET Core C++/CLI? Will net5.0-windows be supported eventually? Asset Target Fallback becomes tricky if so.
-
-* Which framework changes should we adopt? Asset Target Fallback or a `dedicated dual compatibility framework`.
-
 ## Considerations
+
+* AssetTargetFallback
+
+The `Asset Target Fallback` implementation currently suffers from a bug where the dependencies are not pulled in correctly, see [5957](https://github.com/NuGet/Home/issues/5957).
+
+This would require project type changes. The project type would specify which target framework to fall back to. This likely requires fixing [5957](https://github.com/NuGet/Home/issues/5957).
+
+The problem with this approach is that we don't want a warning when a native project was selected.
 
 ### References
 
