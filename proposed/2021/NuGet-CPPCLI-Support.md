@@ -1,7 +1,13 @@
 # NuGet C++/CLI support
 
+- Author Name [Nikolche Kolev](https://github.com/nkolev92)
+- Start Date (YYYY-MM-DD)
+- GitHub Issue (GitHub Issue link)
+- GitHub PR (GitHub PR link)
+
+
 * Status: In Review
-* Author(s): [Nikolche](https://github.com/nkolev92)
+* Author(s): 
 * Issue: [8195](https://github.com/NuGet/Home/issues/8195) and [10194](https://github.com/NuGet/Home/issues/10194) NuGet support for C++/CLI projects.
 
 ## Problem Background
