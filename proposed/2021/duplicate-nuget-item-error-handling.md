@@ -132,7 +132,7 @@ This is an imperfect, best effort solution. There are *many* caveats.
 
 ## Unresolved Questions
 
-- Can the project-system nominate even when an error is raised? This could lead to fewer errors in the error list making it very apparent what the problem is. 
+- Can the project-system nominate even when an error is raised? This could lead to fewer errors in the error list making it very apparent what the problem is.
 
 ## Future Possibilities
 
