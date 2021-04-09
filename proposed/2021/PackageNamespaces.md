@@ -62,7 +62,7 @@ Define the `<packageSource>` element within the `<packageNamespaces>` parent wit
 </packageNamespaces>
 ```
 
-Next, add `<namespace>` elements under the `<packageSource>` with an `id` to specify the namespace. Namespaces can be defined as their full namepsace or using a wildcard(*) to match the glob pattern of 0 or more package ID(s):
+Next, add `<namespace>` elements under the `<packageSource>` with an `id` to specify the namespace. Namespaces can be defined as their full namespace or using a wildcard(*) to match the glob pattern of 0 or more package ID(s):
 
 ```xml
 <packageSources>
