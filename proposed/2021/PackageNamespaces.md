@@ -55,7 +55,7 @@ Define the `<packageSource>` element within the `<packageNamespaces>` parent wit
 </packageSources>
  
 <packageNamespaces>
-    <packageSource name="nuget.org">
+    <packagesource key="nuget.org">
 
     </packageSource>
  
@@ -74,7 +74,7 @@ Next, add `<namespace>` elements under the `<packageSource>` with an `id` to spe
  
 <packageNamespaces>
     <!-- Add a namespace for Microsoft.* or NuGet.* under the nuget.org source. -->
-    <packageSource name="nuget.org">
+    <packagesource key="nuget.org">
         <namespace id="Microsoft.*" />
         <namespace id="NuGet.*" />
     </packageSource>
@@ -98,13 +98,13 @@ Specific ids take precedence over the namespaces.
  
 <packageNamespaces>
     <!-- Add a namespace for Microsoft.* or NuGet.* under the nuget.org source. -->
-    <packageSource name="nuget.org">
+    <packagesource key="nuget.org">
         <namespace id="Microsoft.*" />
         <namespace id="NuGet.*" />
     </packageSource>
 
     <!-- Add a namespace for Contoso.* under the contoso source. -->
-    <packageSource name="contoso">
+    <packagesource key="contoso">
         <namespace id="Contoso.*" />
         <!-- Add a specific id to be download from  the contoso source. -->
         <namespace id="Special.Package.With.An.Imperfect.Id" />
@@ -176,7 +176,7 @@ Microsoft.C 1.0.0
 ```
 
 ```xml
-    <packageSource name="nuget.org">
+    <packagesource key="nuget.org">
         <namespace id="NuGet.*" />
     </packageSource>
     <!-- no contoso namespaces -->
@@ -200,10 +200,10 @@ Microsoft.C 1.0.0 -> Microsoft.B 1.0.0
 ```
 
 ```xml
-    <packageSource name="nuget.org">
+    <packagesource key="nuget.org">
         <namespace id="NuGet.*" />
     </packageSource>
-    <packageSource name="contoso">
+    <packagesource key="contoso">
         <namespace id="Microsoft.*" />
     </packageSource>
 ```
@@ -229,11 +229,11 @@ NuGet.Internal.D 1.0.0
 ```
 
 ```xml
-    <packageSource name="nuget.org">
+    <packagesource key="nuget.org">
         <namespace id="NuGet.*" />
         <namespace id="Microsoft.B" />
     </packageSource>
-    <packageSource name="contoso">
+    <packagesource key="contoso">
         <namespace id="Microsoft.*" />
         <namespace id="NuGet.Internal.*" />
     </packageSource>
@@ -258,10 +258,10 @@ Microsoft.C 1.0.0 -> Microsoft.B 2.0.0
 ```
 
 ```xml
-    <packageSource name="nuget.org">
+    <packagesource key="nuget.org">
         <namespace id="NuGet.*" />
     </packageSource>
-    <packageSource name="contoso">
+    <packagesource key="contoso">
         <namespace id="Microsoft.*" />
     </packageSource>
 ```
@@ -282,11 +282,11 @@ Microsoft.C 1.0.0 -> Microsoft.B 2.0.0
 ```
 
 ```xml
-    <packageSource name="nuget.org">
+    <packagesource key="nuget.org">
         <namespace id="NuGet.*" />
         <namespace id="Microsoft.*" />
     </packageSource>
-    <packageSource name="contoso">
+    <packagesource key="contoso">
         <namespace id="Microsoft.*" />
     </packageSource>
 ```
@@ -309,10 +309,10 @@ Microsoft.Community.B 1.0.0
 ```
 
 ```xml
-    <packageSource name="nuget.org">
+    <packagesource key="nuget.org">
         <namespace id="Microsoft.Community.*" />
     </packageSource>
-    <packageSource name="contoso">
+    <packagesource key="contoso">
         <namespace id="Microsoft.Community.*" />
         <namespace id="Microsoft.*" />
     </packageSource>
@@ -332,7 +332,7 @@ NuGetA 1.0.0 -> Microsoft.B 1.0.0
 ```
 
 ```xml
-    <packageSource name="nuget.org">
+    <packagesource key="nuget.org">
         <namespace id="NuGet*" />
     </packageSource>
     <!-- no contoso namespaces -->
@@ -365,7 +365,7 @@ NuGet.A 1.0.0 -> Microsoft.B 1.0.0
 ```
 
 ```xml
-    <packageSource name="nuget.org">
+    <packagesource key="nuget.org">
         <namespace id="NuGet.*" />
     </packageSource>
     <!-- no contoso namespaces -->
@@ -385,11 +385,11 @@ Microsoft.C 1.0.0 -> Microsoft.B 2.0.0
 ```
 
 ```xml
-    <packageSource name="nuget.org">
+    <packagesource key="nuget.org">
         <namespace id="NuGet.*" />
         <namespace id="Microsoft.*" />
     </packageSource>
-    <packageSource name="contoso">
+    <packagesource key="contoso">
         <namespace id="Microsoft.*" />
     </packageSource>
 ```
@@ -413,10 +413,10 @@ NuGet.Internal.D 1.0.0
 ```
 
 ```xml
-    <packageSource name="nuget.org">
+    <packagesource key="nuget.org">
         <namespace id="NuGet.*" />
     </packageSource>
-    <packageSource name="contoso">
+    <packagesource key="contoso">
         <namespace id="Microsoft.*" />
         <namespace id="NuGet.Internal.*" />
     </packageSource>
@@ -444,7 +444,7 @@ This scenario has an additional source.
 ```
 
 ```xml
-    <packageSource name="nuget.org">
+    <packagesource key="nuget.org">
         <namespace id="NuGet.*" />
     </packageSource>
     <!-- no contoso namespaces -->
@@ -478,10 +478,10 @@ NuGet.A 1.0.0 -> Microsoft.B 1.0.0
 
 ```xml
 <!-- Project 1 Config -->
-<packageSource name="nuget.org">
+<packagesource key="nuget.org">
     <namespace id="NuGet.*" />
 </packageSource>
-<packageSource name="contoso">
+<packagesource key="contoso">
     <namespace id="Microsoft.*" />
 </packageSource>
 ```
@@ -493,10 +493,10 @@ NuGet.A 1.0.0 -> Microsoft.B 1.0.0
 
 ```xml
 <!-- Project 2 Config -->
-<packageSource name="nuget.org">
+<packagesource key="nuget.org">
     <namespace id="Microsoft.*" />
 </packageSource>
-<packageSource name="contoso">
+<packagesource key="contoso">
     <namespace id="NuGet.*" />
 </packageSource>
 ```
