@@ -161,6 +161,8 @@ To get a detailed audit report in a JSON format.
 
 #### dotnet audit fix
 
+The `dotnet audit fix` command will provide a remediation that is calculated with an implicit `dotnet audit` to then apply directly to a resulting package graph. It can add packages, remove packages, and update packages depending on the problem it's attempting to resolve. It does not take into consideration downgrading to a compatible version if a higher one has already been specified.
+
 ![dotnet audit fix](/meta/resources/dotnetaudit/dotnetauditfix.png)
 
 ```
