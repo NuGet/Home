@@ -1,6 +1,6 @@
 # dotnet audit & dotnet audit fix
 
-- Jon Douglas([GitHub username link](https://github.com/JonDouglas/))
+- [Jon Douglas](https://github.com/JonDouglas/)
 - Start Date (2021-04-01)
 - [#8087](https://github.com/NuGet/Home/issues/8087)
 
