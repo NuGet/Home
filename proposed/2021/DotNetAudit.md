@@ -46,10 +46,10 @@ Scanning ContosoUniversity.sln (36 NuGet dependencies)
 error: Vulnernable packages found!
 [net5.0]:
 Top-level Package	    Requested	Resolved	Severity	Advisory URL
-> UmbracoForms		    8.4.1		  8.4.1		  Moderate	https://github.com/advisories/GHSA-8m73-w2r2-6xxj
+> UmbracoForms		    8.4.1		8.4.1		Moderate	https://github.com/advisories/GHSA-8m73-w2r2-6xxj
 
-Transitive Package		  Resolved	Severity	Advisory URL
-> Microsoft.Data.OData	5.2.0		  Moderate	https://github.com/advisories/GHSA-mv2r-q4g5-j8q5
+Transitive Package		Resolved	Severity	Advisory URL
+> Microsoft.Data.OData	5.2.0		Moderate	https://github.com/advisories/GHSA-mv2r-q4g5-j8q5
 
 Found 1 top-level Moderate severity vulnerability & 1 transtive Moderate severity vulnerability package(s) in 36 scanned packages.
 
@@ -57,8 +57,8 @@ Run 'dotnet audit fix' to fix them.
 
 warning: Deprecated packages found!
 [net5.0]:
-Top-level Package						            Requested	Resolved	Reason(s)	Alternative
-> anurse.testing.TestDeprecatedPackage	1.0.0		  1.0.0		  Legacy		Microsoft.AspNetCore.Mvc > 0.0.0
+Top-level Package						Requested	Resolved	Reason(s)	Alternative
+> anurse.testing.TestDeprecatedPackage	1.0.0		1.0.0		Legacy		Microsoft.AspNetCore.Mvc > 0.0.0
 
 Found 1 top-level Legacy deprecated package(s) in 36 scanned packages.
 
@@ -67,8 +67,8 @@ Run 'dotnet audit fix' to fix them.
 warning: Outdated packages found!
 [net5.0]:
 Top-level Package						            Resolved	Latest
-> anurse.testing.TestDeprecatedPackage	1.0.0		  2.0.0		
-> UmbracoForms							            8.4.1		  8.7.1
+> anurse.testing.TestDeprecatedPackage	            1.0.0		2.0.0
+> UmbracoForms							            8.4.1	    8.7.1
 
 Found 2 top-level outdated package(s) in 36 scanned packages.
 
