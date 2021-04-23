@@ -272,6 +272,7 @@ Additionally, there already exists many third-party solutions that try to solve 
 - Should the command be named `audit` or `check`?
   - `audit` is the more consistent name for package manager tooling with other ecosystems.
   - `check` is the more consistent name with dotnet CLI.
+- Should this command only audit `vulnerabilities`? Or should it audit & be proactive as to `vulnerabilities`, `deprecations`, and `outdated` packages?
 - How much information should be present in the --json output?
 
 ## Future Possibilities
