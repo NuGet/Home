@@ -11,17 +11,17 @@ This command will allow someone to inspect all the licenses that are specified f
 
 ## Motivation
 
-The motivation is to give people more insights into the licenses that are used in a project, ensuring they can stay compliant with the licenses.
+The motivation is to give people more insights into the licenses that are used in a project, ensuring they can stay on top of compliancy requirements.
 
 ## Explanation
-
-### Functional explanation
 
 On the new project you're building, there are dependencies on NuGet packages from a remote feed, and those packages in turn have their own dependencies. This has resulted in an opaque view of what licenses are being consumed by the project.
 
 Your companies legal department has outlined a list of open source licenses that it is comfortable consuming and others that it wants to avoid using.
 
 To avoid accidentally consuming an unsupported license we need a way to view the list and ideally fail builds when we use one of these licenses.
+
+### Functional explanation
 
 #### Local scenario
 
@@ -60,14 +60,14 @@ Satisfied with the licenses, you continue on with the task at hand.
 
 #### Blocking builds
 
-It's time to update our build pipeline to avoid releasing anything changes that introduce unsupported licenses. A new step is added to the pipeline YAML:
+It's time to update your build pipeline to avoid releasing anything changes that introduce unsupported licenses. A new step is added to the pipeline YAML:
 
 ```yml
 - name: Validate Licenses
   runs: |
     LICENSES=$(dotnet nuget license --json | jq '<query for allowed licenses>')
     if ($LICENSES) then
-        exit 0
+        exit 1
     fi
 ```
 
@@ -75,9 +75,9 @@ This (pseduocode version) will dump the licenses to a JSON structure that can be
 
 ### Technical explanation
 
-The first technical challenge for this is the inconsistent nature of which licenses are provided by NuGet packages. While the [`licenseUrl` field was deprecated](https://github.com/NuGet/Announcements/issues/32) a large number of packages still haven't adopted the new format, making it difficult to determine what the license of a project is.
+The first technical challenge for this is the inconsistent nature of which licenses are provided by NuGet packages. While the [`licenseUrl` field was deprecated](https://github.com/NuGet/Announcements/issues/32), some projects haven't adopted the new format (or older packages that predate the deprecation are in use), making it difficult to determine what the license of a project is.
 
-The next challenge is how to detect licenses from license files. The ideal approach would be to mirror GitHub's approach, which uses [Licensee](https://licensee.github.io/licensee/) [for detection](https://help.github.com/en/articles/licensing-a-repository#detecting-a-license) (but naturally a dotnet implementation). Essentially this uses [Sørensen–Dice coefficient](https://en.wikipedia.org/wiki/S%C3%B8rensen%E2%80%93Dice_coefficient) with a threshold for what is the acceptable level of comparison between the provided license and license template.
+The next challenge is how to detect licenses from license files. The ideal approach would be to mirror GitHub's approach, which uses [Licensee](https://licensee.github.io/licensee/) [for detection](https://help.github.com/en/articles/licensing-a-repository#detecting-a-license) (but naturally a dotnet implementation). Essentially, this uses [Sørensen–Dice coefficient](https://en.wikipedia.org/wiki/S%C3%B8rensen%E2%80%93Dice_coefficient) with a threshold for what is the acceptable level of comparison between the package's license file and license template.
 
 The technical workflow for license detection would follow:
 
@@ -111,7 +111,7 @@ It may also be worth having the facility to cache the SPDX license information f
 
 ## Drawbacks
 
-Not having functionality to do this will result in users having to rely on third-party tooling, manually resolving the information themselves or being unaware they may break license restrictions.
+Not having functionality to do this will result in users having to rely on third-party tooling, manually resolving the information or being unaware they may break license restrictions.
 
 ## Rationale and alternatives
 
@@ -119,7 +119,7 @@ The rationale is to give people as much information as possible about the OSS th
 
 ## Prior Art
 
-I have created a dotnet global tool that does this, [`dotnet-delice`](https://github.com/aaronpowell/dotnet-delice). This does prove that it is a technical possibility to implement such a solution.
+I have created a dotnet global tool that does this, [`dotnet-delice`](https://github.com/aaronpowell/dotnet-delice). This proves that it is a technical possibility to implement such a solution.
 
 There is a [similar proposal for npm](https://github.com/npm/rfcs/pull/182), created by the author who inspired `dotnet-delice`.
 
