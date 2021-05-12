@@ -92,4 +92,4 @@ the Solution Explorer and Properties pane, which if we want to change, this feat
 
 <!-- What future possibilities can you think of that this proposal would help with? -->
 Creating a full end-to-end story for deprecation within VS that makes the transition smooth for both customers who are installing a package and those who are trying to upgrade
-to the latest package. 
+to the latest package.  
