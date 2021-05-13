@@ -7,17 +7,17 @@ GitHub PR ()
 
 ## Summary
 
-When a developer clicks to see individual package detail on NuGet.org, they will see all the information they need, organized clearly and coherently by three sections – header, sidebar, and body. The body will consist of tabs and allow users to quickly switch between sections
+When a developer clicks to see individual package detail on NuGet.org, they will see all the information they need, organized clearly and coherently by three sections – header, sidebar, and body. The body will consist of tabs and allow users to quickly switch between sections.
 
-![](../../meta/resources/nugetpackagedetails/overallnew.png)
+![](../../meta/resources/NugetPackageDetails/overallnew.png)
 
 ### Version 1: Tabs over Sidebar
 
-![](../../meta/resources/nugetpackagedetails/overallreal.png)
+![](../../meta/resources/NugetPackageDetails/overallreal.png)
 
 ### Version 2: Tabs next to Sidebar
 
-![](../../meta/resources/nugetpackagedetails/overallv2.png)
+![](../../meta/resources/NugetPackageDetails/overallv2.png)
 ## Motivation
 
 We are running out of space on the page. We have lots of features we want to add like READMEs and changelogs. Currently, those additions would push content down the screen so much that users can’t read it. 
@@ -55,7 +55,7 @@ We are also building this for the .NET developer who is creating & publishing Nu
 
 ### Header
 
-![](../../meta/resources/nugetpackagedetails/headernew.png)
+![](../../meta/resources/NugetPackageDetails/headernew.png)
 
 Information that needs to be seen at a glance such as package ID, description, and eventually, TFM badges.
 
@@ -83,7 +83,7 @@ Information that needs to be seen at a glance such as package ID, description, a
 
 Additional helpful information such as package installation instructions, statistics, external links. 
 
-![](../../meta/resources/nugetpackagedetails/sidebarnewest.png)
+![](../../meta/resources/NugetPackageDetails/sidebarnewest.png)
 
 **Requirements:**
 - Download statistics 
@@ -117,7 +117,7 @@ Tabs with titles that clearly convey what information is in them.
 
 **Requirements:**       
 - README Tab
-![](../../meta/resources/nugetpackagedetails/readmenew.png)
+![](../../meta/resources/NugetPackageDetails/readmenew.png)
     - Because this is a new feature, packages without a README will display the package description until a README is uploaded
 - Installation Tab
     - Designed for new .NET developers
