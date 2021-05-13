@@ -83,7 +83,7 @@ Information that needs to be seen at a glance such as package ID, description, a
 
 Additional helpful information such as package installation instructions, statistics, external links. 
 
-![](../../meta/resources/NuGetPackageDetails/sidebarnewest.png)
+![](meta/resources/NuGetPackageDetails/sidebar_final.png)
 
 **Requirements:**
 - Download statistics 
