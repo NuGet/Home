@@ -121,7 +121,12 @@ By default, namespaces will allow a package to match multiple namespaces and dow
 </config>
 ```
 
-The strict flag provides a source pinning behavior by nature in which one namespace is allowed per package source. Entering a strict mode will provide users an error experience when there are namespace conflicts to which a user will be able to resolve by defining one namespace per package source configuration.
+The strict flag provides a source pinning behavior by nature in which one package source is allowed per unique namespace. Entering a strict mode will provide users an error experience when there are namespace conflicts to which a user will be able to resolve by defining one namespace per package source configuration.
+
+Additionally there may be different modes for namespaces such as:
+
+- `fullySpecified` - Any package id must be in one or more matching namespace declarations
+- `singleSource` - No package id may match more than one feed (based on precedence rules)
 
 An error for this experience might look like:
 
@@ -536,6 +541,12 @@ We then considered package grouping concepts which was proposed in [Central Vers
 
 Lastly, we considered package lock files which would ensure repeatability based on the contents of a package. For the sake of control to the user, this approach did not cover the many needs of limiting or filtering as there are currently no great ways to specify a package source nor package namespace within lock file tooling. We may reconsider this at a future date.
 
+## Mockups
+
+![](../../meta/resources/PackageNamespaces/VSOptions.png)
+![](../../meta/resources/PackageNamespaces/VSOptions1.png)
+![](../../meta/resources/PackageNamespaces/VS.png)
+
 ## Prior Art
 
 <!-- What prior art, both good and bad are related to this proposal? -->
@@ -557,7 +568,9 @@ There's a number of features that exist in various ecosystems & layers that solv
 <!-- What parts of the proposal need to be resolved before the proposal is stabilized? -->
 <!-- What related issues would you consider out of scope for this proposal but can be addressed in the future? -->
 
-- Should strict namespaces mode be the default? That would deliver a `secure by default` namespacing experience.
+- Q: Should strict namespaces mode be the default? That would deliver a `secure by default` namespacing experience.
+
+- A: Yes. The feature's intention is to limit one package source to a single namespace prefix, which should be enabled by default.
 
 ## Future Possibilities
 
