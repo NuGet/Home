@@ -167,4 +167,4 @@ This API is designed with those opportunities in mind.
 ## References
 
 - [Design time builds](https://github.com/dotnet/project-system/blob/main/docs/design-time-builds.md)
-- [Restore to intellisense](https://github.com/nkolev92/restore-to-intellisense/), [presentation (Microsoft only)](https://msit.microsoftstream.com/embed/channel/8855a1ff-0400-a936-24ca-f1eaa053d9d5?app=microsoftteams&sort=undefined&l=en-us#)
+- [Restore to intellisense](https://github.com/nkolev92/restore-to-intellisense/), [presentation (Microsoft only)](https://msit.microsoftstream.com/video/e449a1ff-0400-9887-1aca-f1eb55f40c4b?channelId=8855a1ff-0400-a936-24ca-f1eaa053d9d5)
