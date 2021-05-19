@@ -163,3 +163,8 @@ N/A
 
 There are *many* implementation details around this feature, which can include things such as reporting that restore has been delayed etc.
 This API is designed with those opportunities in mind.
+
+## References
+
+- [Design time builds](https://github.com/dotnet/project-system/blob/main/docs/design-time-builds.md)
+- [Restore to intellisense](https://github.com/nkolev92/restore-to-intellisense/), [presentation (Microsoft only)](https://msit.microsoftstream.com/embed/channel/8855a1ff-0400-a936-24ca-f1eaa053d9d5?app=microsoftteams&sort=undefined&l=en-us#)
