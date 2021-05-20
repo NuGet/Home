@@ -90,6 +90,7 @@ Additional helpful information such as package installation instructions, statis
   - Total downloads
   - Downloads of current version
   - Average downloads per day
+- Release date
 - External links
   - Personal site
   - Source repository
