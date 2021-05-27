@@ -3,7 +3,7 @@
 - Author Name [Volodymyr Shkolka @(BlackGad)](https://github.com/BlackGad) 
 - Start Date (2021-05-27)
 - GitHub Issue (https://github.com/NuGet/Home/issues/10793)
-- GitHub PR (GitHub PR link)
+- GitHub PR (https://github.com/NuGet/Home/pull/10899)
 
 ## Summary
 
