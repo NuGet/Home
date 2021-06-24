@@ -145,6 +145,20 @@ This will allow NuGet to remove the sliding window as NuGet can report progress 
 - In any non solution load scenario, NuGet can loop through all IVsProjectRestoreInfoSource objects, calling `HasPendingNomination`. When the first project reports `true` NuGet will call `WhenNominated`. There is no need for NuGet to call `WhenNominated` on all pending projects.
 It is likely that by the time the project in question has nominated, other projects would be done as well. If NuGet called `WhenNominated` at least once, then we'd need to check whether any projects have updated since then. In most relevant scenarios, this should never trigger another round of waiting for NuGet. If it does, it can be reported as a consideration.
 
+#### Measuring success
+
+- Unlike the solution load scenario, the branch switching scenario does not have a natural technical end, so measuring it through telemetry is a work in progress.
+- The operation progress API can track solution load, but the results are very flaky when trying to track the branch switch and related scenarios.
+- For now the focus is on individual components measuring their own work.
+- Some of the complexities of the branch switch scenario is that it may trigger a solution reload, project reload, or just a design time build.
+
+NuGet will measure:
+
+- The performance of the new `Is there any pending work` check.
+- The amount of time NuGet spent delaying restore.
+
+The number of restores after a branch switch and the distance between the start time of restore  - time of last restore end is of interest as well, albeit it's fairly difficult to monitor.
+
 ## Drawbacks
 
 <!-- Why should we not do this? -->
