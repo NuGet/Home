@@ -39,7 +39,7 @@
 <!-- What prior art, both good and bad are related to this proposal? -->
 <!-- Do other features exist in other ecosystems and what experience have their community had? -->
 <!-- What lessons from other communities can we learn from? -->
-<!-- Are there any resources that are relevent to this proposal? -->
+<!-- Are there any resources that are relevant to this proposal? -->
 
 ## Unresolved Questions
 
