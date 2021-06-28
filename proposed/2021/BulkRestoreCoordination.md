@@ -38,7 +38,8 @@ The primary goal is improving the branch switching scenario through Visual Studi
 There are no functional changes to any experiences.
 The user actions are all the same, the changes have a performance focus.
 
-The user *may* should be able to observed differences in any of the above mentioned scenarios, bulk edit, branch switch. 
+The user *may* be able to observe differences in any of the above mentioned scenarios, bulk edit, branch switch. 
+
 The time it takes for the user to be able to do work should be shorter than before.
 
 ### Technical explanation
