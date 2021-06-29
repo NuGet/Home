@@ -141,9 +141,9 @@ This will allow NuGet to remove the sliding window as NuGet can report progress 
 #### Implementation details
 
 - Given that there are risks with this proposal, the NuGet implementation will have a means of disabling this feature.
-- NuGet will only account for projects that have registered an IVsProjectRestoreInfoSource. A PackageReference based project does not have to register an IVsProjectRestoreInfoSource.
+- NuGet will only account for projects that have registered an IVsProjectRestoreInfoSource. A PackageReference based project does not have to register an IVsProjectRestoreInfoSource; however, not registering means that these projects will not participate in the bulk coordination and add a performance hit.
 - At solution load time, NuGet should be able to remove the sliding window, and rely on reporting information to the customer about potentially delayed restores. The frequency and the means of reporting can be determined at a later point.
-- In any non solution load scenario, NuGet can loop through all IVsProjectRestoreInfoSource objects, calling `HasPendingNomination`. When the first project reports `true` NuGet will call `WhenNominated`. There is no need for NuGet to call `WhenNominated` on all pending projects.
+- In any non solution load scenario, NuGet can loop through all IVsProjectRestoreInfoSource objects, calling `HasPendingNomination`. When the first project reports `true` NuGet will call `WhenNominated` on that project. There is no need for NuGet to call `WhenNominated` on all pending projects.
 It is likely that by the time the project in question has nominated, other projects would be done as well. If NuGet called `WhenNominated` at least once, then we'd need to check whether any projects have updated since then. In most relevant scenarios, this should never trigger another round of waiting for NuGet. If it does, it can be reported as a consideration.
 
 #### Measuring success
