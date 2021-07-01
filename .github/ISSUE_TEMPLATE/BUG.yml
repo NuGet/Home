@@ -1,7 +1,7 @@
 name: Bug Report
 description: File a bug report
 title: "[Bug]: "
-labels: [Type:Bug, Triage:Untriaged]
+labels: ["Type:Bug", "Triage:Untriaged"]
 body:
   - type: markdown
     attributes:
@@ -81,7 +81,7 @@ body:
     attributes:
       label: Verbose Logs
       description: If possible, please include verbose logs of the issue.
-      placeholder: NuGet.exe <COMMAND> -verbosity detailed | dotnet.exe <COMMAND> --verbosity diag | etc...
+      placeholder: "NuGet.exe <COMMAND> -verbosity detailed | dotnet.exe <COMMAND> --verbosity diag | etc.."
       render: shell
     validation:
       required: false
