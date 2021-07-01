@@ -1,0 +1,87 @@
+name: Bug Report
+description: File a bug report
+title: "[Bug]: "
+labels: [Type:Bug, Triage:Untriaged]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report!
+
+        If you're having trouble with the NuGet client tools (the Visual Studio extension, NuGet.exe command line tool, etc.), you are in the right place.
+
+        If you're having trouble with the NuGet.org Website, please post in [NuGetGallery issues](http://github.com/nuget/nugetgallery/issues)
+  - type: markdown
+    attributes:
+      value: "# Details About the Problem"
+  - type: dropdown
+    id: product
+    attributes:
+      label: NuGet Product Used
+      multiple: true
+      description: Which of our NuGet clients does this apply to?
+      options:
+        - NuGet.exe
+        - Visual Studio Package Management UI
+        - MSBuild.exe
+        - dotnet.exe
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Product Version
+      description: Which software version does this apply to?
+      placeholder: dotnet --info, msbuild -version, nuget.exe ?, etc
+    validation:
+      required: true
+  - type: checkbox
+    id: regression
+    attributes:
+      label: Worked Before?
+      description: Is this a regression? Did it work in a previous version?
+    validation:
+      required: false
+  - type: input
+    id: lastworking
+    attributes:
+      label: Which Version?
+      description: If so, what was the last working version?
+    validation:
+      required: false
+  - type: textarea
+    id: repro
+    attributes:
+      label: Repro Steps
+      description: What steps can the NuGet team take to reproduce this issue?
+      placeholder: |
+        Please add as much detail as possible to help us to reproduce your problem.
+
+        1. step one
+        2. step two
+        3. ...
+    validation:
+      required: true
+  - type: textarea
+    id: expectation
+    attributes:
+      label: Expected
+      description: What did you expect to see happen?
+    validation:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual
+      description: What happened instead?
+    validation:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Verbose Logs
+      description: If possible, please include verbose logs of the issue.
+      placeholder: NuGet.exe <COMMAND> -verbosity detailed | dotnet.exe <COMMAND> --verbosity diag | etc...
+      render: shell
+    validation:
+      required: false
