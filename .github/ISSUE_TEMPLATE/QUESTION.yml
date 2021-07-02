@@ -1,0 +1,50 @@
+name: Question
+description: "Just asking a question (we don't necessarily always answer these)."
+title: "[Question]: "
+labels: ["Resolution:Question", "Triage:Untriaged"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report!
+
+        If you're having trouble with the NuGet client tools (the Visual Studio extension, NuGet.exe command line tool, etc.), you are in the right place.
+
+        If you're having trouble with the NuGet.org Website, please post in [NuGetGallery issues](http://github.com/nuget/nugetgallery/issues)
+  - type: dropdown
+    id: product
+    attributes:
+      label: NuGet Product Used
+      multiple: true
+      description: Which of our NuGet clients does this apply to?
+      options:
+        - NuGet.exe
+        - Visual Studio Package Management UI
+        - Visual Studio Package Manager Console
+        - MSBuild.exe
+        - dotnet.exe
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Product Version
+      description: Which software version does this apply to?
+      placeholder: dotnet --info, msbuild -version, nuget.exe ?, etc
+    validations:
+      required: true
+  - type: input
+    id: question
+    attributes:
+      label: "What's the question?"
+      description: Give us a brief one-liner of what this is about
+    validations:
+      required: true
+  - type: textarea
+    id: details
+    attributes:
+      label: Details
+      description: Feel free to expand on the question here.
+      placeholder: Why does this matter to you? Did you find any docs about this? etc.
+    validations:
+      required: true
