@@ -3,14 +3,6 @@ description: "Just asking a question (we don't necessarily always answer these).
 title: "[Question]: "
 labels: ["Resolution:Question", "Triage:Untriaged"]
 body:
-  - type: markdown
-    attributes:
-      value: |
-        Thanks for taking the time to fill out this bug report!
-
-        If you're having trouble with the NuGet client tools (the Visual Studio extension, NuGet.exe command line tool, etc.), you are in the right place.
-
-        If you're having trouble with the NuGet.org Website, please post in [NuGetGallery issues](http://github.com/nuget/nugetgallery/issues)
   - type: dropdown
     id: product
     attributes:
