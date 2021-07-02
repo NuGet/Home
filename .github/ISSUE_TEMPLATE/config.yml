@@ -3,3 +3,6 @@ contact_links:
   - name: NuGet.org Issue Tracker
     url: https://github.com/NuGet/NuGetGallery/issues/new/choose
     about: Please file issues about NuGet.org itself here.
+  - name: Report Security Issue
+    url: https://msrc.microsoft.com/
+    about: Is your issue related to security? Please submit it securely through MSRC.
