@@ -23,6 +23,7 @@ body:
       options:
         - NuGet.exe
         - Visual Studio Package Management UI
+        - Visual Studio Package Manager Console
         - MSBuild.exe
         - dotnet.exe
     validations:
