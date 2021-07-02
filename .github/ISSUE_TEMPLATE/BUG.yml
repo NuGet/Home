@@ -40,6 +40,8 @@ body:
     attributes:
       label: Worked Before?
       description: Is this a regression? Did it work in a previous version?
+      options:
+        - label: This used to work.
     validations:
       required: false
   - type: input
