@@ -11,6 +11,20 @@ body:
         If this is about the NuGet client tools (the Visual Studio extension, NuGet.exe command line tool, etc.), you are in the right place.
 
         If it's about the NuGet.org Website, please post in [NuGetGallery issues](http://github.com/nuget/nugetgallery/issues)
+  - type: dropdown
+    id: product
+    attributes:
+      label: NuGet Product(s) Affected
+      multiple: true
+      description: Which of our NuGet clients does this apply to?
+      options:
+        - NuGet.exe
+        - Visual Studio Package Management UI
+        - Visual Studio Package Manager Console
+        - MSBuild.exe
+        - dotnet.exe
+    validations:
+      required: true
   - type: textarea
     id: current
     attributes:
