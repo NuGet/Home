@@ -3,14 +3,6 @@ description: When you want NuGet to work differently than it does.
 title: "[DCR]: "
 labels: ["Type:DCR", "Triage:Untriaged"]
 body:
-  - type: markdown
-    attributes:
-      value: |
-        Thanks for taking the time to fill out this behavior change request!
-
-        If this is about the NuGet client tools (the Visual Studio extension, NuGet.exe command line tool, etc.), you are in the right place.
-
-        If it's about the NuGet.org Website, please post in [NuGetGallery issues](http://github.com/nuget/nugetgallery/issues)
   - type: dropdown
     id: product
     attributes:
