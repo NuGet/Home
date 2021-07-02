@@ -3,6 +3,12 @@ description: "Just asking a question (we don't necessarily always answer these).
 title: "[Question]: "
 labels: ["Resolution:Question", "Triage:Untriaged"]
 body:
+  - type: markdown
+    attributes:
+      value: |
+       Thank you for taking the time to file this issue. In order to best understand what you're asking about and what your needs are, we just need a few details from you.
+       
+       Please note that the NuGet issue tracker is not a support forum, and it's possible your question might not be answered at all and automatically closed after some time. Please consider asking your question on Stack Overflow or the VS Developer Community.
   - type: dropdown
     id: product
     attributes:
