@@ -1,0 +1,34 @@
+name: Behavior Change
+description: When you want NuGet to work differently than it does.
+title: "[DCR]: "
+labels: ["Type:DCR", "Triage:Untriaged"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this behavior change request!
+
+        If this is about the NuGet client tools (the Visual Studio extension, NuGet.exe command line tool, etc.), you are in the right place.
+
+        If it's about the NuGet.org Website, please post in [NuGetGallery issues](http://github.com/nuget/nugetgallery/issues)
+  - type: textarea
+    id: current
+    attributes:
+      label: Current Behavior
+      description: Please describe, in your own words, how you think things currently work now.
+    validations:
+      required: true
+  - type: textarea
+    id: desired
+    attributes:
+      label: Desired Behavior
+      description: What do you think should happen instead?
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional Context
+      description: Any other context you want to share about this. Why is it important to you? What do other tools do? etc.
+    validations:
+      required: false
