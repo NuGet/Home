@@ -4,10 +4,11 @@ title: "[Bug]: "
 labels: ["Type:Bug", "Triage:Untriaged"]
 body:
   - type: markdown
-    value: |
-      Thank you for taking the time to file this issue. In order to resolve it, we just need a few details from you.
-      
-      The more detail you provide, the more likely it will be for us to be able to identify what is going on and how to solve it!
+    attributes:
+      value: |
+       Thank you for taking the time to file this issue. In order to resolve it, we just need a few details from you.
+       
+       The more detail you provide, the more likely it will be for us to be able to identify what is going on and how to solve it!
   - type: dropdown
     id: product
     attributes:
