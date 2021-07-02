@@ -1,5 +1,5 @@
 blank_issues_enabled: true
 contact_links:
   - name: NuGet.org Issue Tracker
-    url: https://github.com/NuGet/NuGetGallery
+    url: https://github.com/NuGet/NuGetGallery/issues/new/choose
     about: Please file issues about NuGet.org itself here.
