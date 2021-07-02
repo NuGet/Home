@@ -5,14 +5,6 @@ labels: ["Type:Bug", "Triage:Untriaged"]
 body:
   - type: markdown
     attributes:
-      value: |
-        Thanks for taking the time to fill out this bug report!
-
-        If you're having trouble with the NuGet client tools (the Visual Studio extension, NuGet.exe command line tool, etc.), you are in the right place.
-
-        If you're having trouble with the NuGet.org Website, please post in [NuGetGallery issues](http://github.com/nuget/nugetgallery/issues)
-  - type: markdown
-    attributes:
       value: "# Details About the Problem"
   - type: dropdown
     id: product
