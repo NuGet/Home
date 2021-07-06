@@ -7,7 +7,7 @@ body:
     attributes:
       value: |
        Thank you for taking the time to file this issue. In order to resolve it, we just need a few details from you.
-       
+
        The more detail you provide, the more likely it will be for us to be able to identify what is going on and how to solve it!
   - type: dropdown
     id: product
@@ -16,11 +16,11 @@ body:
       multiple: true
       description: Which of our NuGet clients does this apply to?
       options:
+        - dotnet.exe
+        - MSBuild.exe
         - NuGet.exe
         - Visual Studio Package Management UI
         - Visual Studio Package Manager Console
-        - MSBuild.exe
-        - dotnet.exe
     validations:
       required: true
   - type: input
@@ -31,19 +31,10 @@ body:
       placeholder: dotnet --info, msbuild -version, nuget.exe ?, etc
     validations:
       required: true
-  - type: checkboxes
-    id: regression
-    attributes:
-      label: Worked Before?
-      description: Is this a regression? Did it work in a previous version?
-      options:
-        - label: This used to work.
-    validations:
-      required: false
   - type: input
     id: lastworking
     attributes:
-      label: Which Version?
+      label: Worked before?
       description: If so, what was the last working version?
     validations:
       required: false
