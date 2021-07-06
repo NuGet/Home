@@ -31,6 +31,17 @@ body:
       placeholder: dotnet --info, msbuild -version, nuget.exe ?, etc
     validations:
       required: true
+  - type: dropdown
+    id: impact
+    attributes:
+      label: Impact
+      multiple: false
+      description: How does this issue impact you?
+      options:
+        - I'm unable to use this version
+        - It's more difficult to complete my work
+        - It bothers me. A fix would be nice
+        - Other
   - type: input
     id: lastworking
     attributes:
@@ -41,28 +52,20 @@ body:
   - type: textarea
     id: repro
     attributes:
-      label: Repro Steps
-      description: What steps can the NuGet team take to reproduce this issue?
+      label: Repro Steps & Context
+      description: What steps can the NuGet team take to reproduce this issue? Any other context you want to share?
       placeholder: |
         Please add as much detail as possible to help us to reproduce your problem.
 
         1. step one
         2. step two
         3. ...
-    validations:
-      required: true
-  - type: textarea
-    id: expectation
-    attributes:
-      label: Expected
-      description: What did you expect to see happen?
-    validations:
-      required: true
-  - type: textarea
-    id: actual
-    attributes:
-      label: Actual
-      description: What happened instead?
+
+        What I expected:
+
+        What I got:
+
+        etc
     validations:
       required: true
   - type: textarea
