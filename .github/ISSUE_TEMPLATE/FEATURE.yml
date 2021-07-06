@@ -1,0 +1,41 @@
+name: Feature Request
+description: "When you want a new feature for something that doesn't already exist"
+title: "[Feature]: "
+labels: ["Type:Feature", "Triage:Untriaged"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+       Thank you for taking the time to file this issue. In order to best understand what you're asking and what your needs are, we just need a few details from you.
+       
+       Please note that designs are usually affected by our own product development processes, and we can't guarantee any particular timeline for when this change might be made.
+       
+       Additionally, keep in mind that Design Change Requests like this one might involve a breaking change, and if it's significant enough, or if it clashes with other product plans, we might have to turn it down. This is more a reflection of our processes and requirements rather than your particular request, so your understanding is appreciated.
+  - type: dropdown
+    id: product
+    attributes:
+      label: NuGet Product(s) Involved
+      multiple: true
+      description: Which of our NuGet clients does this apply to?
+      options:
+        - NuGet.exe
+        - Visual Studio Package Management UI
+        - Visual Studio Package Manager Console
+        - MSBuild.exe
+        - dotnet.exe
+    validations:
+      required: true
+  - type: textarea
+    id: desired
+    attributes:
+      label: The Elevator Pitch
+      description: Pitch us the feature! What can NuGet do better for you?
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional Context and Details
+      description: Any other context or details you want to share about this. Why is it important to you? What do other tools do? etc.
+    validations:
+      required: false
