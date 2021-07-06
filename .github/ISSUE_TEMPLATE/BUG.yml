@@ -31,6 +31,13 @@ body:
       placeholder: dotnet --info, msbuild -version, nuget.exe ?, etc
     validations:
       required: true
+  - type: input
+    id: lastworking
+    attributes:
+      label: Worked before?
+      description: If so, what was the last working version?
+    validations:
+      required: false
   - type: dropdown
     id: impact
     attributes:
@@ -42,13 +49,6 @@ body:
         - It's more difficult to complete my work
         - It bothers me. A fix would be nice
         - Other
-  - type: input
-    id: lastworking
-    attributes:
-      label: Worked before?
-      description: If so, what was the last working version?
-    validations:
-      required: false
   - type: textarea
     id: repro
     attributes:
