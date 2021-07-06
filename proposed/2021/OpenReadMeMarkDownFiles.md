@@ -15,9 +15,9 @@ When developers install packages from Visual Studio&#39;s package manger and if 
 
 ## Requirements
 
-* markdown files open automatically after the user has installed the NuGet package in Visual Studio, if available.
+* Markdown files open automatically after the user has installed the NuGet package in Visual Studio, if available.
 * When opened, `README.md` will be rendered as a markdown.
-* markdown file opens in the doc well of Visual Studio.
+* Markdown file opens in the doc well of Visual Studio.
 
 ## Goals
 
