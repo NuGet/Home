@@ -1,17 +1,21 @@
 # Title
 
-- Author Name (GitHub username link)
-- Start Date (YYYY-MM-DD)
-- GitHub Issue (GitHub Issue link)
-- GitHub PR (GitHub PR link)
+- Nikolche Kolev [nkolev92](https://github.com/nkolev92)
+- Start Date (2021-07-06)
+- GitHub Issue
+  - [NuGet restore in VS should report progress to allow the project-system to better control design time build scheduling.](https://github.com/NuGet/Home/issues/9782)
+  - [IVsPackageInstallerProjectEvents/IVsPackageInstallerEvents events not raised with PackageReference](https://github.com/NuGet/Home/issues/6872)
 
 ## Summary
 
 <!-- One-paragraph description of the proposal. -->
 
-## Motivation 
+## Motivation
 
 <!-- Why are we doing this? What pain points does this solve? What is the expected outcome? -->
+With SDK based projects, NuGet is tightly integrated with solution load & design time builds.
+3 files are of interest for design time builds, `project.assets.json`, `projectName.projectExt.nuget.g.[props/targets]`.
+When a restore happens
 
 ## Explanation
 
