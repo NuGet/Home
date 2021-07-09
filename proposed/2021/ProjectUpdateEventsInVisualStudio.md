@@ -9,13 +9,24 @@
 ## Summary
 
 <!-- One-paragraph description of the proposal. -->
+When any NuGet enabled project has been updated by NuGet, either a package install/uninstall/update or in PackageReference projects an assets file write, NuGet will fire an event to signify the start and end of the update.
+In `packages.config` projects, the denoted interval will be the changes for a single package into the project file.
+In `PackageReference` projects, the denoted interval will be the write `project.assets.json` and `projectName.projectExt.nuget.g.[props/targets]` files.
+In addition, NuGet will provide a solution restore start/end event which will include a list of PackageReference projects only.
 
 ## Motivation
 
 <!-- Why are we doing this? What pain points does this solve? What is the expected outcome? -->
 With SDK based projects, NuGet is tightly integrated with solution load & design time builds.
 3 files are of interest for design time builds, `project.assets.json`, `projectName.projectExt.nuget.g.[props/targets]`.
-When a restore happens
+When a restore happens, one or all of these files may be touched.
+Given that these files are edited in quick succession, normally you'd end up getting only 1 design time build, but in some scenarios, the writes may take longer due to ambient reasons and cause extra design time builds.
+
+`packages.config` and `PackageReference` projects differ fundamentally in the way they deal with package changes.
+In `packages.config` projects, NuGet writes to the *project* files, and NuGet references are equivalent to any other new references.
+In `PackageReference` projects, the contract is expressed through the assets file. An assets file change may mean that 10 packages have changes.
+Components such as test explorer, need to know when packages for a project have changed to scan for adapters.
+For `packages.config` projects, one can use [`IVsPackageInstallerEvents`](https://docs.microsoft.com/en-us/nuget/visual-studio-extensibility/nuget-api-in-visual-studio#ivspackageinstallerevents-interface). There's no PackageReference equivalent.
 
 ## Explanation
 
@@ -23,6 +34,17 @@ When a restore happens
 
 <!-- Explain the proposal as if it were already implemented and you're teaching it to another person. -->
 <!-- Introduce new concepts, functional designs with real life examples, and low-fidelity mockups or  pseudocode to show how this proposal would look. -->
+Given that this is an extensibility feature, there's no NuGet experiences impact.
+The functional impact matches what the consumers of this API use it for.
+
+- For SDK based projects, the project-system will pause eager reevaluation while the writes of the `project.assets.json` and `projectName.projectExt.nuget.g.[props/targets]` are ongoing.
+- The test explorer will be able to refer to listen to a single API for project updates.
+
+### Technical explanation
+
+<!-- Explain the proposal in sufficient detail with implementation details, interaction models, and clarification of corner cases. -->
+
+The API and the shape is fairly self explanatory.
 
 ```cs
 namespace NuGet.SolutionRestoreManager
@@ -86,19 +108,28 @@ namespace NuGet.SolutionRestoreManager
 }
 ```
 
-### Technical explanation
+A few other notes:
 
-<!-- Explain the proposal in sufficient detail with implementation details, interaction models, and clarification of corner cases. -->
+- `SolutionRestoreStarted` and `SolutionRestoreFinished` events will only be called when a solution restore happens, as a response to a solution/project load, or a user issued restore. Package installation through PM UI, PMC or any of the NuGet extensibility APIs *will never* call this event.
+- `ProjectUpdateStarted` and `ProjectUpdateFinished` may be called without corresponding `SolutionRestoreStarted` and `SolutionRestoreFinished` events, if a package installation has been triggered through PM UI, PMC or any of the NuGet extensibility APIs.
 
 ## Drawbacks
 
 <!-- Why should we not do this? -->
+
+- These events are meant to provide a means for better coordinating work for partner teams.
 
 ## Rationale and alternatives
 
 <!-- Why is this the best design compared to other designs? -->
 <!-- What other designs have been considered and why weren't they chosen? -->
 <!-- What is the impact of not doing this? -->
+- Why not provide events only for PackageReference based projects?
+  - This API is an opportunity to handle an extra ask with minimal effort. There is no significant technical work, as events for project installation and uninstallation already exist.
+- Why not provide custom events for package installation/uninstallation like in packages.config projects? Why not implement IVSPackageInstallerEvents in PackageReference.
+  - PackageReference based projects have many means of installing packages. With SDK based project, a project file edit could lead to a few package installation or uninstallations. Keeping track of the exact packages that were installed and uninstalled is not often relevant, as many of the extensions that listen to these updates call `GetInstalledPackages` whenever there is a change.
+- Adding the events in the [IVsSolutionRestoreStatusProvider](https://github.com/NuGet/NuGet.Client/blob/dev/src/NuGet.Clients/NuGet.VisualStudio/SolutionRestoreManager/IVsSolutionRestoreStatusProvider.cs)
+  - This API provides a means to detect if a restore is running, and provide restore updates in this API would be appropriate. It seemed cleaner to add a new API that worked for both `PackageReference` and `packages.config` projects instead.
 
 ## Prior Art
 
@@ -106,6 +137,9 @@ namespace NuGet.SolutionRestoreManager
 <!-- Do other features exist in other ecosystems and what experience have their community had? -->
 <!-- What lessons from other communities can we learn from? -->
 <!-- Are there any resources that are relevant to this proposal? -->
+
+- [`IVsPackageInstallerEvents`](https://docs.microsoft.com/en-us/nuget/visual-studio-extensibility/nuget-api-in-visual-studio#ivspackageinstallerevents-interface) - Provides events for the installation of packages in packages.config projects.
+- [`IVsSolutionRestoreProvider`](https://github.com/NuGet/NuGet.Client/blob/dev/src/NuGet.Clients/NuGet.VisualStudio/SolutionRestoreManager/IVsSolutionRestoreStatusProvider.cs) - Provides a means to detect if a restore is running.
 
 ## Unresolved Questions
 
