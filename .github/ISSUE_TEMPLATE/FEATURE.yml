@@ -9,8 +9,6 @@ body:
        Thank you for taking the time to file this issue. In order to best understand what you're asking and what your needs are, we just need a few details from you.
        
        Please note that designs are usually affected by our own product development processes, and we can't guarantee any particular timeline for when this change might be made.
-       
-       Additionally, keep in mind that Design Change Requests like this one might involve a breaking change, and if it's significant enough, or if it clashes with other product plans, we might have to turn it down. This is more a reflection of our processes and requirements rather than your particular request, so your understanding is appreciated.
   - type: dropdown
     id: product
     attributes:
