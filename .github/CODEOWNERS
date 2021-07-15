@@ -4,5 +4,4 @@
 # review when someone opens a pull request.
 # For more on how to customize the CODEOWNERS file - https://help.github.com/en/articles/about-code-owners
 
-/designs/       @NuGet/nuget-client
-/.github/       @NuGet/nuget-client
+*       @NuGet/nuget-client
