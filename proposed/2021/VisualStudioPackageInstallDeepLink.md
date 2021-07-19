@@ -42,7 +42,16 @@ We will use telemetry the measure % of VS package installs that come from a deep
 4.	Project level PMUI is open
 5.	Solution level PMUI is open
 
-## Visual Studio design
+## Design
+
+### Deep link design
+
+* Must specify package ID
+* Can specify version
+* No version specified defaults to latest version available
+* Structure: TBD
+
+* Example from VS Code extension deep link: [vscode:extension/dracula-theme.theme-dracula](vscode:extension/dracula-theme.theme-dracula)
 
 ### Scenario 1 - Visual Studio isn’t open
 
