@@ -7,7 +7,7 @@
 
 ## Summary
 
-Create links deep links for NuGet.org packages that, when clicked, bring up the package in the Visual Studio NuGet Package Manager UI (PMUI) for a 1 click install experience.
+Support deep links for NuGet.org packages that, when clicked, open the package in the Visual Studio NuGet Package Manager UI (PMUI) for a 1 click install experience.
 
 Applications:
 
@@ -18,11 +18,11 @@ Applications:
 
 ## Motivation 
 
-Today, customers must copy a CLI command to install a NuGet package to their project from NuGet.org, or search for the package in Visual Studio. We should enable customers to directly install the package from the Visual Studio package manager UI so they can continue to use their preferred package manager tool.
+Today, customers must copy a CLI command to install a NuGet package to their project from NuGet.org, or search for the package in Visual Studio. We should enable customers to directly install the package from the Visual Studio package manager UI so they can continue to use their preferred package management tool.
 
 From our NuGet.org survey, 70% of our respondents reported using the Visual Studio NuGet UI to install packages. Additionally, 87% of our respondents use Visual Studio for developing .NET apps. 
 
-Since users prefer installing packages via the VS package manager UI by a large margin, we should support that as a first-class experience.
+Since users prefer installing packages via the VS package manager UI by a large margin relative to CLI methods, we should support that as a first-class experience.
 
 ## Success metric
 
