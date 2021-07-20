@@ -61,7 +61,7 @@ The warning icon will appear for all levels of vulnerabilities – consistent wi
 - The package details window will display a more detailed vulnerability message that includes the severity and a link to the advisory details.
     - If a package is both deprecated and has a vulnerability, we will display both detailed messages with the vulnerability message on top and the deprecation message below it.
 
-![image](https://user-images.githubusercontent.com/15097183/126358425-ffa36885-c0ae-49c9-812d-4d0c66a4ebb8.png)
+![image](https://user-images.githubusercontent.com/15097183/126406263-2aa24019-fe0f-43e0-a21a-c7fa41779a72.png)
 
 ## Prior Art
 
