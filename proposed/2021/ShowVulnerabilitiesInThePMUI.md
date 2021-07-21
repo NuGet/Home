@@ -19,7 +19,12 @@ NuGet hosts over 200,000 packages that developers use today. Most packages depen
 
 ## Success: How do we know if we've solved this problem?
 
-We have succeeded when we see a significant decrease in the percentage of direct vulnerable package installs from the package manager UI.
+We will use the following to measure the success of this feature:
+
+* We see a significant decrease in direct installations for vulnerable packages versions after surfacing vulnerability indicators in the PMUI.
+* We see a significant increase in updates and/or uninstalls for directly installed vulnerable package versions after surfacing vulnerability indicators in the PMUI.
+    * After we enable customers to view transitively installed packages, we will also measure this update/uninstall rates for vulnerable transitive packages.
+* Qualitative feedback from customer interviews following the release of this feature show that customers find this feature very helpful for securing their NuGet packages.
 
 ## Audience: Who are we building for?
 
