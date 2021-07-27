@@ -42,6 +42,10 @@ We are building this for Visual Studio users who manage and install packages thr
 The following scenarios will not be in the MVP, but will be considered for next iterations:
 
 - Users can discover if they have installed packages with vulnerabilities through indicators in the solution explorer.
+- A bolded warning will be shown at the bottom on the package list item to make it more noticeable when a package is deprecated or vulnerable.
+- Deprecated and vulnerable packages will automatically be shown at the top of the installed package list in alphabetical order. The rest of the packages will be below in alphabetical order.
+- The version dropdown list will show “(Vulnerable)” beside the relevant versions.
+    - If a package is vulnerable and deprecated, it will show “(Vulnerable, Deprecated)"
 - Users can see which transitively installed packages have vulnerabilities.
 - Users have a 1-click or wizard experience to “fix” vulnerabilities.
 - Plumbing deprecation and vulnerability data into the search API for a performance improvement.
@@ -57,16 +61,12 @@ The following scenarios are considered separate from this feature but may consid
 
 - Like deprecation, a warning sign will appear on the Installed tab header when a top-level deprecated package is installed.
     - The warning sign on the Installed tab header will display the number of vulnerable and deprecated packages in the tooltip.
-The warning icon will appear for all levels of vulnerabilities – consistent with the behavior on NuGet.org.
-    - A bolded warning will be shown at the bottom on the package list item to make it more noticeable when a package is deprecated or vulnerable.
+    - The warning icon will appear for all levels of vulnerabilities – consistent with the behavior on NuGet.org.
 - We will use the same warning sign for vulnerabilities as we do for deprecation to avoid the “lucky charms” effect where symbols get ignored because there are too many.
-- Deprecated and vulnerable packages will automatically be shown at the top of the installed package list in alphabetical order. The rest of the packages will be below in alphabetical order.
-- The version dropdown list will show “(Vulnerable)” beside the relevant versions.
-    - If a package is vulnerable and deprecated, it will show “(Vulnerable, Deprecated)”
-- The package details window will display a more detailed vulnerability message that includes the severity and a link to the advisory details.
+- The package details window will display a more detailed vulnerability message that includes the total count of advisories and the severities and links to the advisories.
     - If a package is both deprecated and has a vulnerability, we will display both detailed messages with the vulnerability message on top and the deprecation message below it.
 
-![image](https://user-images.githubusercontent.com/15097183/126406263-2aa24019-fe0f-43e0-a21a-c7fa41779a72.png)
+![image](https://user-images.githubusercontent.com/15097183/127079047-84277da4-cbfe-44d3-b882-37b7a486f63a.png)
 
 ## Prior Art
 
