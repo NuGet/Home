@@ -11,7 +11,7 @@ Currently, customers have two main ways of installing NuGet packages: directly f
 
 ## Who are the customers
 
-- Developers who want a quick and easy way to install packages directly from the PMUI with a click of a button.
+- Developers who want a quick and easy way to install packages directly from the PMUI with a click of a URL.
 
 ## Requirements
 
@@ -44,6 +44,10 @@ Since this feature requires a minimum version of Visual Studio to function, the 
 #### Parsing URI
 
 Depending on how the URI link is set up, that link will be split up into its key components that provide me with the information needed to describe a package. Each component will be sub stringed analyzed, and an object will be created with fields associated with said components such as package name and version number. This way, the information in the URI can live somewhere without having to expose the URI in places that it doesn&#39;t need to be.
+
+##### URI Format
+
+To provide context for the point above, the url will be formatted as follows: **vsph://OpenPackageDetails/<packageName>/<version>**, where *packageName* is the name of the NuGet package and *version* is the version number of the target NuGet package. 
 
 ### Opening the PMUI
 
