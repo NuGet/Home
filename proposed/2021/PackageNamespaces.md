@@ -436,7 +436,7 @@ There's a number of features that exist in various ecosystems & layers that solv
 ## Future Possibilities
 
 <!-- What future possibilities can you think of that this proposal would help with? -->
-- Different modes or strategies can be considered in future iterations of thefeature.
+- Different modes or strategies can be considered in future iterations of the feature.
 - The current proposal focuses on the nuget.config experience only. Adding a capability to source pin through RestoreSources is a future task.
 - NuGet can allow users to filter their package namespaces per source within CLI & IDE experiences.
 - NuGet can allow a user to add a full or glob package ID namespace at install time with an additional click/parameter in Visual Studio or CLI.
