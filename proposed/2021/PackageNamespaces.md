@@ -152,30 +152,6 @@ The sources are:
 
 NuGet.A 1.0.0 -> Microsoft.B 1.0.0
 
-Microsoft.C 1.0.0
-
-```xml
-<PackageReference Include="NuGet.A" Version="1.0.0"/>
-<PackageReference Include="Microsoft.C" Version="1.0.0"/>
-```
-
-```xml
-    <packagesource key="nuget.org">
-        <namespace id="NuGet.*" />
-    </packageSource>
-    <!-- no contoso namespaces -->
-```
-
-**Result:**
-
-- Package `NuGet.A` will be installed from nuget.org.
-- Package `Microsoft.B` will be installed from contoso as a fallback.
-- Package `Microsoft.C` will be installed from contoso as a fallback.
-
-**Scenario 1B:**
-
-NuGet.A 1.0.0 -> Microsoft.B 1.0.0
-
 Microsoft.C 1.0.0 -> Microsoft.B 1.0.0
 
 ```xml
@@ -198,7 +174,7 @@ Microsoft.C 1.0.0 -> Microsoft.B 1.0.0
 - Package `Microsoft.C` gets installed from `contoso`.
 - Package `Microsoft.B` gets installed from `contoso`.
 
-**Scenario 1C:**
+**Scenario 1B:**
 
 NuGet.A 1.0.0 -> Microsoft.B 1.0.0
 
@@ -230,7 +206,7 @@ NuGet.Internal.D 1.0.0
 - Package `Microsoft.B` gets installed from `nuget.org`. Even though the contoso namespace matches, the nuget.org one is an exact package id match.
 - Package `NuGet.Internal.D` gets installed from `contoso`, because the prefix match is more specific.
 
-**Scenario 1D:**
+**Scenario 1C:**
 
 A 1.0.0 -> Microsoft.B 1.0.0
 
@@ -253,6 +229,30 @@ Microsoft.C 1.0.0 -> Microsoft.B 2.0.0
 **Result:**
 
 - Package `A` fails installation as none of the namespaces match.
+
+**Scenario 1D:**
+
+NuGet.A 1.0.0 -> Microsoft.B 1.0.0
+
+Microsoft.C 1.0.0
+
+```xml
+<PackageReference Include="NuGet.A" Version="1.0.0"/>
+<PackageReference Include="Microsoft.C" Version="1.0.0"/>
+```
+
+```xml
+    <packagesource key="nuget.org">
+        <namespace id="NuGet.*" />
+    </packageSource>
+    <!-- no contoso namespaces -->
+```
+
+**Result:**
+
+- Package `NuGet.A` will be installed from nuget.org.
+- Package `Microsoft.B` will fail installing as there's no matching namespace.
+- Package `Microsoft.C` will fail installing as there's no matching namespace.
 
 **Scenario 1E:**
 
@@ -331,120 +331,6 @@ NuGetA 1.0.0 -> Microsoft.B 1.0.0
 
 **Scenario 2:**
 
-The following examples cover scenarios in *strict* mode.
-
-The sources are:
-
-- nuget.org : `https://api.nuget.org/v3/index.json`
-- contoso : `https://contoso.org/v3/index.json`
-
-**Scenario 2A:**
-
-Equivalent to scenario 1A in strict mode.
-
-NuGet.A 1.0.0 -> Microsoft.B 1.0.0
-
-```xml
-<PackageReference Include="NuGet.A" Version="1.0.0"/>
-```
-
-```xml
-    <packagesource key="nuget.org">
-        <namespace id="NuGet.*" />
-    </packageSource>
-    <!-- no contoso namespaces -->
-```
-
-**Scenario 2B:**
-
-Equivalent to scenario 1E in strict mode.
-
-NuGet.A 1.0.0 -> Microsoft.B 1.0.0
-
-Microsoft.C 1.0.0 -> Microsoft.B 2.0.0
-
-```xml
-<PackageReference Include="NuGet.A" Version="1.0.0" />
-<PackageReference Include="Microsoft.C" Version="1.0.0" />
-```
-
-```xml
-    <packagesource key="nuget.org">
-        <namespace id="NuGet.*" />
-        <namespace id="Microsoft.*" />
-    </packageSource>
-    <packagesource key="contoso">
-        <namespace id="Microsoft.*" />
-    </packageSource>
-```
-
-**Result:**
-
-- The operation will fail due to conflicting namespaces for `Microsoft.*`.
-
-**Scenario 2C:**
-
-NuGet.A 1.0.0 -> Microsoft.B 1.0.0
-
-Microsoft.C 1.0.0 -> Microsoft.B 2.0.0
-
-NuGet.Internal.D 1.0.0
-
-```xml
-<PackageReference Include="NuGet.A" Version="1.0.0" />
-<PackageReference Include="Microsoft.C" Version="1.0.0" />
-<PackageReference Include="NuGet.Internal.D" Version="1.0.0" />
-```
-
-```xml
-    <packagesource key="nuget.org">
-        <namespace id="NuGet.*" />
-    </packageSource>
-    <packagesource key="contoso">
-        <namespace id="Microsoft.*" />
-        <namespace id="NuGet.Internal.*" />
-    </packageSource>
-```
-
-**Result:**
-
-- Package `NuGet.A` gets installed from `nuget.org`.
-- Package `Microsoft.C` gets installed from `contoso`.
-- Package `Microsoft.B` gets installed from `contoso`.
-- Package `NuGet.Internal.D` gets installed from `contoso`, because the prefix match is more exact. Even though this package matches both contoso and nuget.org prefixes, there's no ambiguity, so this is a valid strict mode configuration.
-
-**Scenario 2D:**
-
-NuGet.A 1.0.0 -> Microsoft.B 1.0.0
-
-This scenario has an additional source.
-
-```xml
-    <add key="Local" value="E:\packages" />
-```
-
-```xml
-<PackageReference Include="NuGet.A" Version="1.0.0"/>
-```
-
-```xml
-    <packagesource key="nuget.org">
-        <namespace id="NuGet.*" />
-    </packageSource>
-    <!-- no contoso namespaces -->
-    <!-- no local source namespaces -->
-```
-
-**Result:**
-
-- Package `NuGet.A` will be installed from nuget.org.
-- Package `Microsoft.B` will fail installation.
-There are two sources without a namespace, thus creating an ambiguity not allowed in strict mode.
-
----
-
-**Scenario 3:**
-
 The following are multi project scenarios.
 
 The sources are:
@@ -452,7 +338,7 @@ The sources are:
 - nuget.org : `https://api.nuget.org/v3/index.json`
 - contoso : `https://contoso.org/v3/index.json`
 
-**Scenario 3A:**
+**Scenario 2A:**
 
 Commandline PackageReference restore supports project level configuration. This equivalent is not support in Visual Studio, so this is not a recommended setup.
 
@@ -493,7 +379,7 @@ NuGet.A 1.0.0 -> Microsoft.B 1.0.0
 **Result:**
 
 - Not deterministic, because it depends on the order in which the projects are restored, this could lead to either package getting restored from either source.
-This is *not* a very common, nor a recommended scenario.
+This is *not* a common, nor a recommended scenario.
 
 ## Drawbacks
 
@@ -512,7 +398,7 @@ The migration for users to leverage package namespaces will be tedious as they w
 
 We believe that this feature provides the highest degree of control and allow users to be more secure using NuGet than they have ever been. Given that other ecosystems like npm & Maven support a concept of scoped or banned dependencies through a concept of namespaces, NuGet would largely benefit from this type of feature as it complements NuGet's existing ability of [reserving package namespaces](https://docs.microsoft.com/nuget/nuget-org/id-prefix-reservation). This is a benefit for any internal packages in which a [best practice is having a package prefix](https://docs.microsoft.com/nuget/create-packages/package-authoring-best-practices#package-id).
 
-The primary alternative to this feature was a concept known as source pinning which would allow you to specify a source on a `<PackageReference>`. We found the feasibility of this feature implementation to be difficult when dealing with [transitive dependencies](https://en.wikipedia.org/wiki/Transitive_dependency) & it's support for `<PackageReference>` only although it had an intuitive UX. We believe that this current proposal captures the spirit of being able to pin sources with an introduction of a `strict` mode.
+The primary alternative to this feature was a concept known as source pinning which would allow you to specify a source on a `<PackageReference>`. We found the feasibility of this feature implementation to be difficult when dealing with [transitive dependencies](https://en.wikipedia.org/wiki/Transitive_dependency) & it's support for `<PackageReference>` only although it had an intuitive UX. We believe that this current proposal captures the spirit of being able to pin sources.
 
 We also considered alternatives such as [`npm scopes`](https://docs.npmjs.com/cli/v7/using-npm/scope) which would include the package source & namespace on the package ID, but that did not fit the MSBuild expectations of our developer-base as the syntax was too foreign & potentially breaking.
 
