@@ -82,7 +82,8 @@ Next, add `<namespace>` elements under the `<packageSource>` with an `id` to spe
 </packageNamespaces>
 ```
 
-If a user would like to support namespaces on different package sources, they can repeat this process for each source.
+Repeat this process for all sources.
+When using package namespaces, every source should have a list of namespaces.
 A user may also pin a specific package id instead of the complete namespace.
 Specific ids take precedence over the namespaces.
 
@@ -113,27 +114,6 @@ Specific ids take precedence over the namespaces.
 </packageNamespaces>
 ```
 
-By default, namespaces will allow a package to match multiple namespaces and download with no precedence. In some cases, one might want to avoid ambiguous cases. That can be done by adding a `strict` flag.
-
-```xml
-<config>
-    <add key="namespaceMode" value="strict" />
-</config>
-```
-
-The strict flag provides a source pinning behavior by nature in which one package source is allowed per unique namespace. Entering a strict mode will provide users an error experience when there are namespace conflicts to which a user will be able to resolve by defining one namespace per package source configuration.
-
-Additionally there may be different modes for namespaces such as:
-
-- `fullySpecified` - Any package id must be in one or more matching namespace declarations
-- `singleSource` - No package id may match more than one feed (based on precedence rules)
-
-An error for this experience might look like:
-
-```console
-NUXXXX: Package namespace {0} is listed on the following sources: {1}. Only one unique package namespace can be defined across sources.
-```
-
 ### Technical explanation
 
 <!-- Explain the proposal in sufficient detail with implementation details, interaction models, and clarification of corner cases. -->
@@ -153,10 +133,9 @@ The global packages folder is an *append only* resource. This means NuGet only e
 #### Package installation rules
 
 - When the requested package is already installed in the global packages folder, no source look-up will happen. The namespaces are irrelevant.
-- The namespace metadata may be defined on zero, one or all sources.
-- When a source has no metadata, the default is *all*.
+- Only sources with namespace metadata will be used.
+- When a source has no metadata, the default is *none*.
 - When a package id needs to be downloaded, it is first compared against sources with namespaces. If any match, only those sources are used. If none of the namespaces match, then the sources without namespaces are considered, if any.
-- Strict namespaces allow only 1 source to match. NuGet will error in every other scenario.
 - A namespace with a specific package id is *always* preferred over a namespace with a prefix.
 - When multiple different namespaces match the package id, the most specific one will be considered.
 
@@ -568,13 +547,10 @@ There's a number of features that exist in various ecosystems & layers that solv
 <!-- What parts of the proposal need to be resolved before the proposal is stabilized? -->
 <!-- What related issues would you consider out of scope for this proposal but can be addressed in the future? -->
 
-- Q: Should strict namespaces mode be the default? That would deliver a `secure by default` namespacing experience.
-
-- A: Yes. The feature's intention is to limit one package source to a single namespace prefix, which should be enabled by default.
-
 ## Future Possibilities
 
 <!-- What future possibilities can you think of that this proposal would help with? -->
+- Different modes or strategies can be considered in future iterations of thefeature.
 - The current proposal focuses on the nuget.config experience only. Adding a capability to source pin through RestoreSources is a future task.
 - NuGet can allow users to filter their package namespaces per source within CLI & IDE experiences.
 - NuGet can allow a user to add a full or glob package ID namespace at install time with an additional click/parameter in Visual Studio or CLI.
