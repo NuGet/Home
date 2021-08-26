@@ -408,9 +408,9 @@ Lastly, we considered package lock files which would ensure repeatability based 
 
 ## Mockups
 
-![](../../meta/resources/PackageNamespaces/VSOptions.png)
-![](../../meta/resources/PackageNamespaces/VSOptions1.png)
-![](../../meta/resources/PackageNamespaces/VS.png)
+![Options 1](../../meta/resources/PackageNamespaces/VSOptions.png)
+![Options 2](../../meta/resources/PackageNamespaces/VSOptions1.png)
+![Options 3](../../meta/resources/PackageNamespaces/VS.png)
 
 ## Prior Art
 
