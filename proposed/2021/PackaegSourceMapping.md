@@ -26,22 +26,17 @@ This work will also allow future experiences in browsing, installing, and updati
 
 <!-- Explain the proposal as if it were already implemented and you're teaching it to another person. -->
 <!-- Introduce new concepts, functional designs with real life examples, and low-fidelity mockups or  pseudocode to show how this proposal would look. -->
-When using a combination of public, private, and local sources defined in `NuGet.config` file(s), a user can add a new `<packageSourceMapping>` element to opt-in to the feature. They can then create `<packageSource>` children elements to define the feed in which they'd like to add allowed package patterns to. Lastly by adding individual `<package pattern="">` elements in the `<packageSource>` node, the source will only allow the matching package IDs from the respective package source.
+When using a combination of public, private, and local sources defined in `NuGet.config` file(s), a user can add a new `<packageSourceMapping>` element to opt-in to the feature.  Lastly by adding individual `<package pattern="">` elements in the `<packageSource>` node, the source will only allow the matching package IDs from the respective package source.
 
 **Definition:**
 
 Add a new `<packageSourceMapping>` element within the `NuGet.config` using the following syntax:
 
 ```xml
-<packageSources>
-    <add key="nuget.org" value="https://api.nuget.org/v3/index.json" />
-         
-    <add key="contoso" value="https://contoso.com/packages/" />
- 
-</packageSources>
- 
-<packageSourceMapping>
-</packageSourceMapping>
+    <packageSources>
+        <add key="nuget.org" value="https://api.nuget.org/v3/index.json" />
+        <add key="contoso" value="https://contoso.com/packages/" />
+    </packageSources>
 ```
 
 Define the `<packageSource>` element within the `<packageSourceMapping>` parent with the name of a valid package source:
