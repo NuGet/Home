@@ -158,8 +158,8 @@ The following are single project scenarios.
 
 The sources are:
 
-- nuget.org : `https://api.nuget.org/v3/index.json`
-- contoso : `https://contoso.org/v3/index.json`
+- `nuget.org` : `https://api.nuget.org/v3/index.json`
+- `contoso` : `https://contoso.org/v3/index.json`
 
 **Scenario 1A:**
 
@@ -220,7 +220,7 @@ NuGet.Internal.D 1.0.0
 
 - Package `NuGet.A` gets installed from `nuget.org`.
 - Package `Microsoft.C` gets installed from `contoso`.
-- Package `Microsoft.B` gets installed from `nuget.org`. Even though the contoso namespace matches, the nuget.org one is an exact package id match.
+- Package `Microsoft.B` gets installed from `nuget.org`. Even though the `contoso` namespace matches, the `nuget.org` one is an exact package id match.
 - Package `NuGet.Internal.D` gets installed from `contoso`, because the prefix match is more specific.
 
 **Scenario 1C:**
@@ -272,7 +272,7 @@ Microsoft.C 1.0.0
 
 **Result:**
 
-- Package `NuGet.A` will be installed from nuget.org.
+- Package `NuGet.A` will be installed from `nuget.org`.
 - Package `Microsoft.B` will fail installing as there's no matching namespace.
 - Package `Microsoft.C` will fail installing as there's no matching namespace.
 
@@ -302,7 +302,7 @@ Microsoft.C 1.0.0 -> Microsoft.B 2.0.0
 
 **Result:**
 
-- Package `NuGet.A` will installed from nuget.org.
+- Package `NuGet.A` will installed from `nuget.org`.
 - Package `Microsoft.C` is inconsistent, can get installed from either `nuget.org` or `contoso`.
 - Package `Microsoft.B` is inconsistent, can get installed from either `nuget.org` or `contoso`.
 
@@ -355,8 +355,8 @@ NuGetA 1.0.0 -> Microsoft.B 1.0.0
 
 **Result:**
 
-- Package `NuGetA` will be installed from nuget.org. ID prefixes do not need `.` delimiters.
-- Package `Microsoft.B` will be installed from contoso as a fallback.
+- Package `NuGetA` will be installed from `nuget.org`. ID prefixes do not need `.` delimiters.
+- Package `Microsoft.B` will be installed from `contoso` as a fallback.
 
 ---
 
@@ -366,8 +366,8 @@ The following are multi project scenarios.
 
 The sources are:
 
-- nuget.org : `https://api.nuget.org/v3/index.json`
-- contoso : `https://contoso.org/v3/index.json`
+- `nuget.org` : `https://api.nuget.org/v3/index.json`
+- `contoso` : `https://contoso.org/v3/index.json`
 
 **Scenario 2A:**
 
@@ -431,7 +431,7 @@ The migration for users to leverage Package Source Mapping will be tedious as th
 <!-- What other designs have been considered and why weren't they chosen? -->
 <!-- What is the impact of not doing this? -->
 
-We believe that this feature provides the highest degree of control and allows users to be more secure using NuGet than they have ever been. Given that other ecosystems like npm & Maven support a concept of scoped or banned dependencies through a concept of source mapping, NuGet would largely benefit from this type of feature as it complements NuGet's existing ability of [reserving package ID prefixes on NuGet.org](https://docs.microsoft.com/nuget/nuget-org/id-prefix-reservation). This is a benefit for any internal packages in which a [best practice is having a package prefix](https://docs.microsoft.com/nuget/create-packages/package-authoring-best-practices#package-id).
+We believe that this feature provides the highest degree of control and allows users to be more secure using NuGet than they have ever been. Given that other ecosystems like npm & Maven support a concept of scoped or banned dependencies through a concept of source mapping, NuGet would largely benefit from this type of feature as it complements NuGet's existing ability of [reserving package ID prefixes on `nuget.org`](https://docs.microsoft.com/nuget/nuget-org/id-prefix-reservation). This is a benefit for any internal packages in which a [best practice is having a package prefix](https://docs.microsoft.com/nuget/create-packages/package-authoring-best-practices#package-id).
 
 The primary alternative to this feature was a concept known as source pinning which would allow you to specify a source on a `<PackageReference>`. We found the feasibility of this feature implementation to be difficult when dealing with [transitive dependencies](https://en.wikipedia.org/wiki/Transitive_dependency) & it's support for `<PackageReference>` only although it had an intuitive UX. We believe that this current proposal captures the spirit of being able to pin sources.
 
