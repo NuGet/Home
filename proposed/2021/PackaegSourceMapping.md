@@ -1,4 +1,4 @@
-# Package Namespaces
+# Package Source Mapping
 
 - [Jon Douglas](https://github.com/JonDouglas) & [Nikolche Kolev](https://github.com/nkolev92) & [Chris Gill](https://github.com/chgill-MSFT)
 - Start Date: (2021-02-19)
@@ -26,7 +26,7 @@ This work will also allow future experiences in browsing, installing, and updati
 
 <!-- Explain the proposal as if it were already implemented and you're teaching it to another person. -->
 <!-- Introduce new concepts, functional designs with real life examples, and low-fidelity mockups or  pseudocode to show how this proposal would look. -->
-When using a combination of public, private, and local sources defined in `NuGet.config` file(s), a user can add a new `<packageSourceMapping>` element to opt-in to the feature. They can then create `<packageSource>` children elements to define the feed in which they'd like to add allowed namespaces to. Lastly by adding individual `<namespace>` elements in the `<packageSource>` node, the source will only allow the matching package namespaces from the respective package source.
+When using a combination of public, private, and local sources defined in `NuGet.config` file(s), a user can add a new `<packageSourceMapping>` element to opt-in to the feature. They can then create `<packageSource>` children elements to define the feed in which they'd like to add allowed package patterns to. Lastly by adding individual `<package pattern="">` elements in the `<packageSource>` node, the source will only allow the matching package IDs from the respective package source.
 
 **Definition:**
 
@@ -62,7 +62,7 @@ Define the `<packageSource>` element within the `<packageSourceMapping>` parent 
 </packageSourceMapping>
 ```
 
-Next, add `<package>` elements under the `<packageSource>` with an `pattern` to specify the pattern. Patterns can be defined as their full namespace or using a wildcard(*) to match the glob pattern of 0 or more package ID(s):
+Next, add `<package pattern="">` elements under the `<packageSource>` to map matching package IDs to that source. Patterns can be defined as an exact package ID or a package ID prefix using a wildcard(*) to match the glob pattern of 0 or more package ID(s):
 
 ```xml
 <packageSources>
@@ -73,7 +73,7 @@ Next, add `<package>` elements under the `<packageSource>` with an `pattern` to 
 </packageSources>
  
 <packageSourceMapping>
-    <!-- Add a namespace for Microsoft.* or NuGet.* under the nuget.org source. -->
+    <!-- Add a pattern for Microsoft.* or NuGet.* under the nuget.org source. -->
     <packagesource key="nuget.org">
         <package pattern="Microsoft.*" />
         <package pattern="NuGet.*" />
@@ -83,9 +83,9 @@ Next, add `<package>` elements under the `<packageSource>` with an `pattern` to 
 ```
 
 Repeat this process for all sources.
-When using package namespaces, every source should have a list of namespaces.
-A user may also pin a specific package id instead of the complete namespace.
-Specific ids take precedence over the namespaces.
+When using package source mapping, every source should have a list of allowed package patterns.
+A user may also pin a specific package id instead of broader package ID prefix.
+The most specific pattern that matches a package ID will have the highest precedence. Exact package IDs will always have the highest precedence over any prefix.
 
 **Example:**
 
@@ -98,13 +98,13 @@ Specific ids take precedence over the namespaces.
 </packageSources>
  
 <packageSourceMapping>
-    <!-- Add a namespace for Microsoft.* or NuGet.* under the nuget.org source. -->
+    <!-- Add a pattern for Microsoft.* or NuGet.* under the nuget.org source. -->
     <packagesource key="nuget.org">
         <package pattern="Microsoft.*" />
         <package pattern="NuGet.*" />
     </packageSource>
 
-    <!-- Add a namespace for Contoso.* under the contoso source. -->
+    <!-- Add a pattern for Contoso.* under the contoso source. -->
     <packagesource key="contoso">
         <package pattern="Contoso.*" />
         <!-- Add a specific id to be download from  the contoso source. -->
@@ -130,14 +130,27 @@ The global packages folder is an *append only* resource. This means NuGet only e
 - Package installation is operation based - If 3 projects are being restored during that operation, and all those projects have a dependency to `Newtonsoft.Json`, version `9.0.1`, in regular scenarios, only 1 project will *actually* download and install the package. The other projects will use the already installed version.
 - `.nupkg.metadata` - Each package installation directory contains a `.nupkg.metadata` file which signify that a package installation is complete. This is expected to be the last file written in the package directory. This file is *not* use during build. NuGet.Client writes the package source information inside this file.
 
-#### Package installation rules
+#### Package Source Mapping rules
 
-- When the requested package is already installed in the global packages folder, no source look-up will happen. The namespaces are irrelevant.
-- Only sources with namespace metadata will be used.
-- When a source has no metadata, the default is *none*.
-- When a package id needs to be downloaded, it is first compared against sources with namespaces. If any match, only those sources are used. If none of the namespaces match, then the sources without namespaces are considered, if any.
-- A namespace with a specific package id is *always* preferred over a namespace with a prefix.
-- When multiple different namespaces match the package id, the most specific one will be considered.
+1. Two types of package ID patterns are supported:
+
+    a. `NuGet.*` - Package prefixes. Must end with a `*`, which may match 0 or more characters. `*` is the broadest valid prefix that matches all package IDs, but will have the lowest precedence by default. `NuGet*` is also valid and will match package IDs `NuGet`, `NuGetFoo`, and `NuGet.Bar`.
+    
+    b. `NuGet.Common` - Exact package IDs.
+
+2. Any requested package ID must map to one or more sources by matching a defined package ID pattern. In other words, once you have defined a `packageSourceMapping` element you must explicitly define which sources *every* package - *including transitive packages* - will be restored from.
+
+    a. Both top level (directly installed) *and transitive* packages must match defined patterns. There is no requirement that a top level package and its dependencies come from the same source.
+    
+    b. The same ID pattern can be defined on multiple sources, allowing matching package IDs to be restored from any of the feeds that define the pattern. However, this isn't recommended due to the impact on restore predictability (a given package could come from multiple sources).
+
+3. When multiple unique patterns match a package ID, the most specific (longest) match will be preferred. 
+
+    a. Exact package ID patterns always have the highest precedence while the generic `*` always has the lowest precedence. For an example package ID `NuGet.Common`, the following package ID patterns are ordered from highest to lowest precedence: `NuGet.Common`, `NuGet.*`, `*`. 
+
+4. Package Source Mapping settings are applied following [nuget.config precedence rules](https://docs.microsoft.com/nuget/consume-packages/configuring-nuget-behavior#how-settings-are-applied) when multiple `nuget.config` files at various levels (machine-level, user-level, repo-level) are present. 
+
+> Important: When the requested package already exists in the global packages folder, no source look-up will happen and the mappings will be ignored. Declare a [global packages folder for your repo](https://docs.microsoft.com/nuget/reference/nuget-config-file#config-section) to gain the full security benefits of this feature. Work to improve the experience with the default global packages folder in planned for a next iteration.
 
 **Scenario 1:**
 
@@ -160,12 +173,14 @@ Microsoft.C 1.0.0 -> Microsoft.B 1.0.0
 ```
 
 ```xml
+<packageSourceMapping>
     <packagesource key="nuget.org">
         <package pattern="NuGet.*" />
     </packageSource>
     <packagesource key="contoso">
         <package pattern="Microsoft.*" />
     </packageSource>
+</packageSourceMapping>
 ```
 
 **Result:**
@@ -189,6 +204,7 @@ NuGet.Internal.D 1.0.0
 ```
 
 ```xml
+<packageSourceMapping>
     <packagesource key="nuget.org">
         <package pattern="NuGet.*" />
         <package pattern="Microsoft.B" />
@@ -197,6 +213,7 @@ NuGet.Internal.D 1.0.0
         <package pattern="Microsoft.*" />
         <package pattern="NuGet.Internal.*" />
     </packageSource>
+</packageSourceMapping>
 ```
 
 **Result:**
@@ -218,17 +235,20 @@ Microsoft.C 1.0.0 -> Microsoft.B 2.0.0
 ```
 
 ```xml
+<packageSourceMapping>
     <packagesource key="nuget.org">
         <package pattern="NuGet.*" />
     </packageSource>
     <packagesource key="contoso">
         <package pattern="Microsoft.*" />
     </packageSource>
+</packageSourceMapping>
+
 ```
 
 **Result:**
 
-- Package `A` fails installation as none of the namespaces match.
+- Package `A` fails installation as none of the patterns match.
 
 **Scenario 1D:**
 
@@ -242,10 +262,12 @@ Microsoft.C 1.0.0
 ```
 
 ```xml
+<packageSourceMapping>
     <packagesource key="nuget.org">
         <package pattern="NuGet.*" />
     </packageSource>
-    <!-- no contoso namespaces -->
+    <!-- no contoso patterns -->
+</packageSourceMapping>
 ```
 
 **Result:**
@@ -266,6 +288,7 @@ Microsoft.C 1.0.0 -> Microsoft.B 2.0.0
 ```
 
 ```xml
+<packageSourceMapping>
     <packagesource key="nuget.org">
         <package pattern="NuGet.*" />
         <package pattern="Microsoft.*" />
@@ -273,6 +296,8 @@ Microsoft.C 1.0.0 -> Microsoft.B 2.0.0
     <packagesource key="contoso">
         <package pattern="Microsoft.*" />
     </packageSource>
+</packageSourceMapping>
+
 ```
 
 **Result:**
@@ -293,6 +318,7 @@ Microsoft.Community.B 1.0.0
 ```
 
 ```xml
+<packageSourceMapping>
     <packagesource key="nuget.org">
         <package pattern="Microsoft.Community.*" />
     </packageSource>
@@ -300,6 +326,8 @@ Microsoft.Community.B 1.0.0
         <package pattern="Microsoft.Community.*" />
         <package pattern="Microsoft.*" />
     </packageSource>
+</packageSourceMapping>
+
 ```
 
 **Result:**
@@ -316,15 +344,18 @@ NuGetA 1.0.0 -> Microsoft.B 1.0.0
 ```
 
 ```xml
+<packageSourceMapping>
     <packagesource key="nuget.org">
         <package pattern="NuGet*" />
     </packageSource>
-    <!-- no contoso namespaces -->
+    <!-- no contoso patterns -->
+</packageSourceMapping>
+
 ```
 
 **Result:**
 
-- Package `NuGetA` will be installed from nuget.org. Namespaces do not have to separated by a `.`.
+- Package `NuGetA` will be installed from nuget.org. ID prefixes do not need `.` delimiters.
 - Package `Microsoft.B` will be installed from contoso as a fallback.
 
 ---
@@ -348,12 +379,14 @@ NuGet.A 1.0.0 -> Microsoft.B 1.0.0
 
 ```xml
 <!-- Project 1 Config -->
-<packagesource key="nuget.org">
-    <package pattern="NuGet.*" />
-</packageSource>
-<packagesource key="contoso">
-    <package pattern="Microsoft.*" />
-</packageSource>
+<packageSourceMapping>
+    <packagesource key="nuget.org">
+        <package pattern="NuGet.*" />
+    </packageSource>
+    <packagesource key="contoso">
+        <package pattern="Microsoft.*" />
+    </packageSource>
+</packageSourceMapping>
 ```
 
 ```xml
@@ -363,12 +396,14 @@ NuGet.A 1.0.0 -> Microsoft.B 1.0.0
 
 ```xml
 <!-- Project 2 Config -->
-<packagesource key="nuget.org">
-    <package pattern="Microsoft.*" />
-</packageSource>
-<packagesource key="contoso">
-    <package pattern="NuGet.*" />
-</packageSource>
+<packageSourceMapping>
+    <packagesource key="nuget.org">
+        <package pattern="Microsoft.*" />
+    </packageSource>
+    <packagesource key="contoso">
+        <package pattern="NuGet.*" />
+    </packageSource>
+</packageSourceMapping>
 ```
 
 ```xml
@@ -386,9 +421,9 @@ This is *not* a common, nor a recommended scenario.
 <!-- Why should we not do this? -->
 There are many ways to exclude & include dependencies in various CI/CD providers like Azure DevOps, GitHub Actions, and more. These are typically for individual dependencies or upstream packages. This however is not supported universally for each CI/CD provider & can be confusing on the limitations.
 
-Package namespaces has best security practices in mind at the cost of user experience. One thing NuGet is known for is "just working". By using package namespaces, we are functionally changing how you might think about including new dependencies into your software supply chain.
+Package Source Mapping has best security practices in mind at the cost of user experience. One thing NuGet is known for is "just working". By using Package Source Mapping, we are functionally changing how you might think about including new dependencies into your software supply chain.
 
-The migration for users to leverage package namespaces will be tedious as they will need to lookup each package ID / namespace used in their project(s). There are no tools planned to do this on behalf of the user & therefore will be a one-time manual effort.
+The migration for users to leverage Package Source Mapping will be tedious as they will need to lookup each package ID / namespace used in their project(s). There are no tools planned to do this on behalf of the user & therefore will be a one-time manual effort.
 
 ## Rationale and alternatives
 
@@ -396,11 +431,11 @@ The migration for users to leverage package namespaces will be tedious as they w
 <!-- What other designs have been considered and why weren't they chosen? -->
 <!-- What is the impact of not doing this? -->
 
-We believe that this feature provides the highest degree of control and allow users to be more secure using NuGet than they have ever been. Given that other ecosystems like npm & Maven support a concept of scoped or banned dependencies through a concept of namespaces, NuGet would largely benefit from this type of feature as it complements NuGet's existing ability of [reserving package namespaces](https://docs.microsoft.com/nuget/nuget-org/id-prefix-reservation). This is a benefit for any internal packages in which a [best practice is having a package prefix](https://docs.microsoft.com/nuget/create-packages/package-authoring-best-practices#package-id).
+We believe that this feature provides the highest degree of control and allows users to be more secure using NuGet than they have ever been. Given that other ecosystems like npm & Maven support a concept of scoped or banned dependencies through a concept of source mapping, NuGet would largely benefit from this type of feature as it complements NuGet's existing ability of [reserving package ID prefixes on NuGet.org](https://docs.microsoft.com/nuget/nuget-org/id-prefix-reservation). This is a benefit for any internal packages in which a [best practice is having a package prefix](https://docs.microsoft.com/nuget/create-packages/package-authoring-best-practices#package-id).
 
 The primary alternative to this feature was a concept known as source pinning which would allow you to specify a source on a `<PackageReference>`. We found the feasibility of this feature implementation to be difficult when dealing with [transitive dependencies](https://en.wikipedia.org/wiki/Transitive_dependency) & it's support for `<PackageReference>` only although it had an intuitive UX. We believe that this current proposal captures the spirit of being able to pin sources.
 
-We also considered alternatives such as [`npm scopes`](https://docs.npmjs.com/cli/v7/using-npm/scope) which would include the package source & namespace on the package ID, but that did not fit the MSBuild expectations of our developer-base as the syntax was too foreign & potentially breaking.
+We also considered alternatives such as [`npm scopes`](https://docs.npmjs.com/cli/v7/using-npm/scope) which would include the package source on the package ID, but that did not fit the MSBuild expectations of our developer-base as the syntax was too foreign & potentially breaking.
 
 We then considered package grouping concepts which was proposed in [Central Version Package Management](https://github.com/NuGet/Home/issues/6764) which would allow control from the package declaration perspective compared to a source view. Although people found this promising as a concept, we found that without large adoption of the existing feature & limitation on `PackageReference` scenarios, that we would not be able to cover our hybrid ecosystem of .NET Framework & .NET Core users.
 
@@ -438,6 +473,6 @@ There's a number of features that exist in various ecosystems & layers that solv
 <!-- What future possibilities can you think of that this proposal would help with? -->
 - Different modes or strategies can be considered in future iterations of the feature.
 - The current proposal focuses on the nuget.config experience only. Adding a capability to source pin through RestoreSources is a future task.
-- NuGet can allow users to filter their package namespaces per source within CLI & IDE experiences.
+- NuGet can allow users to filter their Package Source Mapping per source within CLI & IDE experiences.
 - NuGet can allow a user to add a full or glob package ID namespace at install time with an additional click/parameter in Visual Studio or CLI.
-- NuGet can combine this feature with `Package Lock Files` to allow a user to ensure the lock file is generated under the allowlist of namespaces.
+- NuGet can combine this feature with `Package Lock Files` to allow a user to ensure the lock file is generated under the allowlist of package ID patterns.
