@@ -27,9 +27,7 @@ Partner team(.NET SDK) who needs to consume .pdb, .xml files for their features 
 
 ## Non-Goals
 
-* ~~Define an approach for defining additional assembly metadata.~~
-* ~~Adding metadata such `PrivateAssets`, `GeneratePathProperty` etc. is still csproj XML only, no UI exeperience will be added.~~
-* ~~Define an approach for defining aliases or any other assembly metadata for packages brought in transitively.~~
+* 
 
 ## Solution
 
@@ -130,7 +128,7 @@ When this solution is applied, the targets section in assets file will be:
 ```
 On the library side there are no changes. 
 
-The (LockFileItem)[https://github.com/NuGet/NuGet.Client/blob/4fef99532f4022504feec5f68c8501cbeadd3aed/src/NuGet.Core/NuGet.ProjectModel/LockFile/LockFileItem.cs] type which represents an element in the compile list already has a collection of properties. 
+The [LockFileItem](https://github.com/NuGet/NuGet.Client/blob/4fef99532f4022504feec5f68c8501cbeadd3aed/src/NuGet.Core/NuGet.ProjectModel/LockFile/LockFileItem.cs) type which represents an element in the compile list already has a collection of properties. 
 
 Specifically:
 
@@ -140,16 +138,14 @@ Specifically:
   public IDictionary<string, string> Properties { get; } = new Dictionary<string, string>();
 ```
 
-There is no need for a change here. 
+There is no need to change any code references LockFileItem. 
 
-The value provided in the Aliases attribute will be passed through as far as NuGet is concerned. NuGet will not validate that the value provided is a valid alias, that will be done at build time. 
+But when generating the targets section of assets file, NuGet needs to go through the runtime and compile time folder for the files with specific extensions and add those as the `related` property.  
+NuGet will not use the `related` property after it's generated, it will be consumed at build time. 
 
-The implementation of this feature spans multiple components. 
-Specifically the work items as follows: 
+In order to consume the `related` property, the .NET SDK will need to make change in the following part: 
 
 * [dotnet/sdk/10947](https://github.com/dotnet/sdk/issues/10947) The build tasks for .NET Core SDK  [code](https://github.com/dotnet/sdk/blob/master/src/Tasks/Microsoft.NET.Build.Tasks/ResolvePackageAssets.cs)
-* [dotnet/NuGet.BuildTasks/7](https://github.com/dotnet/NuGet.BuildTasks/issues/70) The build tasks for non-SDK based PackageReference [code](https://github.com/dotnet/NuGet.BuildTasks/blob/master/src/Microsoft.NuGet.Build.Tasks/ResolveNuGetPackageAssets.cs).
-* [dotnet/project-system/6011](https://github.com/dotnet/project-system/issues/6011) Nomination updates on project-system side [code](https://github.com/dotnet/project-system/blob/master/src/Microsoft.VisualStudio.ProjectSystem.Managed/ProjectSystem/Rules/Dependencies/PackageReference.xaml).
 
 ## Future Work
 
@@ -158,10 +154,14 @@ Specifically the work items as follows:
 ## Open Questions
 
 * In which version will this functionality be ready?
+
 * When there is no other extensions, shall NuGet provide empty string `"related": ""`, or just skip adding `"related": ""` in assets file?
-* Shall NuGet list not only .pdb and .xml, but all [AllowedReferenceRelatedFileExtensions](https://github.com/dotnet/msbuild/blame/main/src/Tasks/Microsoft.Common.CurrentVersion.targets#L621-L627) if there is any? (.pdb, .xml, .pri, .dll.config, .exe.config)
-* Is it necessary to apply `related` to project reference type? Or only package reference type is needed.
-* The impact on the cache side.
+
+* Shall NuGet list not only .pdb and .xml, but also all the extensions in [AllowedReferenceRelatedFileExtensions](https://github.com/dotnet/msbuild/blame/main/src/Tasks/Microsoft.Common.CurrentVersion.targets#L621-L627) if there is any? (.pdb, .xml, .pri, .dll.config, .exe.config)
+
+* Is it necessary to add `related` to project reference type node in targets section? Or only adding `related` to package reference type node in targets section?
+
+* If there is a change in `related` property, will it make any difference in restore? For a package reference, there should be no change in `related` property if it's referencing the same package. For a project reference, should manually adding/removing .pdb, .xml file trigger restore? Does it make any difference compared with previous behavior?
 
 ## Considerations
 
@@ -169,34 +169,14 @@ In addition to the proposed approach, 2 of other solutions were considered.
 
 ### Do nothing - Recommend the customers use the custom target workaround
 
-The workaround that allows per assembly granularity is the following:
-
-```xml
-  <Target Name="AddCustomAliases" BeforeTargets="FindReferenceAssembliesForReferences;ResolveReferences">
-    <ItemGroup>
-      <ReferencePath Condition="'%(FileName)' == '$AssembleFileName$' AND '%(ReferencePath.NuGetPackageId)' == '$PackageId$'">
-        <Aliases>$Alias$</Aliases>
-      </ReferencePath>
-    </ItemGroup>
-  </Target>
-```
-
 Pros:
-
-* A very powerful solution, that covers both direct and transitive dependencies.
-* Allows per file granularity, if multiple assemblies are brought in by a package, each can have(or not) their own alias.
 
 Cons:
 
-* Important enough feature that deserves an out of the box solution.
-* The workaround recommends taking a dependency on tasks and targets that are best not depended on by customers. Goes against the policy of minimizing the size of the project files.
-* Not obvious, unnecessarily exposes the customers to restore/build internals.  
+### Add as LockFileItem, but not a property of LockFileItem
+Pros:
+
+Cons:
 
 ### References
 
-* NoWarn does not apply transitively [5740](https://github.com/NuGet/Home/issues/5740)
-* Extern alias language [docs](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/extern-alias)
-* ProjectReference.Aliases [docs](https://docs.microsoft.com/en-us/dotnet/api/microsoft.codeanalysis.projectreference.aliases?view=roslyn-dotnet)
-* [dotnet/sdk/10947](https://github.com/dotnet/sdk/issues/10947) The build tasks on (.NET Core SDK side)
-* [dotnet/NuGet.BuildTasks/7](https://github.com/dotnet/NuGet.BuildTasks/issues/70) The build tasks for the non-SDK based PackageReference
-* [dotnet/project-system/6011](https://github.com/dotnet/project-system/issues/6011) Nomination updates on project-system side.
