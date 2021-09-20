@@ -1,24 +1,24 @@
 # Package Namespaces
 
-- [Jon Douglas](https://github.com/JonDouglas) & [Nikolche Kolev](https://github.com/nkolev92)
+- [Jon Douglas](https://github.com/JonDouglas) & [Nikolche Kolev](https://github.com/nkolev92) & [Chris Gill](https://github.com/chgill-MSFT)
 - Start Date: (2021-02-19)
 - GitHub Issue ([6867](https://github.com/NuGet/Home/issues/6867))
 
 ## Summary
 
 <!-- One-paragraph description of the proposal. -->
-NuGet allows access to all package IDs on a package source. However, many .NET developers have needs to filter & consume a subset of the package IDs available on public, private, and local sources. Although NuGet supports a concept of [trusted-signers](https://docs.microsoft.com/en-us/nuget/reference/cli-reference/cli-ref-trusted-signers) to trust packages signed by specific authors, users would like to optionally specify package namespaces that their organization and project's software supply chain trusts.
+NuGet allows access to all package IDs on a package source. However, many .NET developers have needs to filter & consume a subset of the package IDs available on public, private, and local sources. Although NuGet supports a concept of [trusted-signers](https://docs.microsoft.com/en-us/nuget/reference/cli-reference/cli-ref-trusted-signers) to trust packages signed by specific authors, users would like to optionally specify which sources package IDs should be restored from.
 
-This proposal introduces a concept known as package namespaces, allowing a developer to include or exclude package IDs by specifying package namespaces on their package source(s).
+This proposal introduces a concept known as Package Source Mapping that allows developers to map package ID patterns, including exact IDs and package ID prefixes, to specific sources. These mappings will enable users to centrally manage what packages are allowed in their solution and where those packages should come from.
 
 ## Motivation
 
 <!-- Why are we doing this? What pain points does this solve? What is the expected outcome? -->
 Giving the user more control on what packages are allowed in their software supply chain is an on-going need in the .NET ecosystem. Today, users do not have much control nor capabilities to filter the software dependencies they would consider including in their project. There's a misconception about open source dependencies being more secure which is known as the [Linus' Law](https://en.wikipedia.org/wiki/Linus%27s_Law), which allowing the world an opportunity at your software supply chain is posing a greater risk as more new packages are created everyday. Many requirements by organizations is quite the opposite. Having a controlled list of dependencies that are allowed within the company's policy is regular procedure & considered a best practice.
 
-By providing an allowlist of package namespaces, we believe we can meet the security needs of the ecosystem from cybersquatting & typosquatting attacks like [Dependency Confusion](https://medium.com/@alex.birsan/dependency-confusion-4a5d60fec610). Additionally, we can extend a security feature that makes NuGet unique of allowing [package creators to reserve a package ID prefix](https://docs.microsoft.com/nuget/nuget-org/id-prefix-reservation).
+By providing an allowlist of package ID patterns, we believe we can meet the security needs of the ecosystem from cybersquatting & typosquatting attacks like [Dependency Confusion](https://medium.com/@alex.birsan/dependency-confusion-4a5d60fec610). Additionally, we can extend a security feature that makes NuGet unique of allowing [package creators to reserve a package ID prefix](https://docs.microsoft.com/nuget/nuget-org/id-prefix-reservation).
 
-This work will also allow future experiences in browsing, installing, and updating packages under an allowed list of namespaces to make developers secure by default when managing their dependencies in their software supply chain.
+This work will also allow future experiences in browsing, installing, and updating packages under an allowed list of package ID patterns to make developers secure by default when managing their dependencies in their software supply chain.
 
 ## Explanation
 
@@ -26,60 +26,60 @@ This work will also allow future experiences in browsing, installing, and updati
 
 <!-- Explain the proposal as if it were already implemented and you're teaching it to another person. -->
 <!-- Introduce new concepts, functional designs with real life examples, and low-fidelity mockups or  pseudocode to show how this proposal would look. -->
-When using a combination of public, private, and local sources defined in `NuGet.config` file(s), a user can add a new `<packageNamespaces>` element to opt-in to the feature. They can then create `<packageSource>` children elements to define the feed in which they'd like to add allowed namespaces to. Lastly by adding individual `<namespace>` elements in the `<packageSource>` node, the source will only allow the matching package namespaces from the respective package source.
+When using a combination of public, private, and local sources defined in `NuGet.config` file(s), a user can add a new `<packageSourceMapping>` element to opt-in to the feature. They can then create `<packageSource>` children elements to define the feed in which they'd like to add allowed namespaces to. Lastly by adding individual `<namespace>` elements in the `<packageSource>` node, the source will only allow the matching package namespaces from the respective package source.
 
 **Definition:**
 
-Add a new `<packageNamespaces>` element within the `NuGet.config` using the following syntax:
+Add a new `<packageSourceMapping>` element within the `NuGet.config` using the following syntax:
 
 ```xml
 <packageSources>
-    <add key="nuget.org" value="https://api.nuget.org/v3/index.json" protocolVersion="3" />
+    <add key="nuget.org" value="https://api.nuget.org/v3/index.json" />
          
     <add key="contoso" value="https://contoso.com/packages/" />
  
 </packageSources>
  
-<packageNamespaces>
-</packageNamespaces>
+<packageSourceMapping>
+</packageSourceMapping>
 ```
 
-Define the `<packageSource>` element within the `<packageNamespaces>` parent with the name of a valid package source:
+Define the `<packageSource>` element within the `<packageSourceMapping>` parent with the name of a valid package source:
 
 ```xml
 <packageSources>
-    <add key="nuget.org" value="https://api.nuget.org/v3/index.json" protocolVersion="3" />
+    <add key="nuget.org" value="https://api.nuget.org/v3/index.json" />
          
     <add key="contoso" value="https://contoso.com/packages/" />
  
 </packageSources>
  
-<packageNamespaces>
+<packageSourceMapping>
     <packagesource key="nuget.org">
 
     </packageSource>
  
-</packageNamespaces>
+</packageSourceMapping>
 ```
 
-Next, add `<namespace>` elements under the `<packageSource>` with an `id` to specify the namespace. Namespaces can be defined as their full namespace or using a wildcard(*) to match the glob pattern of 0 or more package ID(s):
+Next, add `<package>` elements under the `<packageSource>` with an `pattern` to specify the pattern. Patterns can be defined as their full namespace or using a wildcard(*) to match the glob pattern of 0 or more package ID(s):
 
 ```xml
 <packageSources>
-    <add key="nuget.org" value="https://api.nuget.org/v3/index.json" protocolVersion="3" />
+    <add key="nuget.org" value="https://api.nuget.org/v3/index.json" />
          
     <add key="contoso" value="https://contoso.com/packages/" />
  
 </packageSources>
  
-<packageNamespaces>
+<packageSourceMapping>
     <!-- Add a namespace for Microsoft.* or NuGet.* under the nuget.org source. -->
     <packagesource key="nuget.org">
-        <namespace id="Microsoft.*" />
-        <namespace id="NuGet.*" />
+        <package pattern="Microsoft.*" />
+        <package pattern="NuGet.*" />
     </packageSource>
  
-</packageNamespaces>
+</packageSourceMapping>
 ```
 
 Repeat this process for all sources.
@@ -91,27 +91,27 @@ Specific ids take precedence over the namespaces.
 
 ```xml
 <packageSources>
-    <add key="nuget.org" value="https://api.nuget.org/v3/index.json" protocolVersion="3" />
+    <add key="nuget.org" value="https://api.nuget.org/v3/index.json" />
          
     <add key="contoso" value="https://contoso.com/packages/" />
  
 </packageSources>
  
-<packageNamespaces>
+<packageSourceMapping>
     <!-- Add a namespace for Microsoft.* or NuGet.* under the nuget.org source. -->
     <packagesource key="nuget.org">
-        <namespace id="Microsoft.*" />
-        <namespace id="NuGet.*" />
+        <package pattern="Microsoft.*" />
+        <package pattern="NuGet.*" />
     </packageSource>
 
     <!-- Add a namespace for Contoso.* under the contoso source. -->
     <packagesource key="contoso">
-        <namespace id="Contoso.*" />
+        <package pattern="Contoso.*" />
         <!-- Add a specific id to be download from  the contoso source. -->
-        <namespace id="Special.Package.With.An.Imperfect.Id" />
+        <package pattern="Special.Package.With.An.Imperfect.Id" />
     </packageSource>
  
-</packageNamespaces>
+</packageSourceMapping>
 ```
 
 ### Technical explanation
@@ -161,10 +161,10 @@ Microsoft.C 1.0.0 -> Microsoft.B 1.0.0
 
 ```xml
     <packagesource key="nuget.org">
-        <namespace id="NuGet.*" />
+        <package pattern="NuGet.*" />
     </packageSource>
     <packagesource key="contoso">
-        <namespace id="Microsoft.*" />
+        <package pattern="Microsoft.*" />
     </packageSource>
 ```
 
@@ -190,12 +190,12 @@ NuGet.Internal.D 1.0.0
 
 ```xml
     <packagesource key="nuget.org">
-        <namespace id="NuGet.*" />
-        <namespace id="Microsoft.B" />
+        <package pattern="NuGet.*" />
+        <package pattern="Microsoft.B" />
     </packageSource>
     <packagesource key="contoso">
-        <namespace id="Microsoft.*" />
-        <namespace id="NuGet.Internal.*" />
+        <package pattern="Microsoft.*" />
+        <package pattern="NuGet.Internal.*" />
     </packageSource>
 ```
 
@@ -219,10 +219,10 @@ Microsoft.C 1.0.0 -> Microsoft.B 2.0.0
 
 ```xml
     <packagesource key="nuget.org">
-        <namespace id="NuGet.*" />
+        <package pattern="NuGet.*" />
     </packageSource>
     <packagesource key="contoso">
-        <namespace id="Microsoft.*" />
+        <package pattern="Microsoft.*" />
     </packageSource>
 ```
 
@@ -243,7 +243,7 @@ Microsoft.C 1.0.0
 
 ```xml
     <packagesource key="nuget.org">
-        <namespace id="NuGet.*" />
+        <package pattern="NuGet.*" />
     </packageSource>
     <!-- no contoso namespaces -->
 ```
@@ -267,11 +267,11 @@ Microsoft.C 1.0.0 -> Microsoft.B 2.0.0
 
 ```xml
     <packagesource key="nuget.org">
-        <namespace id="NuGet.*" />
-        <namespace id="Microsoft.*" />
+        <package pattern="NuGet.*" />
+        <package pattern="Microsoft.*" />
     </packageSource>
     <packagesource key="contoso">
-        <namespace id="Microsoft.*" />
+        <package pattern="Microsoft.*" />
     </packageSource>
 ```
 
@@ -294,11 +294,11 @@ Microsoft.Community.B 1.0.0
 
 ```xml
     <packagesource key="nuget.org">
-        <namespace id="Microsoft.Community.*" />
+        <package pattern="Microsoft.Community.*" />
     </packageSource>
     <packagesource key="contoso">
-        <namespace id="Microsoft.Community.*" />
-        <namespace id="Microsoft.*" />
+        <package pattern="Microsoft.Community.*" />
+        <package pattern="Microsoft.*" />
     </packageSource>
 ```
 
@@ -317,7 +317,7 @@ NuGetA 1.0.0 -> Microsoft.B 1.0.0
 
 ```xml
     <packagesource key="nuget.org">
-        <namespace id="NuGet*" />
+        <package pattern="NuGet*" />
     </packageSource>
     <!-- no contoso namespaces -->
 ```
@@ -349,10 +349,10 @@ NuGet.A 1.0.0 -> Microsoft.B 1.0.0
 ```xml
 <!-- Project 1 Config -->
 <packagesource key="nuget.org">
-    <namespace id="NuGet.*" />
+    <package pattern="NuGet.*" />
 </packageSource>
 <packagesource key="contoso">
-    <namespace id="Microsoft.*" />
+    <package pattern="Microsoft.*" />
 </packageSource>
 ```
 
@@ -364,10 +364,10 @@ NuGet.A 1.0.0 -> Microsoft.B 1.0.0
 ```xml
 <!-- Project 2 Config -->
 <packagesource key="nuget.org">
-    <namespace id="Microsoft.*" />
+    <package pattern="Microsoft.*" />
 </packageSource>
 <packagesource key="contoso">
-    <namespace id="NuGet.*" />
+    <package pattern="NuGet.*" />
 </packageSource>
 ```
 
@@ -408,9 +408,9 @@ Lastly, we considered package lock files which would ensure repeatability based 
 
 ## Mockups
 
-![Options 1](../../meta/resources/PackageNamespaces/VSOptions.png)
-![Options 2](../../meta/resources/PackageNamespaces/VSOptions1.png)
-![Options 3](../../meta/resources/PackageNamespaces/VS.png)
+![Options 1](../../meta/resources/packageSourceMapping/VSOptions.png)
+![Options 2](../../meta/resources/packageSourceMapping/VSOptions1.png)
+![Options 3](../../meta/resources/packageSourceMapping/VS.png)
 
 ## Prior Art
 
