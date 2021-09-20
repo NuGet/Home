@@ -33,14 +33,16 @@ Partner team(.NET SDK) who needs to consume .pdb, .xml files for their features 
 
 ## Solution
 
-For any given assembly under lib and runtime folder, if there are files next to it that differ only by extension, NuGet will add a "related" property underneath the assembly in assets file, listing the extensions of these files.
+For any given assembly under lib and runtime folder, if there are files next to it that differ only by extension, NuGet will add a "related" property underneath the assembly in targets section of assets file, listing the extensions of these files.
 
 * Applies to all the compile time assemblies and runtime assemblies.
 * Apply to transitive dependencies.
+* Apply to both package reference and project reference type.
 
 
 ### Solution - Technical details
 
+#### Package reference:
 For example, one project has a package reference of PackageA. Supppose in folder ./PackageA/1.0.0/lib/netstandard2.0, there are PackageA.pdb, PackageA.xml file besides PackageA.dll.
 Currently, the targets section in assets file is:
 
@@ -82,7 +84,50 @@ When this solution is applied, the targets section in assets file will be:
     }
   },
 ```
+#### Project reference:
+For example, one project has a project reference of ProjectA. Supppose in folder ./ProjectA/lib/netstandard2.0, there are PackageA.pdb, PackageA.xml file besides ProjectA.dll.
+Currently, the targets section in assets file is:
 
+```json
+{
+  "version": 3,
+  "targets": {
+    ".NETCoreApp,Version=v5.0": {
+        "ClassLibrary1/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v5.0",
+        "compile": {
+          "bin/placeholder/ClassLibrary1.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/ClassLibrary1.dll": {}
+        }
+      }
+    },
+```
+When this solution is applied, the targets section in assets file will be:
+
+```json
+{
+  "version": 3,
+  "targets": {
+    ".NETCoreApp,Version=v5.0": {
+        "ClassLibrary1/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v5.0",
+        "compile": {
+          "bin/placeholder/ClassLibrary1.dll": {
+            "related": "pdb,xml"
+          }
+        },
+        "runtime": {
+          "bin/placeholder/ClassLibrary1.dll": {
+            "related": "pdb,xml"
+          }
+        }
+      }
+    },
+```
 On the library side there are no changes. 
 
 The (LockFileItem)[https://github.com/NuGet/NuGet.Client/blob/4fef99532f4022504feec5f68c8501cbeadd3aed/src/NuGet.Core/NuGet.ProjectModel/LockFile/LockFileItem.cs] type which represents an element in the compile list already has a collection of properties. 
@@ -115,6 +160,8 @@ Specifically the work items as follows:
 * In which version will this functionality be ready?
 * When there is no other extensions, shall NuGet provide empty string `"related": ""`, or just skip adding `"related": ""` in assets file?
 * Shall NuGet list not only .pdb and .xml, but all [AllowedReferenceRelatedFileExtensions](https://github.com/dotnet/msbuild/blame/main/src/Tasks/Microsoft.Common.CurrentVersion.targets#L621-L627) if there is any? (.pdb, .xml, .pri, .dll.config, .exe.config)
+* Is it necessary to apply `related` to project reference type? Or only package reference type is needed.
+* The impact on the cache side.
 
 ## Considerations
 
