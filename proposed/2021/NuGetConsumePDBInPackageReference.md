@@ -149,7 +149,6 @@ In order to consume the `related` property, the .NET SDK will need to make chang
 
 ## Future Work
 
-* Package metadata for transitive package references will be considered in the future. For now the recommendation is to elevate that PackageReference to a direct dependency. 
 
 ## Open Questions
 
