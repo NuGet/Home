@@ -1,6 +1,6 @@
 # Consuming pdb support with PackageReference
 
-* Status: Reviewed
+* Status: Reviewing
 * Author(s): [Heng Liu](https://github.com/heng-liu)
 * Issue: [5926](https://github.com/NuGet/Home/issues/5926) Consume pdbs from packages in PackageReference - add Debug Symbols to LockFileTargetLibrary
 * Type: Feature
@@ -27,7 +27,7 @@ Partner team(.NET SDK) who needs to consume .pdb, .xml files for their features 
 
 ## Non-Goals
 
-* 
+* .NET SDK side change to consume .pdb or .xml.
 
 ## Solution
 
@@ -35,7 +35,7 @@ For any given assembly under lib and runtime folder from a package reference, if
 
 * Applies to all the compile time assemblies and runtime assemblies.
 * Apply to transitive dependencies.
-* Apply to package reference only. Will not apply to project reference.
+* Only apply to package reference. Will not apply to project reference.
 
 
 ### Solution - Technical details
@@ -83,7 +83,7 @@ When this solution is applied, the targets section in assets file will be:
   },
 ```
 #### Project reference:
-For example, one project has a project reference of ProjectA. Supppose in folder ./ProjectA/lib/netstandard2.0, there are PackageA.pdb, PackageA.xml file besides ProjectA.dll.
+For example, one project has a project reference of ProjectA. Supppose in folder ./ProjectA/lib/net5.0, there are PackageA.pdb, PackageA.xml file besides ProjectA.dll.
 There will be no change in targets section in assets file for project reference:
 
 ```json
@@ -104,9 +104,11 @@ There will be no change in targets section in assets file for project reference:
     },
 ```
 
+
+
 On the library side there are no changes. 
 
-The [LockFileItem](https://github.com/NuGet/NuGet.Client/blob/4fef99532f4022504feec5f68c8501cbeadd3aed/src/NuGet.Core/NuGet.ProjectModel/LockFile/LockFileItem.cs) type which represents an element in the compile list already has a collection of properties. 
+This solution is adding a `related` property in [LockFileItem](https://github.com/NuGet/NuGet.Client/blob/4fef99532f4022504feec5f68c8501cbeadd3aed/src/NuGet.Core/NuGet.ProjectModel/LockFile/LockFileItem.cs). The [LockFileItem](https://github.com/NuGet/NuGet.Client/blob/4fef99532f4022504feec5f68c8501cbeadd3aed/src/NuGet.Core/NuGet.ProjectModel/LockFile/LockFileItem.cs) type which represents an element in the compile list already has a collection of properties. 
 
 Specifically:
 
@@ -116,16 +118,15 @@ Specifically:
   public IDictionary<string, string> Properties { get; } = new Dictionary<string, string>();
 ```
 
-There is no need to change any code references LockFileItem. 
+So there is no need to change any code references LockFileItem. 
 
-But when generating the targets section of assets file, NuGet needs to go through the runtime and compile time folder for the files with specific extensions and add those as the `related` property.  
-NuGet will not use the `related` property after it's generated, it will be consumed at build time. 
+When generating the targets section of assets file, NuGet needs to go through the runtime and compile time folder for the files with specific extensions and add those as the `related` property.  
+
+After it's generated, NuGet will not use the `related` property. It will be consumed at build time by .NET SDK. 
 
 In order to consume the `related` property, the .NET SDK will need to make change in the following part: 
 
-* [dotnet/sdk/10947](https://github.com/dotnet/sdk/issues/10947) The build tasks for .NET Core SDK  [code](https://github.com/dotnet/sdk/blob/master/src/Tasks/Microsoft.NET.Build.Tasks/ResolvePackageAssets.cs)
-
-## Future Work
+[dotnet/sdk/10947](https://github.com/dotnet/sdk/issues/10947) The build tasks for .NET Core SDK  [code](https://github.com/dotnet/sdk/blob/master/src/Tasks/Microsoft.NET.Build.Tasks/ResolvePackageAssets.cs)
 
 
 ## Open Questions
@@ -136,13 +137,15 @@ In order to consume the `related` property, the .NET SDK will need to make chang
 
 * Shall NuGet list not only .pdb and .xml, but also all the extensions in [AllowedReferenceRelatedFileExtensions](https://github.com/dotnet/msbuild/blame/main/src/Tasks/Microsoft.Common.CurrentVersion.targets#L621-L627) if there is any? (.pdb, .xml, .pri, .dll.config, .exe.config)
 
-* If there is a change in `related` property, will it make any difference in restore? For a package reference, there should be no change in `related` property unless we change to reference a different package/version. So there is no difference in restore when having `related` property.
 
 ## Considerations
 
-In addition to the proposed approach, 2 of other solutions were considered. 
+### 1. If there is a change in `related` property, will it make any difference in restore? 
+For a package reference, there should be no change in `related` property unless we change to reference a different package/version. So there is no difference in restore when having `related` property.
 
-### Do nothing - Recommend the customers use the custom target workaround
+### 2. In addition to the proposed approach, 2 of other solutions were considered. 
+
+#### **Do nothing - Recommend the customers use the custom target workaround**
 
 The workaround that copying .pdb and .xml file into build output folder(.NET Framework) is as following:
 ```xml
@@ -166,9 +169,10 @@ Pros:
 
 Cons:
 * It only works for .NET Framework. For .NET Core, it needs to be adjusted.
-* It only copies .pdb and .xml file to build output. If publish output path is different from build output path, it needs to be adjusted if needs to copy .pdb and .xml to publish output.
+* It only copies .pdb and .xml file to build output. If publish output path is different from build output path, it needs to be adjusted to publish .pdb and .xml.
 
-### Add as LockFileItem, but not a property of LockFileItem
+
+#### **Add as LockFileItem, but not a property of LockFileItem**
 
 Instead of adding existing extension as a property of LockFileItem, adding each exsisting file as a property as a LockFileItem.
 So the targets section in assets file is as following:
@@ -200,7 +204,7 @@ Pros:
 Cons:
 * NuGet caches all LockFileItem across projects. Since NuGet performs the asset selection for individual package for each framework and runtime combination, for large solutions, the number of assets selection calls is high. As such, the memory allocations could be largely affected if adding multiple LockFileItems. (Refer to [comments](https://github.com/NuGet/NuGet.Client/pull/3934#issuecomment-875837433) for more details)
 
-### References
+## References
 * [dotnet/sdk/1458](https://github.com/dotnet/sdk/issues/1458)
 * [Controlling dependency assets](https://docs.microsoft.com/en-us/nuget/consume-packages/package-references-in-project-files#controlling-dependency-assets)
 * [Customized targets example in Github issue comment](https://github.com/dotnet/sdk/issues/1458#issuecomment-420456386)
