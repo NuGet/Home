@@ -31,11 +31,11 @@ Partner team(.NET SDK) who needs to consume .pdb, .xml files for their features 
 
 ## Solution
 
-For any given assembly under lib and runtime folder, if there are files next to it that differ only by extension, NuGet will add a "related" property underneath the assembly in targets section of assets file, listing the extensions of these files.
+For any given assembly under lib and runtime folder from a package reference, if there are files next to it that differ only by extension, NuGet will add a "related" property underneath the assembly in targets section of assets file, listing the extensions of these files.
 
 * Applies to all the compile time assemblies and runtime assemblies.
 * Apply to transitive dependencies.
-* Apply to both package reference and project reference type.
+* Apply to package reference only. Will not apply to project reference.
 
 
 ### Solution - Technical details
@@ -84,7 +84,7 @@ When this solution is applied, the targets section in assets file will be:
 ```
 #### Project reference:
 For example, one project has a project reference of ProjectA. Supppose in folder ./ProjectA/lib/netstandard2.0, there are PackageA.pdb, PackageA.xml file besides ProjectA.dll.
-Currently, the targets section in assets file is:
+There will be no change in targets section in assets file for project reference:
 
 ```json
 {
@@ -103,29 +103,7 @@ Currently, the targets section in assets file is:
       }
     },
 ```
-When this solution is applied, the targets section in assets file will be:
 
-```json
-{
-  "version": 3,
-  "targets": {
-    ".NETCoreApp,Version=v5.0": {
-        "ClassLibrary1/1.0.0": {
-        "type": "project",
-        "framework": ".NETCoreApp,Version=v5.0",
-        "compile": {
-          "bin/placeholder/ClassLibrary1.dll": {
-            "related": "pdb,xml"
-          }
-        },
-        "runtime": {
-          "bin/placeholder/ClassLibrary1.dll": {
-            "related": "pdb,xml"
-          }
-        }
-      }
-    },
-```
 On the library side there are no changes. 
 
 The [LockFileItem](https://github.com/NuGet/NuGet.Client/blob/4fef99532f4022504feec5f68c8501cbeadd3aed/src/NuGet.Core/NuGet.ProjectModel/LockFile/LockFileItem.cs) type which represents an element in the compile list already has a collection of properties. 
@@ -158,9 +136,7 @@ In order to consume the `related` property, the .NET SDK will need to make chang
 
 * Shall NuGet list not only .pdb and .xml, but also all the extensions in [AllowedReferenceRelatedFileExtensions](https://github.com/dotnet/msbuild/blame/main/src/Tasks/Microsoft.Common.CurrentVersion.targets#L621-L627) if there is any? (.pdb, .xml, .pri, .dll.config, .exe.config)
 
-* Is it necessary to add `related` to project reference type node in targets section? Or only adding `related` to package reference type node in targets section?
-
-* If there is a change in `related` property, will it make any difference in restore? For a package reference, there should be no change in `related` property if it's referencing the same package. For a project reference, should manually adding/removing .pdb, .xml file trigger restore? Does it make any difference compared with previous behavior?
+* If there is a change in `related` property, will it make any difference in restore? For a package reference, there should be no change in `related` property unless we change to reference a different package/version. So there is no difference in restore when having `related` property.
 
 ## Considerations
 
@@ -168,14 +144,65 @@ In addition to the proposed approach, 2 of other solutions were considered.
 
 ### Do nothing - Recommend the customers use the custom target workaround
 
+The workaround that copying .pdb and .xml file into build output folder(.NET Framework) is as following:
+```xml
+ <Target Name="_ResolveCopyLocalNuGetPackagePdbsAndXml" 
+          Condition="$(CopyLocalLockFileAssemblies) == true" 
+          AfterTargets="ResolveReferences">
+    <ItemGroup>
+      <ReferenceCopyLocalPaths 
+        Include="@(ReferenceCopyLocalPaths->'%(RootDir)%(Directory)%(Filename).pdb')" 
+        Condition="'%(ReferenceCopyLocalPaths.NuGetPackageId)' != ''
+                    and Exists('%(RootDir)%(Directory)%(Filename).pdb')" />
+      <ReferenceCopyLocalPaths 
+        Include="@(ReferenceCopyLocalPaths->'%(RootDir)%(Directory)%(Filename).xml')" 
+        Condition="'%(ReferenceCopyLocalPaths.NuGetPackageId)' != ''
+                    and Exists('%(RootDir)%(Directory)%(Filename).xml')" />
+    </ItemGroup>
+  </Target>
+```
 Pros:
+* It works (in certain condition).
 
 Cons:
+* It only works for .NET Framework. For .NET Core, it needs to be adjusted.
+* It only copies .pdb and .xml file to build output. If publish output path is different from build output path, it needs to be adjusted if needs to copy .pdb and .xml to publish output.
 
 ### Add as LockFileItem, but not a property of LockFileItem
+
+Instead of adding existing extension as a property of LockFileItem, adding each exsisting file as a property as a LockFileItem.
+So the targets section in assets file is as following:
+```json
+{
+  "version": 3,
+  "targets": {
+    ".NETCoreApp,Version=v5.0": {
+      "PackageA/1.0.0": {
+        "type": "package",
+        "compile": {
+           "lib/netstandard2.0/PackageA.dll": {}
+        },
+        "runtime": {
+           "lib/netstandard2.0/PackageA.dll": {}
+        },
+        "symbol": {
+           "lib/netstandard2.0/PackageA.pdb": {}
+        },
+        "xml": {
+           "lib/netstandard2.0/PackageA.xml": {}
+        },
+    }
+  },
+```
 Pros:
+* It's as powerful as adding existing extension as a property of LockFileItem.
 
 Cons:
+* NuGet caches all LockFileItem across projects. Since NuGet performs the asset selection for individual package for each framework and runtime combination, for large solutions, the number of assets selection calls is high. As such, the memory allocations could be largely affected if adding multiple LockFileItems. (Refer to [comments](https://github.com/NuGet/NuGet.Client/pull/3934#issuecomment-875837433) for more details)
 
 ### References
+* [dotnet/sdk/1458](https://github.com/dotnet/sdk/issues/1458)
+* [Controlling dependency assets](https://docs.microsoft.com/en-us/nuget/consume-packages/package-references-in-project-files#controlling-dependency-assets)
+* [Customized targets example in Github issue comment](https://github.com/dotnet/sdk/issues/1458#issuecomment-420456386)
+* [The performance impact analysis for assets selection path](https://github.com/NuGet/NuGet.Client/pull/3934#issuecomment-875837433)
 
