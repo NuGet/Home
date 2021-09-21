@@ -7,7 +7,7 @@
 ## Summary
 
 <!-- One-paragraph description of the proposal. -->
-NuGet allows access to all package IDs on a package source. However, many .NET developers have needs to filter & consume a subset of the package IDs available on public, private, and local sources. Although NuGet supports a concept of [trusted-signers](https://docs.microsoft.com/en-us/nuget/reference/cli-reference/cli-ref-trusted-signers) to trust packages signed by specific authors, users would like to optionally specify which sources package IDs should be restored from.
+NuGet allows access to all package IDs on a package source. However, many .NET developers have needs to filter & consume a subset of the package IDs available on public, private, and local sources. Although NuGet supports a concept of [trusted-signers](https://docs.microsoft.com/en-us/nuget/reference/cli-reference/cli-ref-trusted-signers) to trust packages signed by specific authors, users would like to optionally specify which package IDs shoulder be allowed from which sources.
 
 This proposal introduces a concept known as Package Source Mapping that allows developers to map package ID patterns, including exact IDs and package ID prefixes, to specific sources. These mappings will enable users to centrally manage what packages are allowed in their solution and where those packages should come from.
 
@@ -26,7 +26,7 @@ This work will also allow future experiences in browsing, installing, and updati
 
 <!-- Explain the proposal as if it were already implemented and you're teaching it to another person. -->
 <!-- Introduce new concepts, functional designs with real life examples, and low-fidelity mockups or  pseudocode to show how this proposal would look. -->
-When using a combination of public, private, and local sources defined in `NuGet.config` file(s), a user can add a new `<packageSourceMapping>` element to opt-in to the feature.  Lastly by adding individual `<package pattern="">` elements in the `<packageSource>` node, the source will only allow the matching package IDs from the respective package source.
+When using a combination of public, private, and local sources defined in `NuGet.config` file(s), a user can add a new `<packageSourceMapping>` element to opt-in to the feature. Lastly by adding individual `<package pattern="">` elements in the `<packageSource>` node, the source will only allow the matching package IDs from the respective package source.
 
 **Definition:**
 
@@ -147,6 +147,8 @@ The global packages folder is an *append only* resource. This means NuGet only e
 
 > Important: When the requested package already exists in the global packages folder, no source look-up will happen and the mappings will be ignored. Declare a [global packages folder for your repo](https://docs.microsoft.com/nuget/reference/nuget-config-file#config-section) to gain the full security benefits of this feature. Work to improve the experience with the default global packages folder in planned for a next iteration.
 
+#### Examples
+
 **Scenario 1:**
 
 The following are single project scenarios.
@@ -261,15 +263,15 @@ Microsoft.C 1.0.0
     <packagesource key="nuget.org">
         <package pattern="NuGet.*" />
     </packageSource>
-    <!-- no contoso patterns -->
+    <!-- no patterns for contoso source -->
 </packageSourceMapping>
 ```
 
 **Result:**
 
 - Package `NuGet.A` will be installed from `nuget.org`.
-- Package `Microsoft.B` will fail installing as there's no matching namespace.
-- Package `Microsoft.C` will fail installing as there's no matching namespace.
+- Package `Microsoft.B` will fail installing as there's no matching pattern.
+- Package `Microsoft.C` will fail installing as there's no matching pattern.
 
 **Scenario 1E:**
 
@@ -343,7 +345,9 @@ NuGetA 1.0.0 -> Microsoft.B 1.0.0
     <packagesource key="nuget.org">
         <package pattern="NuGet*" />
     </packageSource>
-    <!-- no contoso patterns -->
+    <packagesource key="contoso">
+        <package pattern="*" />
+    </packageSource>
 </packageSourceMapping>
 
 ```
@@ -351,7 +355,7 @@ NuGetA 1.0.0 -> Microsoft.B 1.0.0
 **Result:**
 
 - Package `NuGetA` will be installed from `nuget.org`. ID prefixes do not need `.` delimiters.
-- Package `Microsoft.B` will be installed from `contoso` as a fallback.
+- Package `Microsoft.B` will be installed from `contoso`. `*` is a valid ID prefix that matches all package IDs and be used to define a default/fallback source. However, `*` has the lowest precedence and will "lose" if a package ID matches a more specific pattern.
 
 ---
 
@@ -471,3 +475,5 @@ There's a number of features that exist in various ecosystems & layers that solv
 - NuGet can allow users to filter their Package Source Mapping per source within CLI & IDE experiences.
 - NuGet can allow a user to add a full or glob package ID namespace at install time with an additional click/parameter in Visual Studio or CLI.
 - NuGet can combine this feature with `Package Lock Files` to allow a user to ensure the lock file is generated under the allowlist of package ID patterns.
+- Create a better experience for this feature interacting with the global packages folder so that packages in the GPF are validated against the source mapping configuration.
+- Enable users to validate the outcome of their configuration with a CLI command, maybe apart of `dotnet list package`
