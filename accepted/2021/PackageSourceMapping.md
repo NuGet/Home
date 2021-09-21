@@ -4,6 +4,22 @@
 - Start Date: (2021-02-19)
 - GitHub Issue ([6867](https://github.com/NuGet/Home/issues/6867))
 
+## Status
+
+This feature is released in preview and will GA with Visual Studio 17.0.
+
+Release announcement: https://devblogs.microsoft.com/nuget/introducing-package-source-mapping/
+
+ compatible with the following tools:
+
+* [Visual Studio 2022 preview 4](https://visualstudio.microsoft.com/vs/preview/) and later
+* [nuget.exe 6.0.0-preview.4](https://www.nuget.org/downloads) and later
+* [.NET SDK 6.0.100-rc.1](https://devblogs.microsoft.com/nuget/introducing-package-source-mapping/#package-source-mapping-rules) and later
+
+Older tooling will ignore the Package Source Mapping configuration. To use this feature, ensure all your build environments use compatible tooling versions.
+
+Package Source Mappings will apply to all project types – including .NET Framework – as long as compatible tooling is used for build and restore.
+
 ## Summary
 
 <!-- One-paragraph description of the proposal. -->
