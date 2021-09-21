@@ -28,28 +28,76 @@ This work will also allow future experiences in browsing, installing, and updati
 <!-- Introduce new concepts, functional designs with real life examples, and low-fidelity mockups or  pseudocode to show how this proposal would look. -->
 When using a combination of public, private, and local sources defined in `NuGet.config` file(s), a user can add a new `<packageSourceMapping>` element to opt-in to the feature. Lastly by adding individual `<package pattern="">` elements in the `<packageSource>` node, the source will only allow the matching package IDs from the respective package source.
 
+**Prerequisites**
+
+1. Create a repo-level `nuget.config` file by executing `dotnet new nugetconfig` at the repo root.
+2. Define a [repo-specific global packages folder](https://docs.microsoft.com/nuget/reference/nuget-config-file#config-section) in your `nuget.config`.
+3. Define your package sources preceded with a `<clear />` to ensure no sources are inherited from a lower level config.
+
+```xml
+<!-- Define a global packages folder for your repository. -->
+<!-- This is where installed packages will be stored locally. -->
+<config>
+  <add key="globalPackagesFolder" value="globalPackagesFolder" />
+</config>
+
+<!-- Define my package sources, nuget.org and contoso.com. -->
+<!-- `clear` ensures no additional sources are inherited from another config file. -->
+<packageSources>
+  <clear />
+  <!-- `key` can be any identifier for your source. -->
+  <add key="nuget.org" value="https://api.nuget.org/v3/index.json" />
+  <add key="contoso" value="https://contoso.com/packages/" />
+</packageSources>
+```
+
 **Definition:**
 
 Add a new `<packageSourceMapping>` element within the `NuGet.config` using the following syntax:
 
 ```xml
-    <packageSources>
-        <add key="nuget.org" value="https://api.nuget.org/v3/index.json" />
-        <add key="contoso" value="https://contoso.com/packages/" />
-    </packageSources>
+<!-- Define a global packages folder for your repository. -->
+<!-- This is where installed packages will be stored locally. -->
+<config>
+  <add key="globalPackagesFolder" value="globalPackagesFolder" />
+</config>
+
+<!-- Define my package sources, nuget.org and contoso.com. -->
+<!-- `clear` ensures no additional sources are inherited from another config file. -->
+<packageSources>
+  <clear />
+  <!-- `key` can be any identifier for your source. -->
+  <add key="nuget.org" value="https://api.nuget.org/v3/index.json" />
+  <add key="contoso" value="https://contoso.com/packages/" />
+</packageSources>
+
+<!-- Define your source mapping element -->
+<packageSourceMapping>
+ 
+</packageSourceMapping>
 ```
 
 Define the `<packageSource>` element within the `<packageSourceMapping>` parent with the name of a valid package source:
 
 ```xml
+<!-- Define a global packages folder for your repository. -->
+<!-- This is where installed packages will be stored locally. -->
+<config>
+  <add key="globalPackagesFolder" value="globalPackagesFolder" />
+</config>
+
+<!-- Define my package sources, nuget.org and contoso.com. -->
+<!-- `clear` ensures no additional sources are inherited from another config file. -->
 <packageSources>
-    <add key="nuget.org" value="https://api.nuget.org/v3/index.json" />
-         
-    <add key="contoso" value="https://contoso.com/packages/" />
- 
+  <clear />
+  <!-- `key` can be any identifier for your source. -->
+  <add key="nuget.org" value="https://api.nuget.org/v3/index.json" />
+  <add key="contoso" value="https://contoso.com/packages/" />
 </packageSources>
- 
+
+<!-- Define your source mapping element -->
 <packageSourceMapping>
+
     <packagesource key="nuget.org">
 
     </packageSource>
@@ -60,13 +108,22 @@ Define the `<packageSource>` element within the `<packageSourceMapping>` parent 
 Next, add `<package pattern="">` elements under the `<packageSource>` to map matching package IDs to that source. Patterns can be defined as an exact package ID or a package ID prefix using a wildcard(*) to match the glob pattern of 0 or more package ID(s):
 
 ```xml
+<!-- Define a global packages folder for your repository. -->
+<!-- This is where installed packages will be stored locally. -->
+<config>
+  <add key="globalPackagesFolder" value="globalPackagesFolder" />
+</config>
+
+<!-- Define my package sources, nuget.org and contoso.com. -->
+<!-- `clear` ensures no additional sources are inherited from another config file. -->
 <packageSources>
-    <add key="nuget.org" value="https://api.nuget.org/v3/index.json" />
-         
-    <add key="contoso" value="https://contoso.com/packages/" />
- 
+  <clear />
+  <!-- `key` can be any identifier for your source. -->
+  <add key="nuget.org" value="https://api.nuget.org/v3/index.json" />
+  <add key="contoso" value="https://contoso.com/packages/" />
 </packageSources>
- 
+
+<!-- Define your source mapping element -->
 <packageSourceMapping>
     <!-- Add a pattern for Microsoft.* or NuGet.* under the nuget.org source. -->
     <packagesource key="nuget.org">
@@ -85,13 +142,22 @@ The most specific pattern that matches a package ID will have the highest preced
 **Example:**
 
 ```xml
+<!-- Define a global packages folder for your repository. -->
+<!-- This is where installed packages will be stored locally. -->
+<config>
+  <add key="globalPackagesFolder" value="globalPackagesFolder" />
+</config>
+
+<!-- Define my package sources, nuget.org and contoso.com. -->
+<!-- `clear` ensures no additional sources are inherited from another config file. -->
 <packageSources>
-    <add key="nuget.org" value="https://api.nuget.org/v3/index.json" />
-         
-    <add key="contoso" value="https://contoso.com/packages/" />
- 
+  <clear />
+  <!-- `key` can be any identifier for your source. -->
+  <add key="nuget.org" value="https://api.nuget.org/v3/index.json" />
+  <add key="contoso" value="https://contoso.com/packages/" />
 </packageSources>
- 
+
+<!-- Define your source mapping element -->
 <packageSourceMapping>
     <!-- Add a pattern for Microsoft.* or NuGet.* under the nuget.org source. -->
     <packagesource key="nuget.org">
@@ -146,6 +212,11 @@ The global packages folder is an *append only* resource. This means NuGet only e
 4. Package Source Mapping settings are applied following [nuget.config precedence rules](https://docs.microsoft.com/nuget/consume-packages/configuring-nuget-behavior#how-settings-are-applied) when multiple `nuget.config` files at various levels (machine-level, user-level, repo-level) are present. 
 
 > Important: When the requested package already exists in the global packages folder, no source look-up will happen and the mappings will be ignored. Declare a [global packages folder for your repo](https://docs.microsoft.com/nuget/reference/nuget-config-file#config-section) to gain the full security benefits of this feature. Work to improve the experience with the default global packages folder in planned for a next iteration.
+
+#### Packge Source Mapping strategies and tips
+
+* Use a repo-specific `nuget.config` file as a best practice. User and machine level config files add complexity through inheritance as explained in the [nuget.config precedence rules](https://docs.microsoft.com/nuget/consume-packages/configuring-nuget-behavior#how-settings-are-applied).
+* Add a `<clear>
 
 #### Examples
 
