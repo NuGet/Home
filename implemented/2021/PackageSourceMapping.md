@@ -232,7 +232,12 @@ The global packages folder is an *append only* resource. This means NuGet only e
 #### Packge Source Mapping strategies and tips
 
 * Use a repo-specific `nuget.config` file as a best practice. User and machine level config files add complexity through inheritance as explained in the [nuget.config precedence rules](https://docs.microsoft.com/nuget/consume-packages/configuring-nuget-behavior#how-settings-are-applied).
-* Add a `<clear>
+* Add a `<clear />` statement in your <packageSources> element to ensure no sources are inherited from lower level configs.
+* Use broad package ID prefixes like `Microsoft.*` and take advantage of the precedence rules to efficiently onboard and scale your configuration to large solutions.
+* Use narrow package ID prefixes or exact IDs to effectively use your source mappings as a centralized package allowlist.
+* `*` is a valid ID prefix that matches all package IDs but also has the lowest precedence. Defining it for a source will effectively make that source your default source where all packages that don't match more specific defined patterns will be restored from.
+* Having the exact same package ID pattern defined for multiple sources is allowed. However, this practice is not recommended as it introduces potential restore inconsistencies.
+* Using a consistent unique prefix for internal packages such as `CompanyName.Internal.*` will make your configurations easier to define and manage.
 
 #### Examples
 
