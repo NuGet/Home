@@ -8,14 +8,17 @@
 ## Problem Background
 
 In the PackageReference world, the packages are consumed from the global-packages folder, .pdb, .xml files from lib and runtime folder are not copied into the build output folder.
-However, in some cases, consuming .pbd, .xml files are needed to support certain features, like source link ( see issue [1458](https://github.com/dotnet/sdk/issues/1458)).
-But .NET SDK could not consume those files, as it needs [LockFileTargetLibrary](https://github.com/NuGet/NuGet.Client/blob/dev/src/NuGet.Core/NuGet.ProjectModel/LockFile/LockFileTargetLibrary.cs) to tell what those asset files are, and NuGet doesn't have any reference to .pdb, .xml asset files in LockFileTargetLibrary for now.
+In some cases, consuming .pbd, .xml files are needed to support certain features, like source link ( see issue [1458](https://github.com/dotnet/sdk/issues/1458)).
+The established design for consuming files out of packages is that NuGet tells the .NET SDK which files are important through the assets file, or to be specific, the [LockFileTargetLibrary](https://github.com/NuGet/NuGet.Client/blob/dev/src/NuGet.Core/NuGet.ProjectModel/LockFile/LockFileTargetLibrary.cs). 
+Currently, NuGet does not select pdb or xml files.
 
-In comparison, in packages.config, .pdb, .xml files are automatically copied from lib and runtime folder into the build output folder. So there is no such problem in packages.config.
+In comparison, in packages.config, .pdb, .xml files are automatically copied from lib and runtime folder into the build output folder because of the [ResolveAssemblyReference](https://github.com/dotnet/msbuild/blob/main/src/Tasks/AssemblyDependency/ResolveAssemblyReference.cs#L75) task. So there is no such problem in packages.config.
 
 ## Who are the customers
 
-Partner team(.NET SDK) who needs to consume .pdb, .xml files for their features in PackageReference world.
+Partner team(.NET SDK) who needs to consume .pdb, .xml files for their features in PackageReference world. 
+
+Take source link as an example. When a NuGet package includes a .pdb file in its lib folder, in order to debug into the NuGet package, it needs the .pdb file to be copied to the build output folder of the project which reference the NuGet package.
 
 ## Requirements
 
@@ -41,7 +44,7 @@ For any given assembly under lib and runtime folder from a package reference, if
 ### Solution - Technical details
 
 #### Package reference:
-For example, one project has a package reference of PackageA. Supppose in folder ./PackageA/1.0.0/lib/netstandard2.0, there are PackageA.pdb, PackageA.xml file besides PackageA.dll.
+For example, one project has a package reference of PackageA. Suppose in folder ./PackageA/1.0.0/lib/netstandard2.0, there are PackageA.pdb, PackageA.xml file besides PackageA.dll.
 Currently, the targets section in assets file is:
 
 ```json
@@ -131,19 +134,18 @@ In order to consume the `related` property, the .NET SDK will need to make chang
 
 ## Open Questions
 
-* In which version will this functionality be ready?
+### 1. When there is no other extensions, shall NuGet provide empty string `"related": ""`, or just skip adding `"related": ""` in assets file?
+NuGet tends to not adding `"related": ""` if it's there is no other extension. The assets file can get very large. so a general rule is to not write more than absolutely necessary. 
 
-* When there is no other extensions, shall NuGet provide empty string `"related": ""`, or just skip adding `"related": ""` in assets file?
+### 2. Will NuGet list not only .pdb and .xml, but also all the extensions in [AllowedReferenceRelatedFileExtensions](https://github.com/dotnet/msbuild/blame/main/src/Tasks/Microsoft.Common.CurrentVersion.targets#L621-L627) if there is any? (.pdb, .xml, .pri, .dll.config, .exe.config)
+NuGet will check and add all extension, no matter the extension is in [AllowedReferenceRelatedFileExtensions](https://github.com/dotnet/msbuild/blame/main/src/Tasks/Microsoft.Common.CurrentVersion.targets#L621-L627) or not. So if there is a `a.random`, NuGet will add `random` into the `related` property.
 
-* Shall NuGet list not only .pdb and .xml, but also all the extensions in [AllowedReferenceRelatedFileExtensions](https://github.com/dotnet/msbuild/blame/main/src/Tasks/Microsoft.Common.CurrentVersion.targets#L621-L627) if there is any? (.pdb, .xml, .pri, .dll.config, .exe.config)
-
+### 3. Will having `related` property make any difference in No-op restore? 
+For a package reference, there should be no change in `related` property unless we change to reference a different package/version. So there is no difference in No-op restore when having `related` property.
 
 ## Considerations
 
-### 1. If there is a change in `related` property, will it make any difference in restore? 
-For a package reference, there should be no change in `related` property unless we change to reference a different package/version. So there is no difference in restore when having `related` property.
-
-### 2. In addition to the proposed approach, 2 of other solutions were considered. 
+### In addition to the proposed approach, 2 of other solutions were considered. 
 
 #### **Do nothing - Recommend the customers use the custom target workaround**
 
@@ -202,6 +204,8 @@ Pros:
 * It's as powerful as adding existing extension as a property of LockFileItem.
 
 Cons:
+* .pdb and .xml files are not on the same level as compile or runtime items.
+The usage of .pdb and .xml files are SDK driven rather than package author driven.
 * NuGet caches all LockFileItem across projects. Since NuGet performs the asset selection for individual package for each framework and runtime combination, for large solutions, the number of assets selection calls is high. As such, the memory allocations could be largely affected if adding multiple LockFileItems. (Refer to [comments](https://github.com/NuGet/NuGet.Client/pull/3934#issuecomment-875837433) for more details)
 
 ## References
