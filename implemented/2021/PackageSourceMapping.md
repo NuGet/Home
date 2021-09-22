@@ -449,6 +449,36 @@ NuGetA 1.0.0 -> Microsoft.B 1.0.0
 - Package `NuGetA` will be installed from `nuget.org`. ID prefixes do not need `.` delimiters.
 - Package `Microsoft.B` will be installed from `contoso`. `*` is a valid ID prefix that matches all package IDs and be used to define a default/fallback source. However, `*` has the lowest precedence and will "lose" if a package ID matches a more specific pattern.
 
+**Scenario 1H:**
+
+```xml
+<PackageReference Include="Microsoft.A" Version="1.0.0"/>
+<PackageReference Include="Newtonsoft.Json" Version="11.0.0"/>
+<PackageReference Include="Serilog" Version="11.0.0"/>
+<PackageReference Include="Contoso.Is.Private.Package" Version="1.0.0"/>
+```
+
+```xml
+<packageSourceMapping>
+    <packagesource key="nuget.org">
+        <package pattern="Serilog" />
+        <package pattern="Microsoft.Extensions.Options" />
+        <package pattern="Newtonsoft.Json" />
+    </packageSource>
+    <packagesource key="contoso">
+        <package pattern="*" />
+    </packageSource>
+</packageSourceMapping>
+```
+
+**Result:**
+
+- `Serilog`, `Microsoft.A`, and `Newtonsoft.Json` are all installed from `nuget.org`.
+- `Microsoft.Is.Private.Package` is installed from `contoso` feed.
+- All packages not explicitly defined by the listed patterns will be only be searched for from `contoso` feed due to matching `*`.
+
+Essentially, this configuration makes my internal feed a "default" and creates an explicit allowlist for `nuget.org` packages.
+
 ---
 
 **Scenario 2:**
