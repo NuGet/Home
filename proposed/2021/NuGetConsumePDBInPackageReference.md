@@ -85,9 +85,10 @@ When this solution is applied, the targets section in assets file will be:
     }
   },
 ```
+
 #### Project reference:
-For example, one project has a project reference of ProjectA. Supppose in folder ./ProjectA/lib/net5.0, there are PackageA.pdb, PackageA.xml file besides ProjectA.dll.
-There will be no change in targets section in assets file for project reference:
+For example, one project has a project reference to ProjectA. Supppose in folder ./ProjectA/lib/net5.0, there are PackageA.pdb, PackageA.xml file besides ProjectA.dll.
+Since the [ResolveAssemblyReference](https://github.com/dotnet/msbuild/blob/main/src/Tasks/AssemblyDependency/ResolveAssemblyReference.cs#L75) task will copy the related files, there will be no change in the assets file for project references.
 
 ```json
 {
@@ -107,11 +108,7 @@ There will be no change in targets section in assets file for project reference:
     },
 ```
 
-
-
-On the library side there are no changes. 
-
-This solution is adding a `related` property in [LockFileItem](https://github.com/NuGet/NuGet.Client/blob/4fef99532f4022504feec5f68c8501cbeadd3aed/src/NuGet.Core/NuGet.ProjectModel/LockFile/LockFileItem.cs). The [LockFileItem](https://github.com/NuGet/NuGet.Client/blob/4fef99532f4022504feec5f68c8501cbeadd3aed/src/NuGet.Core/NuGet.ProjectModel/LockFile/LockFileItem.cs) type which represents an element in the compile list already has a collection of properties. 
+On the library side there are no changes. This solution is adding a `related` property in [LockFileItem](https://github.com/NuGet/NuGet.Client/blob/4fef99532f4022504feec5f68c8501cbeadd3aed/src/NuGet.Core/NuGet.ProjectModel/LockFile/LockFileItem.cs). The [LockFileItem](https://github.com/NuGet/NuGet.Client/blob/4fef99532f4022504feec5f68c8501cbeadd3aed/src/NuGet.Core/NuGet.ProjectModel/LockFile/LockFileItem.cs) type which represents an element in the compile list already has a collection of properties.
 
 Specifically:
 
@@ -129,10 +126,10 @@ After it's generated, NuGet will not use the `related` property. It will be cons
 
 In order to consume the `related` property, the .NET SDK will need to make change in the following part: 
 
-[dotnet/sdk/10947](https://github.com/dotnet/sdk/issues/10947) The build tasks for .NET Core SDK  [code](https://github.com/dotnet/sdk/blob/master/src/Tasks/Microsoft.NET.Build.Tasks/ResolvePackageAssets.cs)
+[dotnet/sdk#10947](https://github.com/dotnet/sdk/issues/10947) The build task in the .NET SDK  [ResolvePackageAssets task](https://github.com/dotnet/sdk/blob/80e801ed0ef8027b7894ebd4a8af4fc9afc21ac8/src/Tasks/Microsoft.NET.Build.Tasks/ResolvePackageAssets.cs).
 
 
-## Open Questions
+## Considerations
 
 ### 1. When there is no other extensions, shall NuGet provide empty string `"related": ""`, or just skip adding `"related": ""` in assets file?
 NuGet tends to not adding `"related": ""` if it's there is no other extension. The assets file can get very large. So a general rule is to not write more than absolutely necessary. 
@@ -143,9 +140,7 @@ NuGet will check and add all extension, no matter the extension is in [AllowedRe
 ### 3. Will having `related` property make any difference in No-op restore? 
 For a package reference, there should be no change in `related` property unless we change to reference a different package/version. So there is no difference in No-op restore when having `related` property.
 
-## Considerations
-
-### In addition to the proposed approach, 2 of other solutions were considered. 
+### 4. In addition to the proposed approach, 2 of other solutions were considered. 
 
 #### **Do nothing - Recommend the customers use the custom target workaround**
 
@@ -204,8 +199,6 @@ Pros:
 * It's as powerful as adding existing extension as a property of LockFileItem.
 
 Cons:
-* .pdb and .xml files are not on the same level as compile or runtime items.
-The usage of .pdb and .xml files are SDK driven rather than package author driven.
 * NuGet caches all LockFileItem across projects. Since NuGet performs the asset selection for individual package for each framework and runtime combination, for large solutions, the number of assets selection calls is high. As such, the memory allocations could be largely affected if adding multiple LockFileItems. (Refer to [comments](https://github.com/NuGet/NuGet.Client/pull/3934#issuecomment-875837433) for more details)
 
 ## References
