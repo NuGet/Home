@@ -1,7 +1,5 @@
 name: Team Internal
 description: Issue template used for tasks created by the NuGet team for themselves. Internal Use Only.
-title: ""
-labels: []
 body:
   - type: markdown
     attributes:
