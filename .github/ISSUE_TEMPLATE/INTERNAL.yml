@@ -1,0 +1,41 @@
+name: Team Internal
+description: Issue template used for tasks created by the NuGet team for themselves. Internal Use Only.
+title: ""
+labels: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Preflight Checklist
+
+        **Do not file this issue until you've gone through this checklist.**
+
+        ### Basic Labels (required)
+
+        * Add **Regression** labels if this is a regression.
+        * Add a **Type:** label
+        * Add **Area:** and/or **Functionality:** labels
+        * Add a **Tenet:** if applicable
+
+        ### Triage Labels (required)
+
+        * Add a **Priority:** label
+        * Move the **Pipeline** to **Backlog** (on ZenHub)
+
+        ### Additional Items
+
+        * Add an **estimate** if you have one
+        * Apply a **Style** label if it's style-specific.
+        * Add a **Category**
+
+  - type: textarea
+    id: info
+    attributes:
+      label: Issue Body
+      description: What's this issue about?
+      placeholder: |
+        Please add as much detail as is relevant to this issue.
+
+        Even if you think the task is for yourself, it might end up being handed off to someone else, or a community member might want to jump in!
+    validations:
+      required: true
