@@ -553,4 +553,4 @@ There's a number of features that exist in various ecosystems & layers that solv
 - NuGet can allow a user to add a full or glob package ID namespace at install time with an additional click/parameter in Visual Studio or CLI.
 - NuGet can combine this feature with `Package Lock Files` to allow a user to ensure the lock file is generated under the allowlist of package ID patterns.
 - Create a better experience for this feature interacting with the global packages folder so that packages in the GPF are validated against the source mapping configuration.
-- Enable users to validate the outcome of their configuration with a CLI command, maybe apart of `dotnet list package`
+- Enable users to validate the outcome of their configuration with a CLI command, maybe a part of `dotnet list package`
