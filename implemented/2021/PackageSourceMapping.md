@@ -164,7 +164,7 @@ The global packages folder is an *append only* resource. This means NuGet only e
 
 #### Package Source Mapping rules
 
-1. Two types of package ID patterns are supported:
+1. Two types of package patterns are supported:
 
     a. `NuGet.*` - Package prefixes. Must end with a `*`, which may match 0 or more characters. `*` is the broadest valid prefix that matches all package IDs, but will have the lowest precedence by default. `NuGet*` is also valid and will match package IDs `NuGet`, `NuGetFoo`, and `NuGet.Bar`.
     
