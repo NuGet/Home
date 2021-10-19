@@ -8,13 +8,13 @@
 
 This feature is released in preview and will GA with Visual Studio 17.0.
 
-Release announcement: https://devblogs.microsoft.com/nuget/introducing-package-source-mapping/
+Release announcement: <https://devblogs.microsoft.com/nuget/introducing-package-source-mapping/>
 
  compatible with the following tools:
 
-* [Visual Studio 2022 preview 4](https://visualstudio.microsoft.com/vs/preview/) and later
-* [nuget.exe 6.0.0-preview.4](https://www.nuget.org/downloads) and later
-* [.NET SDK 6.0.100-rc.1](https://devblogs.microsoft.com/nuget/introducing-package-source-mapping/#package-source-mapping-rules) and later
+- [Visual Studio 2022 preview 4](https://visualstudio.microsoft.com/vs/preview/) and later
+- [nuget.exe 6.0.0-preview.4](https://www.nuget.org/downloads) and later
+- [.NET SDK 6.0.100-rc.1](https://devblogs.microsoft.com/nuget/introducing-package-source-mapping/#package-source-mapping-rules) and later
 
 Older tooling will ignore the Package Source Mapping configuration. To use this feature, ensure all your build environments use compatible tooling versions.
 
@@ -49,7 +49,7 @@ When using a combination of public, private, and local sources defined in `NuGet
 Have or create a repo-level `nuget.config` file by executing `dotnet new nugetconfig` at the repo root. In your `nuget.config`, define your package sources.
 
 ```xml
-<!-- [Optional] Define a global packages folder for your repository. -->
+<!-- [Optional] Define a global packages folder for your repository. See Package Installation Rules for more context. -->
 <config>
   <add key="globalPackagesFolder" value="globalPackagesFolder" />
 </config>
@@ -114,7 +114,7 @@ When you're finished, your `nuget.config` might look like the following:
 **Example:**
 
 ```xml
-<!-- [Optional] Define a global packages folder for your repository. -->
+<!-- [Optional] Define a global packages folder for your repository. See Package Installation Rules for more context.-->
 <config>
   <add key="globalPackagesFolder" value="globalPackagesFolder" />
 </config>
@@ -173,32 +173,32 @@ The global packages folder is an *append only* resource. This means NuGet only e
 1. Two types of package patterns are supported:
 
     a. `NuGet.*` - Package prefixes. Must end with a `*`, which may match 0 or more characters. `*` is the broadest valid prefix that matches all package IDs, but will have the lowest precedence by default. `NuGet*` is also valid and will match package IDs `NuGet`, `NuGetFoo`, and `NuGet.Bar`.
-    
+
     b. `NuGet.Common` - Exact package IDs.
 
 2. Any requested package ID must map to one or more sources by matching a defined package ID pattern. In other words, once you have defined a `packageSourceMapping` element you must explicitly define which sources *every* package - *including transitive packages* - will be restored from.
 
     a. Both top level (directly installed) *and transitive* packages must match defined patterns. There is no requirement that a top level package and its dependencies come from the same source.
-    
+
     b. The same ID pattern can be defined on multiple sources, allowing matching package IDs to be restored from any of the feeds that define the pattern. However, this isn't recommended due to the impact on restore predictability (a given package could come from multiple sources).
 
-3. When multiple unique patterns match a package ID, the most specific (longest) match will be preferred. 
+3. When multiple unique patterns match a package ID, the most specific (longest) match will be preferred.
 
-    a. Exact package ID patterns always have the highest precedence while the generic `*` always has the lowest precedence. For an example package ID `NuGet.Common`, the following package ID patterns are ordered from highest to lowest precedence: `NuGet.Common`, `NuGet.*`, `*`. 
+    a. Exact package ID patterns always have the highest precedence while the generic `*` always has the lowest precedence. For an example package ID `NuGet.Common`, the following package ID patterns are ordered from highest to lowest precedence: `NuGet.Common`, `NuGet.*`, `*`.
 
-4. Package Source Mapping settings are applied following [nuget.config precedence rules](https://docs.microsoft.com/nuget/consume-packages/configuring-nuget-behavior#how-settings-are-applied) when multiple `nuget.config` files at various levels (machine-level, user-level, repo-level) are present. 
+4. Package Source Mapping settings are applied following [nuget.config precedence rules](https://docs.microsoft.com/nuget/consume-packages/configuring-nuget-behavior#how-settings-are-applied) when multiple `nuget.config` files at various levels (machine-level, user-level, repo-level) are present.
 
-> Important: When the requested package already exists in the global packages folder, no source look-up will happen and the mappings will be ignored. Declare a [global packages folder for your repo](https://docs.microsoft.com/nuget/reference/nuget-config-file#config-section) to gain the full security benefits of this feature. Work to improve the experience with the default global packages folder in planned for a next iteration.
+> Important: When the requested package already exists in the global packages folder, no source look-up will happen and the mappings will be ignored. Declare a [global packages folder for your repo](https://docs.microsoft.com/nuget/reference/nuget-config-file#config-section) to gain the full security benefits of this feature. See [Package Installation rules](#package-installation-rules) for more context. Work to improve the experience with the default global packages folder in planned for a next iteration.
 
 #### Packge Source Mapping strategies and tips
 
-* Use a repo-specific `nuget.config` file as a best practice. User and machine level config files add complexity through inheritance as explained in the [nuget.config precedence rules](https://docs.microsoft.com/nuget/consume-packages/configuring-nuget-behavior#how-settings-are-applied).
-* Add a `<clear />` statement in your <packageSources> element to ensure no sources are inherited from lower level configs.
-* Use broad package ID prefixes like `Microsoft.*` and take advantage of the precedence rules to efficiently onboard and scale your configuration to large solutions.
-* Use narrow package ID prefixes or exact IDs to effectively use your source mappings as a centralized package allowlist.
-* `*` is a valid ID prefix that matches all package IDs but also has the lowest precedence. Defining it for a source will effectively make that source your default source where all packages that don't match more specific defined patterns will be restored from.
-* Having the exact same package ID pattern defined for multiple sources is allowed. However, this practice is not recommended as it introduces potential restore inconsistencies.
-* Using a consistent unique prefix for internal packages such as `CompanyName.Internal.*` will make your configurations easier to define and manage.
+- Use a repo-specific `nuget.config` file as a best practice. User and machine level config files add complexity through inheritance as explained in the [nuget.config precedence rules](https://docs.microsoft.com/nuget/consume-packages/configuring-nuget-behavior#how-settings-are-applied).
+- Add a `<clear />` statement in your `<packageSources>` element to ensure no sources are inherited from lower level configs.
+- Use broad package ID prefixes like `Microsoft.*` and take advantage of the precedence rules to efficiently onboard and scale your configuration to large solutions.
+- Use narrow package ID prefixes or exact IDs to effectively use your source mappings as a centralized package allowlist.
+- `*` is a valid ID prefix that matches all package IDs but also has the lowest precedence. Defining it for a source will effectively make that source your default source where all packages that don't match more specific defined patterns will be restored from.
+- Having the exact same package ID pattern defined for multiple sources is allowed. However, this practice is not recommended as it introduces potential restore inconsistencies.
+- Using a consistent unique prefix for internal packages such as `CompanyName.Internal.*` will make your configurations easier to define and manage.
 
 #### Examples
 
