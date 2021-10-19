@@ -162,6 +162,12 @@ The global packages folder is an *append only* resource. This means NuGet only e
 - Package installation is operation based - If 3 projects are being restored during that operation, and all those projects have a dependency to `Newtonsoft.Json`, version `9.0.1`, in regular scenarios, only 1 project will *actually* download and install the package. The other projects will use the already installed version.
 - `.nupkg.metadata` - Each package installation directory contains a `.nupkg.metadata` file which signify that a package installation is complete. This is expected to be the last file written in the package directory. This file is *not* use during build. NuGet.Client writes the package source information inside this file.
 
+#### Package installation rules
+
+1. When the requested package is already installed in the global packages folder, no source look-up will happen. The package source mappings are irrelevant.
+1. When a source has no metadata, the default is *none*.
+1. When a package id needs to be downloaded, the [Package Source Mapping rules](#package-source-mapping-rules) apply.
+
 #### Package Source Mapping rules
 
 1. Two types of package patterns are supported:
