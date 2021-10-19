@@ -23,7 +23,7 @@ Package Source Mappings will apply to all project types as long as compatible to
 ## Summary
 
 <!-- One-paragraph description of the proposal. -->
-NuGet allows access to all package IDs on a package source. However, many .NET developers have needs to filter & consume a subset of the package IDs available on public, private, and local sources. Although NuGet supports a concept of [trusted-signers](https://docs.microsoft.com/en-us/nuget/reference/cli-reference/cli-ref-trusted-signers) to trust packages signed by specific authors, users would like to optionally specify which package IDs shoulder be allowed from which sources.
+NuGet allows access to all package IDs on a package source. However, many .NET developers have needs to filter & consume a subset of the package IDs available on public, private, and local sources. Although NuGet supports a concept of [trusted-signers](https://docs.microsoft.com/en-us/nuget/reference/cli-reference/cli-ref-trusted-signers) to trust packages signed by specific authors, users would like to optionally specify which package IDs should be allowed from which sources.
 
 This proposal introduces a concept known as Package Source Mapping that allows developers to map package ID patterns, including exact IDs and package ID prefixes, to specific sources. These mappings will enable users to centrally manage what packages are allowed in their solution and where those packages should come from.
 
