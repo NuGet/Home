@@ -107,7 +107,7 @@ Repeat this process for all sources.
 When using package source mapping, every source should have a list of allowed package patterns.
 A user may also pin a specific package id instead of broader package ID prefix.
 
-The most specific pattern that matches a package ID will have the highest precedence. Exact package IDs will always have the highest precedence over any prefix.
+The most specific pattern that matches a package ID will have the highest precedence. Patterns with exact IDs will always have the highest precedence over a prefix pattern.
 
 When you're finished, your `nuget.config` might look like the following:
 
