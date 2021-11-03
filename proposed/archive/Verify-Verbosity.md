@@ -1,6 +1,6 @@
 # `dotnet nuget verify --verbosity`
 
-* Status: **In Review**
+* Status: **Implemented**
 * Author: [Kartheek Penagamuri](https://github.com/kartheekp-ms)
 * Issue: [#10316](https://github.com/NuGet/Home/issues/10316) - dotnet nuget verify is too quiet
 
@@ -15,7 +15,7 @@ Package consumers that use the `dotnet nuget verify` command to verify package s
 ## Goals
 
 * Change the output of `dotnet nuget verify` command for various `--verbosity` options.
-* Improve log messages & error codes in docs to improve the customer experience based upon the learnings from the recent Debian incident.
+* Improve log messages & error codes in docs to improve the customer experience based upon the learnings from the recent [`Symantec CA distrust case`](https://github.com/NuGet/Home/issues/10491).
 
 ## Non-goals
 
@@ -40,13 +40,11 @@ The details that should be displayed on each verbosity level are described below
 `Author/Repository Certificate -> Subject name`| ❌       | ✔️          | ✔️         | ✔️         | ✔️
 `Author/Repository Certificate -> SHA-256 hash`| ❌       | ✔️          | ✔️         | ✔️         | ✔️
 `Author/Repository Certificate -> Validity period`| ❌       | ✔️          | ✔️         | ✔️         | ✔️
-`Author/Repository Certificate -> Service index URL (If applicable)`| ❌       | ✔️          | ✔️         | ✔️         | ✔️
+`Repository Certificate -> Service index URL`| ❌       | ✔️          | ✔️         | ✔️         | ✔️
 `Package name being verified`                    | ❌       | ✔️          | ✔️         | ✔️         | ✔️
 `Type of signature (author or repository)`| ❌       | ✔️          | ✔️         | ✔️         | ✔️
 
-```
 Once this spec has been implemented the output of `nuget.exe verify` command for various verbosity levels will change and be in sync with `dotnet nuget verify` command.
-```
 
 ### Log level mapping - The following details are copied from [here](https://github.com/NuGet/Home/blob/dev/designs/Package-List-Verbosity.md#log-level-mapping). Thanks to [Joel Verhagen](https://github.com/joelverhagen) for the detailed information
 
@@ -338,7 +336,7 @@ Package signature validation failed.
 
 </details>
 
-#### `Debian case - Verifying author signed package with untrusted timestamping signing certificate`
+#### `Symantec CA distrust case - Verifying author signed package with untrusted timestamping signing certificate`
 
 <details>
 <summary>output</summary>
@@ -374,7 +372,7 @@ Package signature validation failed.
 
 </details>
 
-#### `Debian case - Verifying expired author signed package with untrusted timestamping signing certificate`
+#### `Symantec CA distrust case - Verifying expired author signed package with untrusted timestamping signing certificate`
 
 <details>
 <summary>output</summary>
