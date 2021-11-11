@@ -38,6 +38,8 @@ There are many generations of .NET. For the sake of this proposal, we will focus
   - `netcoreapp1.0, netcoreapp1.1, netcoreapp2.0, netcoreapp2.1, netcoreapp2.2, netcoreapp3.0, netcoreapp3.1`
 - .NET:
   - `net5.0, net6.0`
+- Any:
+  - .NET Framework, .NET Core, .NET
 
 ![](meta/resources/TargetFrameworkAndPlatformFilters/GenerationsOfNET.png)
 
