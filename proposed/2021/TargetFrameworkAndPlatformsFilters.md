@@ -53,10 +53,12 @@ With .NET Core introducing support for cross-platform scenarios, we will define 
   - .NET Framework
   - .NET Core
   - .NET 5+
+    - `net5.0-windows, net6.0-windows`
   - .NET Standard
 - macOS:
   - .NET Core
   - .NET 5+
+    - `net6.0-macos`
   - .NET Standard
 - Linux:
   - .NET Core
@@ -64,18 +66,23 @@ With .NET Core introducing support for cross-platform scenarios, we will define 
   - .NET Standard
 - Android:
   - .NET 6+
+    - `net6.0-android`
   - .NET Standard
 - iOS:
   - .NET 6+
+    - `net6.0-ios`
   - .NET Standard
 - macCatalyst:
   - .NET 6+
+    - `net6.0-maccatalyst`
   - .NET Standard
 - tvOS:
   - .NET 6+
+    - `net6.0-tvos`
   - .NET Standard
 - Tizen:
   - .NET 6+
+    - `net6.0-tizen`
   - .NET Standard
 
 **Note:** .NET Standard is considered a special case that supports majority of these platforms depending on the [version of .NET standard](https://docs.microsoft.com/dotnet/standard/net-standard#net-implementation-support). If the framework precedence of a target framework supports .NET Standard, it's respective versions supported will be implicitly included.
