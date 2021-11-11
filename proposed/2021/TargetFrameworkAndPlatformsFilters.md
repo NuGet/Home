@@ -127,6 +127,10 @@ platform:windows platform:macos platform:linux    # Match the platforms
 implementation:netframework implementation:netcore implementation:net  # Match the generation of .NET including both supported frameworks & platforms.
 ```
 
+- `framework:` - Allows a short-form TFM value to serach on.
+- `platform:` - Allows a platform value to search on.
+- `implementation` - Allows a generation of .NET to search on (includes all frameworks of the generaiton).
+
 **Implementations* is the best word to describe a generation of .NET at the time of writing. This can change at anytime.
 
 <!--### Technical explanation-->
