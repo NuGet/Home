@@ -26,7 +26,7 @@ When browsing for packages on NuGet.org, a developer will be able to filter pack
 2. The **supported platforms** for the generation such as .NET Standard, Windows, macOS, Linux, Android, iOS, and more.
 3. The **version number** of the generation being used such as .NET 5, .NET Core 3.1, .NET Framework 4.8, and more.
 
-This proposal only accounts for the **majority of packages on NuGet.org**. There are many unique TFMs in the .NET ecosystem, but for the sake of creating a concept that will scale with the future of .NET, many unsupported & low usage TFMs are not considered. Thus this proposal only focuses on the [most common target frameworks](https://docs.microsoft.com/dotnet/standard/frameworks#latest-versions) & omits considering TFMs with less than 5,000 packages.
+This proposal only accounts for the **majority of packages on NuGet.org**. There are many unique TFMs in the .NET ecosystem, but for the sake of creating a concept that will scale with the future of .NET, many unsupported & low usage TFMs are not considered. Thus this proposal only focuses on the [most common target frameworks](https://docs.microsoft.com/dotnet/standard/frameworks#latest-versions) & omits considering TFMs with fewer than 5,000 packages.
 
 #### Generations of .NET
 
