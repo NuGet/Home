@@ -136,7 +136,7 @@ implementation:netframework implementation:netcore implementation:net  # Match t
 
 - `framework:` - Allows a short-form TFM value to search on.
 - `platform:` - Allows a platform value to search on.
-- `implementation` - Allows a generation of .NET to search on (includes all frameworks of the generaiton).
+- `implementation:` - Allows a generation of .NET to search on (includes all frameworks of the generation).
 
 **Implementations* is the best word to describe a generation of .NET at the time of writing. This can change at anytime.
 
