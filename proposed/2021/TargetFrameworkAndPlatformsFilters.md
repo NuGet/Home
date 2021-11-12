@@ -12,7 +12,7 @@ When a developer is browsing for a NuGet package to include in their project, th
 ## Motivation
 
 <!-- Why are we doing this? What pain points does this solve? What is the expected outcome? -->
-Finding a package that is compatible with your project is a daily challenge for the average developer in the .NET ecosystem. Over 21% of developers fail to install a package today because of an incompatibility; it's one of NuGet's top errors known as `NU1202`. Ontop of it being one of the biggest error codes we see, it is also [the number #1 request on the `NuGetGallery` repository](https://github.com/NuGet/NuGetGallery/issues/3098) for good reason. It should be straight-forward for a developer to separate the generation of .NET they are currently targeting and find packages that are supported on the platforms that the respective generation supports.
+Finding a package that is compatible with your project is a daily challenge for the average developer in the .NET ecosystem. Over 21% of developers fail to install a package today because of an incompatibility; it's one of NuGet's top errors known as `NU1202`. On top of it being one of the biggest error codes we see, it is also [the number #1 request on the `NuGetGallery` repository](https://github.com/NuGet/NuGetGallery/issues/3098) for good reason. It should be straight-forward for a developer to separate the generation of .NET they are currently targeting and find packages that are supported on the platforms that the respective generation supports.
 
 ## Explanation
 
