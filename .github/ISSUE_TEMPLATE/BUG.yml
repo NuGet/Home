@@ -21,6 +21,8 @@ body:
         - NuGet.exe
         - Visual Studio Package Management UI
         - Visual Studio Package Manager Console
+        - NuGet SDK
+        - Other/NA
     validations:
       required: true
   - type: input
