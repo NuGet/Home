@@ -198,4 +198,4 @@ Then the consumed assets will probably need to be set to whatever were defined i
 1. Are you confused about the transitive behavior of what "pinning" a reference does today? (i.e. promotes a transitive dependency to a top-level dependency implicitly).
 2. Is it important to you to be able to optionally remove a single `PackageReference` from the same "pinning" behavior?
 3. Would you expect `IncludeAssets`, `ExcludeAssets`, or `PrivateAssets` to be respected when overriding a dependency?
-4. Do you understand that this feature is primarily designed for usability & maintainability of your packages in a central location. It does not guarantee any performance benefits with as your projects scale.
+4. Do you understand that this feature is primarily designed for usability & maintainability of your packages in a central location? It does not guarantee any performance benefits with as your projects scale.
