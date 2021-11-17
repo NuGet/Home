@@ -21,6 +21,8 @@ body:
         - Visual Studio Package Manager Console
         - MSBuild.exe
         - dotnet.exe
+        - NuGet SDK
+        - Other/NA
     validations:
       required: true
   - type: textarea
