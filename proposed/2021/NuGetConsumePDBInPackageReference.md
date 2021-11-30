@@ -199,7 +199,8 @@ Pros:
 * It's as powerful as adding existing extension as a property of LockFileItem.
 
 Cons:
-* NuGet caches all LockFileItem across projects. Since NuGet performs the asset selection for individual package for each framework and runtime combination, for large solutions, the number of assets selection calls is high. As such, the memory allocations could be largely affected if adding multiple LockFileItems. (Refer to [comments](https://github.com/NuGet/NuGet.Client/pull/3934#issuecomment-875837433) for more details)
+* It's not an open ended solution as the proposed solution.
+* NuGet caches all LockFileItem across projects. Since NuGet performs the asset selection for individual package for each framework and runtime combination, for large solutions, the memory allocations for the cache can go large. So NuGet would like to add as less things as possible into the targets section. 
 
 ## References
 * [dotnet/sdk/1458](https://github.com/dotnet/sdk/issues/1458)
