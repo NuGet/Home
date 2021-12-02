@@ -98,9 +98,9 @@ Finally, selecting a transitive dependency will provide the user the ability to 
 * PackageReference & Package.Config: PackageReference will be the priority for this feature – Packages.Config won’t be considered unless it comes for free with the work for PR. 
 
 **Browse, Installed, and Updates tab behavior:**
-* Installed: Transitive dependencies will only be shown and managed in the Installed tab 
-* Browse: We will not surface transitive dependencies in the Browse tab. Transitively installed packages will not have an “Installed latest version” check mark. 
-* Updates: We will not show transitive dependencies in the Updates tab. This is because users shouldn’t typically update transitive dependencies outside of extenuating circumstances like vulnerabilities and deprecation. 
+* **Installed:** Transitive dependencies will only be shown and managed in the Installed tab 
+* **Browse:** We will not surface transitive dependencies in the Browse tab. Transitively installed packages will not have an “Installed latest version” check mark. 
+* **Updates:** We will not show transitive dependencies in the Updates tab. This is because users shouldn’t typically update transitive dependencies outside of extenuating circumstances like vulnerabilities and deprecation. 
 
 **Feed selection:** Selection of different feeds won’t impact the packages shown, only some associated metadata like deprecation and vulnerabilities – the same behavior as exists today. 
 
