@@ -93,23 +93,18 @@ Finally, selecting a transitive dependency will provide the user the ability to 
 * If one tab or the other is collapsed, they will remain collapsed on search 
 * The counter for the number of packages will change to reflect the number of packages being shown when filtered with a search query 
 
-Package details window: The package details window will be the exact same for transitive and top level packages. 
+**Package details window:** The package details window will be the exact same for transitive and top level packages. 
+* Similar to top-level packages, users will have the ability to “Install” or “Update” the transitive package to make it a top-level package of the desired version. 
+* PackageReference & Package.Config: PackageReference will be the priority for this feature – Packages.Config won’t be considered unless it comes for free with the work for PR. 
 
-Similar to top-level packages, users will have the ability to “Install” or “Update” the transitive package to make it a top-level package of the desired version. 
+**Browse, Installed, and Updates tab behavior:**
+* Installed: Transitive dependencies will only be shown and managed in the Installed tab 
+* Browse: We will not surface transitive dependencies in the Browse tab. Transitively installed packages will not have an “Installed latest version” check mark. 
+* Updates: We will not show transitive dependencies in the Updates tab. This is because users shouldn’t typically update transitive dependencies outside of extenuating circumstances like vulnerabilities and deprecation. 
 
-PackageReference & Package.Config: PackageReference will be the priority for this feature – Packages.Config won’t be considered unless it comes for free with the work for PR. 
+**Feed selection:** Selection of different feeds won’t impact the packages shown, only some associated metadata like deprecation and vulnerabilities – the same behavior as exists today. 
 
-Browse, Installed, and Updates tab behavior: 
-
-Installed: Transitive dependencies will only be shown and managed in the Installed tab 
-
-Browse: We will not surface transitive dependencies in the Browse tab. Transitively installed packages will not have an “Installed latest version” check mark. 
-
-Updates: We will not show transitive dependencies in the Updates tab. This is because users shouldn’t typically update transitive dependencies outside of extenuating circumstances like vulnerabilities and deprecation. 
-
-Feed selection: Selection of different feeds won’t impact the packages shown, only some associated metadata like deprecation and vulnerabilities – the same behavior as exists today. 
-
-Vulnerabilities & deprecation: Vulnerability and deprecation indicators will appear on transitive packages in the same way they appear for top-level packages. 
+**Vulnerabilities & deprecation:** Vulnerability and deprecation indicators will appear on transitive packages in the same way they appear for top-level packages. 
 
 ## Goals and Non-Goals
 
