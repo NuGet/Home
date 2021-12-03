@@ -164,7 +164,7 @@ The above elements will be checked against Accessibility Insights. We'll ensure 
 - A: The NuGet client team should own this work. They are familiar with the Visual Studio Package Manager UI & concepts of transitive dependencies.
 
 - Q: Should packages.config be considered in this work?
-- A: Since packages.config is based on top-level packages only, it will just use its existing experience by placing all packages in the top-level packages section unless the it's technically convenient.
+- A: Since packages.config is based on top-level packages only, it will just use its existing experience by placing all packages in the top-level packages section unless it's technically convenient.
 
 - Q: I want to know what transitive dependencies are being brought in by a package. How do I do that?
 - A: You install package X & view the transitive dependencies panel inside Visual Studio or within the project system’s NuGet reference node. If we do CLI work, you would be able to type “dotnet list package –include-transitive” to see a similar output.
