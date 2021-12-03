@@ -77,7 +77,7 @@ Finally, selecting a transitive dependency will provide the user the ability to 
 
 #### Detailed design
 
-**Collapsible vertical tabs:** Direct and transitive packages will be grouped under collapsible tabs 
+**Collapsible, vertical list group:** Direct and transitive packages will be grouped under collapsible list group
 
 * **Labels:** Tabs will be labeled “Top-level packages” and “Transitive packages” respectively 
 * **Count:** Tabs will display the number of packages in the group 
