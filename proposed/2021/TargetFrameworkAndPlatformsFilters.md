@@ -190,6 +190,11 @@ The .NET ecosystem currently is divided into two major cohorts: developers using
 
 - Should there be an advanced option to disable .NET Standard from being implicit/on-by-default for more exact matches?
   - Should we consider .NET Standard as a platform in this case or make it more implicit in the filtering?
+- Where do we draw the line on precedence for older/out of support TFMs that are still "compatible"?
+- Can framework and platforms be mixed in queries?
+  - No, it's one framework and multiple platforms for now.
+- What benefit to customers would there be to exclude .NET Standard-only libraries from search results?
+  - It would allow the ability to search for platform-specific assets that do not have .NET Standard as a fallback.
 
 ## Future Possibilities
 
