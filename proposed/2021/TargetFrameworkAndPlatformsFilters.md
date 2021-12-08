@@ -124,7 +124,7 @@ For further scenarios, see the [framework precedence](https://nugettools.azurewe
 
 **Note:** There's opportunity to put a tooltip in the complete experience to help explain what the difference of .NET, .NET Core, .NET Framework is & link to a documentaiton page.
 
-## Search Syntax
+## Search Syntax (Optional)
 
 Lastly, NuGet should add a protocol in which supports [search syntax](https://docs.microsoft.com/nuget/consume-packages/finding-and-choosing-packages#search-syntax) for frameworks, platforms, and potentially *implementations**.
 
