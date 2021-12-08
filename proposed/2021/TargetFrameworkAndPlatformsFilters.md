@@ -195,6 +195,8 @@ The .NET ecosystem currently is divided into two major cohorts: developers using
   - No, it's one framework and multiple platforms for now.
 - What benefit to customers would there be to exclude .NET Standard-only libraries from search results?
   - It would allow the ability to search for platform-specific assets that do not have .NET Standard as a fallback.
+- Is `implementation` the best word to describe a generation of .NET?
+  - Current thinking is that `framework` is still the best word, but it's a bit overloaded with the context of .NET Framework, Target Framework Monikers, and more.
 
 ## Future Possibilities
 
