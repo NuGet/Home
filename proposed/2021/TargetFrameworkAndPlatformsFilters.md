@@ -205,3 +205,4 @@ The .NET ecosystem currently is divided into two major cohorts: developers using
 - As new platforms become available in future versions of .NET, new filtering & search experiences can be added to help developers targeting those platforms.
 - As platforms mature to define a development category such as Cloud, Web, Desktop, Mobile, Gaming, IoT, AI, and more, there will be opportunity to create filters for each of these by using a combination of the filters proposed in this proposal. **For example:**
 ![](meta/resources/TargetFrameworkAndPlatformFilters/dotnet-unified-platform.png)
+- With .NET badges & Frameworks tab coming live soon, there is opportunity to revisit adding platform badges to provide a consistent story across details & search and being able to click on any badge & have a populated filter for the next search.
