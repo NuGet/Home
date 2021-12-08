@@ -144,6 +144,8 @@ implementation:netframework implementation:netcore implementation:net  # Match t
 
 **Implementations* is the best word to describe a generation of .NET at the time of writing. This can change at anytime.
 
+**Note:** This implementation is pending on technical feasibility. This experience would allow users who know the search syntax to be able to filter within NuGet.org or Visual Studio without having to click through filters.
+
 <!--### Technical explanation-->
 
 <!-- Explain the proposal in sufficient detail with implementation details, interaction models, and clarification of corner cases. -->
