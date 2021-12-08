@@ -116,9 +116,13 @@ For further scenarios, see the [framework precedence](https://nugettools.azurewe
 
 ![](meta/resources/TargetFrameworkAndPlatformFilters/VersionNumbers.png)
 
+**Note:** The label should best represent the ".NET" version. Thus the label name may change from "versions" to "framework versions / .NET versions" or similar.
+
 #### Complete Experience
 
 ![](meta/resources/TargetFrameworkAndPlatformFilters/CompleteExperience.png)
+
+**Note:** There's opportunity to put a tooltip in the complete experience to help explain what the difference of .NET, .NET Core, .NET Framework is & link to a documentaiton page.
 
 ## Search Syntax
 
