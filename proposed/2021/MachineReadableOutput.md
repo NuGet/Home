@@ -32,7 +32,7 @@ Anyone (government/private enterprises, security experts, individual contributor
 <!-- Explain the proposal as if it were already implemented and you're teaching it to another person. -->
 <!-- Introduce new concepts, functional designs with real life examples, and low-fidelity mockups or  pseudocode to show how this proposal would look. -->
 
-### --json option
+#### --json option
 
 Ability to use new `--json` option for all `dotnet list package` commands to ensure JSON-formatted output is emitted to the console.
 
@@ -48,7 +48,7 @@ dotnet list [<PROJECT>|<SOLUTION>] package [--config <SOURCE>]
 dotnet list package -h|--help
 ```
 
-### dotnet list package
+#### dotnet list package
 
 ```dotnetcli
 Project 'MyProjectA' has the following package references
@@ -70,7 +70,7 @@ Project 'MyProjectB' has the following package references
    > Text2Xml.Lib         1.1.2                 1.1.2
 ```
 
-### dotnet list package --json
+#### dotnet list package --json
 
 ```json
 {
@@ -132,7 +132,7 @@ Project 'MyProjectB' has the following package references
 }
 ```
 
-### dotnet list package --outdated
+#### dotnet list package --outdated
 
 ```dotnetcli
 
@@ -159,7 +159,7 @@ Project `MyProjectB` has the following updates to its packages
    > Text2Xml.Lib         1.1.2                 1.1.2                 1.1.4
 ```
 
-### dotnet list package --outdated --json
+#### dotnet list package --outdated --json
 
 ```json
 {
@@ -232,7 +232,7 @@ Project `MyProjectB` has the following updates to its packages
 }
 ```
 
-### dotnet list package --deprecated
+#### dotnet list package --deprecated
 
 ```dotnetcli
 The following sources were used:
@@ -255,7 +255,7 @@ Project `MyProjectB` has the following deprecated packages
    > NuGet.Core           2.13.0      2.13.0     Legacy
 ```
 
-### dotnet list package --deprecated --json
+#### dotnet list package --deprecated --json
 
 ```json
 {
@@ -272,7 +272,7 @@ Project `MyProjectB` has the following deprecated packages
           "id": "EntityFramework.MappingAPI",
           "requestedVersion": "*",
           "resolvedVersion": "6.2.1",
-          "reasons": ["Legacy"],
+          "deprecationReasons": ["Legacy"],
           "alternativePackage": {
             "id": "Z.EntityFramework.Extensions",
             "versionRange": "[0.0.0,)"
@@ -282,7 +282,7 @@ Project `MyProjectB` has the following deprecated packages
           "id": "NuGet.Core",
           "requestedVersion": "2.13.0",
           "resolvedVersion": "2.13.0",
-          "reasons": ["Legacy"],
+          "deprecationReasons": ["Legacy"],
         }
       ]
     }
@@ -295,7 +295,7 @@ Project `MyProjectB` has the following deprecated packages
           "id": "NuGet.Core",
           "requestedVersion": "2.13.0",
           "resolvedVersion": "2.13.0",
-          "reasons": ["Legacy"],
+          "deprecationReasons": ["Legacy"],
         }
       ]
     },
@@ -306,7 +306,7 @@ Project `MyProjectB` has the following deprecated packages
           "id": "NuGet.Core",
           "requestedVersion": "2.13.0",
           "resolvedVersion": "2.13.0",
-          "reasons": ["Legacy"],
+          "deprecationReasons": ["Legacy"],
         }
       ]
     }
@@ -314,7 +314,7 @@ Project `MyProjectB` has the following deprecated packages
 }
 ```
 
-### dotnet list package --vulnerable
+#### dotnet list package --vulnerable
 
 ```dotnetcli
 The following sources were used:
@@ -585,7 +585,7 @@ Project 'MyProjectB' has the following package references
 "--parsable" option needs separate spec.
 * Currently license info is not emitted from any cli command, it could be quite useful, we should consider in the future.
 
-## Prior Art
+### Prior Art
 
 <!-- What prior art, both good and bad are related to this proposal? -->
 <!-- Do other features exist in other ecosystems and what experience have their community had? -->
