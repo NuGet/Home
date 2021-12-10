@@ -6,18 +6,19 @@
 
 ## Problem background
 <!-- Why are we doing this? What pain points does this solve? What is the expected outcome? -->
-Many organization are required by [regulation](https://www.whitehouse.gov/briefing-room/presidential-actions/2021/05/12/executive-order-on-improving-the-nations-cybersecurity/) to audit packages that they're using in repository.
-Currently there's no easy way produce Software Bill of Material (SBOM) output which can be consumed by another auditing system or historic keeping.
+Many organizations are required by [regulation](https://www.whitehouse.gov/briefing-room/presidential-actions/2021/05/12/executive-order-on-improving-the-nations-cybersecurity/) to audit packages that they're using in a repository.
 
-* Parse-friendly output. Other PMP like Npm already have it(`npm ls --parseable` and `npm ls --json`).
+Currently there's no easy way to produce a [Software Bill of Material (SBOM)](https://blog.sonatype.com/what-is-a-software-bill-of-materials) output which can be consumed by another auditing system or kept for records.
+
+* Parse-friendly output. Other package managers like [NPM already have it](https://docs.npmjs.com/cli/v7/commands/npm-ls) (`npm ls --parseable` and `npm ls --json`).
 * Useful for CI/CD auditing(compliance, security ..)
   * Produce Software Bill of Material (SBOM) (compliance, historic keeping)
   * Enhancing Software Supply Chain Security
-    * check any vulnerable packages
-    * check any deprecated packages
+    * Check any vulnerable packages
+    * Check any deprecated packages
     * Check any outdated packages
   * Check license compliance
-  * Resolve dependency issue (detect duplicate packages, detect new dependency introduced or existing one removed etc ..)
+  * Resolve dependency issues (detect duplicate packages, newly introduced dependencies, dependency removals, etc.)
   * Making the output machine-readable unlocks additional tooling and automation scenarios in CI/CD pipeline above scenarios.
 
 ## Who are the customers
