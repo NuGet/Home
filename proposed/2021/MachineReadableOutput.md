@@ -283,7 +283,6 @@ Project `MyProjectB` has the following deprecated packages
           "requestedVersion": "2.13.0",
           "resolvedVersion": "2.13.0",
           "reasons": ["Legacy"],
-          "alternativePackage": null
         }
       ]
     }
@@ -297,7 +296,6 @@ Project `MyProjectB` has the following deprecated packages
           "requestedVersion": "2.13.0",
           "resolvedVersion": "2.13.0",
           "reasons": ["Legacy"],
-          "alternativePackage": null
         }
       ]
     },
@@ -309,7 +307,6 @@ Project `MyProjectB` has the following deprecated packages
           "requestedVersion": "2.13.0",
           "resolvedVersion": "2.13.0",
           "reasons": ["Legacy"],
-          "alternativePackage": null
         }
       ]
     }
