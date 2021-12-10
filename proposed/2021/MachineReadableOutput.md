@@ -32,9 +32,9 @@ Anyone (government/private enterprises, security experts, individual contributor
 <!-- Explain the proposal as if it were already implemented and you're teaching it to another person. -->
 <!-- Introduce new concepts, functional designs with real life examples, and low-fidelity mockups or  pseudocode to show how this proposal would look. -->
 
-#### --json option
+#### `--format` option
 
-Ability to use new `--json` option for all `dotnet list package` commands to ensure JSON-formatted output is emitted to the console.
+Ability to use new `--format` option for all `dotnet list package` commands to ensure formatted(JSON etc) output is emitted to the console.
 
 ```dotnetcli
 dotnet list [<PROJECT>|<SOLUTION>] package [--config <SOURCE>]
@@ -43,10 +43,12 @@ dotnet list [<PROJECT>|<SOLUTION>] package [--config <SOURCE>]
     [--include-prerelease] [--include-transitive] [--interactive]
     [--outdated] [--source <SOURCE>] [-v|--verbosity <LEVEL>]
     [--vulnerable]
-    [--json]
+    [--format <FORMAT>]
 
 dotnet list package -h|--help
 ```
+
+`<FORMAT>` - Allowed values as part of spec is `json`. (In the future `parseable`, `yaml` could be candidates.)
 
 #### `> dotnet list package`
 
@@ -70,7 +72,7 @@ Project 'MyProjectB' has the following package references
    > Text2Xml.Lib         1.1.2                 1.1.2
 ```
 
-#### `> dotnet list package --json`
+#### `> dotnet list package --format json`
 
 ```json
 {
@@ -159,7 +161,7 @@ Project `MyProjectB` has the following updates to its packages
    > Text2Xml.Lib         1.1.2                 1.1.2                 1.1.4
 ```
 
-#### `> dotnet list package --outdated --json`
+#### `> dotnet list package --outdated --format json`
 
 ```json
 {
@@ -255,7 +257,7 @@ Project `MyProjectB` has the following deprecated packages
    > NuGet.Core           2.13.0      2.13.0     Legacy
 ```
 
-#### `> dotnet list package --deprecated --json`
+#### `> dotnet list package --deprecated --format json`
 
 ```json
 {
@@ -358,7 +360,7 @@ Project `MyProjectB` has the following vulnerable packages
                                                  Moderate   https://github.com/advisories/GHSA-5whq-j5qg-wjvp
 ```
 
-### `> dotnet list package --vulnerable --json`
+### `> dotnet list package --vulnerable --format json`
 
 ```json
 {
@@ -479,7 +481,7 @@ Project 'MyProjectB' has the following package references
 
 ```
 
-### `> dotnet list package --include-transitive --json`
+### `> dotnet list package --include-transitive --format json`
 
 ```json
 {
