@@ -48,7 +48,7 @@ dotnet list [<PROJECT>|<SOLUTION>] package [--config <SOURCE>]
 dotnet list package -h|--help
 ```
 
-`<FORMAT>` - Allowed values as part of spec is `json`. (In the future `parseable`, `yaml` could be candidates.)
+`<FORMAT>` - Allowed values as part of spec is `json`. (In the future `parseable`, `csv`, `yaml`, `xml` could be candidates.)
 
 #### `> dotnet list package`
 
@@ -439,7 +439,7 @@ Project `MyProjectB` has the following vulnerable packages
 }
 ```
 
-### `> dotnet list package --include-transitive`
+#### `> dotnet list package --include-transitive`
 
 ```dotnetcli
 Project 'MyProjectA' has the following package references
@@ -481,7 +481,7 @@ Project 'MyProjectB' has the following package references
 
 ```
 
-### `> dotnet list package --include-transitive --format json`
+#### `> dotnet list package --include-transitive --format json`
 
 ```json
 {
@@ -576,18 +576,18 @@ Project 'MyProjectB' has the following package references
 }
 ```
 
-### Compatibility
+## Compatibility
 
  We start with `version 1`, as long as we don't remove or rename then it'll be backward compatible. In case [we change version](https://stackoverflow.com/a/13945074) just add new properties, keep old ones even it's not used.
 
-### Out-of-scope
+## Out-of-scope
 
 * We won't support saving the machine-readable output to disk as part of this spec. The work-around is for the consumer to read from the console's stdout stream.
 * At this point, no other CLI commands (e.g. dotnet list reference) will be within scope for this feature.
 "--parsable" option needs separate spec.
 * Currently license info is not emitted from any cli command, it could be quite useful, we should consider in the future.
 
-### Prior Art
+## Prior Art
 
 <!-- What prior art, both good and bad are related to this proposal? -->
 <!-- Do other features exist in other ecosystems and what experience have their community had? -->
@@ -597,3 +597,5 @@ Project 'MyProjectB' has the following package references
 * https://github.com/NuGet/Home/blob/dotnet-audit/proposed/2021/DotNetAudit.md#dotnet-audit---json
 
 * https://github.com/NuGet/Home/wiki/%5BSpec%5D-Machine-readable-output-for-dotnet-list-package
+
+## Unresolved Questions
