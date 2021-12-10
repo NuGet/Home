@@ -774,7 +774,7 @@ Project 'MyProjectB' has the following package references
 
 ### Out-of-scope
 
-* To avoid disk I/O, we won't support saving the machine-readable output to disk as part of this spec. The work-around is for the consumer to read from the console's stdout stream.
+* We won't support saving the machine-readable output to disk as part of this spec. The work-around is for the consumer to read from the console's stdout stream.
 * At this point, no other CLI commands (e.g. dotnet list reference) will be within scope for this feature.
 "--parsable" option needs separate spec.
 * Currently license info is not emitted from any cli command, it could be quite useful, we should consider in the future.
