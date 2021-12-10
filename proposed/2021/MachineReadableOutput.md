@@ -48,7 +48,7 @@ dotnet list [<PROJECT>|<SOLUTION>] package [--config <SOURCE>]
 dotnet list package -h|--help
 ```
 
-#### dotnet list package
+#### `> dotnet list package`
 
 ```dotnetcli
 Project 'MyProjectA' has the following package references
@@ -70,7 +70,7 @@ Project 'MyProjectB' has the following package references
    > Text2Xml.Lib         1.1.2                 1.1.2
 ```
 
-#### dotnet list package --json
+#### `> dotnet list package --json`
 
 ```json
 {
@@ -132,7 +132,7 @@ Project 'MyProjectB' has the following package references
 }
 ```
 
-#### dotnet list package --outdated
+#### `> dotnet list package --outdated`
 
 ```dotnetcli
 
@@ -159,7 +159,7 @@ Project `MyProjectB` has the following updates to its packages
    > Text2Xml.Lib         1.1.2                 1.1.2                 1.1.4
 ```
 
-#### dotnet list package --outdated --json
+#### `> dotnet list package --outdated --json`
 
 ```json
 {
@@ -232,7 +232,7 @@ Project `MyProjectB` has the following updates to its packages
 }
 ```
 
-#### dotnet list package --deprecated
+#### `> dotnet list package --deprecated`
 
 ```dotnetcli
 The following sources were used:
@@ -255,7 +255,7 @@ Project `MyProjectB` has the following deprecated packages
    > NuGet.Core           2.13.0      2.13.0     Legacy
 ```
 
-#### dotnet list package --deprecated --json
+#### `> dotnet list package --deprecated --json`
 
 ```json
 {
@@ -314,7 +314,7 @@ Project `MyProjectB` has the following deprecated packages
 }
 ```
 
-#### dotnet list package --vulnerable
+#### `> dotnet list package --vulnerable`
 
 ```dotnetcli
 The following sources were used:
@@ -358,7 +358,7 @@ Project `MyProjectB` has the following vulnerable packages
                                                  Moderate   https://github.com/advisories/GHSA-5whq-j5qg-wjvp
 ```
 
-### dotnet list package --vulnerable --json
+### `> dotnet list package --vulnerable --json`
 
 ```json
 {
@@ -437,7 +437,7 @@ Project `MyProjectB` has the following vulnerable packages
 }
 ```
 
-### dotnet list package --include-transitive
+### `> dotnet list package --include-transitive`
 
 ```dotnetcli
 Project 'MyProjectA' has the following package references
@@ -479,7 +479,7 @@ Project 'MyProjectB' has the following package references
 
 ```
 
-### dotnet list package --include-transitive --json
+### `> dotnet list package --include-transitive --json`
 
 ```json
 {
