@@ -34,7 +34,7 @@ Anyone (government/private enterprises, security experts, individual contributor
 
 #### `--format` option
 
-Ability to use new `--format` option for all `dotnet list package` commands to ensure formatted(JSON etc) output is emitted to the console.
+Ability to use new `--format` option for all `dotnet list package` commands to ensure formatted(json, text, csv etc) output is emitted to the console.
 
 ```dotnetcli
 dotnet list [<PROJECT>|<SOLUTION>] package [--config <SOURCE>]
@@ -48,7 +48,7 @@ dotnet list [<PROJECT>|<SOLUTION>] package [--config <SOURCE>]
 dotnet list package -h|--help
 ```
 
-`<FORMAT>` - Allowed values as part of spec is `json`. (In the future `parseable`, `csv`, `yaml`, `xml` could be candidates.)
+`<FORMAT>` - Allowed values as part of spec is `json`. Also `text` is acceptable value too, it'll just output current cli output. (In the future `parseable`, `csv`, `yaml`, `xml` could be candidates.)
 
 #### `> dotnet list package`
 
@@ -587,6 +587,10 @@ Project 'MyProjectB' has the following package references
 "--parsable" option needs separate spec.
 * Currently license info is not emitted from any cli command, it could be quite useful, we should consider in the future.
 
+## Rationale and alternatives
+Currently, no other `dotnet command` implemented this, this is the 1st time dotnet command implementing `json`(etc) output, so it could become example for others next time they implement.
+Please note, except "tab completion" (for dotnet) part all changes would be inside NuGet.Client repo(under NuGet.Core), and risk of introducing regression is low.(`--format text` refactoring related changes only come into my mind.), no impact on dotnet sdk.
+
 ## Prior Art
 
 <!-- What prior art, both good and bad are related to this proposal? -->
@@ -599,3 +603,25 @@ Project 'MyProjectB' has the following package references
 * https://github.com/NuGet/Home/wiki/%5BSpec%5D-Machine-readable-output-for-dotnet-list-package
 
 ## Unresolved Questions
+
+* Chris: One problem is most `dotnet list package` options outputs are exclusive and have to query separately and join result to get full picture. Both below approach require additional work.
+  * dotnet cli needs an all up `dotnet list package --all` that shows all deprecated, vulnerable, and outdated top level and transitive packages. [r766860629](https://github.com/NuGet/Home/pull/11446#discussion_r766860629)
+  * Alternatively the behavior of --outdated and --deprecated could be additive rather than exclusive. That adds to the scope of this work though.[r766860629](https://github.com/NuGet/Home/pull/11446#discussion_r766860629). With this approach we can have single schema to populate.
+
+* Donnie: When I want to create archival records, will I want something more unique than the project name?
+Adding the path, repo, commit ID, etc seems complex. [r766920783](https://github.com/NuGet/Home/pull/11446#discussion_r766920783)
+  * `name/relative path to solution` could be solution here.
+
+* Donnie: How can we record in the output that --include-transitive wasn't used here?
+In other words, if I look at this output years from now, how would I know whether any transitives were in this project? [r766924390](https://github.com/NuGet/Home/pull/11446#discussion_r766924390)
+  * packages.lock.json format could be used here.  
+
+* Loïc : Should `dotnet list package` include hashes or package source for each dependency? The package ID and version isn't globally unique across package sources?
+  * If we re-sign package then hash changes?
+* Related to above: `dotnet list package --outdated`output include `The following sources were used:`, but `dotnet list package` doesn't. Should we make them same?
+* Loïc : Should we include some sort of hash or package source used to restore the package? A package ID and version may have different content across different package sources. In other words, the package ID + version does not actually capture which package your project depends on. [r767030495](https://github.com/NuGet/Home/pull/11446#discussion_r767030495)
+* Loïc : How would this format evolve if we add another "package pivot" in addition to top level and transitive packages? For example, what if we add new package kinds for source generators, Roslyn analyzers, etc...? [r767026799](https://github.com/NuGet/Home/pull/11446#discussion_r767026799)
+
+* Could we use existing packages.lock.json format? [sample](https://gist.github.com/erdembayar/4894b66bde227147b60e60997d20df41)
+  * Direct/top level packages point to dependency packages.
+  * Content hash.
