@@ -25,7 +25,13 @@ Currently there's no easy way to produce a [Software Bill of Material (SBOM)](ht
 
 Anyone (government/private enterprises, security experts, individual contributors) who wants to consume `dotnet list package` output for auditing tool or historic keeping, CI/CD orchestrating.
 
-## Explanation
+## Solution
+
+In order to solve problem going to introduce 2 new options.
+
+1. `--format` option for all `dotnet list package` commands to ensure formatted(json, text, csv etc) output is emitted to the console.
+
+1. `--all` option which works in conjunction with above for that shows all deprecated, vulnerable, and outdated top level and transitive packages. Users can form their own json as a last resort, instead of your team having to respond to every possible user need.
 
 ### Functional explanation
 
@@ -503,6 +509,7 @@ Project 'MyProjectB' has the following package references
             "id": "Microsoft.Extensions.Primitives",
             "requestedVersion": "[1.0.0, 5.0.0]",
             "resolvedVersion": "1.0.0"
+
           },
           {
             "id": "NuGet.Commands",
@@ -579,6 +586,183 @@ Project 'MyProjectB' has the following package references
             "resolvedVersion": "1.1.0"
           },
   ...
+        ]
+      }
+    ]
+  }
+}
+```
+
+#### `--all` option
+
+Ability to use new `--all` option in conjunction with `--format` option shows all deprecated, vulnerable, and outdated top level and transitive packages. Users can form their own json as a last resort, instead of your team having to respond to every possible user need.  It would result in if `[--deprecated],[--include-transitive],[--outdated],[--vulnerable]` are combined, currently options '--outdated', '--deprecated' and '--vulnerable' cannot be combined on cli.
+
+```dotnetcli
+dotnet list [<PROJECT>|<SOLUTION>] package [--config <SOURCE>]
+    [--framework <FRAMEWORK>] [--highest-minor] [--highest-patch]
+    [--include-prerelease] [--interactive]
+     [--source <SOURCE>] [-v|--verbosity <LEVEL>]
+    [--format <FORMAT>]
+    [--all]
+
+dotnet list package -h|--help
+```
+
+#### `> dotnet list package --format json --all`
+
+```json
+{
+  "version": 1,
+   "sources": [
+    "https://api.nuget.org/v3/index.json",
+    "https://apidev.nugettest.org/v3-index/index.json"
+  ],
+  "projects": {
+    "MyProjectA": [
+      {
+        "framework": "netcoreapp3.1",
+        "topLevelPackages": [
+          {
+            "id": "DotNetNuke.Core",
+            "requestedVersion": "6.0.0",
+            "resolvedVersion": "6.0.0",
+            "latestVersion": "6.1.4",
+            "deprecationReasons": ["Legacy"],
+            "vulnerabilities" : [
+              {
+                  "severity":"High",
+                  "advisoryurl":"https://github.com/advisories/GHSA-g8j6-m4p7-5rfq"
+              },
+              {
+                  "severity":"Moderate",
+                  "advisoryurl":"https://github.com/advisories/GHSA-v76m-f5cx-8rg4"
+              },
+  ...
+              ]
+          }
+        ],
+        "transitivePackages": [
+          {
+            "id": "Microsoft.CSharp",
+            "resolvedVersion": "4.0.1",
+            "latestVersion": "4.1.4",
+            "deprecationReasons": ["Legacy"],
+            "vulnerabilities" : [
+              {
+                  "severity":"High",
+                  "advisoryurl":"https://github.com/advisories/GHSA-g8j6-m4p7-5rfq"
+              },
+              {
+                  "severity":"Moderate",
+                  "advisoryurl":"https://github.com/advisories/GHSA-v76m-f5cx-8rg4"
+              },
+  ...
+              ]
+          },
+          {
+            "id": "Microsoft.NETCore.Platforms",
+            "resolvedVersion": "1.1.0",
+            "latestVersion": "2.1.4",
+            "deprecationReasons": ["Legacy"]
+          }
+        ]
+      }
+    ],
+    "MyProjectB": [
+      {
+        "framework": "netcoreapp3.1",
+        "topLevelPackages": [
+          {
+            "id": "DotNetNuke.Core",
+            "requestedVersion": "6.0.0",
+            "resolvedVersion": "6.0.0",
+            "latestVersion": "7.0.0",
+            "deprecationReasons": ["Legacy"],
+            "vulnerabilities" : [
+              {
+                  "severity":"High",
+                  "advisoryurl":"https://github.com/advisories/GHSA-g8j6-m4p7-5rfq"
+              },
+              {
+                  "severity":"Moderate",
+                  "advisoryurl":"https://github.com/advisories/GHSA-v76m-f5cx-8rg4"
+              },
+  ...
+              ]
+          }
+        ],
+        "transitivePackages": [
+          {
+            "id": "Microsoft.CSharp",
+            "resolvedVersion": "4.0.1",
+            "latestVersion": "4.1.4",
+            "deprecationReasons": ["Legacy"],
+            "vulnerabilities" : [
+              {
+                  "severity":"High",
+                  "advisoryurl":"https://github.com/advisories/GHSA-g8j6-m4p7-5rfq"
+              },
+              {
+                  "severity":"Moderate",
+                  "advisoryurl":"https://github.com/advisories/GHSA-v76m-f5cx-8rg4"
+              },
+  ...
+              ]
+          },
+          {
+            "id": "Microsoft.NETCore.Platforms",
+            "resolvedVersion": "1.1.0",
+            "latestVersion": "2.1.4",
+            "deprecationReasons": ["Legacy"]
+          }
+        ]
+      },
+      {
+        "framework": "net5.0",
+        "topLevelPackages": [ 
+          {
+            "id": "DotNetNuke.Core",
+            "requestedVersion": "6.0.0",
+            "resolvedVersion": "6.0.0",
+            "latestVersion": "7.0.0",
+            "deprecationReasons": ["Legacy"],
+            "vulnerabilities" : [
+              {
+                  "severity":"High",
+                  "advisoryurl":"https://github.com/advisories/GHSA-g8j6-m4p7-5rfq"
+              },
+              {
+                  "severity":"Moderate",
+                  "advisoryurl":"https://github.com/advisories/GHSA-v76m-f5cx-8rg4"
+              },
+  ...
+              ]
+          }
+        ],
+        "transitivePackages": [
+          {
+            "id": "Microsoft.CSharp",
+            "resolvedVersion": "4.0.1",
+            "latestVersion": "4.1.4",
+            "deprecationReasons": ["Legacy"],
+            "vulnerabilities" : [
+              {
+                  "severity":"High",
+                  "advisoryurl":"https://github.com/advisories/GHSA-g8j6-m4p7-5rfq"
+              },
+              {
+                  "severity":"Moderate",
+                  "advisoryurl":"https://github.com/advisories/GHSA-v76m-f5cx-8rg4"
+              },
+  ...
+              ]
+          },
+          {
+            "id": "Microsoft.NETCore.Platforms",
+            "resolvedVersion": "1.1.0",
+            "latestVersion": "2.1.4",
+            "deprecationReasons": ["Legacy"]
+          }
         ]
       }
     ]
