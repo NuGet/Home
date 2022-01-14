@@ -94,8 +94,8 @@ Finally, selecting a transitive dependency will provide the user the ability to 
 * The counter for the number of packages will change to reflect the number of packages being shown when filtered with a search query 
 
 **Package details window:** The package details window will be the exact same for transitive and top level packages. 
-* Similar to top-level packages, users will have the ability to “Install” or “Update” the transitive package to make it a top-level package of the desired version. 
-* PackageReference & Package.Config: PackageReference will be the priority for this feature – Packages.Config won’t be considered unless it comes for free with the work for PR. 
+* Similar to top-level packages, users will have the ability to “Install” the transitive package to make it a top-level package of the desired version. 
+* PackageReference & packages.config: This feature will only be surfaced for PackageReference projects. The "transitive" list group will be hidden for package.config.
 
 **Browse, Installed, and Updates tab behavior:**
 * **Installed:** Transitive dependencies will only be shown and managed in the Installed tab 
