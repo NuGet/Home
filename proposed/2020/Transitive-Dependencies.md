@@ -37,7 +37,7 @@ We will add telemetry to categorize when a top-level package is installed, and w
 
 ## Audience: Who are we building this for?
 
-We are building this for .NET users, both old and new, to be successful with understanding the types of NuGet dependencies in their project(s) and solution(s).
+We are building this for .NET users, both old and new, to be successful with understanding the types of NuGet dependencies in their projects and solutions.
 
 ## What: What does this look like in the product?
 
@@ -74,6 +74,37 @@ When a user highlights a transitive package, they will see a pop-up that display
 ![](../../meta/resources/TransitiveDependencies/TransitiveVSPMUI.png)
 
 Finally, selecting a transitive dependency will provide the user the ability to “Install” the package as you normally would a top-level dependency. This will promote the transitive dependency to a top-level dependency, and the transitive dependency will now be placed in the top-level packages list instead.
+
+#### Detailed design
+
+**Collapsible, vertical list group:** Direct and transitive packages will be grouped under collapsible list group
+
+* **Labels:** List groups will be labeled “Top-level packages” and “Transitive packages” respectively 
+* **Count:** List groups will display the number of packages in the group 
+* **Default state:** Transitive packages list group will be collapsed by default 
+* **Warnings:** List group headers will surface a warning icon for vulnerabilities and deprecations - see “Vulnerabilities and deprecation” section for relevant details 
+
+**Package items:** The packages under the “Transitive packages” list group will have the same appearance/design as the “Top level packages” (Id, description, author, versions on the right, etc.) 
+* **Status overlays:** Transitive packages will not show an “Update available” icon (upward arrow) or “Latest version installed” icon (check mark) - only directly installed packages will 
+* **Tooltip:** Hovering over the package list item will show a pop-up that displays how the transitive dependency originated & what top-level package(s) are bringing it in. 
+
+**Search:** Searching for a package ID will filter the packages shown in both list groups in the same way. 
+* Searching for “Microsoft” will show all relevant filtered results for both the top level and transitive packages 
+* If one list group or the other is collapsed, they will remain collapsed on search 
+* The counter for the number of packages will change to reflect the number of packages being shown when filtered with a search query 
+
+**Package details window:** The package details window will be the exact same for transitive and top level packages. 
+* Similar to top-level packages, users will have the ability to “Install” the transitive package to make it a top-level package of the desired version. 
+* PackageReference & packages.config: This feature will only be surfaced for PackageReference projects. The "transitive" list group will be hidden for package.config.
+
+**Browse, Installed, and Updates tab behavior:**
+* **Installed:** Transitive dependencies will only be shown and managed in the Installed tab 
+* **Browse:** We will not surface transitive dependencies in the Browse tab. Transitively installed packages will not have an “Installed latest version” check mark. 
+* **Updates:** We will not show transitive dependencies in the Updates tab. This is because users shouldn’t typically update transitive dependencies outside of extenuating circumstances like vulnerabilities and deprecation. 
+
+**Feed selection:** Selection of different feeds won’t impact the packages shown, only some associated metadata like deprecation and vulnerabilities – the same behavior as exists today. 
+
+**Vulnerabilities & deprecation:** Vulnerability and deprecation indicators will appear on transitive packages in the same way they appear for top-level packages. 
 
 ## Goals and Non-Goals
 
@@ -133,7 +164,7 @@ The above elements will be checked against Accessibility Insights. We'll ensure 
 - A: The NuGet client team should own this work. They are familiar with the Visual Studio Package Manager UI & concepts of transitive dependencies.
 
 - Q: Should packages.config be considered in this work?
-- A: Since packages.config is based on top-level packages only, it will just use its existing experience by placing all packages in the top-level packages section.
+- A: Since packages.config is based on top-level packages only, it will just use its existing experience by placing all packages in the top-level packages section unless it's technically convenient.
 
 - Q: I want to know what transitive dependencies are being brought in by a package. How do I do that?
 - A: You install package X & view the transitive dependencies panel inside Visual Studio or within the project system’s NuGet reference node. If we do CLI work, you would be able to type “dotnet list package –include-transitive” to see a similar output.
