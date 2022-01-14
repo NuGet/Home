@@ -79,18 +79,18 @@ Finally, selecting a transitive dependency will provide the user the ability to 
 
 **Collapsible, vertical list group:** Direct and transitive packages will be grouped under collapsible list group
 
-* **Labels:** Tabs will be labeled “Top-level packages” and “Transitive packages” respectively 
-* **Count:** Tabs will display the number of packages in the group 
-* **Default state:** Transitive packages tab will be collapsed by default 
-* **Warnings:** Tab headers will surface a warning icon for vulnerabilities and deprecations - see “Vulnerabilities and deprecation” section for relevant details 
+* **Labels:** List groups will be labeled “Top-level packages” and “Transitive packages” respectively 
+* **Count:** List groups will display the number of packages in the group 
+* **Default state:** Transitive packages list group will be collapsed by default 
+* **Warnings:** List group headers will surface a warning icon for vulnerabilities and deprecations - see “Vulnerabilities and deprecation” section for relevant details 
 
-**Package items:** The packages under the “Transitive packages” tab will have the same appearance/design as the “Top level packages” (Id, description, author, versions on the right, etc.) 
+**Package items:** The packages under the “Transitive packages” list group will have the same appearance/design as the “Top level packages” (Id, description, author, versions on the right, etc.) 
 * **Status overlays:** Transitive packages will not show an “Update available” icon (upward arrow) or “Latest version installed” icon (check mark) - only directly installed packages will 
 * **Tooltip:** Hovering over the package list item will show a pop-up that displays how the transitive dependency originated & what top-level package(s) are bringing it in. 
 
-**Search:** Searching for a package ID will filter the packages shown in both tabs in the same way. 
+**Search:** Searching for a package ID will filter the packages shown in both list groups in the same way. 
 * Searching for “Microsoft” will show all relevant filtered results for both the top level and transitive packages 
-* If one tab or the other is collapsed, they will remain collapsed on search 
+* If one list group or the other is collapsed, they will remain collapsed on search 
 * The counter for the number of packages will change to reflect the number of packages being shown when filtered with a search query 
 
 **Package details window:** The package details window will be the exact same for transitive and top level packages. 
