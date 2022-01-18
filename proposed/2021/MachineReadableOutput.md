@@ -48,8 +48,6 @@ dotnet list [<PROJECT>|<SOLUTION>] package [--config <SOURCE>]
 dotnet list package -h|--help
 ```
 
-`<FORMAT>` - Allowed values as part of spec is `json`. Also `text` is acceptable value too, it'll just output current cli output. (In the future `parseable`, `csv`, `yaml`, `xml` could be candidates.)
-
 #### `> dotnet list package`
 
 ```dotnetcli
@@ -80,6 +78,7 @@ Project 'MyProjectB' has the following package references
   "projects": {
     "MyProjectA": [
       {
+        "Path": "src/tool/MyProjectA.csproj",
         "framework": "netcoreapp3.1",
         "topLevelPackages": [
           {
@@ -102,6 +101,7 @@ Project 'MyProjectB' has the following package references
     ],
     "MyProjectB": [
       {
+        "Path": "src/lib/MyProjectB.csproj",
         "framework": "netcoreapp3.1",
         "topLevelPackages": [
           {
@@ -117,6 +117,7 @@ Project 'MyProjectB' has the following package references
         ]
       },
       {
+        "Path": "src/lib/MyProjectB.csproj",
         "framework": "net5.0",
         "topLevelPackages": [ 
           {
@@ -175,6 +176,7 @@ Project `MyProjectB` has the following updates to its packages
   "projects": {
     "MyProjectA": [
       {
+        "Path": "src/tool/MyProjectA.csproj",
         "framework": "netcoreapp3.1",
         "topLevelPackages": [
           {
@@ -200,6 +202,7 @@ Project `MyProjectB` has the following updates to its packages
     ],
     "MyProjectB": [
       {
+        "Path": "src/tool/MyProjectB.csproj",
         "framework": "netcoreapp3.1",
         "topLevelPackages": [
           {
@@ -217,6 +220,7 @@ Project `MyProjectB` has the following updates to its packages
         ]
       },
       {
+        "Path": "src/tool/MyProjectB.csproj",
         "framework": "net5.0",
         "topLevelPackages": [ 
           {
@@ -271,8 +275,10 @@ Project `MyProjectB` has the following deprecated packages
     "https://apidev.nugettest.org/v3-index/index.json"
   ],
   "projects": {
+
     "MyProjectA": [
       {
+        "Path": "src/tool/MyProjectA.csproj",
         "framework": "netcoreapp3.1",
         "topLevelPackages": [
           {
@@ -296,6 +302,7 @@ Project `MyProjectB` has the following deprecated packages
     ],
     "MyProjectB": [
       {
+        "Path": "src/lib/MyProjectB.csproj",
         "framework": "netcoreapp3.1",
         "topLevelPackages": [
           {
@@ -307,6 +314,7 @@ Project `MyProjectB` has the following deprecated packages
         ]
       },
       {
+        "Path": "src/lib/MyProjectB.csproj",
         "framework": "net5.0",
         "topLevelPackages": [ 
           {
@@ -378,6 +386,7 @@ Project `MyProjectB` has the following vulnerable packages
   "projects": {
     "MyProjectA": [
       {
+        "Path": "src/lib/MyProjectA.csproj",
         "framework": "netcoreapp3.1",
         "topLevelPackages": [
           {
@@ -401,6 +410,7 @@ Project `MyProjectB` has the following vulnerable packages
     ],
     "MyProjectB": [
       {
+        "Path": "src/lib/MyProjectB.csproj",
         "framework": "netcoreapp3.1",
         "topLevelPackages": [
           {
@@ -422,6 +432,7 @@ Project `MyProjectB` has the following vulnerable packages
         ]
       },
       {
+        "Path": "src/lib/MyProjectB.csproj",
         "framework": "net5.0",
         "topLevelPackages": [ 
           {
@@ -497,6 +508,7 @@ Project 'MyProjectB' has the following package references
   "projects": {
     "MyProjectA": [
       {
+        "Path": "src/lib/MyProjectA.csproj",
         "framework": "netcoreapp3.1",
         "topLevelPackages": [
           {
@@ -530,6 +542,7 @@ Project 'MyProjectB' has the following package references
     ],
     "MyProjectB": [
       {
+        "Path": "src/lib/MyProjectB.csproj",
         "framework": "netcoreapp3.1",
         "topLevelPackages": [
           {
@@ -556,6 +569,7 @@ Project 'MyProjectB' has the following package references
         ]
       },
       {
+        "Path": "src/lib/MyProjectB.csproj",
         "framework": "net5.0",
         "topLevelPackages": [ 
           {
@@ -608,15 +622,13 @@ Please note, except "tab completion" (for dotnet) part all changes would be insi
 <!-- What lessons from other communities can we learn from? -->
 <!-- Are there any resources that are relevent to this proposal? -->
 
-* https://github.com/NuGet/Home/blob/dotnet-audit/proposed/2021/DotNetAudit.md#dotnet-audit---json
+* https://github.com/NuGet/Home/blob/dotnet-audit/proposed/2021/DotNetAudit.md#dotnet-audit---futjson There're some overlaps, but current spec is one more focused on SBOM and CI/CD actions, while `dotnet audit fix` is more focused detecting/fixing dependencies manually. Current spec already include ideas from this spec like `json format`.
 
-* https://github.com/NuGet/Home/wiki/%5BSpec%5D-Machine-readable-output-for-dotnet-list-package
+* https://github.com/NuGet/Home/wiki/%5BSpec%5D-Machine-readable-output-for-dotnet-list-package Basic idea from this spec is still same here and I extended from it. In current spec more orient to `dotnet style syntax` and cover more uses cases like `dotnet list package --vulnerable --format json` and `--include-transitive`, also json schema improved to include project name/identifier for multi-project scenario which would most likely use case.
+
+* https://docs.microsoft.com/en-us/dotnet/core/diagnostics/dotnet-counters One idea we can take from `dotnet counter` is we can specify output file with `-o`, `--output` option. So instead of writing output into console, it allows output directly saved into file. It allows both `csv` and `json` formats, currently saved file doesn't have version concept.
 
 ## Unresolved Questions
-
-* Chris: One problem is most `dotnet list package` options outputs are exclusive and have to query separately and join result to get full picture. Both below approach require additional work.
-  * dotnet cli needs an all up `dotnet list package --all` that shows all deprecated, vulnerable, and outdated top level and transitive packages. [r766860629](https://github.com/NuGet/Home/pull/11446#discussion_r766860629)
-  * Alternatively the behavior of --outdated and --deprecated could be additive rather than exclusive. That adds to the scope of this work though.[r766860629](https://github.com/NuGet/Home/pull/11446#discussion_r766860629). With this approach we can have single schema to populate.
 
 * Donnie: When I want to create archival records, will I want something more unique than the project name?
 Adding the path, repo, commit ID, etc seems complex. [r766920783](https://github.com/NuGet/Home/pull/11446#discussion_r766920783)
@@ -626,12 +638,22 @@ Adding the path, repo, commit ID, etc seems complex. [r766920783](https://github
 In other words, if I look at this output years from now, how would I know whether any transitives were in this project? [r766924390](https://github.com/NuGet/Home/pull/11446#discussion_r766924390)
   * packages.lock.json format could be used here.  
 
-* Loïc : Should `dotnet list package` include hashes or package source for each dependency? The package ID and version isn't globally unique across package sources?
-  * If we re-sign package then hash changes?
-* Related to above: `dotnet list package --outdated`output include `The following sources were used:`, but `dotnet list package` doesn't. Should we make them same?
-* Loïc : Should we include some sort of hash or package source used to restore the package? A package ID and version may have different content across different package sources. In other words, the package ID + version does not actually capture which package your project depends on. [r767030495](https://github.com/NuGet/Home/pull/11446#discussion_r767030495)
 * Loïc : How would this format evolve if we add another "package pivot" in addition to top level and transitive packages? For example, what if we add new package kinds for source generators, Roslyn analyzers, etc...? [r767026799](https://github.com/NuGet/Home/pull/11446#discussion_r767026799)
+
+>> Out of scope from MVP, this schema can evolve over time, by the time we have necessity to do change we can make more educated decision.
 
 * Could we use existing packages.lock.json format? [sample](https://gist.github.com/erdembayar/4894b66bde227147b60e60997d20df41)
   * Direct/top level packages point to dependency packages.
-  * Content hash.
+  * Content hash. >> out of scope for now. Tracking issue https://github.com/NuGet/Home/issues/11552
+
+## Future Possibilities
+
+* Show resolution tree for transitive dependencies and constraint for dependency [resolved version](https://github.com/NuGet/Home/pull/11446/files#r777233006), tracking issue: https://github.com/NuGet/Home/issues/11553
+
+* Return different exit codes if any vulnerabilities, deprecations, outdated package is [detected](https://github.com/NuGet/Home/blob/dotnet-audit/proposed/2021/DotNetAudit.md#dotnet-audit-exit-codes).
+
+* `--all` option for dotnet list package [r766860629](https://github.com/NuGet/Home/pull/11446#discussion_r766860629), tracking issue https://github.com/NuGet/Home/issues/11551
+
+* Include-transitive dependencies by default [r766924390](https://github.com/NuGet/Home/pull/11446#discussion_r766924390), tracking issue https://github.com/NuGet/Home/issues/11550
+
+* Include hash + source for package, because same package ID+version might have different hash. It can be used to detect [dependency confusion attack](https://github.com/NuGet/Home/pull/11446#discussion_r767030495), tracking issue: https://github.com/NuGet/Home/issues/11552
