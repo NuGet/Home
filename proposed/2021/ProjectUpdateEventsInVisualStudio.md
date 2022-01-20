@@ -46,7 +46,7 @@ The API and the shape is fairly self explanatory.
 
 using System.Collections.Generic;
 
-namespace NuGet.SolutionRestoreManager
+namespace NuGet.VisualStudio
 {
     /// <summary>
     /// NuGet project update events.
