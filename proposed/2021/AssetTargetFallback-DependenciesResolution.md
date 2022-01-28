@@ -6,9 +6,7 @@
 
 ## Summary
 
-While .NET (Core) & .NET Framework are not fully compatible, often times packages written for .NET Framework only can be safely used on .NET (Core) as well.
-AssetTargetFallback is the mechanism by which .NET (Core) projects can reference .NET Framework packages and projects.
-This design covers the approach for addressing this long standing bug.
+This is a write-up for the fix of the long standing bug where packages resolved with AssetTargetFallback do not get their dependencies.
 
 ## Motivation
 
@@ -99,7 +97,7 @@ Along the way NuGet will detect and resolve conflicts for package `Y`, before se
 The `netstandard2.0` gets the same exercise, in this case package `Z` is one that is used.
 When NuGet completes the dependency resolution, it has a list of packages that it needs to install in the global packages folder. For example:
 
-```yaml
+```text
 net472:
     X 1.0.0
     Y 2.0.0
@@ -123,7 +121,7 @@ Here's a simple example using one of NuGet's libraries.
     ...
     <PropertyGroup>
         <TargetFramework>netcoreapp3.0</TargetFramework>
-        <AssetTargetFallback>net461;net48</TargetFramework> <!-- This is usually declared in the SDK, not the project file-->
+        <AssetTargetFallback>net461;net48</AssetTargetFallback> <!-- This is usually declared in the SDK, not the project file-->
     ...
     <ItemGroup>
         <PackageReference Include="NuGet.PackageManagement" Version="5.1.0" />
@@ -134,7 +132,7 @@ NuGet.PackageManagement is a package that contains only `net472` assets.
 
 The directory structure of this package is:
 
-```yaml
+```text
 NuGet.PackageManagement.nuspec
 lib
     net472
@@ -198,7 +196,7 @@ Installing the below package to a netcoreapp3.0 project:
 
 Package A:
 
-```yaml
+```text
 lib/net472/a.dll
 lib/netstandard2.0/a.dll
 ```
@@ -213,7 +211,7 @@ lib/netstandard2.0/a.dll
 
 Package B:
 
-```yaml
+```text
 lib/net472/b.dll
 ```
 
@@ -308,7 +306,7 @@ Normally, the dependency groups would perfectly match what the rest of the packa
 
 Take the below package for example in a net472 project.
 
-```yaml
+```text
 lib/net472/b.dll
 lib/net462/b.dll
 ```
@@ -362,7 +360,7 @@ We would not consider these packages well authored today, but that has not alway
 
 Say we have `netcoreapp3.0` project and a package like below:
 
-```yaml
+```text
 lib/net472/a.dll
 lib/netstandard2.0/a.dll
 ```
