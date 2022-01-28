@@ -245,13 +245,7 @@ Here's the matrix of scenarios we need to consider.
 | ATF for package assets, ATF for dependencies | The current ATF warning raised. |
 | No ATF for package assets, ATF for dependencies | No warning |
 
-Should NuGet warn when AssetTargetFallback is used for dependencies? Here are our 3 options.
-
-- No warning. In this special case, effectively what would happen is that we would download more assemblies. The potential runtime errors are not made better or worse by this selection.
-- We can raise the same warning as the usual ATF case. Similar logic applies as to the no warning scenario. In this case we'd be louder about a potential error.
-- Raise a different warning specifically targeting this scenario. Specifically address this particular scenario. Similarly to earlier, the runtime experience will not have been affected by this selection.
-
-See [unresolved questions](#unresolved-questions) for details.
+NuGet will not warn when AssetTargetFallback is used for dependencies. In this special case, effectively what would happen is that we would download more assemblies. The potential runtime errors are not made better or worse by this selection.
 
 To better understand the reason behind the proposal, let's look at the packages on nuget.org in 2019.
 
@@ -396,15 +390,16 @@ While still possible, this approach would be a significant undertaking.
 
 - It is notable that not every package node NuGet processes gets selected. Meaning if there are multiple `Newtonsoft.Json` references, we currently read the dependencies for all of them and select assets for one. With this change we would do the assets selection for all of them in addition to reading the dependencies.
 
+#### AssetTargetFallback and warnings
+
+At this point, we're not going to raise any warnings if AssetTargetFallback was used.
+
+- We can raise the same warning as the usual ATF case. Similar logic applies as to the no warning scenario. In this case we'd be louder about a potential error.
+- Raise a different warning specifically targeting this scenario. Specifically address this particular scenario. Similarly to earlier, the runtime experience will not have been affected by this selection.
+
 ## Prior Art
 
 ## Unresolved Questions
-
-Should NuGet warn when AssetTargetFallback is used for dependencies? Here are our 3 options.
-
-- No warning. In this special case, effectively what would happen is that we would download more assemblies. The potential runtime errors are not made better or worse by this selection.
-- We can raise the same warning as the usual ATF case. Similar logic applies as to the no warning scenario. In this case we'd be louder about a potential error.
-- Raise a different warning specifically targeting this scenario. Specifically address this particular scenario. Similarly to earlier, the runtime experience will not have been affected by this selection.
 
 ## Future Possibilities
 
