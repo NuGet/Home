@@ -277,6 +277,7 @@ This analysis was done on the latest versions of packages.
 
 - 3.1% (5) of all (really only 85% can call into this) the packages have inconsistencies in the target frameworks defined in the compile and dependency groups.
 These packages can be considered not well authored and are specifically affected by the direction we choose.
+Pack warning NU5128 informs package authors that their package has this inconsistency, and the percentage of packages with this inconsistency should decrease as authors adopt the warning's suggestions.
 
 - Interpolating the numbers from (2), (4) and (5) we can predict that about 2% of packages have potential mismatch in the package assets supported & dependency group target frameworks.
 This effectively means that about 64% of packages that could be used with AssetTargetFallback will work with any approach.
@@ -392,7 +393,7 @@ While still possible, this approach would be a significant undertaking.
 
 #### AssetTargetFallback and warnings
 
-At this point, we're not going to raise any warnings if AssetTargetFallback was used.
+At this point, we're not going to raise any warnings if AssetTargetFallback was used to select a package dependency. 
 
 - We can raise the same warning as the usual ATF case. Similar logic applies as to the no warning scenario. In this case we'd be louder about a potential error.
 - Raise a different warning specifically targeting this scenario. Specifically address this particular scenario. Similarly to earlier, the runtime experience will not have been affected by this selection.
