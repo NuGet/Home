@@ -75,6 +75,7 @@ Project 'MyProjectB' has the following package references
 ```json
 {
   "version": 1,
+  "parameters": "",
   "projects": {
     "MyProjectA": [
       {
@@ -169,6 +170,7 @@ Project `MyProjectB` has the following updates to its packages
 ```json
 {
   "version": 1,
+  "parameters": "--outdated",
    "sources": [
     "https://api.nuget.org/v3/index.json",
     "https://apidev.nugettest.org/v3-index/index.json"
@@ -270,6 +272,7 @@ Project `MyProjectB` has the following deprecated packages
 ```json
 {
   "version": 1,
+  "parameters": "--deprecated",
    "sources": [
     "https://api.nuget.org/v3/index.json",
     "https://apidev.nugettest.org/v3-index/index.json"
@@ -379,6 +382,7 @@ Project `MyProjectB` has the following vulnerable packages
 ```json
 {
   "version": 1,
+  "parameters": "--vulnerable",
    "sources": [
     "https://api.nuget.org/v3/index.json",
     "https://apidev.nugettest.org/v3-index/index.json"
@@ -505,6 +509,7 @@ Project 'MyProjectB' has the following package references
 ```json
 {
   "version": 1,
+  "parameters": "--include-transitive",
   "projects": {
     "MyProjectA": [
       {
@@ -600,6 +605,128 @@ Project 'MyProjectB' has the following package references
 }
 ```
 
+
+#### `> dotnet list package --include-transitive --outdated --framework net5.0`
+
+The following sources were used:
+   https://api.nuget.org/v3/index.json
+   https://apidev.nugettest.org/v3-index/index.json
+
+No packages were found for the project `MyProjectA` given the specified frameworks.
+Project `MyProjectB` has the following updates to its packages
+   [net5.0]:
+   Top-level Package      Requested             Resolved              Latest
+   > NuGet.Commands       4.8.0-preview3.5278   4.8.0-preview3.5278   6.0.0
+   > Text2Xml.Lib         1.1.2                 1.1.2                 1.1.4
+
+   Transitive Package                                                                   Resolved              Latest
+   > Microsoft.CSharp                                                                   4.0.1                 4.7.0
+   > Microsoft.NETCore.Platforms                                                        1.1.0                 6.0.1
+   > Microsoft.NETCore.Targets                                                          1.1.0                 5.0.0
+
+#### `> dotnet list package --include-transitive --outdated --framework net5.0 --format json`
+
+```json
+{
+  "version": 1,
+  "parameters": "-include-transitive --outdated --framework net5.0",
+   "sources": [
+    "https://api.nuget.org/v3/index.json",
+    "https://apidev.nugettest.org/v3-index/index.json"
+  ],
+  "projects": {
+    "MyProjectA": [
+    ],
+    "MyProjectB": [
+      {
+        "Path": "src/lib/MyProjectB.csproj",
+        "framework": "net5.0",
+        "topLevelPackages": [ 
+          {
+            "id": "NuGet.Commands",
+            "requestedVersion": "4.8.0-preview3.5278",
+            "resolvedVersion": "4.8.0-preview3.5278",
+            "latestVersion": "6.0.0",
+          },
+          {
+            "id": "Text2Xml.Lib",
+            "requestedVersion": "1.1.2",
+            "resolvedVersion": "1.1.2",
+            "latestVersion": "1.1.4",
+          }
+        ],
+        "transitivePackages": [
+          {
+            "id": "Microsoft.CSharp",
+            "resolvedVersion": "4.0.1",
+            "latestVersion": "4.7.0",
+          }
+  ...
+        ]
+      }
+    ]
+  }
+}
+```
+
+#### `> dotnet list package --include-transitive --deprecated --framework net5.0`
+
+The following sources were used:
+   https://api.nuget.org/v3/index.json
+   https://apidev.nugettest.org/v3-index/index.json
+
+No packages were found for the project `MyProjectA` given the specified frameworks.
+Project `MyProjectB` has the following deprecated packages
+   [net5.0]:
+   Top-level Package      Requested   Resolved   Reason(s)   Alternative
+   > NuGet.Core           2.13.0      2.13.0     Legacy
+
+   Transitive Package          Resolved              Reason(s)   Alternative
+   > NuGet.Packaging.Core      4.8.0-preview3.5278   Legacy      NuGet.Packaging >= 0.0.0
+
+#### `> dotnet list package --include-transitive --deprecated --framework net5.0 --format json`
+
+```json
+{
+  "version": 1,
+  "parameters": "--include-transitive --deprecated --framework net5.0",
+   "sources": [
+    "https://api.nuget.org/v3/index.json",
+    "https://apidev.nugettest.org/v3-index/index.json"
+  ],
+  "projects": {
+    "MyProjectA": [
+    ],
+    "MyProjectB": [
+      {
+        "Path": "src/lib/MyProjectB.csproj",
+        "framework": "net5.0",
+        "topLevelPackages": [ 
+          {
+            "id": "NuGet.Core",
+            "requestedVersion": "2.13.0",
+            "resolvedVersion": "2.13.0",
+            "deprecationReasons": ["Legacy"]
+          }
+        ],
+        "transitivePackages": [
+          {
+            "id": "Microsoft.CSharp",
+            "resolvedVersion": "4.0.1",
+            "deprecationReasons": ["Legacy"],
+            "alternativePackage": {
+              "id": "NuGet.Packaging",
+              "versionRange": "[0.0.0,)"
+            }
+          }
+  ...
+        ]
+      }
+    ]
+  }
+}
+```
+
 ## Compatibility
 
  We start with `version 1`, as long as we don't remove or rename then it'll be backward compatible. In case [we change version](https://stackoverflow.com/a/13945074) just add new properties, keep old ones even it's not used.
@@ -628,32 +755,42 @@ Please note, except "tab completion" (for dotnet) part all changes would be insi
 
 * https://docs.microsoft.com/en-us/dotnet/core/diagnostics/dotnet-counters One idea we can take from `dotnet counter` is we can specify output file with `-o`, `--output` option. So instead of writing output into console, it allows output directly saved into file. It allows both `csv` and `json` formats, currently saved file doesn't have version concept.
 
+* https://github.com/NuGet/Home/wiki/Enable-repeatable-package-restore-using-lock-file It's very similar what we're doing here, and it has schema versioning. [sample](https://gist.github.com/erdembayar/4894b66bde227147b60e60997d20df41) Only major difference is json object are grouped under TFM unlike `dotnet list package` where items are grouped under projects. Below are possible takeaways.
+  * Direct/top level packages point to dependency packages. >> Could be included, down side is duplicate information, increase json size. Also I feel https://github.com/NuGet/Home/issues/11553 addresses this issue better, because in the end who transitive dependency brought in is more important than what dependencies exist under each top package.
+  * Content hash. >> It's very easy to include it, question is how about source? Related issue https://github.com/NuGet/Home/issues/11552
+
+* [npm ls --json](https://gist.github.com/erdembayar/ddfbf9c160fbb8a0e31e3596f03ee906), [npm outdated -json](https://gist.github.com/erdembayar/12030f1db89ad9f2e206f2b6ff7d740f) Actually it's less sophisticated than what we have, because it doesn't have multi TFM and projects concept.
+
 ## Unresolved Questions
 
 * Donnie: When I want to create archival records, will I want something more unique than the project name?
 Adding the path, repo, commit ID, etc seems complex. [r766920783](https://github.com/NuGet/Home/pull/11446#discussion_r766920783)
-  * `name/relative path to solution` could be solution here.
+  >> `path property` could be solution here, see proposal.
 
 * Donnie: How can we record in the output that --include-transitive wasn't used here?
 In other words, if I look at this output years from now, how would I know whether any transitives were in this project? [r766924390](https://github.com/NuGet/Home/pull/11446#discussion_r766924390)
-  * packages.lock.json format could be used here.  
+  >> We could include options and parameters used here.
 
 * Loïc : How would this format evolve if we add another "package pivot" in addition to top level and transitive packages? For example, what if we add new package kinds for source generators, Roslyn analyzers, etc...? [r767026799](https://github.com/NuGet/Home/pull/11446#discussion_r767026799)
 
 >> Out of scope from MVP, this schema can evolve over time, by the time we have necessity to do change we can make more educated decision.
 
-* Could we use existing packages.lock.json format? [sample](https://gist.github.com/erdembayar/4894b66bde227147b60e60997d20df41)
-  * Direct/top level packages point to dependency packages.
-  * Content hash. >> out of scope for now. Tracking issue https://github.com/NuGet/Home/issues/11552
-
 ## Future Possibilities
+
+If we address them in plain `dotnet list package` then we'll address in `json output` too.
+
+* Include source info for all  options. https://github.com/NuGet/Home/issues/11556
+
+* Include hash + source for package, because same package ID+version might have different hash. It can be used to detect [dependency confusion attack](https://github.com/NuGet/Home/pull/11446#discussion_r767030495), tracking issue: https://github.com/NuGet/Home/issues/11552
+
+* Include hash for each package, sub issue of above. This's low hanging fruit I can include it.
+
+* Some outputs include source info. Maybe we should include package source mapping info into sources, tracking issue https://github.com/NuGet/Home/issues/11557
 
 * Show resolution tree for transitive dependencies and constraint for dependency [resolved version](https://github.com/NuGet/Home/pull/11446/files#r777233006), tracking issue: https://github.com/NuGet/Home/issues/11553
 
-* Return different exit codes if any vulnerabilities, deprecations, outdated package is [detected](https://github.com/NuGet/Home/blob/dotnet-audit/proposed/2021/DotNetAudit.md#dotnet-audit-exit-codes).
+* Include-transitive dependencies by default [r766924390](https://github.com/NuGet/Home/pull/11446#discussion_r766924390), workaround pass `--include-transitive`, tracking issue https://github.com/NuGet/Home/issues/11550
 
 * `--all` option for dotnet list package [r766860629](https://github.com/NuGet/Home/pull/11446#discussion_r766860629), tracking issue https://github.com/NuGet/Home/issues/11551
 
-* Include-transitive dependencies by default [r766924390](https://github.com/NuGet/Home/pull/11446#discussion_r766924390), tracking issue https://github.com/NuGet/Home/issues/11550
-
-* Include hash + source for package, because same package ID+version might have different hash. It can be used to detect [dependency confusion attack](https://github.com/NuGet/Home/pull/11446#discussion_r767030495), tracking issue: https://github.com/NuGet/Home/issues/11552
+* Return different exit codes if any vulnerabilities, deprecations, outdated package is [detected](https://github.com/NuGet/Home/blob/dotnet-audit/proposed/2021/DotNetAudit.md#dotnet-audit-exit-codes).
