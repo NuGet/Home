@@ -233,7 +233,7 @@ When outdated packages are detected, a warning is thrown by default.
 
 ```
 dotnet audit --help
-dotnet audit [<PROJECT>|<SOLUTION>|<Directory.Packages.props>] [-v|--verbosity <LEVEL>] [--json]
+dotnet audit [<PROJECT>|<SOLUTION>|<Directory.Packages.props>] [-v|--verbosity <LEVEL>] [--json] [--interactive]
 ```
 
 ```
