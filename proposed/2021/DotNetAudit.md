@@ -229,6 +229,18 @@ When deprecated packages are detected, a warning is thrown by default.
 
 When outdated packages are detected, a warning is thrown by default.
 
+#### CLI Usage
+
+```
+dotnet audit --help
+dotnet audit [<PROJECT>|<SOLUTION>|<Directory.Packages.props>] [-v|--verbosity <LEVEL>] [--json]
+```
+
+```
+dotnet audit fix --help
+dotnet audit fix [<PROJECT>|<SOLUTION>|<Directory.Packages.props>] [-v|--verbosity <LEVEL>] [--dry-run] [--json] [--interactive]
+```
+
 ### Technical explanation
 
 <!-- Explain the proposal in sufficient detail with implementation details, interaction models, and clarification of corner cases. -->
@@ -281,4 +293,4 @@ Additionally, there already exists many third-party solutions that try to solve 
 - `dotnet audit` can be run on every `restore` which can throw warnings or errors to the user to take action against a vulnerable, deprecated, or outdated software supply chain.
 - `dotnet audit` and `dotnet audit fix` output & resolutions can be extended by the .NET ecosystem to build tooling & new experiences around.
 - `dotnet audit` and `dotnet audit fix` experiences can be extended into Visual Studio IDEs providing users with more visualizations of potential problems in their dependencies & ways to resolve them with a single click experience.
-- `dotnet audit` can be added to CI/CD environments for an extra layer of monitoring.
+- `dotnet audit` can be added to CI/CD environments for an extra layer of monitoring such as a GitHub Action template.
