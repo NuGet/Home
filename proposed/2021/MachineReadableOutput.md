@@ -79,7 +79,7 @@ Project 'MyProjectB' has the following package references
   "projects": {
     "MyProjectA": [
       {
-        "Path": "src/tool/MyProjectA.csproj",
+        "Path": "src/tool/MyProjectA.csproj", // relative to invocation directory
         "framework": "netcoreapp3.1",
         "topLevelPackages": [
           {
@@ -766,10 +766,6 @@ Please note, except "tab completion" (for dotnet) part all changes would be insi
 * Donnie: When I want to create archival records, will I want something more unique than the project name?
 Adding the path, repo, commit ID, etc seems complex. [r766920783](https://github.com/NuGet/Home/pull/11446#discussion_r766920783)
   >> `path property` could be solution here, see proposal.
-
-* Donnie: How can we record in the output that --include-transitive wasn't used here?
-In other words, if I look at this output years from now, how would I know whether any transitives were in this project? [r766924390](https://github.com/NuGet/Home/pull/11446#discussion_r766924390)
-  >> We could include options and parameters used here.
 
 * Loïc : How would this format evolve if we add another "package pivot" in addition to top level and transitive packages? For example, what if we add new package kinds for source generators, Roslyn analyzers, etc...? [r767026799](https://github.com/NuGet/Home/pull/11446#discussion_r767026799)
 
