@@ -79,7 +79,6 @@ Project 'MyProjectB' has the following package references
   "projects": {
     "MyProjectA": [
       {
-        "Path": "src/tool/MyProjectA.csproj", // relative to invocation directory
         "framework": "netcoreapp3.1",
         "topLevelPackages": [
           {
@@ -102,7 +101,6 @@ Project 'MyProjectB' has the following package references
     ],
     "MyProjectB": [
       {
-        "Path": "src/lib/MyProjectB.csproj",
         "framework": "netcoreapp3.1",
         "topLevelPackages": [
           {
@@ -118,7 +116,6 @@ Project 'MyProjectB' has the following package references
         ]
       },
       {
-        "Path": "src/lib/MyProjectB.csproj",
         "framework": "net5.0",
         "topLevelPackages": [ 
           {
@@ -178,7 +175,6 @@ Project `MyProjectB` has the following updates to its packages
   "projects": {
     "MyProjectA": [
       {
-        "Path": "src/tool/MyProjectA.csproj",
         "framework": "netcoreapp3.1",
         "topLevelPackages": [
           {
@@ -204,7 +200,6 @@ Project `MyProjectB` has the following updates to its packages
     ],
     "MyProjectB": [
       {
-        "Path": "src/tool/MyProjectB.csproj",
         "framework": "netcoreapp3.1",
         "topLevelPackages": [
           {
@@ -222,7 +217,6 @@ Project `MyProjectB` has the following updates to its packages
         ]
       },
       {
-        "Path": "src/tool/MyProjectB.csproj",
         "framework": "net5.0",
         "topLevelPackages": [ 
           {
@@ -281,7 +275,6 @@ Project `MyProjectB` has the following deprecated packages
 
     "MyProjectA": [
       {
-        "Path": "src/tool/MyProjectA.csproj",
         "framework": "netcoreapp3.1",
         "topLevelPackages": [
           {
@@ -305,7 +298,6 @@ Project `MyProjectB` has the following deprecated packages
     ],
     "MyProjectB": [
       {
-        "Path": "src/lib/MyProjectB.csproj",
         "framework": "netcoreapp3.1",
         "topLevelPackages": [
           {
@@ -317,7 +309,6 @@ Project `MyProjectB` has the following deprecated packages
         ]
       },
       {
-        "Path": "src/lib/MyProjectB.csproj",
         "framework": "net5.0",
         "topLevelPackages": [ 
           {
@@ -390,7 +381,6 @@ Project `MyProjectB` has the following vulnerable packages
   "projects": {
     "MyProjectA": [
       {
-        "Path": "src/lib/MyProjectA.csproj",
         "framework": "netcoreapp3.1",
         "topLevelPackages": [
           {
@@ -414,7 +404,6 @@ Project `MyProjectB` has the following vulnerable packages
     ],
     "MyProjectB": [
       {
-        "Path": "src/lib/MyProjectB.csproj",
         "framework": "netcoreapp3.1",
         "topLevelPackages": [
           {
@@ -436,7 +425,6 @@ Project `MyProjectB` has the following vulnerable packages
         ]
       },
       {
-        "Path": "src/lib/MyProjectB.csproj",
         "framework": "net5.0",
         "topLevelPackages": [ 
           {
@@ -513,7 +501,6 @@ Project 'MyProjectB' has the following package references
   "projects": {
     "MyProjectA": [
       {
-        "Path": "src/lib/MyProjectA.csproj",
         "framework": "netcoreapp3.1",
         "topLevelPackages": [
           {
@@ -547,7 +534,6 @@ Project 'MyProjectB' has the following package references
     ],
     "MyProjectB": [
       {
-        "Path": "src/lib/MyProjectB.csproj",
         "framework": "netcoreapp3.1",
         "topLevelPackages": [
           {
@@ -574,7 +560,6 @@ Project 'MyProjectB' has the following package references
         ]
       },
       {
-        "Path": "src/lib/MyProjectB.csproj",
         "framework": "net5.0",
         "topLevelPackages": [ 
           {
@@ -639,7 +624,6 @@ Project `MyProjectB` has the following updates to its packages
     ],
     "MyProjectB": [
       {
-        "Path": "src/lib/MyProjectB.csproj",
         "framework": "net5.0",
         "topLevelPackages": [ 
           {
@@ -699,7 +683,6 @@ Project `MyProjectB` has the following deprecated packages
     ],
     "MyProjectB": [
       {
-        "Path": "src/lib/MyProjectB.csproj",
         "framework": "net5.0",
         "topLevelPackages": [ 
           {
@@ -780,6 +763,8 @@ If we address them in plain `dotnet list package` then we'll address in `json ou
 * Include hash + source for package, because same package ID+version might have different hash. It can be used to detect [dependency confusion attack](https://github.com/NuGet/Home/pull/11446#discussion_r767030495), tracking issue: https://github.com/NuGet/Home/issues/11552
 
 * Include hash for each package, sub issue of above. This's low hanging fruit I can include it.
+
+* Include [path info](https://github.com/NuGet/Home/pull/11446#discussion_r798509892) for project (either relative to current working dir or relative to solution): tracking issue: https://github.com/NuGet/Home/issues/11562
 
 * Some outputs include source info. Maybe we should include package source mapping info into sources, tracking issue https://github.com/NuGet/Home/issues/11557
 
