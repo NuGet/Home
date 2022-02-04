@@ -43,7 +43,7 @@ Fetching package metadata from: 'https://api.nuget.org/v3/index.json'
 Loaded 23 security advisories from 'https://api.nuget.org/v3/index.json'
 Scanning ContosoUniversity.sln (36 NuGet dependencies)
 
-error: Vulnernable packages found!
+error: Vulnerable packages found!
 [net5.0]:
 Top-level Package	    Requested	Resolved	Severity	Advisory URL
 > UmbracoForms		    8.4.1		8.4.1		Moderate	https://github.com/advisories/GHSA-8m73-w2r2-6xxj
