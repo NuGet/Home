@@ -168,7 +168,7 @@ The `dotnet audit fix` command will provide a remediation that is calculated wit
 ```
 $ dotnet audit fix
 
-Fixing vulnernable packages in ContosoUniversity.sln
+Fixing vulnerable packages in ContosoUniversity.sln
 	Upgrading UmbracoForms 8.4.1 to 8.7.1
 
 Fixing deprecated packages in ContosoUniversity.sln
