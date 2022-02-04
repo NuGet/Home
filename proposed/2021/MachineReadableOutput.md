@@ -744,16 +744,6 @@ Please note, except "tab completion" (for dotnet) part all changes would be insi
 
 * [npm ls --json](https://gist.github.com/erdembayar/ddfbf9c160fbb8a0e31e3596f03ee906), [npm outdated -json](https://gist.github.com/erdembayar/12030f1db89ad9f2e206f2b6ff7d740f) Actually it's less sophisticated than what we have, because it doesn't have multi TFM and projects concept.
 
-## Unresolved Questions
-
-* Donnie: When I want to create archival records, will I want something more unique than the project name?
-Adding the path, repo, commit ID, etc seems complex. [r766920783](https://github.com/NuGet/Home/pull/11446#discussion_r766920783)
-  >> `path property` could be solution here, see proposal.
-
-* Loïc : How would this format evolve if we add another "package pivot" in addition to top level and transitive packages? For example, what if we add new package kinds for source generators, Roslyn analyzers, etc...? [r767026799](https://github.com/NuGet/Home/pull/11446#discussion_r767026799)
-
->> Out of scope from MVP, this schema can evolve over time, by the time we have necessity to do change we can make more educated decision.
-
 ## Future Possibilities
 
 If we address them in plain `dotnet list package` then we'll address in `json output` too.
