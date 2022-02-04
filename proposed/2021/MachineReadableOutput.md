@@ -44,7 +44,7 @@ dotnet list [<PROJECT>|<SOLUTION>] package [--config <SOURCE>]
     [--outdated] [--source <SOURCE>] [-v|--verbosity <LEVEL>]
     [--vulnerable]
     [--format <FORMAT>]
-
+    [--output-version <VERSION>]
 dotnet list package -h|--help
 ```
 
@@ -76,65 +76,68 @@ Project 'MyProjectB' has the following package references
 {
   "version": 1,
   "parameters": "",
-  "projects": {
-    "MyProjectA": [
-      {
-        "Path": "src/tool/MyProjectA.csproj", // relative to invocation directory
-        "framework": "netcoreapp3.1",
-        "topLevelPackages": [
-          {
-            "id": "Microsoft.Extensions.Primitives",
-            "requestedVersion": "[1.0.0, 5.0.0]",
-            "resolvedVersion": "1.0.0"
-          },
-          {
-            "id": "NuGet.Commands",
-            "requestedVersion": "4.8.0-preview3.5278",
-            "resolvedVersion": "4.8.0-preview3.5278"
-          },
-          {
-            "id": "Text2Xml.Lib",
-            "requestedVersion": "[1.1.2, 2.0.0)",
-            "resolvedVersion": "1.1.2"
-          }
-        ]
-      }
-    ],
-    "MyProjectB": [
-      {
-        "Path": "src/lib/MyProjectB.csproj",
-        "framework": "netcoreapp3.1",
-        "topLevelPackages": [
-          {
-            "id": "NuGet.Commands",
-            "requestedVersion": "4.8.0-preview3.5278",
-            "resolvedVersion": "4.8.0-preview3.5278"
-          },
-          {
-            "id": "Text2Xml.Lib",
-            "requestedVersion": "1.1.2",
-            "resolvedVersion": "1.1.2"
-          }
-        ]
-      },
-      {
-        "Path": "src/lib/MyProjectB.csproj",
-        "framework": "net5.0",
-        "topLevelPackages": [ 
-          {
-            "id": "NuGet.Commands",
-            "requestedVersion": "4.8.0-preview3.5278",
-            "resolvedVersion": "4.8.0-preview3.5278"
-          },
-          {
-            "id": "Text2Xml.Lib",
-            "requestedVersion": "1.1.2",
-            "resolvedVersion": "1.1.2"
-          }
-        ]
-      }
-    ]
-  }
+  "projects": [
+    {
+      "path": "src/lib/MyProjectA.csproj",
+      "frameworks": [
+        {
+          "framework": "netcoreapp3.1",
+          "topLevelPackages": [
+            {
+              "id": "Microsoft.Extensions.Primitives",
+              "requestedVersion": "[1.0.0, 5.0.0]",
+              "resolvedVersion": "1.0.0"
+            },
+            {
+              "id": "NuGet.Commands",
+              "requestedVersion": "4.8.0-preview3.5278",
+              "resolvedVersion": "4.8.0-preview3.5278"
+            },
+            {
+              "id": "Text2Xml.Lib",
+              "requestedVersion": "[1.1.2, 2.0.0)",
+              "resolvedVersion": "1.1.2"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "src/lib/MyProjectB.csproj",
+      "frameworks": [
+        {
+          "framework": "netcoreapp3.1",
+          "topLevelPackages": [
+            {
+              "id": "NuGet.Commands",
+              "requestedVersion": "4.8.0-preview3.5278",
+              "resolvedVersion": "4.8.0-preview3.5278"
+            },
+            {
+              "id": "Text2Xml.Lib",
+              "requestedVersion": "1.1.2",
+              "resolvedVersion": "1.1.2"
+            }
+          ]
+        },
+        {
+          "framework": "net5.0",
+          "topLevelPackages": [
+            {
+              "id": "NuGet.Commands",
+              "requestedVersion": "4.8.0-preview3.5278",
+              "resolvedVersion": "4.8.0-preview3.5278"
+            },
+            {
+              "id": "Text2Xml.Lib",
+              "requestedVersion": "1.1.2",
+              "resolvedVersion": "1.1.2"
+            }
+          ]
+        }
+      ]
+    }
+  ]
 }
 ```
 
@@ -175,72 +178,75 @@ Project `MyProjectB` has the following updates to its packages
     "https://api.nuget.org/v3/index.json",
     "https://apidev.nugettest.org/v3-index/index.json"
   ],
-  "projects": {
-    "MyProjectA": [
-      {
-        "Path": "src/tool/MyProjectA.csproj",
-        "framework": "netcoreapp3.1",
-        "topLevelPackages": [
-          {
-            "id": "Microsoft.Extensions.Primitives",
-            "requestedVersion": "[1.0.0, 5.0.0]",
-            "resolvedVersion": "1.0.0",
-            "latestVersion": "6.0.0",
-          },
-          {
-            "id": "NuGet.Commands",
-            "requestedVersion": "4.8.0-preview3.5278",
-            "resolvedVersion": "4.8.0-preview3.5278",
-            "latestVersion": "6.0.0",
-          },
-          {
-            "id": "Text2Xml.Lib",
-            "requestedVersion": "[1.1.2, 2.0.0)",
-            "resolvedVersion": "1.1.2",
-            "latestVersion": "1.1.4"
-          }
-        ]
-      }
-    ],
-    "MyProjectB": [
-      {
-        "Path": "src/tool/MyProjectB.csproj",
-        "framework": "netcoreapp3.1",
-        "topLevelPackages": [
-          {
-            "id": "NuGet.Commands",
-            "requestedVersion": "4.8.0-preview3.5278",
-            "resolvedVersion": "4.8.0-preview3.5278",
-            "latestVersion": "6.0.0"
-          },
-          {
-            "id": "Text2Xml.Lib",
-            "requestedVersion": "1.1.2",
-            "resolvedVersion": "1.1.2",
-            "latestVersion": "1.1.4"
-          }
-        ]
-      },
-      {
-        "Path": "src/tool/MyProjectB.csproj",
-        "framework": "net5.0",
-        "topLevelPackages": [ 
-          {
-            "id": "NuGet.Commands",
-            "requestedVersion": "4.8.0-preview3.5278",
-            "resolvedVersion": "4.8.0-preview3.5278",
-            "latestVersion": "6.0.0"
-          },
-          {
-            "id": "Text2Xml.Lib",
-            "requestedVersion": "1.1.2",
-            "resolvedVersion": "1.1.2",
-            "latestVersion": "1.1.4"
-          }
-        ]
-      }
-    ]
-  }
+  "projects": [
+    {
+      "path": "src/lib/MyProjectA.csproj",
+      "frameworks": [
+        {
+          "framework": "netcoreapp3.1",
+          "topLevelPackages": [
+              {
+                "id": "Microsoft.Extensions.Primitives",
+                "requestedVersion": "[1.0.0, 5.0.0]",
+                "resolvedVersion": "1.0.0",
+                "latestVersion": "6.0.0",
+              },
+              {
+                "id": "NuGet.Commands",
+                "requestedVersion": "4.8.0-preview3.5278",
+                "resolvedVersion": "4.8.0-preview3.5278",
+                "latestVersion": "6.0.0",
+              },
+              {
+                "id": "Text2Xml.Lib",
+                "requestedVersion": "[1.1.2, 2.0.0)",
+                "resolvedVersion": "1.1.2",
+                "latestVersion": "1.1.4"
+              }
+            ]
+        }
+      ]
+    },
+    {
+      "path": "src/lib/MyProjectB.csproj",
+      "frameworks": [
+        {
+          "framework": "netcoreapp3.1",
+          "topLevelPackages": [
+              {
+                "id": "NuGet.Commands",
+                "requestedVersion": "4.8.0-preview3.5278",
+                "resolvedVersion": "4.8.0-preview3.5278",
+                "latestVersion": "6.0.0"
+              },
+              {
+                "id": "Text2Xml.Lib",
+                "requestedVersion": "1.1.2",
+                "resolvedVersion": "1.1.2",
+                "latestVersion": "1.1.4"
+              }
+          ]
+        },
+        {
+          "framework": "net5.0",
+          "topLevelPackages": [ 
+              {
+                "id": "NuGet.Commands",
+                "requestedVersion": "4.8.0-preview3.5278",
+                "resolvedVersion": "4.8.0-preview3.5278",
+                "latestVersion": "6.0.0"
+              },
+              {
+                "id": "Text2Xml.Lib",
+                "requestedVersion": "1.1.2",
+                "resolvedVersion": "1.1.2",
+                "latestVersion": "1.1.4"
+              }
+            ]
+        }
+      ]
+    }
+  ]
 }
 ```
 
@@ -277,59 +283,61 @@ Project `MyProjectB` has the following deprecated packages
     "https://api.nuget.org/v3/index.json",
     "https://apidev.nugettest.org/v3-index/index.json"
   ],
-  "projects": {
-
-    "MyProjectA": [
-      {
-        "Path": "src/tool/MyProjectA.csproj",
-        "framework": "netcoreapp3.1",
-        "topLevelPackages": [
-          {
-            "id": "EntityFramework.MappingAPI",
-            "requestedVersion": "*",
-            "resolvedVersion": "6.2.1",
-            "deprecationReasons": ["Legacy"],
-            "alternativePackage": {
-              "id": "Z.EntityFramework.Extensions",
-              "versionRange": "[0.0.0,)"
-            }
-          },
-          {
-            "id": "NuGet.Core",
-            "requestedVersion": "2.13.0",
-            "resolvedVersion": "2.13.0",
-            "deprecationReasons": ["Legacy"],
-          }
-        ]
-      }
-    ],
-    "MyProjectB": [
-      {
-        "Path": "src/lib/MyProjectB.csproj",
-        "framework": "netcoreapp3.1",
-        "topLevelPackages": [
-          {
-            "id": "NuGet.Core",
-            "requestedVersion": "2.13.0",
-            "resolvedVersion": "2.13.0",
-            "deprecationReasons": ["Legacy"],
-          }
-        ]
-      },
-      {
-        "Path": "src/lib/MyProjectB.csproj",
-        "framework": "net5.0",
-        "topLevelPackages": [ 
-          {
-            "id": "NuGet.Core",
-            "requestedVersion": "2.13.0",
-            "resolvedVersion": "2.13.0",
-            "deprecationReasons": ["Legacy"],
-          }
-        ]
-      }
-    ]
-  }
+  "projects": [
+    {
+      "path": "src/lib/MyProjectA.csproj",
+      "frameworks": [
+        {
+          "framework": "netcoreapp3.1",
+          "topLevelPackages": [
+              {
+                "id": "EntityFramework.MappingAPI",
+                "requestedVersion": "*",
+                "resolvedVersion": "6.2.1",
+                "deprecationReasons": ["Legacy"],
+                "alternativePackage": {
+                  "id": "Z.EntityFramework.Extensions",
+                  "versionRange": "[0.0.0,)"
+                }
+              },
+              {
+                "id": "NuGet.Core",
+                "requestedVersion": "2.13.0",
+                "resolvedVersion": "2.13.0",
+                "deprecationReasons": ["Legacy"],
+              }
+            ]
+        }
+      ]
+    },
+    {
+      "path": "src/lib/MyProjectB.csproj",
+      "frameworks": [
+        {
+          "framework": "netcoreapp3.1",
+          "topLevelPackages": [
+              {
+                "id": "NuGet.Core",
+                "requestedVersion": "2.13.0",
+                "resolvedVersion": "2.13.0",
+                "deprecationReasons": ["Legacy"],
+              }
+            ]
+        },
+        {
+          "framework": "net5.0",
+          "topLevelPackages": [ 
+              {
+                "id": "NuGet.Core",
+                "requestedVersion": "2.13.0",
+                "resolvedVersion": "2.13.0",
+                "deprecationReasons": ["Legacy"],
+              }
+            ]
+        }
+      ]
+    }
+  ]
 }
 ```
 
@@ -387,78 +395,81 @@ Project `MyProjectB` has the following vulnerable packages
     "https://api.nuget.org/v3/index.json",
     "https://apidev.nugettest.org/v3-index/index.json"
   ],
-  "projects": {
-    "MyProjectA": [
-      {
-        "Path": "src/lib/MyProjectA.csproj",
-        "framework": "netcoreapp3.1",
-        "topLevelPackages": [
-          {
-            "id": "DotNetNuke.Core",
-            "requestedVersion": "6.0.0",
-            "resolvedVersion": "6.0.0",
-            "vulnerabilities" : [
+  "projects": [
+    {
+      "path": "src/lib/MyProjectA.csproj",
+      "frameworks": [
+        {
+          "framework": "netcoreapp3.1",
+          "topLevelPackages": [
               {
-                  "severity":"High",
-                  "advisoryurl":"https://github.com/advisories/GHSA-g8j6-m4p7-5rfq"
-              },
+                "id": "DotNetNuke.Core",
+                "requestedVersion": "6.0.0",
+                "resolvedVersion": "6.0.0",
+                "vulnerabilities" : [
+                  {
+                      "severity":"High",
+                      "advisoryurl":"https://github.com/advisories/GHSA-g8j6-m4p7-5rfq"
+                  },
+                  {
+                      "severity":"Moderate",
+                      "advisoryurl":"https://github.com/advisories/GHSA-v76m-f5cx-8rg4"
+                  },
+      ...
+                  ]
+              }
+            ]
+        }
+      ]
+    },
+    {
+      "path": "src/lib/MyProjectB.csproj",
+      "frameworks": [
+        {
+          "framework": "netcoreapp3.1",
+          "topLevelPackages": [
               {
-                  "severity":"Moderate",
-                  "advisoryurl":"https://github.com/advisories/GHSA-v76m-f5cx-8rg4"
-              },
-  ...
-              ]
-          }
-        ]
-      }
-    ],
-    "MyProjectB": [
-      {
-        "Path": "src/lib/MyProjectB.csproj",
-        "framework": "netcoreapp3.1",
-        "topLevelPackages": [
-          {
-            "id": "DotNetNuke.Core",
-            "requestedVersion": "6.0.0",
-            "resolvedVersion": "6.0.0",
-            "vulnerabilities" : [
+                "id": "DotNetNuke.Core",
+                "requestedVersion": "6.0.0",
+                "resolvedVersion": "6.0.0",
+                "vulnerabilities" : [
+                  {
+                      "severity":"High",
+                      "advisoryurl":"https://github.com/advisories/GHSA-g8j6-m4p7-5rfq"
+                  },
+                  {
+                      "severity":"Moderate",
+                      "advisoryurl":"https://github.com/advisories/GHSA-v76m-f5cx-8rg4"
+                  },
+      ...
+                  ]
+              }
+            ]
+        },
+        {
+          "framework": "net5.0",
+          "topLevelPackages": [ 
               {
-                  "severity":"High",
-                  "advisoryurl":"https://github.com/advisories/GHSA-g8j6-m4p7-5rfq"
-              },
-              {
-                  "severity":"Moderate",
-                  "advisoryurl":"https://github.com/advisories/GHSA-v76m-f5cx-8rg4"
-              },
-  ...
-              ]
-          }
-        ]
-      },
-      {
-        "Path": "src/lib/MyProjectB.csproj",
-        "framework": "net5.0",
-        "topLevelPackages": [ 
-          {
-            "id": "DotNetNuke.Core",
-            "requestedVersion": "6.0.0",
-            "resolvedVersion": "6.0.0",
-            "vulnerabilities" : [
-              {
-                  "severity":"High",
-                  "advisoryurl":"https://github.com/advisories/GHSA-g8j6-m4p7-5rfq"
-              },
-              {
-                  "severity":"Moderate",
-                  "advisoryurl":"https://github.com/advisories/GHSA-v76m-f5cx-8rg4"
-              },
-  ...
-              ]
-          }
-        ]
-      }
-    ]
-  }
+                "id": "DotNetNuke.Core",
+                "requestedVersion": "6.0.0",
+                "resolvedVersion": "6.0.0",
+                "vulnerabilities" : [
+                  {
+                      "severity":"High",
+                      "advisoryurl":"https://github.com/advisories/GHSA-g8j6-m4p7-5rfq"
+                  },
+                  {
+                      "severity":"Moderate",
+                      "advisoryurl":"https://github.com/advisories/GHSA-v76m-f5cx-8rg4"
+                  },
+      ...
+                  ]
+              }
+            ]
+        }
+      ]
+    }
+  ]
 }
 ```
 
@@ -510,98 +521,101 @@ Project 'MyProjectB' has the following package references
 {
   "version": 1,
   "parameters": "--include-transitive",
-  "projects": {
-    "MyProjectA": [
-      {
-        "Path": "src/lib/MyProjectA.csproj",
-        "framework": "netcoreapp3.1",
-        "topLevelPackages": [
-          {
-            "id": "Microsoft.Extensions.Primitives",
-            "requestedVersion": "[1.0.0, 5.0.0]",
-            "resolvedVersion": "1.0.0"
-          },
-          {
-            "id": "NuGet.Commands",
-            "requestedVersion": "4.8.0-preview3.5278",
-            "resolvedVersion": "4.8.0-preview3.5278"
-          },
-          {
-            "id": "Text2Xml.Lib",
-            "requestedVersion": "[1.1.2, 2.0.0)",
-            "resolvedVersion": "1.1.2"
-          }
-        ],
-        "transitivePackages": [
-          {
-            "id": "Microsoft.CSharp",
-            "resolvedVersion": "4.0.1"
-          },
-          {
-            "id": "Microsoft.NETCore.Platforms",
-            "resolvedVersion": "1.1.0"
-          },
-  ...
-        ]
-      }
-    ],
-    "MyProjectB": [
-      {
-        "Path": "src/lib/MyProjectB.csproj",
-        "framework": "netcoreapp3.1",
-        "topLevelPackages": [
-          {
-            "id": "NuGet.Commands",
-            "requestedVersion": "4.8.0-preview3.5278",
-            "resolvedVersion": "4.8.0-preview3.5278"
-          },
-          {
-            "id": "Text2Xml.Lib",
-            "requestedVersion": "1.1.2",
-            "resolvedVersion": "1.1.2"
-          }
-        ],
-        "transitivePackages": [
-          {
-            "id": "Microsoft.CSharp",
-            "resolvedVersion": "4.0.1"
-          },
-          {
-            "id": "Microsoft.NETCore.Platforms",
-            "resolvedVersion": "1.1.0"
-          },
-  ...
-        ]
-      },
-      {
-        "Path": "src/lib/MyProjectB.csproj",
-        "framework": "net5.0",
-        "topLevelPackages": [ 
-          {
-            "id": "NuGet.Commands",
-            "requestedVersion": "4.8.0-preview3.5278",
-            "resolvedVersion": "4.8.0-preview3.5278"
-          },
-          {
-            "id": "Text2Xml.Lib",
-            "requestedVersion": "1.1.2",
-            "resolvedVersion": "1.1.2"
-          }
-        ],
-        "transitivePackages": [
-          {
-            "id": "Microsoft.CSharp",
-            "resolvedVersion": "4.0.1"
-          },
-          {
-            "id": "Microsoft.NETCore.Platforms",
-            "resolvedVersion": "1.1.0"
-          },
-  ...
-        ]
-      }
-    ]
-  }
+  "projects": [
+    {
+      "path": "src/lib/MyProjectA.csproj",
+      "frameworks": [
+        {
+          "framework": "netcoreapp3.1",
+          "topLevelPackages": [
+              {
+                "id": "Microsoft.Extensions.Primitives",
+                "requestedVersion": "[1.0.0, 5.0.0]",
+                "resolvedVersion": "1.0.0"
+              },
+              {
+                "id": "NuGet.Commands",
+                "requestedVersion": "4.8.0-preview3.5278",
+                "resolvedVersion": "4.8.0-preview3.5278"
+              },
+              {
+                "id": "Text2Xml.Lib",
+                "requestedVersion": "[1.1.2, 2.0.0)",
+                "resolvedVersion": "1.1.2"
+              }
+          ],
+          "transitivePackages": [
+              {
+                "id": "Microsoft.CSharp",
+                "resolvedVersion": "4.0.1"
+              },
+              {
+                "id": "Microsoft.NETCore.Platforms",
+                "resolvedVersion": "1.1.0"
+              },
+      ...
+            ]
+        }
+      ]
+    },
+    {
+      "path": "src/lib/MyProjectB.csproj",
+      "frameworks": [
+        {
+          "framework": "netcoreapp3.1",
+          "topLevelPackages": [
+              {
+                "id": "NuGet.Commands",
+                "requestedVersion": "4.8.0-preview3.5278",
+                "resolvedVersion": "4.8.0-preview3.5278"
+              },
+              {
+                "id": "Text2Xml.Lib",
+                "requestedVersion": "1.1.2",
+                "resolvedVersion": "1.1.2"
+              }
+            ],
+            "transitivePackages": [
+              {
+                "id": "Microsoft.CSharp",
+                "resolvedVersion": "4.0.1"
+              },
+              {
+                "id": "Microsoft.NETCore.Platforms",
+                "resolvedVersion": "1.1.0"
+              },
+      ...
+            ]
+        },
+        {
+          "framework": "net5.0",
+          "topLevelPackages": [ 
+              {
+                "id": "NuGet.Commands",
+                "requestedVersion": "4.8.0-preview3.5278",
+                "resolvedVersion": "4.8.0-preview3.5278"
+              },
+              {
+                "id": "Text2Xml.Lib",
+                "requestedVersion": "1.1.2",
+                "resolvedVersion": "1.1.2"
+              }
+          ],
+          "transitivePackages": [
+              {
+                "id": "Microsoft.CSharp",
+                "resolvedVersion": "4.0.1"
+              },
+              {
+                "id": "Microsoft.NETCore.Platforms",
+                "resolvedVersion": "1.1.0"
+              },
+      ...
+            ]
+        }
+      ]
+    }
+  ]
 }
 ```
 
@@ -634,38 +648,43 @@ Project `MyProjectB` has the following updates to its packages
     "https://api.nuget.org/v3/index.json",
     "https://apidev.nugettest.org/v3-index/index.json"
   ],
-  "projects": {
-    "MyProjectA": [
-    ],
-    "MyProjectB": [
-      {
-        "Path": "src/lib/MyProjectB.csproj",
-        "framework": "net5.0",
-        "topLevelPackages": [ 
-          {
-            "id": "NuGet.Commands",
-            "requestedVersion": "4.8.0-preview3.5278",
-            "resolvedVersion": "4.8.0-preview3.5278",
-            "latestVersion": "6.0.0",
-          },
-          {
-            "id": "Text2Xml.Lib",
-            "requestedVersion": "1.1.2",
-            "resolvedVersion": "1.1.2",
-            "latestVersion": "1.1.4",
-          }
-        ],
-        "transitivePackages": [
-          {
-            "id": "Microsoft.CSharp",
-            "resolvedVersion": "4.0.1",
-            "latestVersion": "4.7.0",
-          }
-  ...
-        ]
-      }
-    ]
-  }
+  "projects": [
+    {
+      "path": "src/lib/MyProjectA.csproj",
+      "frameworks": [
+      ]
+    },
+    {
+      "path": "src/lib/MyProjectB.csproj",
+      "frameworks": [
+        {
+          "framework": "net5.0",
+          "topLevelPackages": [ 
+              {
+                "id": "NuGet.Commands",
+                "requestedVersion": "4.8.0-preview3.5278",
+                "resolvedVersion": "4.8.0-preview3.5278",
+                "latestVersion": "6.0.0",
+              },
+              {
+                "id": "Text2Xml.Lib",
+                "requestedVersion": "1.1.2",
+                "resolvedVersion": "1.1.2",
+                "latestVersion": "1.1.4",
+              }
+            ],
+            "transitivePackages": [
+              {
+                "id": "Microsoft.CSharp",
+                "resolvedVersion": "4.0.1",
+                "latestVersion": "4.7.0",
+              }
+      ...
+            ]
+        }
+      ]
+    }
+  ]
 }
 ```
 
@@ -689,47 +708,53 @@ Project `MyProjectB` has the following deprecated packages
 ```json
 {
   "version": 1,
-  "parameters": "--include-transitive --deprecated --framework net5.0",
+  "parameters": "-include-transitive --outdated --framework net5.0",
    "sources": [
     "https://api.nuget.org/v3/index.json",
     "https://apidev.nugettest.org/v3-index/index.json"
   ],
-  "projects": {
-    "MyProjectA": [
-    ],
-    "MyProjectB": [
-      {
-        "Path": "src/lib/MyProjectB.csproj",
-        "framework": "net5.0",
-        "topLevelPackages": [ 
-          {
-            "id": "NuGet.Core",
-            "requestedVersion": "2.13.0",
-            "resolvedVersion": "2.13.0",
-            "deprecationReasons": ["Legacy"]
-          }
-        ],
-        "transitivePackages": [
-          {
-            "id": "Microsoft.CSharp",
-            "resolvedVersion": "4.0.1",
-            "deprecationReasons": ["Legacy"],
-            "alternativePackage": {
-              "id": "NuGet.Packaging",
-              "versionRange": "[0.0.0,)"
-            }
-          }
-  ...
-        ]
-      }
-    ]
-  }
+  "projects": [
+    {
+      "path": "src/lib/MyProjectA.csproj",
+      "frameworks": [
+      ]
+    },
+    {
+      "path": "src/lib/MyProjectB.csproj",
+      "frameworks": [
+        {
+          "framework": "net5.0",
+          "topLevelPackages": [ 
+              {
+                "id": "NuGet.Core",
+                "requestedVersion": "2.13.0",
+                "resolvedVersion": "2.13.0",
+                "deprecationReasons": ["Legacy"]
+              }
+            ],
+            "transitivePackages": [
+              {
+                "id": "Microsoft.CSharp",
+                "resolvedVersion": "4.0.1",
+                "deprecationReasons": ["Legacy"],
+                "alternativePackage": {
+                  "id": "NuGet.Packaging",
+                  "versionRange": "[0.0.0,)"
+                }
+              }
+      ...
+            ]
+        }
+      ]
+    }
+  ]
 }
 ```
 
 ## Compatibility
 
- We start with `version 1`, as long as we don't remove or rename then it'll be backward compatible. In case [we change version](https://stackoverflow.com/a/13945074) just add new properties, keep old ones even it's not used.
+We start with `version 1`, as long as we don't remove or rename then it'll be backward compatible. In case [we change version](https://stackoverflow.com/a/13945074) just add new properties, keep old ones even it's not used.
+By default `--format json` will output latest schema version of json, but we can set older version of output like `--output-version 1`, intention behind is we don't want to customer CI build script because sdk/nuget version is upgraded and keep it predictable.
 
 ## Out-of-scope
 
