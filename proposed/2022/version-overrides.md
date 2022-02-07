@@ -69,7 +69,7 @@ Finally, a repo owner should be able to disable the ability for developers to ov
 <Project>
 ```
 
-When this is disabled, specifying a `VersionOverride` on a `<PackageReference />` would result in a restore error indicating that he feature is disabled.
+When this is disabled, specifying a `VersionOverride` on a `<PackageReference />` would result in a restore error indicating that the feature is disabled.
 
 ### Technical explanation
 
