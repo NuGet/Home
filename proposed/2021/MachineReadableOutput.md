@@ -34,7 +34,7 @@ Anyone (government/private enterprises, security experts, individual contributor
 
 #### `--format` option
 
-Ability to use new `--format` option for all `dotnet list package` commands to ensure formatted(json, text, csv etc) output is emitted to the console.
+Ability to use new `--format` option for all `dotnet list package` commands to ensure formatted(json, text) output is emitted to the console.
 
 ```dotnetcli
 dotnet list [<PROJECT>|<SOLUTION>] package [--config <SOURCE>]
@@ -755,6 +755,23 @@ Project `MyProjectB` has the following deprecated packages
 }
 ```
 
+#### `> dotnet list package --format json --output-version 1`
+
+Outputs json for format version 1, if it's not specified then latest version'll be used by default.
+
+```json
+{
+  "version": 1,
+  "parameters": "",
+  "projects": [
+    {
+      "path": "src/lib/MyProjectA.csproj",
+      ...
+    }
+  ]
+}
+```
+
 ## Compatibility
 
 We start with `version 1`, as long as we don't remove or rename then it'll be backward compatible. In case [we change version](https://stackoverflow.com/a/13945074) just add new properties, keep old ones even it's not used.
@@ -762,10 +779,9 @@ By default `--format json` will output latest schema version of json, but we can
 
 ## Out-of-scope
 
-* We won't support saving the machine-readable output to disk as part of this spec. The work-around is for the consumer to read from the console's stdout stream.
-* At this point, no other CLI commands (e.g. dotnet list reference) will be within scope for this feature.
-"--parsable" option needs separate spec.
-* Currently license info is not emitted from any cli command, it could be quite useful, we should consider in the future.
+* Saving the output to disk.
+* Any other additions, such as --parsable.
+* Include license information [#11563)](https://github.com/NuGet/Home/issues/11563).
 
 ## Rationale and alternatives
 Currently, no other `dotnet command` implemented this, this is the 1st time dotnet command implementing `json`(etc) output, so it could become example for others next time they implement.
@@ -794,18 +810,16 @@ Please note, except "tab completion" (for dotnet) part all changes would be insi
 
 If we address them in plain `dotnet list package` then we'll address in `json output` too.
 
-* Include source info for all  options. https://github.com/NuGet/Home/issues/11556
+* [Include source info for all  options](https://github.com/NuGet/Home/issues/11556).
 
-* Include hash + source for package, because same package ID+version might have different hash. It can be used to detect [dependency confusion attack](https://github.com/NuGet/Home/pull/11446#discussion_r767030495), tracking issue: https://github.com/NuGet/Home/issues/11552
+* [Include hash + source for package](https://github.com/NuGet/Home/issues/11552), because same package ID+version might have different hash. It can be used to detect dependency confusion attack. Please note existing feature `lock files` is more appropriate for this.
 
-* Include hash for each package, sub issue of above. This's low hanging fruit I can include it.
+* [Some outputs include source info](https://github.com/NuGet/Home/issues/11557). Maybe we should include package source mapping info into sources.
 
-* Some outputs include source info. Maybe we should include package source mapping info into sources, tracking issue https://github.com/NuGet/Home/issues/11557
+* [Show resolution tree for transitive dependencies](https://github.com/NuGet/Home/issues/11553) and constraint for dependency resolved version.
 
-* Show resolution tree for transitive dependencies and constraint for dependency [resolved version](https://github.com/NuGet/Home/pull/11446/files#r777233006), tracking issue: https://github.com/NuGet/Home/issues/11553
+* [Include-transitive dependencies](https://github.com/NuGet/Home/issues/11550) by default, workaround pass `--include-transitive`.
 
-* Include-transitive dependencies by default [r766924390](https://github.com/NuGet/Home/pull/11446#discussion_r766924390), workaround pass `--include-transitive`, tracking issue https://github.com/NuGet/Home/issues/11550
-
-* `--all` option for dotnet list package [r766860629](https://github.com/NuGet/Home/pull/11446#discussion_r766860629), tracking issue https://github.com/NuGet/Home/issues/11551
+* [--all option](https://github.com/NuGet/Home/issues/11551) for dotnet list package.
 
 * Return different exit codes if any vulnerabilities, deprecations, outdated package is [detected](https://github.com/NuGet/Home/blob/dotnet-audit/proposed/2021/DotNetAudit.md#dotnet-audit-exit-codes).
