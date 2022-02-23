@@ -622,6 +622,7 @@ Project 'MyProjectB' has the following package references
 
 #### `> dotnet list package --include-transitive --outdated --framework net5.0`
 
+```dotnetcli
 The following sources were used:
    https://api.nuget.org/v3/index.json
    https://apidev.nugettest.org/v3-index/index.json
@@ -637,6 +638,7 @@ Project `MyProjectB` has the following updates to its packages
    > Microsoft.CSharp                                                                   4.0.1                 4.7.0
    > Microsoft.NETCore.Platforms                                                        1.1.0                 6.0.1
    > Microsoft.NETCore.Targets                                                          1.1.0                 5.0.0
+```
 
 #### `> dotnet list package --include-transitive --outdated --framework net5.0 --format json`
 
@@ -690,6 +692,7 @@ Project `MyProjectB` has the following updates to its packages
 
 #### `> dotnet list package --include-transitive --deprecated --framework net5.0`
 
+```dotnetcli
 The following sources were used:
    https://api.nuget.org/v3/index.json
    https://apidev.nugettest.org/v3-index/index.json
@@ -702,6 +705,7 @@ Project `MyProjectB` has the following deprecated packages
 
    Transitive Package          Resolved              Reason(s)   Alternative
    > NuGet.Packaging.Core      4.8.0-preview3.5278   Legacy      NuGet.Packaging >= 0.0.0
+```
 
 #### `> dotnet list package --include-transitive --deprecated --framework net5.0 --format json`
 
