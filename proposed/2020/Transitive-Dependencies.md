@@ -60,6 +60,7 @@ We are building this for .NET users, both old and new, to be successful with und
 ### CLI
 
 We should consider a minor tweak to the existing experience of “dotnet list package --include-transitive” to provide the user with a sense of where the package came from. This could be a new column next to “Resolved” which says “Transitively Referenced” or “Referenced” and has a list of the top-level packages that requested the dependency.
+Tracking issue can be found here: https://github.com/NuGet/Home/issues/11625
 
 ![](../../meta/resources/TransitiveDependencies/TransitiveDotNetCLI.png)
 
@@ -183,3 +184,6 @@ The above elements will be checked against Accessibility Insights. We'll ensure 
 
 - Q: Will we surface how transitive dependencies will be changed when updating a top-level package?
 - A: No, this is not a goal for this spec but may be a consideration in the future which would help a user determine if they want to update a package or not. We want to show things that are resolved, not requested.
+
+- Q: How transitive packages/dependencies from referenced projects are shown?
+- A: We will not show transitive dependencies from referenced projects in the first iteration.
