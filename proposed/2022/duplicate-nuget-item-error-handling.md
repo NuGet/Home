@@ -3,7 +3,7 @@
 - Author Name: [nkolev92](https://github.com/nkolev92)
 - Start Date 2021-04-01
 - GitHub Issue - Duplicate PackageReference [9864](https://github.com/NuGet/Home/issues/9864), CPVM duplicate erroring [9467](https://github.com/NuGet/Home/issues/9467)
-- GitHub PR [3928](https://github.com/NuGet/NuGet.Client/compare/dev-nkolev92-duplicatePRs)
+- GitHub PR [4484](https://github.com/NuGet/NuGet.Client/pull/4484)
 
 ## Summary
 
@@ -130,7 +130,7 @@ This is an imperfect, best effort solution. There are *many* caveats.
 
 ## Prior Art
 
-- N/A
+- SDK does [duplicate checking](https://github.com/dotnet/sdk/blob/main/src/Tasks/Microsoft.NET.Build.Tasks/CheckForDuplicateItems.cs).
 
 ## Unresolved Questions
 
