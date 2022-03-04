@@ -71,6 +71,8 @@ The warnings will be coded as following:
 | NU1506 | PackageDownload |
 | NU1507 | PackageVersion |
 
+As a last restore, if a user wants to completely disable this behavior, they can set `DisableCheckingDuplicateNuGetItems` to `true`.
+
 ### Technical explanation
 
 - In dotnet.exe, msbuild.exe restore scenarios, NuGet reads the items by itself by calling the `Collect{ItemName}s` targets. Given that NuGet has full control over the project interpretation, the items can be deduplicated in these respective targets. The warnings and errors will be respected there as well.
@@ -133,6 +135,7 @@ This is an imperfect, best effort solution. There are *many* caveats.
 ## Unresolved Questions
 
 - Can the project-system nominate even when an error is raised? This could lead to fewer errors in the error list making it very apparent what the problem is.
+- Is `DisableCheckingDuplicateNuGetItems` really necessary? Given that `NoWarn` is supported, the only thing this would change is that the SDK based projects in Visual Studio would go back to using the latest element, instead of the first, and that's *different* from the CI, so it's not very likely anyone would prefer this behavior.
 
 ## Future Possibilities
 
