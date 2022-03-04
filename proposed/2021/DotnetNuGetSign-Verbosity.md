@@ -6,7 +6,7 @@
 
 ## Problem background
 
-`dotnet nuget sign` command doesn't provide any output by default due to logical error in the implementation. If the user didn't pass value for `--verbosity` option, then the log level is set to [`LogLevel.Minimal`](https://github.com/NuGet/NuGet.Client/blob/dev/src/NuGet.Core/NuGet.CommandLine.XPlat/Commands/Signing/VerifyCommand.cs#L58). Customers need to know the results of signing.
+`dotnet nuget sign` command doesn't provide any output by default due to logical error in the implementation. If the user didn't pass value for `--verbosity` option, then the log level is set to [`LogLevel.Minimal`](https://github.com/NuGet/NuGet.Client/blob/dev/src/NuGet.Core/NuGet.CommandLine.XPlat/Commands/Signing/SignCommand.cs#L130). Customers need to know the results of signing.
 
 
 ## Who are the customers
@@ -32,6 +32,8 @@ The details that should be displayed on each verbosity level are described below
 `Output Path`        | ❌       | ❌          | ✔️         | ✔️         | ✔️
 `Signing command succeeds Information`| ❌       | ✔️          | ✔️         | ✔️         | ✔️
 
+## Log level mapping
+Please refer to [log level mapping](https://github.com/NuGet/Home/blob/dev/implemented/2021/Verify-Verbosity.md#log-level-mapping---the-following-details-are-copied-from-here-thanks-to-joel-verhagen-for-the-detailed-information) in spec of "[dotnet nuget verify --verbosity](https://github.com/NuGet/Home/blob/dev/implemented/2021/Verify-Verbosity.md#dotnet-nuget-verify---verbosity)".
 
 ### Example output in success scenarios
 
@@ -58,8 +60,10 @@ Signing package(s) with certificate:
   SHA256 hash: 54D4139CC924A50E8851C1B2ACAFECB09D7C48E927778C1F325B59DEE6272BBB
   Issued by: CN=Test certificate for testing NuGet package signing
   Valid from: 8/27/2021 10:19:48 AM to 8/28/2021 10:19:48 AM
+
 Timestamping package(s) with:
 http://timestamper/test
+
 Signed package(s) output path:
 .\package\Signed\
 Package(s) signed successfully.
@@ -93,8 +97,10 @@ Signing package(s) with certificate:
   SHA256 hash: 1CAA0FA97F22B3D04483DA858B25C8215AEF7F52EB51E895F1CCE8146ACAABDD
   Issued by: CN=Test certificate for testing NuGet package signing
   Valid from: 10/25/2021 4:53:00 PM to 10/26/2021 4:53:00 PM
+
 Timestamping package(s) with:
 http://timestamper/test
+
 Signed package(s) output path:
 .\package\Signed\
 error: NU3018: NotTimeValid: A required certificate is not within its validity period when verifying against the current system clock or the timestamp in the signed file.
