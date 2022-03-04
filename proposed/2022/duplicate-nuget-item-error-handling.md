@@ -3,11 +3,11 @@
 - Author Name: [nkolev92](https://github.com/nkolev92)
 - Start Date 2021-04-01
 - GitHub Issue - Duplicate PackageReference [9864](https://github.com/NuGet/Home/issues/9864), CPVM duplicate erroring [9467](https://github.com/NuGet/Home/issues/9467)
-- GitHub PR [3928](https://github.com/NuGet/NuGet.Client/pull/3928)
+- GitHub PR [3928](https://github.com/NuGet/NuGet.Client/compare/dev-nkolev92-duplicatePRs)
 
 ## Summary
 
-It's uncommon that PackageReference (or PackageVersion, PackageDownload etc) items are included through secondary files and/or are manually edited, which sometimes leads to multiple items with the same name being included.
+It's not uncommon that PackageReference (or PackageVersion, PackageDownload etc) items are included through secondary files and/or are manually edited, which can sometimes lead to multiple items with the same name being included.
 In some scenarios, this can cause restore inconsistencies. We will to detect these scenarios and raise a warning. NoWarn and TreatWarningsAsErrors are also respected.
 
 ## Motivation
@@ -42,7 +42,7 @@ See the below table for details
 
 This leads to issues as the ones described in [arcade/issues#5550](https://github.com/dotnet/arcade/issues/5550).
 
-The inconsistencies are likely and common in SDK based PackageReference projects. As such addressing those scenarios is the primary goal.
+The inconsistencies are likely and common in SDK-based PackageReference projects. As such addressing those scenarios is the primary goal.
 
 ## Explanation
 
@@ -67,9 +67,9 @@ The warnings will be coded as following:
 
 | Log Code | Item type |
 |----------|-----------|
-| NU1504 | PackageReference |
-| NU1505 | PackageDownload |
-| NU1506 | PackageVersion |
+| NU1505 | PackageReference |
+| NU1506 | PackageDownload |
+| NU1507 | PackageVersion |
 
 ### Technical explanation
 
@@ -100,7 +100,7 @@ It is possible that restore succeeds in this case, despite the collect target er
 
 NuGet.exe shells out to MSBuild to generate the restore graph. The warnings from the targets are swallowed in this scenario. Due to the support for TreatWarningsAsErrors, to prevent silent failures, NuGet.exe restore will not raise any warnings/errors.
 
-1. Legacy csproj + MSBuild.exe/dotnet.exe
+1. Legacy csproj + MSBuild.exe
 
 NuGet completely controls the reading of the items. By adding the warning in the collector targets, the warnings can be raised.
 When the warning is elevated to an error, the error scenario is fail fast, so restore *will not* run. This is unusual and different from the other input errors.
@@ -136,4 +136,4 @@ This is an imperfect, best effort solution. There are *many* caveats.
 
 ## Future Possibilities
 
-- Raising the warnings in NuGet.exe. This technically very challenging, but not impossible.
+- Raising the warnings in NuGet.exe. This is laborious, but not impossible.
