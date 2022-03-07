@@ -81,6 +81,7 @@ Some repository owners might not want `VersionOverride` to contribute to version
 
 When the functionality is disabled, specifying a `VersionOverride` on a `<PackageReference />` would result in a restore error indicating that the feature is disabled.  Also, when a `VersionOverride` is specified but central package management is disabled, a warning will be emitted indicating that it was ignored.
 
+When central package management is not enabled, specifying a `VersionOverride` results in a warning indicating that the value was ignored.
 
 In the initial implemenation of this feature, it will only be respected by restore and existing tooling like Visual Studio and .NET CLI will not execute the correct actions when updating a version.  There is planned future work to update tooling to work with all of the features of central package management.
    
