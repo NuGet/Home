@@ -67,12 +67,12 @@ If necessary, a project would override the version with the `VersionOverride` me
 
 In this case, the project's restore graph would resolve `PackageA` to version `3.0.0`. Any project that references it would also get that version and a user would be responsible for handling an unresolved conflicts.
 
-Finally, a repo owner should be able to disable the ability for developers to override package version. This would be used for instance if someone wanted to ensure that all package versions are unified. This would be possible by setting the MSBuild property `EnablePackageVersionOverride` to `false` in a project or common import like `Directory.Packages.props` or `Directory.Build.props`:
+Finally, a repo owner should be able to disable the ability for developers to override package version. This would be used for instance if someone wanted to ensure that all package versions are unified. This would be possible by setting the MSBuild property `CentralPackageVersionOverrideEnabled` to `false` in a project or common import like `Directory.Packages.props` or `Directory.Build.props`:
 
 ```xml
 <Project>
   <PropertyGroup>
-    <EnablePackageVersionOverride>false</EnablePackageVersionOverride>
+    <CentralPackageVersionOverrideEnabled>false</CentralPackageVersionOverrideEnabled>
   </PropertyGroup>
 <Project>
 ```
