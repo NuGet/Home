@@ -137,7 +137,6 @@ This is an imperfect, best effort solution. There are *many* caveats.
 ## Unresolved Questions
 
 - Can the project-system nominate even when an error is raised? This could lead to fewer errors in the error list making it very apparent what the problem is.
-- Is `DisableCheckingDuplicateNuGetItems` really necessary? Given that `NoWarn` is supported, the only thing this would change is that the SDK based projects in Visual Studio would go back to using the latest element, instead of the first, and that's *different* from the CI, so it's not very likely anyone would prefer this behavior.
 
 ## Future Possibilities
 
