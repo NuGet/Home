@@ -75,6 +75,8 @@ As a last restore, if a user wants to completely disable this behavior, they can
 
 ### Technical explanation
 
+Note that duplication is done in a case insensitive manner.
+
 - In dotnet.exe, msbuild.exe restore scenarios, NuGet reads the items by itself by calling the `Collect{ItemName}s` targets. Given that NuGet has full control over the project interpretation, the items can be deduplicated in these respective targets. The warnings and errors will be respected there as well.
 
 - In Visual Studio, the project systems are the ones that collect the items for NuGet. The legacy project system collects all the items without the conditions. The new project system calls the `Collect{ItemName}s` targets.
