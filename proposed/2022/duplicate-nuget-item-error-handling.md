@@ -71,7 +71,8 @@ The warnings will be coded as following:
 | NU1506 | PackageDownload |
 | NU1507 | PackageVersion |
 
-As a last restore, if a user wants to completely disable this behavior, they can set `DisableCheckingDuplicateNuGetItems` to `true`.
+As a last resort, if a user wants to completely disable this behavior, they can set `DisableCheckingDuplicateNuGetItems` to `true`.
+The difference between `NoWarn` and `DisableCheckingDuplicateNuGetItems` is that NoWarning an issue still deduplicates, but simply uses the first option.
 
 ### Technical explanation
 
