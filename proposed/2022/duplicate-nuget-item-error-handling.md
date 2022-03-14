@@ -67,9 +67,9 @@ The warnings will be coded as following:
 
 | Log Code | Item type |
 |----------|-----------|
-| NU1505 | PackageReference |
-| NU1506 | PackageDownload |
-| NU1507 | PackageVersion |
+| NU1504 | PackageReference |
+| NU1505 | PackageDownload |
+| NU1506 | PackageVersion |
 
 As a last resort, if a user wants to completely disable this behavior, they can set `DisableCheckingDuplicateNuGetItems` to `true`.
 The difference between `NoWarn` and `DisableCheckingDuplicateNuGetItems` is that NoWarning an issue still deduplicates, but simply uses the first option.
