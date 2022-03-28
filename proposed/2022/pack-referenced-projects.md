@@ -1,15 +1,15 @@
-# Title
+# Pack referenced projects
 
-- Author Name (GitHub username link)
-- Start Date (YYYY-MM-DD)
-- GitHub Issue (GitHub Issue link)
-- GitHub PR (GitHub PR link)
+- Author Name (https://github.com/maxkoshevoi)
+- Start Date (2022-03-28)
+- GitHub Issue (https://github.com/NuGet/Home/issues/3891)
+- GitHub PR (-)
 
 ## Summary
 
 <!-- One-paragraph description of the proposal. -->
 
-## Motivation 
+## Motivation
 
 <!-- Why are we doing this? What pain points does this solve? What is the expected outcome? -->
 
