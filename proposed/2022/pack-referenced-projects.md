@@ -7,46 +7,67 @@
 
 ## Summary
 
-<!-- One-paragraph description of the proposal. -->
+Allow referenced projects' artifacts to be packed inside the NuGet.
 
 ## Motivation
 
-<!-- Why are we doing this? What pain points does this solve? What is the expected outcome? -->
+When SDK-style project is being packed as a NuGet, all projects that it references are considered as NuGet themselves that this NuGet depends on.
+This is not always a desired behavior, sometimes user needs artifacts from referenced project(s) to be packed into the NuGet.
+Currently there's no easy way to override this behavior except for ditching `crproj`, and  going back to `nuspec`, which becomes another source of truth and all that good stuff.
 
 ## Explanation
 
 ### Functional explanation
 
-<!-- Explain the proposal as if it were already implemented and you're teaching it to another person. -->
-<!-- Introduce new concepts, functional designs with real life examples, and low-fidelity mockups or  pseudocode to show how this proposal would look. -->
+Proposed solution is to take into account `IsPackable` property of the referenced projects. If it's `True` or not present (to preserve backward compatibility) - consider the project as a NuGet dependency, if it's `False` - pack its artifacts in.
+
+Second part is introduce new project-wide `PackReferencedProjects` property that would switch pack behavior for all `ProjectReferencees` inside a single project.
+
+This one is so people won't need to remember put `<IsPackable>False</IsPackable>` everywhere (they can use `Directory.Build.props`, but still).
 
 ### Technical explanation
 
-<!-- Explain the proposal in sufficient detail with implementation details, interaction models, and clarification of corner cases. -->
+When NuGet is being created from `csproj` file:
+
+1) See if `PackReferencedProjects` is defined.
+2) If it's and it's value is `False` - preserve behavior that have existed before introduction of this feature (don't include artifacts of referenced projects into the NuGet, and consider them as NuGet-dependencies).
+3) If it's and it's value is `True` - include artifacts of referenced projects into the NuGet
+4) If it's not defined, look at the `IsPackable` value of each referenced project and use behavior describe on step 2 or 3 according to it.
 
 ## Drawbacks
 
-<!-- Why should we not do this? -->
+This is a breaking change for projects that have `IsPackable` set to `False`, and are referenced by project that is packed into NuGet.
+Currently they are being considered an NuGet-dependency, even though it's not possible to pack them as NuGets.
+
+I cannot think of a single case where existing behavior would be a desirable one for such projects.
+
+On the other hand, there might be projects with `IsPackable` to set `True` (and being distributed as a NuGet), and don't want to be shown as a dependency. But I cannot think of any such case too.
 
 ## Rationale and alternatives
 
-<!-- Why is this the best design compared to other designs? -->
-<!-- What other designs have been considered and why weren't they chosen? -->
-<!-- What is the impact of not doing this? -->
+- If using `IsPackable` to switch the behavior is too breaking, new `Pack` property could be added to `ProjectReference` instead, so there would be no breaking changes (`<ProjectReference Include="..." Pack="True" />`).
+
+I like this approach less, since it requires introducing another new "thing", while `IsPackable` already exists, and is designed to indicate whether project can be packed as a NuGet or not.
+Also if some project is always supposed to be packed into dependent projects' NuGets, it would require to specify `Pack="True"` every time it's referenced.
+
+- Also new project-wide `PackArtifactsIntoDependantProjects` (or something) property can be introduced to be used in this proposal instead of `IsPackable`.
+
+Like this even less, since it's also `another new "thing"`, but it's also really similar to `IsPackable`.
+
+- Another solution is to introduce a `IncludeReferencedProjects` switch for `nuget` CLI.
+
+Downsides are: Behavior of individual projects (if packing is performed in bulk) and `ProjectReferencees` cannot be changed, and it's not obvious how to properly pack any specific project (I thought we are consolidating all the information in `csproj` now)
 
 ## Prior Art
 
-<!-- What prior art, both good and bad are related to this proposal? -->
-<!-- Do other features exist in other ecosystems and what experience have their community had? -->
-<!-- What lessons from other communities can we learn from? -->
-<!-- Are there any resources that are relevant to this proposal? -->
+This design flaw have been a pain for the community for more than 5 years now. It was such an issue that even third party solution was created - [nugetizer](https://github.com/devlooped/nugetizer).
+
+I haven't used it, so don't have much to comment here, but community clearly [expressed a desire for out of the box solution](https://github.com/NuGet/Home/issues/3891#issuecomment-1080044314).
 
 ## Unresolved Questions
 
-<!-- What parts of the proposal do you expect to resolve before this gets accepted? -->
-<!-- What parts of the proposal need to be resolved before the proposal is stabilized? -->
-<!-- What related issues would you consider out of scope for this proposal but can be addressed in the future? -->
+Using `IsPackable` for per-`ProjectReference` behavior switching is an open question. It is a breaking change that can be avoided by introducing a new property here or there, but I've yet to see an example of what it would actually break.
 
 ## Future Possibilities
 
-<!-- What future possibilities can you think of that this proposal would help with? -->
+This proposal would allow users more flexibility in choosing what is being packed as part of a NuGet, and how it's dependencies look like.
