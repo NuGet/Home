@@ -13,7 +13,7 @@ Allow referenced projects' artifacts to be packed inside the NuGet.
 
 When SDK-style project is being packed as a NuGet, all projects that it references are considered as NuGet themselves that this NuGet depends on.
 This is not always a desired behavior, sometimes user needs artifacts from referenced project(s) to be packed into the NuGet.
-Currently there's no easy way to override this behavior except for ditching `crproj`, and  going back to `nuspec`, which becomes another source of truth and all that good stuff.
+Currently there's no easy way to override this behavior except for ditching `csproj`, and  going back to `nuspec`, which becomes another source of truth and all that good stuff.
 
 ## Explanation
 
@@ -21,7 +21,7 @@ Currently there's no easy way to override this behavior except for ditching `crp
 
 Proposed solution is to take into account `IsPackable` property of the referenced projects. If it's `True` or not present (to preserve backward compatibility) - consider the project as a NuGet dependency, if it's `False` - pack its artifacts in.
 
-Second part is introduce new project-wide `PackReferencedProjects` property that would switch pack behavior for all `ProjectReferencees` inside a single project.
+Second part is introduce new project-wide `PackReferencedProjects` property that would switch pack behavior for all `ProjectReference`s inside a single project.
 
 This one is so people won't need to remember put `<IsPackable>False</IsPackable>` everywhere (they can use `Directory.Build.props`, but still).
 
@@ -56,7 +56,7 @@ Like this even less, since it's also `another new "thing"`, but it's also really
 
 - Another solution is to introduce a `IncludeReferencedProjects` switch for `nuget` CLI.
 
-Downsides are: Behavior of individual projects (if packing is performed in bulk) and `ProjectReferencees` cannot be changed, and it's not obvious how to properly pack any specific project (I thought we are consolidating all the information in `csproj` now)
+Downsides are: Behavior of individual projects (if packing is performed in bulk) and `ProjectReference`s cannot be changed, and it's not obvious how to properly pack any specific project (I thought we are consolidating all the information in `csproj` now)
 
 ## Prior Art
 
