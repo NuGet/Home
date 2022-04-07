@@ -1,8 +1,8 @@
 # Pack referenced projects
 
-- Author Name (https://github.com/maxkoshevoi)
+- Author Name [maxkoshevoi](https://github.com/maxkoshevoi)
 - Start Date (2022-03-28)
-- GitHub Issue (https://github.com/NuGet/Home/issues/3891)
+- GitHub Issue [3891](https://github.com/NuGet/Home/issues/3891)
 - GitHub PR (-)
 
 ## Summary
@@ -61,6 +61,7 @@ I haven't used it, so don't have much to comment here, but community clearly [ex
 - **How is conflict resolution going to work with consumers taking in a dependency already present in the bundle?**
 - Should license flow/validation be considered right from the start?
 - **Should a `PackageReference` or `ProjectReference` tagged with `Pack="true"` be resolved transitively?**
+- What happens to NuGets that are referenced in `PackageReference` tagged with `Pack="true"`? Do they become dependencies of the resulting NuGet or being packed into it.
 
 ## Future Possibilities
 
