@@ -57,7 +57,10 @@ I haven't used it, so don't have much to comment here, but community clearly [ex
 
 ## Unresolved Questions
 
-None
+- **How do we flow/assign TFM based `lib`/`content` items?** (Is `PackagePath` a desired parameter?)
+- **How is conflict resolution going to work with consumers taking in a dependency already present in the bundle?**
+- Should license flow/validation be considered right from the start?
+- **Should a `PackageReference` or `ProjectReference` tagged with `Pack="true"` be resolved transitively?**
 
 ## Future Possibilities
 
