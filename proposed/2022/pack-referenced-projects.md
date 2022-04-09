@@ -13,7 +13,8 @@ Allow referenced projects' artifacts to be packed inside the NuGet.
 
 When SDK-style project is being packed as a NuGet, all projects that it references are considered as NuGet themselves that this NuGet depends on.
 This is not always a desired behavior, sometimes user needs artifacts from referenced project(s) to be packed into the NuGet.
-Currently there's no easy way to override this behavior except for ditching `csproj`, and  going back to `nuspec`, which becomes another source of truth and all that good stuff.
+Currently there's no easy way to override this behavior except for ditching `csproj`, and going back to `nuspec`. In many cases that involves piping lots of information from the `MSBuild` context into the `nuspec` evaluation via `key=value` parameters.  
+Chaining together dozens of arguments to achieve parity with metadata usually automagically introduced by the SDK becomes tedious, which eventually weakens the otherwise rich set of information attached to a modern NuGet package.
 
 ## Explanation
 
