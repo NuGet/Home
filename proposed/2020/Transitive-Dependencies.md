@@ -91,7 +91,7 @@ Finally, selecting a transitive dependency will provide the user the ability to 
 
 **Search:** Searching for a package ID will filter the packages shown in both list groups in the same way. 
 * Searching for “Microsoft” will show all relevant filtered results for both the top level and transitive packages 
-* If one list group or the other is collapsed, they will remain collapsed on search 
+* If one list group or the other is collapsed, they will be expanded on search
 * The counter for the number of packages will change to reflect the number of packages being shown when filtered with a search query 
 
 **Package details window:** The package details window will be the exact same for transitive and top level packages. 
