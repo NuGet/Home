@@ -78,7 +78,7 @@ Finally, selecting a transitive dependency will provide the user the ability to 
 
 #### Detailed design
 
-**Collapsible, vertical list group:** Direct and transitive packages will be grouped under collapsible list group
+**Collapsible, vertical list group:** Direct and transitive packages will be grouped under collapsible list group (both expanded by default).
 
 * **Labels:** List groups will be labeled “Top-level packages” and “Transitive packages” respectively 
 * **Count:** List groups will display the number of packages in the group 
@@ -127,7 +127,7 @@ Finally, selecting a transitive dependency will provide the user the ability to 
 There are three primary elements that will be added as part of this design to the existing Visual Studio Package Manager UI.
 
 1.	ScrollViewer – To show transitive dependency nodes.
-2.	Expander – To collapse transitive dependency nodes by default & expand upon user action. To collapse top-level dependency nodes.
+2.	Expander – To collapse and expand transitive dependencies node (expanded by default).
 3.	Tooltip – To show the transitive dependency’s origin.
 
 The actual elements that will be implemented is up to the individual to which would best represent showing a scrollable list of transitive dependencies, collapse them, and provide a hover experience. These elements are simply the closest controls I found to convey the design.
