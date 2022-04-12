@@ -68,7 +68,7 @@ Tracking issue can be found here: https://github.com/NuGet/Home/issues/11625
 
 Within Visual Studio, there will be a new panel within the Visual Studio Package Manager UI named “Transitive Packages” in which all transitive packages will be displayed to the user. For the sake of not confusing the user, there will additionally be a header titled “Top-level Packages” where the current experience is today for top-level packages.
 
-**By default, a user’s transitive packages will be collapsed** as a project can have hundreds, if not thousands of transitive packages & would potentially impact performance displaying these many records on each load.
+**By default, a user’s transitive packages will be expanded** to ensure that vulnerability and deprecation notices are discoverable.
 
 When a user highlights a transitive package, they will see a pop-up that displays how the transitive dependency originated & what top-level package(s) are bringing it in.
 
@@ -82,7 +82,7 @@ Finally, selecting a transitive dependency will provide the user the ability to 
 
 * **Labels:** List groups will be labeled “Top-level packages” and “Transitive packages” respectively 
 * **Count:** List groups will display the number of packages in the group 
-* **Default state:** Transitive packages list group will be collapsed by default 
+* **Default state:** Transitive packages list group will be expanded by default
 * **Warnings:** List group headers will surface a warning icon for vulnerabilities and deprecations - see “Vulnerabilities and deprecation” section for relevant details 
 
 **Package items:** The packages under the “Transitive packages” list group will have the same appearance/design as the “Top level packages” (Id, description, author, versions on the right, etc.) 
