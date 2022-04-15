@@ -20,7 +20,9 @@ Chaining together dozens of arguments to achieve parity with metadata usually au
 
 ### Functional explanation
 
-Proposed solution is to add new `Pack` property to `ProjectReference` (`<ProjectReference Include="..." Pack="True" />`) and `PackageReference`. If it's `False` or not present - consider the project (or package) as a NuGet's dependency, if it's `True` - pack its artifacts in.
+Proposed solution is to add new `Pack` and `PackagePath` properties to `ProjectReference` (`<ProjectReference Include="..." Pack="True" PackagePath="tools" />`) and `PackageReference`. 
+If `Pack` is `False` or not present - consider the project (or package) as a NuGet's dependency, if it's `True` - pack its artifacts in.
+If `PackagePath` is not present - pack artifacts to the default location within the package. If it's present - pack them to the specified path.
 
 For `PackageReference`s it's useful in case referenced package is from private feed, but NuGet that's being packed will be public.
 
