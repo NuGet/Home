@@ -31,7 +31,7 @@ For `PackageReference`s it's useful in case referenced package is from private f
 When NuGet is being created from `csproj` file:
 
 1) If `ProjectReference` doesn't have `Pack` property, or has it set to `False` - preserve behavior that have existed before introduction of this feature (don't include artifacts of referenced projects into the NuGet, and consider them as NuGet-dependencies).
-2) If `ProjectReference` has `Pack` property and it's set to `True` - include it's artifacts into the NuGet.
+2) If `ProjectReference` has `Pack` property and it's set to `True` - include it's artifacts into the NuGet (to the default location or one specified in `PackagePath`).
 3) Do the same steps for `PackageReference`s
 
 ## Drawbacks
