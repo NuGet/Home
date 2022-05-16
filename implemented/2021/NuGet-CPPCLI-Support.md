@@ -91,7 +91,8 @@ To understand the proposed changes, here's a mapping of all `C++` project types 
 | Native C++ | .NETFramework,Version=v4.0 | Windows,Version=10.0.19041.0 | false | native | NuGet will continue special casing vcxproj. |
 | C++ UWP App | | UAP,Version=10.0.18362.0 | false | native | NuGet will continue special casing vcxproj. |
 | CLR C++ | .NETFramework,Version=v4.7.2 | Windows,Version=7.0 | true | ??? | This project has .NET Framework CLR support. This is not a focus scenario |
-| Core CLR C++ | .NETCoreApp,Version=v5.0 | Windows,Version=10.0.19041.0 | NetCore | ??? | Dual compatibility. Supports everything that net5.0-windows support & everything native supports |
+| Core CLR C++ | .NETCoreApp,Version=v5.0 | | NetCore | ??? | Dual compatibility. Supports everything that net5.0 support & everything native supports |
+| Core CLR C++ | .NETCoreApp,Version=v5.0 | Windows,Version=7.0 | NetCore | ??? | Dual compatibility. Supports everything that net5.0 support & everything native supports. Note that for CPP/CLI projects NuGet *ignores* the TargetPlatformMoniker. In particular, `CLRSupport` being `NetCore` implies that the `TargetPlatformMoniker` is not considered. |
 
 Worth noting that, `native` framework is not compatible with anything but `native` and that will remain.
 From C++/SDK perspective, net5.0-windows projects will be supported. NuGet would normally not special case which .NET target frameworks are supported.
