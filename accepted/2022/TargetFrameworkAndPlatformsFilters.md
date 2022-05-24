@@ -41,7 +41,7 @@ There are many generations of .NET. For the sake of this proposal, we will focus
 - Any:
   - .NET Framework, .NET Core, .NET
 
-![](meta/resources/TargetFrameworkAndPlatformFilters/GenerationsOfNET.png)
+![](../../meta/resources/TargetFrameworkAndPlatformFilters/GenerationsOfNET.png)
 
 #### Supported Platforms
 
@@ -114,15 +114,29 @@ There are many unique version numbers for all generations of .NET & supported pl
 
 For further scenarios, see the [framework precedence](https://nugettools.azurewebsites.net/6.0.0-preview.3/framework-precedence) tool to understand how the version matrix would be calculated.
 
-![](meta/resources/TargetFrameworkAndPlatformFilters/VersionNumbers.png)
+![](../../meta/resources/TargetFrameworkAndPlatformFilters/VersionNumbers.png)
 
 **Note:** The label should best represent the ".NET" version. Thus the label name may change from "versions" to "framework versions / .NET versions" or similar.
 
 #### Complete Experience
 
-![](meta/resources/TargetFrameworkAndPlatformFilters/CompleteExperience.png)
+![](../../meta/resources/TargetFrameworkAndPlatformFilters/CompleteExperience.png)
 
 **Note:** There's opportunity to put a tooltip in the complete experience to help explain what the difference of .NET, .NET Core, .NET Framework is & link to a documentaiton page.
+
+#### Alternate Experience
+
+Instead of filters at the top of the NuGet.org search experience, we can leverage the whitespace on the sides to provide an alternate experience of checkboxes and filter mechanisms that are more consistent with other package managers.
+
+![](../../meta/resources/TargetFrameworkAndPlatformFilters/SearchByTFM1.png)
+
+A user selecting checkboxes on the left will autocomplete search syntax in the search bar.
+
+![](../../meta/resources/TargetFrameworkAndPlatformFilters/SearchByTFM2.png)
+
+Different search criteria can be combined and added to the search experience depending on the developer's needs.
+
+![](../../meta/resources/TargetFrameworkAndPlatformFilters/SearchByTFM3.png)
 
 ## Search Syntax (Optional)
 
