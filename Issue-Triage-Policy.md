@@ -1,4 +1,4 @@
-# Issues Triaging
+# Issues Triage Policy
 Triaging an issue is a multi-step process that is collaboratively performed by the HotSeat, the triage meeting, area owners, and our issue bot. Triaging an issue usually takes around one week but may take longer, for example, when the feature area owner is not around, or we need more information.
 
 ## Our Triaging Flow
