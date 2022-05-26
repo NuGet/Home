@@ -62,9 +62,9 @@ Currently, NuGet only uses two icons to display status indicators:
 
 Hovering over the package and icon will display the respective information for the status.
 
-- Deprecated - "This package has been deprecated as it is <deprecation category>."
-- Vulnerable - "This package has at least one vulnerability with <severity category> severity."
-- Outdated - "This package has version <latest version> available.
+- Deprecated - "This package has been deprecated as it is `<deprecation category>`."
+- Vulnerable - "This package has at least one vulnerability with `<severity category>` severity."
+- Outdated - "This package has version `<latest version>` available.
 
 When right clicking a package, a developer should be able to get to the "Manager NuGet Packages..." context menu action like they can with the "Packages" and "Dependencies" nodes.
 
