@@ -1,5 +1,9 @@
 # Adding Dotnet CLI support to projects onboarded with Central Package Management
 
+Author: Pragnya Pandrate
+Issue: [11807] (https://github.com/NuGet/Home/issues/11807)
+Status: In Review
+
 ## Problem Background
 The dotnet add package command allows users to add or update a package reference in a project file through the Dotnet CLI. However, when this command is used in a project that has been onboarded to Central Package Management (CPM), it poses an issue. 
 
