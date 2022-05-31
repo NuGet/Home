@@ -1,8 +1,8 @@
 # Adding Dotnet CLI support to projects onboarded with Central Package Management
 
-Author: Pragnya Pandrate
-Issue: [11807] (https://github.com/NuGet/Home/issues/11807)
-Status: In Review
+Author: Pragnya Pandrate <br>
+Issue: https://github.com/NuGet/Home/issues/11807 <br>
+Status: In Review <br>
 
 ## Problem Background
 The dotnet add package command allows users to add or update a package reference in a project file through the Dotnet CLI. However, when this command is used in a project that has been onboarded to Central Package Management (CPM), it poses an issue as this error is thrown: `error: NU1008: Projects that use central package version management should not define the version on the PackageReference items but on the PackageVersion items: [PackageName]`.
