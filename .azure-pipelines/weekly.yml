@@ -1,0 +1,17 @@
+pr: none
+trigger: none
+
+schedules:
+- cron: "0 20 * * 0" # Every Sunday at 8pm UTC
+  displayName: "Weekly Home issue maintainance"
+  always: true
+  branches:
+    include:
+    - dev
+
+steps:
+  - checkout: none
+  - script: dotnet tool install -g NuGet.Internal.GithubIssueTagger -s https://pkgs.dev.azure.com/dnceng/public/_packaging/nuget-build/nuget/v3/index.json
+    displayName: Install GithubIssueTagger
+  - script: GithubIssueTagger UpvoteWatcher -o NuGet -r Home -l "Pipeline:Icebox" -m 5
+    displayName: Check Icebox for upvoted issues
