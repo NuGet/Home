@@ -23,7 +23,7 @@ If the package does not already exist, it should be added along with the appropr
 
 Before:<br>
 The props file: <br>
-![](/images/props_no_packages.png)<br>
+![props_no_packages](/images/props_no_packages.png)<br>
 A .csproj file from the project: <br>
 ![cs_proj_before](/images/cs_proj_before.png) <br>
 
