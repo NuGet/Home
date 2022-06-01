@@ -23,29 +23,29 @@ If the package does not already exist, it should be added along with the appropr
 
 Before:<br>
 The props file: <br>
-![props_no_packages](/images/props_no_packages.png)<br>
+![props_no_packages](./images/props_no_packages.png)<br>
 A .csproj file from the project: <br>
-![cs_proj_before](/images/cs_proj_before.png) <br>
+![cs_proj_before](./images/cs_proj_before.png) <br>
 
 After:<br>
 The props file: <br>
-![props_w_packages](/images/props_w_packages.png)<br>
+![props_w_packages](./images/props_w_packages.png)<br>
 A .csproj file from the project: <br>
-![cs_proj_after](/images/cs_proj_after.png) <br>
+![cs_proj_after](./images/cs_proj_after.png) <br>
 
 ### 2. The package reference does exist
 If the package already exists in `Directory.packages.props` the version should be updated in `Directory.packages.props`. The package version should either be the latest version or the one specified in the CLI command. The `<PackageReference>` in the project file should not change.
 
 Before:<br>
-![props_old_package](/images/props_old_package.png)
+![props_old_package](./images/props_old_package.png)
 
 After:<br>
-![props_new_package](/images/props_new_package.png)
+![props_new_package](./images/props_new_package.png)
 
 ### 3. There are multiple `Directory.packages.props` files
 In the case that there are multiple `Directory.packages.props` files in the repo, the props file that is closest must be considered.
 
-![directory_structure](/images/directory_structure.png) <br>
+![directory_structure](./images/directory_structure.png) <br>
 
 In the above example, the following scenarios are possible:
 1. Project1 will evaluate the Directory.Packages.props file in the Repository\Solution1\ directory.
