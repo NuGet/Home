@@ -21,36 +21,105 @@ When `dotnet add package` is executed in a project onboarded to CPM (meaning tha
 ### 1. The package reference does not exist
 If the package does not already exist, it should be added along with the appropriate package version to `Directory.packages.props`. The package version should either be the latest version or the one specified in the CLI command. Only the package name (not the version) should be added to `<PackageReference>` in the project file.
 
-Before:<br>
-The props file: <br>
-![props_no_packages](./images/props_no_packages.png)<br>
-A .csproj file from the project: <br>
-![cs_proj_before](./images/cs_proj_before.png) <br>
+#### Before `add package` is executed:<br>
 
-After:<br>
 The props file: <br>
-![props_w_packages](./images/props_w_packages.png)<br>
-A .csproj file from the project: <br>
-![cs_proj_after](./images/cs_proj_after.png) <br>
+```xml
+<Project>
+    <PropertyGroup>
+        <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    </PropertyGroup>
+    <ItemGroup>
+    </ItemGroup>
+</Project>
+```
+The .csproj file: <br>
+```xml
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+    </ItemGroup>
+</Project>
+```
+
+#### After `add package` is executed:<br>
+
+The props file: <br>
+```xml
+<Project>
+    <PropertyGroup>
+        <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    </PropertyGroup>
+    <ItemGroup>
+    <PackageVersion Include="Newtonsoft.Json" Version="13.0.1"/>
+    </ItemGroup>
+</Project>
+```
+The .csproj file: <br>
+```xml
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Newtonsoft.Json"/>
+    </ItemGroup>
+</Project>
+```
 
 ### 2. The package reference does exist
 If the package already exists in `Directory.packages.props` the version should be updated in `Directory.packages.props`. The package version should either be the latest version or the one specified in the CLI command. The `<PackageReference>` in the project file should not change.
 
-Before:<br>
-![props_old_package](./images/props_old_package.png)
+#### Before `add package` is executed:<br>
+```xml
+<Project>
+    <PropertyGroup>
+        <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    </PropertyGroup>
+    <ItemGroup>
+    <PackageVersion Include="Newtonsoft.Json" Version="12.0.1"/>
+    </ItemGroup>
+</Project>
+```
 
-After:<br>
-![props_new_package](./images/props_new_package.png)
+#### After `add package` is executed:<br>
+```xml
+<Project>
+    <PropertyGroup>
+        <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    </PropertyGroup>
+    <ItemGroup>
+    <PackageVersion Include="Newtonsoft.Json" Version="13.0.1"/>
+    </ItemGroup>
+</Project>
+```
 
 ### 3. There are multiple `Directory.packages.props` files
 In the case that there are multiple `Directory.packages.props` files in the repo, the props file that is closest must be considered.
 
-![directory_structure](./images/directory_structure.png) <br>
+```xml
+Repository
+ |-- Directory.Packages.props
+ |-- Solution1
+    |-- Directory.Packages.props
+    |-- Project1
+ |-- Solution2
+    |-- Project2
+```
 
 In the above example, the following scenarios are possible:
 1. Project1 will evaluate the Directory.Packages.props file in the Repository\Solution1\ directory.
 2. Project2 will evaluate the Directory.Packages.props file in the Repository\ directory.
 
+***Sourced from https://devblogs.microsoft.com/nuget/introducing-central-package-management/
 
 ### Other Scenarios that can be considered
 
