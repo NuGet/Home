@@ -22,12 +22,16 @@ When `dotnet add package` is executed in a project onboarded to CPM (meaning tha
 If the package does not already exist, it should be added along with the appropriate package version to `Directory.packages.props`. The package version should either be the latest version or the one specified in the CLI command. Only the package name (not the version) should be added to `<PackageReference>` in the project file.
 
 Before:<br>
-![props_no_packages](/images/props_no_packages.png)
-![cs_proj_before](/images/cs_proj_before.png)
+The props file: <br>
+![props_no_packages](/images/props_no_packages.png)<br>
+A .csproj file from the project: <br>
+![cs_proj_before](/images/cs_proj_before.png) <br>
 
 After:<br>
-![props_w_packages](/images/props_w_packages.png)
-![cs_proj_after](/images/cs_proj_after.png)
+The props file: <br>
+![props_w_packages](/images/props_w_packages.png)<br>
+A .csproj file from the project: <br>
+![cs_proj_after](/images/cs_proj_after.png) <br>
 
 ### 2. The package reference does exist
 If the package already exists in `Directory.packages.props` the version should be updated in `Directory.packages.props`. The package version should either be the latest version or the one specified in the CLI command. The `<PackageReference>` in the project file should not change.
