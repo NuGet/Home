@@ -127,6 +127,7 @@ While the above cases must be considered to solve the issue, there are a few oth
 
 1. If the project has the <ManagePackageVersionsCentrally> set to true, but the `Directory.packages.props` file has not been created yet the file should be created. At this point, package references can be updated according to the cases discussed above.
 2. If the `Directory.packages.props` file has been created but the <ManagePackageVersionsCentrally> property has not been set to true, it should be set to true.
+3. Consider what happens if the property is set to false
 
 ### Unresolved Questions
 1. If there are `Directory.packages.props` files inherit other props files, which props file should be modified when `add package` is executed?
