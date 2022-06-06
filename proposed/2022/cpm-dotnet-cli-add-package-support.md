@@ -130,5 +130,5 @@ While the above cases must be considered to solve the issue, there are a few oth
 2. If the `Directory.packages.props` file has been created but the `<ManagePackageVersionsCentrally>` property has not been set to true, it should be set to true.
 3. If the project has the `<ManagePackageVersionsCentrally>` set to false, the project should not be considered as onboarded to CPM. Therefore the `Directory.packages.props` file should be deleted if it exists and only `.csproj` files should be modified.
 4. If there are `Directory.packages.props` files that inherit other props files, all inherited files should be considered when `add package` is executed.
-
+5. If the project has a `VersionOverride` attribute defined in the `csproj` file and the `add package` command is run in order to update a package version, then the `VersionOverride` attribute should be updated with the appropriate package version.
 
