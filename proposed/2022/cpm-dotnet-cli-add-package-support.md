@@ -18,7 +18,9 @@ The main goal is to add support for `dotnet add package` to be used with project
 
 Users wanting to use CPM onboarded projects and dotnet CLI commands.
 
-## Solutions
+## Solution
+
+Few scenarios that are relevant to this work are mentioned below.
 
 | Scenario # | PackageReference exists? | Directory.Packages.Props file exists? | Is ManagePackageVersionsCentrally property set to true? | Is VersionOverride? | Current behavior | New behavior in dotnet CPI | In Scope |
 | ---- |-----| -----|-----|----------|----------|----------|----------|
@@ -144,13 +146,3 @@ If the package already exists in `Directory.packages.props` the version should b
 ```
 
 In case there are multiple `Directory.packages.props` files in the repo, all of them should be searched for a matching package reference. Once a matching package reference is found, its package version can be updated appropriately.
-
-### Other Scenarios that can be considered
-
-While the above cases must be considered to solve the issue, there are a few other cases that can be considered to make the product more usable:
-
-1. If the project has the `<ManagePackageVersionsCentrally>` set to true, but the `Directory.packages.props` file has not been created yet the file should be created. At this point, package references can be updated according to the cases discussed above.
-2. If the `Directory.packages.props` file has been created but the `<ManagePackageVersionsCentrally>` property has not been set to true, it should be set to true.
-3. If the project has the `<ManagePackageVersionsCentrally>` set to false, the project should not be considered as onboarded to CPM. Therefore the `Directory.packages.props` file should be deleted if it exists and only `.csproj` files should be modified.
-4. If there are `Directory.packages.props` files that inherit other props files, all inherited files should be considered when `add package` is executed.
-5. If the project has a `VersionOverride` attribute defined in the `csproj` file and the `add package` command is run in order to update a package version, then the `VersionOverride` attribute should be updated with the appropriate package version.
