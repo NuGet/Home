@@ -20,6 +20,15 @@ Users wanting to use CPM onboarded projects and dotnet CLI commands.
 
 ## Solutions
 
+| Scenario # | PackageReference exists? | Directory.Packages.Props file exists? | Is ManagePackageVersionsCentrally property set to true? | Is VersionOverride? | Current behavior | New behavior in dotnet CPI | In Scope |
+| ---- |-----| -----|-----|----------|----------|----------|----------|
+| 1 | ❌ | ✔️ | ✔️ in Directory.Packages.Props file | ❌ | Restore failed with NU1008 error and NO edits were made to the csproj file (same in VS and dotnet CLI) | `PackageReference` should be added to .(cs/vb)proj file and `PackageVersion` should be added to the closest `Directory.Packages.Props` file | ✔️ |
+| 2 | ❌ | ✔️ | ✔️ in (cs/vb)proj file | ❌ | Restore failed with NU1008 error and NO edits were made to the csproj file (same in VS and dotnet CLI) | `PackageReference` added to .(cs/vb)proj file and `PackageVersion` added to the closest `Directory.Packages.Props` file |✔️ |
+| 3 | ❌ | ❌ | ✔️ in (cs/vb)proj file | ❌ | Restore failed with NU1008 error and NO edits were made to the csproj file (same in VS and dotnet CLI) | `Directory.Packages.Props` file should be created in the project folder. `PackageReference` should be added to .(cs/vb)proj file and `PackageVersion` should be added to the new `Directory.Packages.Props` file| ✔️ Open for feedback |
+| 4 | ❌ | ✔️ | ❌ | ❌ | Restore failed with NU1008 error and NO edits were made to the csproj file (same in VS and dotnet CLI) | `PackageReference and Version` should be added to .(cs/vb)proj file. `Directory.packages.props` file should be deleted if it exists in the project folder | ❌ |
+| 5 | ✔️ | ✔️ | ✔️ | ❌ | **dotnet CLI** - Restore failed with NU1008 error and NO edits were made to the csproj file. **VS** - Clicked on Update package in PM UI. New `PackageVersion` added to csproj file and `Directory.packages.props` file was not updated *(IMO this is a bug)* | No changes to the `PackageReference` item in but `PackageVersion` should be updated in the appropriate `Directory.Packages.Props` file. If the closest `Directory.packages.props` file inherit other props files, all inherited files should be considered when `add package` is executed.|[?](https://github.com/NuGet/Home/pull/11849#discussion_r890639808) |
+| 6 | ✔️ | ✔️ | ✔️ | ✔️ | **dotnet CLI** - Restore failed with NU1008 error and NO edits were made to the csproj file. **VS** - Clicked on Update package in PM UI. New `PackageVersion` added to csproj file and `VersionOverride` in .csproj file was not updated *(IMO this is a bug)* | Update `VersionOverride` element in the corresponding `PackageReference` | ✔️ Open for feedback |
+
 When `dotnet add package` is executed in a project onboarded to CPM (meaning that the `Directory.packages.props` file exists) there are a few scenarios that must be considered.
 
 ### 1. The package reference does not exist
