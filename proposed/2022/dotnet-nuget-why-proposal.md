@@ -29,7 +29,7 @@ When a user highlights a transitive package, they will see a pop-up that display
 Sadly, we don’t have any further CLI or visualizing tool today to answer `Running 'dotnet restore' on a (large) .sln file restores a certain problematic package. How do I know which project(s) in the solution is causing that package to be restored?` question.
 
 ## Goals
-The main goal is to add `dotnet nuget why` command to .NET CLI to help customers visual the dependency graph for a given package.
+The main goal is to add `dotnet nuget why` command to .NET CLI to help customers understand the dependency graph for a given package.
 
 ## Customers
 We are building this for .NET users to be successful with understanding dependency graph for a given package.
