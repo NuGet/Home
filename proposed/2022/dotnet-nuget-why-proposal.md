@@ -37,7 +37,17 @@ Projects that use `packages.config` format are out of scope for this effort beca
 We are building this for .NET users to be successful with understanding dependency graph for a given package.
 
 ## Solution
-`dotnet nuget why` command prints the dependency graph of a package for PackageRefernce projects to the console host.
+NuGet restore operation generates following files under `obj` folder for `PackageReference` style projects.
+- `project.assets.json` file that maintains a project's dependency graph, which is used to make sure that all necessary packages are installed on the computer.
+- `{projectName}.nuget.dgspec.json` file that maintains a project's top-level dependencies along with other metadata.
+- `{projectName}nuget.g.targets` and `{projectName}.nuget.g.props` files define various properties, such as the path to where the packages cache is on the local machine. They also include any MSBuild imports that NuGet packages referenced by the project need.
+
+The contents of `{projectName}.nuget.dgspec.json` and `project.assets.json` will be helpful to understand the dependency graph of a given package but there are few limitations.
+
+-  NuGet restore operation downloads packages during dependency resolution which may not part of the final graph The absence of a package id and version combination in `project.assets.json` file signals that it was downloaded during dependency resolution but not part of the final dependency graph.
+- Packages acquired through `PackageDownload` are not tied to the project in any way beyond acquisition. These packages are not recorded in the final graph that `project.assets.json` maintains.
+
+`dotnet nuget why` command prints the dependency graph of a given package only if it is part of the final graph.
 
 ```
 dotnet nuget why [<PROJECT>|<SOLUTION>] package <PACKAGE_NAME>
@@ -77,9 +87,46 @@ Sets the verbosity level of the command. Allowed values are q[uiet], m[inimal], 
 
 #### Examples
 
-- List depdency graph for a specific package.
+- List depdency graph of a package given package id.
 
 ```
-dotnet nuget why package
+dotnet nuget why packageA
+
+Project 'projectNameA' has the following dependency graph for 'pacakgeA'
+   [net6.0]: Microsoft.ML (1.0.0) > Microsoft.ML.Util (1.0.0) > pacakgeA (1.0.0)
+   [net472] Microsoft.ML (1.0.0) > Microsoft.ML.Util (1.0.0) > pacakgeA (1.0.0)
+
+Project 'projectNameB' has the following dependency graph for 'pacakgeA'
+   [net6.0]: Microsoft.ML (1.1.0) > Microsoft.ML.Util (1.1.0) > pacakgeA (1.1.0)
+   [net472] Microsoft.ML (1.1.0) > Microsoft.ML.Util (1.1.0) > pacakgeA (1.1.0)
 ```
 
+- List depdency graph of a package given `package id` and `version`.
+
+```
+dotnet nuget why packageA --version 1.0.0
+
+Project 'projectNameA' has the following dependency graph for 'pacakgeA'
+   [net6.0]: Microsoft.ML (1.0.0) > Microsoft.ML.Util (1.0.0) > pacakgeA (1.0.0)
+   [net472] Microsoft.ML (1.0.0) > Microsoft.ML.Util (1.0.0) > pacakgeA (1.0.0)
+```
+- List depdency graph of a package given `pacakge id` and `target framework`.
+
+```
+dotnet nuget why packageA -f net6.0
+
+Project 'projectNameA' has the following dependency graph for 'pacakgeA'
+   [net6.0]: Microsoft.ML (1.0.0) > Microsoft.ML.Util (1.0.0) > pacakgeA (1.0.0)
+
+Project 'projectNameB' has the following dependency graph for 'pacakgeA'
+   [net6.0]: Microsoft.ML (1.1.0) > Microsoft.ML.Util (1.1.0) > pacakgeA (1.1.0)
+```
+
+- List depdency graph of a package given `pacakge id`, `version` and `target framework`.
+
+```
+dotnet nuget why packageA --version 1.0.0 -f net472
+
+Project 'projectNameA' has the following dependency graph for 'pacakgeA'
+   [net472] Microsoft.ML (1.0.0) > Microsoft.ML.Util (1.0.0) > pacakgeA (1.0.0)
+```
