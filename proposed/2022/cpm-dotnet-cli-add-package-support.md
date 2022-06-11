@@ -68,6 +68,8 @@ The .csproj file:
 
 #### After `add package` is executed
 
+`dotnet add ToDo.csproj package Newtonsoft.Json -v 13.0.1`
+
 The props file:
 
 ```xml
@@ -135,6 +137,8 @@ If the package already exists in `Directory.packages.props` the version should b
 
 #### After `add package` is executed
 
+`dotnet add ToDo.csproj package Newtonsoft.Json -v 13.0.1`
+
 ```xml
 <Project>
     <PropertyGroup>
@@ -142,6 +146,52 @@ If the package already exists in `Directory.packages.props` the version should b
     </PropertyGroup>
     <ItemGroup>
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.1"/>
+    </ItemGroup>
+</Project>
+```
+
+### 3. The package reference does exist with an VersionOverride
+
+If the package already exists in `Directory.packages.props` the version should be updated in `Directory.packages.props`. The package version should either be the latest version or the one specified in the CLI command. The `<PackageReference>` in the project file should not change.
+
+#### Before `add package` is executed
+
+```xml
+<Project>
+    <PropertyGroup>
+        <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    </PropertyGroup>
+    <ItemGroup>
+    <PackageVersion Include="Newtonsoft.Json" Version="11.0.1"/>
+    </ItemGroup>
+</Project>
+```
+
+```xml
+<Project>
+    <PropertyGroup>
+        <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    </PropertyGroup>
+    <ItemGroup>
+    <PackageVersion Include="Newtonsoft.Json" VersionOverride="12.0.1"/>
+    </ItemGroup>
+</Project>
+```
+
+#### After `add package` is executed
+
+- No changes should be made to the `Directory.packages.props` file. 
+- The version specified in the `VersionOverride` atribute value of `PackageReference` element in the project file should be updated.
+
+`dotnet add ToDo.csproj package Newtonsoft.Json -v 13.0.1`
+
+```xml
+<Project>
+    <PropertyGroup>
+        <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    </PropertyGroup>
+    <ItemGroup>
+    <PackageVersion Include="Newtonsoft.Json" VersionOverride="13.0.1"/>
     </ItemGroup>
 </Project>
 ```
