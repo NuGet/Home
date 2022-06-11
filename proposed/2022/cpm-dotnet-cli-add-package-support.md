@@ -145,5 +145,3 @@ If the package already exists in `Directory.packages.props` the version should b
     </ItemGroup>
 </Project>
 ```
-
-In case there are multiple `Directory.packages.props` files in the repo, all of them should be searched for a matching package reference. Once a matching package reference is found, its package version can be updated appropriately.
