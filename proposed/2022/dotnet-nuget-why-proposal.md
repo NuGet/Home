@@ -47,7 +47,7 @@ The contents of `{projectName}.nuget.dgspec.json` and `project.assets.json` will
 -  NuGet restore operation downloads packages during dependency resolution which may not part of the final graph The absence of a package id and version combination in `project.assets.json` file signals that it was downloaded during dependency resolution but not part of the final dependency graph.
 - Packages acquired through `PackageDownload` are not tied to the project in any way beyond acquisition. These packages are not recorded in the final graph that `project.assets.json` maintains.
 
-`dotnet nuget why` command prints the dependency graph of a given package only if it is part of the final graph.
+`dotnet nuget why` command prints the dependency graph of a given package only if it is part of the final depedency graph.
 
 ```
 dotnet nuget why [<PROJECT>|<SOLUTION>] package <PACKAGE_NAME>
@@ -130,3 +130,11 @@ dotnet nuget why packageA --version 1.0.0 -f net472
 Project 'projectNameA' has the following dependency graph for 'pacakgeA'
    [net472] Microsoft.ML (1.0.0) > Microsoft.ML.Util (1.0.0) > pacakgeA (1.0.0)
 ```
+
+## Appendix
+
+- https://github.com/NuGet/Home/blob/dev/proposed/2020/Transitive-Dependencies.md
+- [npm-why](https://github.com/amio/npm-why#npm-why-)
+- [cargo-tree](https://doc.rust-lang.org/cargo/commands/cargo-tree.html)
+- [mvn dependency:tree](https://maven.apache.org/plugins/maven-dependency-plugin/usage.html#dependency:tree)
+
