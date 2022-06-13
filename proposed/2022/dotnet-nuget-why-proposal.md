@@ -92,13 +92,13 @@ Sets the verbosity level of the command. Allowed values are q[uiet], m[inimal], 
 ```
 dotnet nuget why packageA
 
-Project 'projectNameA' has the following dependency graph for 'pacakgeA'
-   [net6.0]: Microsoft.ML (1.0.0) > Microsoft.ML.Util (1.0.0) > pacakgeA (1.0.0)
-   [net472] Microsoft.ML (1.0.0) > Microsoft.ML.Util (1.0.0) > pacakgeA (1.0.0)
+Project 'projectNameA' has the following dependency graph for 'packageA'
+   [net6.0]: Microsoft.ML (1.0.0) > Microsoft.ML.Util (1.0.0) > packageA (1.0.0)
+   [net472] Microsoft.ML (1.0.0) > Microsoft.ML.Util (1.0.0) > packageA (1.0.0)
 
-Project 'projectNameB' has the following dependency graph for 'pacakgeA'
-   [net6.0]: Microsoft.ML (1.1.0) > Microsoft.ML.Util (1.1.0) > pacakgeA (1.1.0)
-   [net472] Microsoft.ML (1.1.0) > Microsoft.ML.Util (1.1.0) > pacakgeA (1.1.0)
+Project 'projectNameB' has the following dependency graph for 'packageA'
+   [net6.0]: Microsoft.ML (1.1.0) > Microsoft.ML.Util (1.1.0) > packageA (1.1.0)
+   [net472] Microsoft.ML (1.1.0) > Microsoft.ML.Util (1.1.0) > packageA (1.1.0)
 ```
 
 - List dependency graph of a package given `package id` and `version`.
@@ -106,20 +106,20 @@ Project 'projectNameB' has the following dependency graph for 'pacakgeA'
 ```
 dotnet nuget why packageA --version 1.0.0
 
-Project 'projectNameA' has the following dependency graph for 'pacakgeA'
-   [net6.0]: Microsoft.ML (1.0.0) > Microsoft.ML.Util (1.0.0) > pacakgeA (1.0.0)
-   [net472] Microsoft.ML (1.0.0) > Microsoft.ML.Util (1.0.0) > pacakgeA (1.0.0)
+Project 'projectNameA' has the following dependency graph for 'packageA'
+   [net6.0]: Microsoft.ML (1.0.0) > Microsoft.ML.Util (1.0.0) > packageA (1.0.0)
+   [net472] Microsoft.ML (1.0.0) > Microsoft.ML.Util (1.0.0) > packageA (1.0.0)
 ```
 - List dependency graph of a package given `pacakge id` and `target framework`.
 
 ```
 dotnet nuget why packageA -f net6.0
 
-Project 'projectNameA' has the following dependency graph for 'pacakgeA'
-   [net6.0]: Microsoft.ML (1.0.0) > Microsoft.ML.Util (1.0.0) > pacakgeA (1.0.0)
+Project 'projectNameA' has the following dependency graph for 'packageA'
+   [net6.0]: Microsoft.ML (1.0.0) > Microsoft.ML.Util (1.0.0) > packageA (1.0.0)
 
-Project 'projectNameB' has the following dependency graph for 'pacakgeA'
-   [net6.0]: Microsoft.ML (1.1.0) > Microsoft.ML.Util (1.1.0) > pacakgeA (1.1.0)
+Project 'projectNameB' has the following dependency graph for 'packageA'
+   [net6.0]: Microsoft.ML (1.1.0) > Microsoft.ML.Util (1.1.0) > packageA (1.1.0)
 ```
 
 - List dependency graph of a package given `pacakge id`, `version` and `target framework`.
@@ -127,8 +127,8 @@ Project 'projectNameB' has the following dependency graph for 'pacakgeA'
 ```
 dotnet nuget why packageA --version 1.0.0 -f net472
 
-Project 'projectNameA' has the following dependency graph for 'pacakgeA'
-   [net472] Microsoft.ML (1.0.0) > Microsoft.ML.Util (1.0.0) > pacakgeA (1.0.0)
+Project 'projectNameA' has the following dependency graph for 'packageA'
+   [net472] Microsoft.ML (1.0.0) > Microsoft.ML.Util (1.0.0) > packageA (1.0.0)
 ```
 
 ## Appendix
