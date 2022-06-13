@@ -47,7 +47,7 @@ The contents of `{projectName}.nuget.dgspec.json` and `project.assets.json` will
 -  NuGet restore operation downloads packages during dependency resolution which may not part of the final graph The absence of a package id and version combination in `project.assets.json` file signals that it was downloaded during dependency resolution but not part of the final dependency graph.
 - Packages acquired through `PackageDownload` are not tied to the project in any way beyond acquisition. These packages are not recorded in the final graph that `project.assets.json` maintains.
 
-`dotnet nuget why` command prints the dependency graph of a given package only if it is part of the final depedency graph.
+`dotnet nuget why` command prints the dependency graph of a given package only if it is part of the final graph.
 
 ```
 dotnet nuget why [<PROJECT>|<SOLUTION>] package <PACKAGE_NAME>
