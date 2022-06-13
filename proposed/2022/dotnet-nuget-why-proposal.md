@@ -87,7 +87,7 @@ Sets the verbosity level of the command. Allowed values are q[uiet], m[inimal], 
 
 #### Examples
 
-- List depdency graph of a package given package id.
+- List dependency graph of a package given package id.
 
 ```
 dotnet nuget why packageA
@@ -101,7 +101,7 @@ Project 'projectNameB' has the following dependency graph for 'pacakgeA'
    [net472] Microsoft.ML (1.1.0) > Microsoft.ML.Util (1.1.0) > pacakgeA (1.1.0)
 ```
 
-- List depdency graph of a package given `package id` and `version`.
+- List dependency graph of a package given `package id` and `version`.
 
 ```
 dotnet nuget why packageA --version 1.0.0
@@ -110,7 +110,7 @@ Project 'projectNameA' has the following dependency graph for 'pacakgeA'
    [net6.0]: Microsoft.ML (1.0.0) > Microsoft.ML.Util (1.0.0) > pacakgeA (1.0.0)
    [net472] Microsoft.ML (1.0.0) > Microsoft.ML.Util (1.0.0) > pacakgeA (1.0.0)
 ```
-- List depdency graph of a package given `pacakge id` and `target framework`.
+- List dependency graph of a package given `pacakge id` and `target framework`.
 
 ```
 dotnet nuget why packageA -f net6.0
@@ -122,7 +122,7 @@ Project 'projectNameB' has the following dependency graph for 'pacakgeA'
    [net6.0]: Microsoft.ML (1.1.0) > Microsoft.ML.Util (1.1.0) > pacakgeA (1.1.0)
 ```
 
-- List depdency graph of a package given `pacakge id`, `version` and `target framework`.
+- List dependency graph of a package given `pacakge id`, `version` and `target framework`.
 
 ```
 dotnet nuget why packageA --version 1.0.0 -f net472
