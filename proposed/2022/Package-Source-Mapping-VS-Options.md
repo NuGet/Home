@@ -18,7 +18,7 @@ Adding support for package source mapping in the VS options dialog will allow us
 
 #### Package Source Mappings Page 
 
-When the user opens the package source mapping page in the options dialog, they will see a list of all the package source mappings they have already configured. This page will have three buttons: _Add_ , _Remove_, and _Clear_.
+When the user opens the package source mapping page in the options dialog, they will see a list of all the package source mappings they have already configured and the filepath to the solution level config file. There is a hierarchy of NuGet configs levels: machine, user, and solution. Package source mappings will be read from all of the levels, but only written to the solution level config. This page will have three buttons: _Add_ , _Remove_, and _Clear_.
 
 * Add: Brings user to a pop-up where they can add package source mappings to their project.
 
@@ -34,9 +34,17 @@ The add window has two buttons: _Add_ and _Close_.
 
 * Close: Will close pop-up without adding any package source mappings.
 
+Below are the mockups for the package source mappings page. The top left is the package source mappings page, and the bottom left is the popup that appears when the user clicks the add button.
+
+![Options 1](../../meta/resources/PackageSourceMapping/VSOptions.png)
+
 #### Package Sources Page
 
 I will add a feature that allows a user to pin default sources for all package source mappings that are not specified on the package source mapping page. There will be a pin button, that when clicked, creates a default mapping for all package IDs to the pinned source. A pin icon will appear next to all pinned sources.
+
+Below are mockups of the package sources page with the added pin feature.
+
+![Options 2](../../meta/resources/PackageSourceMapping/VSOptions1.png)
 
 ### Technical Explanation
 
@@ -131,3 +139,5 @@ There were multiple ways to design the package source mappings page (e.g. use a 
 * Package source mapping in PMUI
 
 * Delete package source mappings from config
+
+* Telemetry for package source mappings page
