@@ -129,9 +129,8 @@ Total Score - 100
 Finally, Security represents the trust indicators representing the package in the current state of the supply chain risk. This includes known vulnerabilities, license risk, and any issues surrounding secure supply chain risk.
 
 - No known security vulnerabilities (Critical, High, Moderate, Low) in top-level or transitive dependencies.
-- Includes a permissive license.
+- Specifies a valid license (SPDX, embedded)
 - Not deprecated.
-- Passes antivirus checks.
 
 An emphasis would be placed on known security vulnerabilities and license restriction.
 
@@ -164,7 +163,7 @@ As mentioned in the [original spec](https://github.com/dotnet/designs/pull/216),
 In addition in recent surveys of 2022, we have seen other themes pop up as well such as:
 
 - Clear metrics that help me evaluate package quality (3rd most popular averaging 16/100 points spent on this area)
-- Special badges for key ecosystem projects, trusted packages that significantlycontribute to the .NET ecosystem  (4th most popular averaging 14/100 points spent on this area)
+- Special badges for key ecosystem projects, trusted packages that significantly contribute to the .NET ecosystem  (4th most popular averaging 14/100 points spent on this area)
 
 We then asked how people install a package with the following emphasis in order.
 
