@@ -81,7 +81,7 @@ Prints out a description of how to use the command.
 
 Version of the package. See NuGet package versioning.
 
-- -v|--verbosity <VERSION>
+- -v|--verbosity <LEVEL>
 
 Sets the verbosity level of the command. Allowed values are q[uiet], m[inimal], n[ormal], d[etailed], and diag[nostic]. The default is minimal. For more information, see [LoggerVerbosity](https://docs.microsoft.com/en-us/dotnet/api/microsoft.build.framework.loggerverbosity).
 
