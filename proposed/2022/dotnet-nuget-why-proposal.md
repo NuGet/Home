@@ -50,7 +50,7 @@ The contents of `{projectName}.nuget.dgspec.json` and `project.assets.json` will
 `dotnet nuget why` command prints the dependency graph of a given package only if it is part of the final graph.
 
 ```
-dotnet nuget why [<PROJECT>|<SOLUTION>] package <PACKAGE_NAME>
+dotnet nuget why [<PROJECT>|<SOLUTION>] <PACKAGE_NAME>
     [-f|--framework <FRAMEWORK>]
     [--version <VERSION>]
     [-v|--verbosity <LEVEL>]
