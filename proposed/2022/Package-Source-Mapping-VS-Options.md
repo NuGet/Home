@@ -89,7 +89,7 @@ If the user removes one of these package source mappings, it will be deleted fro
 
 If the user clicks the _Clear_ button on the package source mappings options page, then all package sources will be removed from the configuration, and package source mapping will be disabled. 
 
-If the user removes a source from the package sources page, any mappings to that source will not be deleted in the config. The user will get a message that they are removing a source that still has mappings to it. If a user adds a source that has already has mappings to it in the config, this will also be a message to the user.
+If the user removes a source from the package sources page, any mappings to that source will not be deleted in the config. The user will get a message that they are removing a source that still has mappings to it. If a user adds a source that has already has mappings to it in the config, they will get a message that this source has pre-existing mappings in the config that will be applied once the source is added. 
 
 If the user adds `*` as the package ID, then the selected sources will be pinned on the package sources page. This is because if the user adds `*` as the package ID, it will be written to the solution level config with `pattern=*` for the selected source(s). See `Example 2` below.
 
