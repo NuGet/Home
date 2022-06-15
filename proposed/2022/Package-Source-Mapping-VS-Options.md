@@ -54,7 +54,7 @@ When the user opens the package source mapping page in the options dialog, it wi
 
 When the user adds a package source mapping to their project, the NuGet config will be updated when the user clicks the okay button. The specified package ID will be mapped to the selected source(s) in the config. 
 
-**Example** 
+**Example 1** 
 
 ```xml
 <PackageReference Include="Microsoft.A" Version="1.0.0"/>
@@ -91,13 +91,15 @@ If the user clicks the _Clear_ button on the package source mappings options pag
 
 If the user removes a source from the package sources page, any mappings to that source will not be deleted in the config. The user will get a message that they are removing a source that still has mappings to it. If a user adds a source that has already has mappings to it in the config, this will also be a message to the user.
 
+If the user adds `*` as the package ID, then the selected sources will be pinned on the package sources page. This is because if the user adds `*` as the package ID, it will be written to the solution level config with `pattern=*` for the selected source(s). See `Example 2` below.
+
 #### Package Sources Page
 
 When the user opens the package sources page, it will automatically display a pin icon with all previously pinned default sources.
 
 When the user pins a package source(s), the NuGet config will be updated. Unless otherwise specified in the package source mappings page, all package IDs will be pinned to this source because the `pattern=*` in the config. 
 
-**Example**
+**Example 2**
 
 ```xml
 <packageSourceMapping>
@@ -109,7 +111,7 @@ When the user pins a package source(s), the NuGet config will be updated. Unless
 
 **Result:**
 
-In this example, the user pinned the source `contoso` and did not specify any specific package source mappings. All packages will come from the source `contoso` due to matching the `*` pattern.
+In this example, the user pinned the source `contoso` and did not specify any specific package source mappings. All packages will come from the source `contoso` due to matching the `*` pattern. Alternatively, the user could have added `*` as the package ID and selected `contoso` as the source on the package source mappings page. These two options would be written to the solution level config and read by the package sources page in the same way.
 
 ### Accessibility 
 
