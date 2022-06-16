@@ -209,14 +209,6 @@ If the package already exists in `Directory.packages.props` the version should b
 
 `dotnet add ToDo.csproj package Newtonsoft.Json -v 13.0.1`
 
-
-#### After `add package` is executed
-
-- No changes should be made to the `Directory.packages.props` file. 
-- The version specified in the `VersionOverride` atribute value of `PackageReference` element in the project file should be updated.
-
-`dotnet add ToDo.csproj package Newtonsoft.Json -v 13.0.1`
-
 ```xml
 <Project>
     <PropertyGroup>
