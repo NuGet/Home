@@ -123,6 +123,7 @@ In the above example, the following scenarios are possible:
 If the package already exists in `Directory.packages.props` the version should be updated in `Directory.packages.props`. The package version should either be the latest version or the one specified in the CLI command. The `<PackageReference>` in the project file should not change.
 
 #### Before `add package` is executed
+The props file:
 
 ```xml
 <Project>
@@ -135,17 +136,40 @@ If the package already exists in `Directory.packages.props` the version should b
 </Project>
 ```
 
+The .csproj file:
+
+```xml
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Newtonsoft.Json"/>
+    </ItemGroup>
+</Project>
+```
+
 #### After `add package` is executed
 
 `dotnet add ToDo.csproj package Newtonsoft.Json -v 13.0.1`
 
+No changes should be made to the `Directory.Packages.Props` file. Add `VersionOverride` attribute to the existing `PackageReference` item in .(cs/vb)proj file. If `VersionOverride` is already specified then the value should be updated.
+
+The .csproj file:
+
 ```xml
-<Project>
+<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+        <TargetFramework>net6.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
     </PropertyGroup>
+
     <ItemGroup>
-    <PackageVersion Include="Newtonsoft.Json" Version="13.0.1"/>
+        <PackageReference Include="Newtonsoft.Json" VersionOverride="13.0.1"/>
     </ItemGroup>
 </Project>
 ```
