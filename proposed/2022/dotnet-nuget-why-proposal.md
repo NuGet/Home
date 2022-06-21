@@ -7,11 +7,11 @@
 
 A developer should be able to understand where every package in a solution/project originated from. This can help them understand complex dependency chains they may have within their projects. Having this understanding can help a developer promote a transitive dependency quickly & easily to a top-level dependency in case there is a security concern or conflict.
 
-Currently, there is not a great solution for developers to understand the nature of top-level packages and their transitive dependencies. The solution explorer in Visual Studio does a decent job at allowing a user to dive into each NuGet package & see all transitive dependencies from the top-level dependency, however this solution can be improved.
+Currently, there is not a great solution for developers to understand the nature of top-level packages and their transitive dependencies. The solution explorer in Visual Studio does a decent job at allowing a user to dive into each NuGet package & see all transitive dependencies from the top-level dependency.
 
 ![](../../meta/resources/TransitiveDependencies/SolutionView.png)
 
-The dotnet CLI does not provide the insight into “why” a transitive dependency is listed, although it does list everything that has been resolved.
+However, in comparison to Visual Studio the dotnet CLI does not provide the insight into “why” a transitive dependency is listed, although it does list everything that has been resolved.
 
 ![](../../meta/resources/TransitiveDependencies/DotNetCLI.png)
 
