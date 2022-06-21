@@ -51,7 +51,6 @@ The contents of `{projectName}.nuget.dgspec.json` and `project.assets.json` will
 ```
 dotnet nuget why [<PROJECT>|<SOLUTION>] <PACKAGE_NAME>
     [-f|--framework <FRAMEWORK>]
-    [--version <VERSION>]
     [-v|--verbosity <LEVEL>]
 
 dotnet nuget why -h|--help
@@ -75,10 +74,6 @@ Search package depdnency graph only for a specific target framework.
 - -?|-h|--help
 
 Prints out a description of how to use the command.
-
-- --version <VERSION>
-
-Version of the package. See NuGet package versioning.
 
 - -v|--verbosity <LEVEL>
 
@@ -129,6 +124,9 @@ dotnet nuget why packageA --version 1.0.0 -f net472
 Project 'projectNameA' has the following dependency graph for 'packageA'
    [net472] Microsoft.ML (1.0.0) > Microsoft.ML.Util (1.0.0) > packageA (1.0.0)
 ```
+
+## Additional improvements
+Add a [--version <VERSION>] option to the command if the user wants to print dependency graphs for a specific version of the package. See NuGet package versioning for more information.
 
 ## Appendix
 
