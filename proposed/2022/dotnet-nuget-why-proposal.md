@@ -1,7 +1,6 @@
 # dotnet nuget why command
 
-- Status: **Draft**
-- Author: [Kartheek Penagamuri](https://github.com/kartheekp-ms)
+- Author: [Kartheek Penagamuri](https://github.com/kartheekp-ms), [Pragnya Pandrate](https://github.com/pragnya17)
 - GitHub Issue [11782](https://github.com/NuGet/Home/issues/11782)
 
 ## Problem Background
