@@ -5,9 +5,9 @@
 
 ## Problem Background
 
-Developers are often confused with top-level & transitive dependencies in their project. A developer should be able understand where every package originated from. A user should be able to promote a transitive dependency quickly & easily to a top-level dependency in the case there is a security concern on the package version depended on or if promoting to a top-level package will resolve a conflict.
+A developer should be able to understand where every package in a solution/project originated from. This can help them understand complex dependency chains they may have within their projects. Having this understanding can help a developer promote a transitive dependency quickly & easily to a top-level dependency in case there is a security concern or conflict.
 
-Knowing how a package is being included in a project helps a developer diagnose many problems. It also provides them with an opportunity to understand complex dependency chains they may have within their projects. There is not a great solution that exists to understand the nature of top-level packages and their transitive dependencies. The solution explorer in Visual Studio does the best job at allowing a user to dive into each NuGet package & see all transitive dependencies from the top-level dependency.
+Currently, there is not a great solution for developers to understand the nature of top-level packages and their transitive dependencies. The solution explorer in Visual Studio does a decent job at allowing a user to dive into each NuGet package & see all transitive dependencies from the top-level dependency, however this solution can be improved.
 
 ![](../../meta/resources/TransitiveDependencies/SolutionView.png)
 
