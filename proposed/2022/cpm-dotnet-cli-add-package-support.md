@@ -22,6 +22,26 @@ Users wanting to use CPM onboarded projects and dotnet CLI commands.
 
 When `dotnet add package` is executed in a project onboarded to CPM (meaning that the `Directory.packages.props` file exists) there are a few scenarios that must be considered.
 
+| Scenario # | PackageReference exists? | VersionOverride exists? | PackageVersion exists? | Is Version specified from the commandline | New behavior in dotnet CLI | In Scope |
+| ---- |----- | ----- | ---- |---- | ----- | ---- |
+| 1 | ❌ | ❌ | ❌ | ❌ | Add PackageReference to the project file. Add PackageVersion to the Directory.Packages.Props file. Use latest version from the package sources| ✔️ |
+| 2 | ❌ | ❌ | ❌ | ✔️ | Add PackageReference to the project file. Add PackageVersion to the Directory.Packages.Props file. Use version specified in the command line | ✔️ |
+| 3 | ❌ | ❌ | ✔️ | ❌ | N/A | ❌ |
+| 4 | ❌ | ❌ | ✔️ | ✔️ | N/A | ❌ |
+| 5 | ❌ | ✔️ | ❌ | ❌ | N/A | ❌ |
+| 6 | ❌ | ✔️ | ❌ | ✔️ | N/A | ❌ |
+| 7 | ❌ | ✔️ | ✔️ | ❌ | N/A | ❌ |
+| 8 | ❌ | ✔️ | ✔️ | ✔️ | N/A | ❌ |
+| 9 | ✔️ | ❌ | ❌ | ❌ | N/A | ❌ |
+| 10 | ✔️ | ❌ | ❌ | ✔️ | N/A | ❌ |
+| 11 | ✔️ | ❌ | ✔️ | ❌ | N/A | ❌ |
+| 12 | ✔️ | ❌ | ✔️ | ✔️ | N/A | ❌ |
+| 13 | ✔️ | ✔️ |❌  | ❌ | N/A | ❌ |
+| 14 | ✔️ | ✔️ | ❌ | ✔️ | N/A | ❌ |
+| 15 | ✔️ | ✔️ | ✔️ | ❌ | N/A | ❌ |
+| 16 | ✔️ | ✔️ | ✔️ | ✔️ | N/A | ❌ |
+
+
 | Scenario # | PackageReference exists? | Directory.Packages.Props file exists? | Is ManagePackageVersionsCentrally property set to true? | Is VersionOverride? | Current behavior | New behavior in dotnet CLI | In Scope |
 | ---- |-----| -----|-----|----------|----------|----------|----------|
 | 1 | ❌ | ✔️ | ✔️ (in Directory.Packages.Props or .csproj file) | ❌ | Restore failed with NU1008 error and NO edits were made to the csproj file (same in VS and dotnet CLI) | `PackageReference` should be added to .(cs/vb)proj file and `PackageVersion` should be added to the closest `Directory.Packages.Props` file | ✔️ |
