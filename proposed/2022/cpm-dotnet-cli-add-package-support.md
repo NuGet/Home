@@ -53,7 +53,7 @@ NuGet restore operation generates `{projectName}.nuget.dgspec.json` file that fi
     <summary>Sample C# code snippet for working with MSBuild API to update the project files</summary>
 
     Thanks to [Jeff Kluge's](https://github.com/jeffkl) for this code snippet with us.
-    
+
     ```cs
     Project project = new Project(@"D:\Samples\CentralPackageManagementExample\src\ClassLibrary1\ClassLibrary1.csproj");
     string id = "Newtonsoft.Json2";
@@ -127,6 +127,7 @@ NuGet restore operation generates `{projectName}.nuget.dgspec.json` file that fi
     }
     ```
 </details>
+
 ## Unresolved Questions
 
 - Scenarios with multiple `Directory.Packages.props` are out of scope for now. In case there are multiple `Directory.packages.props` files in the repo, the props file that is closest must be considered.
