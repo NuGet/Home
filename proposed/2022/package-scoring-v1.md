@@ -60,7 +60,6 @@ EX: A package might be missing a README which a developer may not be able to eas
 
 **Issue Examples:**
 
-- Invalid .nuspec / .csproj
 - Missing dependency
 - Missing README
 - No example
@@ -78,7 +77,6 @@ EX: A package might be missing a README which a developer may not be able to eas
 - Unsafe copyright
 - Deprecated
 - Empty package
-- Malware
 - etc
 
 #### Popularity
@@ -97,7 +95,6 @@ Total Score - 100
 Quality is the combination of:
 
 - Follow NuGet conventions
-  - Provides a valid .csproj / .nuspec
   - Provides a valid README
 - Provide documentation
   - Provides an example
