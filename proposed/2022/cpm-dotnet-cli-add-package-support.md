@@ -22,7 +22,7 @@ Users wanting to use CPM onboarded projects and dotnet CLI commands.
 
 When `dotnet add package` is executed in a project onboarded to CPM (meaning that the `Directory.packages.props` file exists) there are a few scenarios that must be considered.
 
-| Scenario # | PackageReference exists? | VersionOverride exists? | PackageVersion exists? | Is Version specified from the commandline | New behavior in dotnet CLI | In Scope for V1?|
+| Scenario # | PackageReference exists? | VersionOverride exists? | PackageVersion exists? | Is Version passed from the commandline? | New behavior in dotnet CLI | In Scope for V1?|
 | ---- |----- | ----- | ---- |---- | ----- | ---- |
 | 1 | ❌ | ❌ | ❌ | ❌ | Add PackageReference to the project file. Add PackageVersion to the Directory.Packages.Props file. Use latest version from the package sources. | ✔️ |
 | 2 | ❌ | ❌ | ❌ | ✔️ | Add PackageReference to the project file. Add PackageVersion to the Directory.Packages.Props file. Use version specified in the commandline. | ✔️ |
