@@ -27,13 +27,13 @@ When `dotnet add package` is executed in a project onboarded to CPM (meaning tha
 | 1 | ❌ | ❌ | ❌ | ❌ | Add `PackageReference` to the project file. Add `PackageVersion` to the `Directory.Packages.Props` file. Use latest version from the package sources. | ✔️ |
 | 2 | ❌ | ❌ | ❌ | ✔️ | Add `PackageReference` to the project file. Add `PackageVersion` to the `Directory.Packages.Props` file. Use version specified in the commandline. | ✔️ |
 | 3 | ❌ | ❌ | ✔️ | ❌ |  Add `PackageReference` to the project file. No changes to the `Directory.Packages.Props` file. Basically we are reusing the version defined centrally for this package. | ✔️ |
-| 4 | ❌ | ❌ | ✔️ | ✔️ | Add `PackageReference` to the project file. Update `PackageVersion` in the `Directory.Packages.Props` file.  | ✔️ |
+| 4 | ❌ | ❌ | ✔️ | ✔️ | Add `PackageReference` to the project file. Update `PackageVersion` in the `Directory.Packages.Props` file with the version specified in the commandline.  | ✔️ |
 | 5 | ❌ | ✔️ | ❌ | ❌ | Not a valid scenario because a `VersionOverride` can't exist without `PackageReference`. | ❌ |
 | 6 | ❌ | ✔️ | ❌ | ✔️ | Not a valid scenario because a `VersionOverride` can't exist without `PackageReference`. | ❌ |
 | 7 | ❌ | ✔️ | ✔️ | ❌ | Not a valid scenario because a `VersionOverride` can't exist without `PackageReference`. | ❌ |
 | 8 | ❌ | ✔️ | ✔️ | ✔️ | Not a valid scenario because a `VersionOverride` can't exist without `PackageReference`. | ❌ |
 | 9 | ✔️ | ❌ | ❌ | ❌ | Emit an error -OR- Remove `Version` from `PackageReference`, Add `PackageVersion` to the `Directory.Packages.Props` file. Use `Version` from `PackageReference` if it exists otherwise use latest version from the package sources. | ✔️ |
-| 10 | ✔️ | ❌ | ❌ | ✔️ | Emit an error -OR- Remove `Version` from `PackageReference`, Add `PackageVersion` to the `Directory.Packages.Props` file. Use `Version` passed to the commandline. | ✔️ |
+| 10 | ✔️ | ❌ | ❌ | ✔️ | Emit an error -OR- Remove `Version` from `PackageReference`, Add `PackageVersion` to the `Directory.Packages.Props` file. Use `Version` passed in the commandline. | ✔️ |
 | 11 | ✔️ | ❌ | ✔️ | ❌ | No-op -OR- Update `PackageVersion` in the `Directory.Packages.Props` file,  use latest version from the package sources. | ✔️ |
 | 12 | ✔️ | ❌ | ✔️ | ✔️ | Update `PackageVersion` in the `Directory.Packages.Props` file, use version specified in the commandline. | ✔️ |
 | 13 | ✔️ | ✔️ |❌  | ❌ | Update `VersionOverride` in the existing `PackageReference` item, use latest version from the package sources. | ✔️ |
@@ -49,6 +49,84 @@ NuGet restore operation generates `{projectName}.nuget.dgspec.json` file that fi
 - [`ProjectRestoreMetadata.CentralPackageVersionsEnabled`](https://github.com/NuGet/NuGet.Client/blob/dev/src/NuGet.Core/NuGet.ProjectModel/ProjectRestoreMetadata.cs#L119) flag will be accessed while executing `dotnet add package` command to verify if the project has onboarded onto CPM. If yes, the scenarios listed in the functional explanation will be handled accordingly.
 - Leverage the existing functionality in [`MSBuildAPIUtility.cs`](https://github.com/NuGet/NuGet.Client/blob/dev/src/NuGet.Core/NuGet.CommandLine.XPlat/Utility/MSBuildAPIUtility.cs) to modify the `PackageReference` items in project and `PackageVersion` items in the `Directory.Packages.Props` file.
 
+    <details>
+    <summary>Sample C# code snippet for working with MSBuild API to update the project files</summary>
+
+    Thanks to [Jeff Kluge's](https://github.com/jeffkl) for this code snippet with us.
+    
+    ```cs
+    Project project = new Project(@"D:\Samples\CentralPackageManagementExample\src\ClassLibrary1\ClassLibrary1.csproj");
+    string id = "Newtonsoft.Json2";
+    string version = "2.0.0";
+    // Find the last declared <PackageReference /> item with a matching the package ID
+    ProjectItem packageReference = project.Items.LastOrDefault(i => i.ItemType == "PackageReference" && i.EvaluatedInclude.Equals(id));
+    // Find the last declared <PackageVersion /> item with a matching the package ID
+    ProjectItem packageVersion = project.Items.LastOrDefault(i => i.ItemType == "PackageVersion" &&  i.EvaluatedInclude.Equals(id));
+    // Add a <PackageReference /> item if one does not already exist
+    if (packageReference != null)
+    {
+        // Determine which <ItemGroup /> to add to by searching for the first one available:
+        //   Find the first <PackageReference /> in the project so we know what ItemGroup to add to
+        //   -or-
+        //   Use the first first ItemGroup
+        //   -or-
+        //   Add a new ItemGroup
+        ProjectItemGroupElement itemGroupElement = project.Xml.ItemGroups.FirstOrDefault(i => i.Items.Any(i => i.ItemType == "PackageReference"))
+            ?? project.Xml.ItemGroups.FirstOrDefault()
+            ?? project.Xml.AddItemGroup();
+        // TODO: Add the item in sorted order
+        // Add the <PackageReference /> item
+        itemGroupElement.AddItem("PackageReference", id);
+        // Save the main project
+        project.Save();
+    }
+    // Add a <PackageVersion /> to Directory.Build.props if one does not already exist
+    if (packageVersion == null)
+    {
+        // Technically the Directory.Package.props path is stored in an MSBuild property
+        string directoryPackagesPropsPath = project.GetPropertyValue("DirectoryPackagesPropsPath");
+        // Get the Directory.Build.props
+        ProjectRootElement directoryBuildPropsRootElement = project.Imports.FirstOrDefault(i => i.ImportedProject.FullPath.Equals(directoryPackagesPropsPath)).ImportedProject;
+        // Get the ItemGroup to add a PackageVersion to
+        //   Find the first <ItemGroup /> that contains a <PackageVersion />
+        //   -or-
+        //   Find the first <ItemGroup />
+        //   -or-
+        //   Add an <ItemGroup />
+        ProjectItemGroupElement packageVersionItemGroupElement = directoryBuildPropsRootElement.ItemGroups.FirstOrDefault(i => i.Items.Any(i => i.ItemType == "PackageVersion"))
+            ?? directoryBuildPropsRootElement.ItemGroups.FirstOrDefault()
+            ?? directoryBuildPropsRootElement.AddItemGroup();
+        // Add a <PackageVersion /> item
+        ProjectItemElement packageVersionItemElement = packageVersionItemGroupElement.AddItem("PackageVersion", id);
+        // Set the Version attribute
+        packageVersionItemElement.AddMetadata("Version", version, expressAsAttribute: true);
+        directoryBuildPropsRootElement.Save();
+    }
+    // Only update <PackageVersion /> if it doesn't currently have the specified value
+    else if (!packageVersion.GetMetadataValue("Version").Equals(version))
+    {
+        // Determine where the <PackageVersion /> item is decalred
+        ProjectItemElement packageVersionItemElement = project.GetItemProvenance(packageVersion).LastOrDefault()?.ItemElement;
+        if (packageVersionItemElement == null)
+        {
+            throw new Exception("Failed to find item provenance");
+        }
+        // Get the Version attribute
+        ProjectMetadataElement versionAttribute = packageVersionItemElement.Metadata.FirstOrDefault(i => i.Name.Equals("Version"));
+        if (versionAttribute != null)
+        {
+            // Set the Version
+            versionAttribute.Value = version;
+        }
+        else
+        {
+            // Add the Version attribute
+            packageVersionItemElement.AddMetadata("Version", version, expressAsAttribute: true);
+        }
+        packageVersionItemElement.ContainingProject.Save();
+    }
+    ```
+</details>
 ## Unresolved Questions
 
 - Scenarios with multiple `Directory.Packages.props` are out of scope for now. In case there are multiple `Directory.packages.props` files in the repo, the props file that is closest must be considered.
