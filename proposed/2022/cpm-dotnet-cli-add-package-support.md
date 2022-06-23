@@ -35,7 +35,7 @@ When `dotnet add package` is executed in a project onboarded to CPM (meaning tha
 | 9 | ✔️ | ❌ | ❌ | ❌ | Emit an error -OR- Remove Version from PackageReference, Add PackageVersion to the Directory.Packages.Props file. Use Version from PackageReference if it exists otherwise use latest version from the package sources. | ✔️ |
 | 10 | ✔️ | ❌ | ❌ | ✔️ | Emit an error -OR- Remove Version from PackageReference, Add PackageVersion to the Directory.Packages.Props file. Use Version passed to the commandline. | ✔️ |
 | 11 | ✔️ | ❌ | ✔️ | ❌ | No-op -OR- update to latest | ✔️ |
-| 12 | ✔️ | ❌ | ✔️ | ✔️ | Update PackageVersion in the Directory.Packages.Props file. | ✔️ |
+| 12 | ✔️ | ❌ | ✔️ | ✔️ | Update PackageVersion in the Directory.Packages.Props file, use version specified in the commandline. | ✔️ |
 | 13 | ✔️ | ✔️ |❌  | ❌ | Update VersionOverride in the existing PackageReference item, use latest version from the package sources. | ✔️ |
 | 14 | ✔️ | ✔️ | ❌ | ✔️ | Update VersionOverride in the existing PackageReference item, use version specified in the commandline. | ✔️ |
 | 15 | ✔️ | ✔️ | ✔️ | ❌ | Update VersionOverride in the existing PackageReference item, use latest version from the package sources. | ✔️ |
