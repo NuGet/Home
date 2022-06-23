@@ -47,11 +47,11 @@ NuGet restore operation generates `{projectName}.nuget.dgspec.json` file that fi
 - `dgspec.json` file will have `centralPackageVersionsManagementEnabled` property set to `true` for projects onboarded onto CPM.
 - `dotnet add pacakge` command currently access [`ProjectRestoreMetadata`](https://github.com/NuGet/NuGet.Client/blob/dev/src/NuGet.Core/NuGet.ProjectModel/ProjectRestoreMetadata.cs) to perform preview restore.
 - [`ProjectRestoreMetadata.CentralPackageVersionsEnabled`](https://github.com/NuGet/NuGet.Client/blob/dev/src/NuGet.Core/NuGet.ProjectModel/ProjectRestoreMetadata.cs#L119) flag will be accessed while executing `dotnet add package` command to verify if the project has onboarded onto CPM. If yes, the scenarios listed in the functional explanation will be handled accordingly.
+- Leverage the existing functionality in [`MSBuildAPIUtility.cs`](https://github.com/NuGet/NuGet.Client/blob/dev/src/NuGet.Core/NuGet.CommandLine.XPlat/Utility/MSBuildAPIUtility.cs) to modify the `PackageReference` items in project and `PackageVersion` items in the Directory.Packages.Props file.
 
 ## Unresolved Questions
 
 - Scenarios with multiple `Directory.Packages.props` are out of scope for now. In case there are multiple `Directory.packages.props` files in the repo, the props file that is closest must be considered.
-
     ```
     Repository
     |-- Directory.Packages.props
@@ -61,16 +61,10 @@ NuGet restore operation generates `{projectName}.nuget.dgspec.json` file that fi
     |-- Solution2
         |-- Project2
     ```
-
     In the above example, the following scenarios are possible:
-
     1. Project1 will evaluate the Directory.Packages.props file in the Repository\Solution1\ directory.
-    2. Project2 will evaluate the Directory.Packages.props file in the Repository\ directory.
-
+    2. Project2 will evaluate the Directory.Packages.props file in the Repository\ directory.    
     Sourced from <https://devblogs.microsoft.com/nuget/introducing-central-package-management/>
-
 - The abscence of `Directory.Packages.Props` file for CPM onboarded projects fallback to the current behavior that is adding/updating `PackageReference` & `Version` to the project file. As per [Jeff Kluge's](https://github.com/jeffkl) comment [on a GitHub issue](https://github.com/NuGet/Home/issues/11903#issuecomment-1161996051), `At this time, the customers must use a file named Directory.Packages.props or set an MSBuild property to indicate what file you want to use. Using other files and importing it manually is not a supported scenario.`
-
 - Scenarios `10` and `11` mentioned in the `Functional explanation` requires clarity about the command functionality.
-
 - `dotnet add package` by design supports only `PackageReference` style projects. Hence `Packages.Config` style projects remain unsupported.
