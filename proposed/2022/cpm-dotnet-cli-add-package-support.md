@@ -22,33 +22,24 @@ Users wanting to use CPM onboarded projects and dotnet CLI commands.
 
 When `dotnet add package` is executed in a project onboarded to CPM (meaning that the `Directory.packages.props` file exists) there are a few scenarios that must be considered.
 
-| Scenario # | PackageReference exists? | VersionOverride exists? | PackageVersion exists? | Is Version specified from the commandline | New behavior in dotnet CLI | In Scope |
+| Scenario # | PackageReference exists? | VersionOverride exists? | PackageVersion exists? | Is Version specified from the commandline | New behavior in dotnet CLI | In Scope for V1?|
 | ---- |----- | ----- | ---- |---- | ----- | ---- |
-| 1 | ❌ | ❌ | ❌ | ❌ | Add PackageReference to the project file. Add PackageVersion to the Directory.Packages.Props file. Use latest version from the package sources| ✔️ |
-| 2 | ❌ | ❌ | ❌ | ✔️ | Add PackageReference to the project file. Add PackageVersion to the Directory.Packages.Props file. Use version specified in the command line | ✔️ |
-| 3 | ❌ | ❌ | ✔️ | ❌ | N/A | ❌ |
-| 4 | ❌ | ❌ | ✔️ | ✔️ | N/A | ❌ |
-| 5 | ❌ | ✔️ | ❌ | ❌ | N/A | ❌ |
-| 6 | ❌ | ✔️ | ❌ | ✔️ | N/A | ❌ |
-| 7 | ❌ | ✔️ | ✔️ | ❌ | N/A | ❌ |
-| 8 | ❌ | ✔️ | ✔️ | ✔️ | N/A | ❌ |
-| 9 | ✔️ | ❌ | ❌ | ❌ | N/A | ❌ |
-| 10 | ✔️ | ❌ | ❌ | ✔️ | N/A | ❌ |
-| 11 | ✔️ | ❌ | ✔️ | ❌ | N/A | ❌ |
-| 12 | ✔️ | ❌ | ✔️ | ✔️ | N/A | ❌ |
-| 13 | ✔️ | ✔️ |❌  | ❌ | N/A | ❌ |
-| 14 | ✔️ | ✔️ | ❌ | ✔️ | N/A | ❌ |
-| 15 | ✔️ | ✔️ | ✔️ | ❌ | N/A | ❌ |
-| 16 | ✔️ | ✔️ | ✔️ | ✔️ | N/A | ❌ |
-
-
-| Scenario # | PackageReference exists? | Directory.Packages.Props file exists? | Is ManagePackageVersionsCentrally property set to true? | Is VersionOverride? | Current behavior | New behavior in dotnet CLI | In Scope |
-| ---- |-----| -----|-----|----------|----------|----------|----------|
-| 1 | ❌ | ✔️ | ✔️ (in Directory.Packages.Props or .csproj file) | ❌ | Restore failed with NU1008 error and NO edits were made to the csproj file (same in VS and dotnet CLI) | `PackageReference` should be added to .(cs/vb)proj file and `PackageVersion` should be added to the closest `Directory.Packages.Props` file | ✔️ |
-| 2 | ❌ | ❌ | ✔️ in (cs/vb)proj file | ❌ | Restore failed with NU1008 error and NO edits were made to the csproj file (same in VS and dotnet CLI) | `PackageReference` and `Version` should be added to .(cs/vb)proj file.| ✔️ |
-| 3 | ❌ | ✔️ | ❌ | ❌ | `PackageReference` and `Version` added to .(cs/vb)proj file. | In addition to the current behavior `Directory.packages.props` file should be deleted if it exists in the project folder | ❌ |
-| 4 | ✔️ | ✔️ | ✔️ | ❌ | **dotnet CLI** - Restore failed with NU1008 error and NO edits were made to the csproj file. **VS** - Clicked on Update package in PM UI. New `PackageVersion` added to csproj file and `Directory.packages.props` file was not updated | No changes should be made to the `Directory.Packages.Props` file. Add `VersionOverride` attribute to the existing `PackageReference` item in .(cs/vb)proj file. If `VersionOverride` is already specified then the value should be updated.|✔️ [More Info](https://github.com/NuGet/Home/pull/11849#discussion_r890639808) |
-| 5 | ✔️ | ✔️ | ✔️ | ✔️ | **dotnet CLI** - Restore failed with NU1008 error and NO edits were made to the csproj file. **VS** - Clicked on Update package in PM UI. New `PackageVersion` added to csproj file and `VersionOverride` in .csproj file was not updated | Update `VersionOverride` attribute value in the corresponding `PackageReference` item in .(cs/vb)proj file. | ✔️ |
+| 1 | ❌ | ❌ | ❌ | ❌ | Add PackageReference to the project file. Add PackageVersion to the Directory.Packages.Props file. Use latest version from the package sources. | ✔️ |
+| 2 | ❌ | ❌ | ❌ | ✔️ | Add PackageReference to the project file. Add PackageVersion to the Directory.Packages.Props file. Use version specified in the commandline. | ✔️ |
+| 3 | ❌ | ❌ | ✔️ | ❌ |  Add PackageReference to the project file. No changes to the Directory.Packages.Props file. Basically we are reusing the version defined centrally for this package. | ✔️ |
+| 4 | ❌ | ❌ | ✔️ | ✔️ | Add PackageReference to the project file. Update PackageVersion in the Directory.Packages.Props file.  | ✔️ |
+| 5 | ❌ | ✔️ | ❌ | ❌ | Not a valid scenario because a VersionOverride can't exist without PackageReference. | ❌ |
+| 6 | ❌ | ✔️ | ❌ | ✔️ | Not a valid scenario because a VersionOverride can't exist without PackageReference. | ❌ |
+| 7 | ❌ | ✔️ | ✔️ | ❌ | Not a valid scenario because a VersionOverride can't exist without PackageReference. | ❌ |
+| 8 | ❌ | ✔️ | ✔️ | ✔️ | Not a valid scenario because a VersionOverride can't exist without PackageReference. | ❌ |
+| 9 | ✔️ | ❌ | ❌ | ❌ | Emit an error -OR- Remove Version from PackageReference, Add PackageVersion to the Directory.Packages.Props file. Use Version from PackageReference if it exists otherwise use latest version from the package sources. | ✔️ |
+| 10 | ✔️ | ❌ | ❌ | ✔️ | Emit an error -OR- Remove Version from PackageReference, Add PackageVersion to the Directory.Packages.Props file. Use Version passed to the commandline. | ✔️ |
+| 11 | ✔️ | ❌ | ✔️ | ❌ | No-op -OR- update to latest | ✔️ |
+| 12 | ✔️ | ❌ | ✔️ | ✔️ | Update PackageVersion in the Directory.Packages.Props file. | ✔️ |
+| 13 | ✔️ | ✔️ |❌  | ❌ | Update VersionOverride in the existing PackageReference item, use latest version from the package sources. | ✔️ |
+| 14 | ✔️ | ✔️ | ❌ | ✔️ | Update VersionOverride in the existing PackageReference item, use version specified in the commandline. | ✔️ |
+| 15 | ✔️ | ✔️ | ✔️ | ❌ | Update VersionOverride in the existing PackageReference item, use latest version from the package sources. | ✔️ |
+| 16 | ✔️ | ✔️ | ✔️ | ✔️ | Update VersionOverride in the existing PackageReference item, use version specified in the commandline. | ✔️ |
 
 > [!NOTE]
 > Scenarios with multiple Directory.Packages.props are out of scope for now.
