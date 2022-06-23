@@ -52,7 +52,7 @@ NuGet restore operation generates `{projectName}.nuget.dgspec.json` file that fi
     <details>
     <summary>Sample C# code snippet for working with MSBuild API to update the project files</summary>
 
-    Thanks to [Jeff Kluge's](https://github.com/jeffkl) for this code snippet with us.
+    Thanks to [Jeff Kluge's](https://github.com/jeffkl) for sharing this code snippet with us.
 
     ```cs
     Project project = new Project(@"D:\Samples\CentralPackageManagementExample\src\ClassLibrary1\ClassLibrary1.csproj");
