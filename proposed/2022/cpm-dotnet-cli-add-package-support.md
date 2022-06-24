@@ -50,7 +50,7 @@ NuGet restore operation generates `{projectName}.nuget.dgspec.json` file that fi
 - Leverage the existing functionality in [`MSBuildAPIUtility.cs`](https://github.com/NuGet/NuGet.Client/blob/dev/src/NuGet.Core/NuGet.CommandLine.XPlat/Utility/MSBuildAPIUtility.cs) to modify the `PackageReference` items in project and `PackageVersion` items in the `Directory.Packages.Props` file.
 
     <details>
-    <summary>Sample C# code snippet for working with MSBuild API to update the project files</summary>
+    <summary>Sample C# code snippet for working with MSBuild API to update the project and Directory.Packages.Props files</summary>
 
     Thanks to [Jeff Kluge](https://github.com/jeffkl) for sharing this code snippet with us.
 
