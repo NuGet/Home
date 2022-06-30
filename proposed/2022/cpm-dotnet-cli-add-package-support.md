@@ -32,13 +32,13 @@ When `dotnet add package` is executed in a project onboarded to CPM (meaning tha
 | 6 | ❌ | ✔️ | ❌ | ✔️ | Not a valid scenario because a `VersionOverride` can't exist without `PackageReference`. | ❌ |
 | 7 | ❌ | ✔️ | ✔️ | ❌ | Not a valid scenario because a `VersionOverride` can't exist without `PackageReference`. | ❌ |
 | 8 | ❌ | ✔️ | ✔️ | ✔️ | Not a valid scenario because a `VersionOverride` can't exist without `PackageReference`. | ❌ |
-| 9 | ✔️ | ❌ | ❌ | ❌ | Emit an error -OR- Remove `Version` from `PackageReference`, Add `PackageVersion` to the `Directory.Packages.Props` file. Use `Version` from `PackageReference` if it exists otherwise use latest version from the package sources. | ✔️ |
-| 10 | ✔️ | ❌ | ❌ | ✔️ | Emit an error -OR- Remove `Version` from `PackageReference`, Add `PackageVersion` to the `Directory.Packages.Props` file. Use `Version` passed in the commandline. | ✔️ |
-| 11 | ✔️ | ❌ | ✔️ | ❌ | No-op -OR- Update `PackageVersion` in the `Directory.Packages.Props` file,  use latest version from the package sources. | ✔️ |
+| 9 | ✔️ | ❌ | ❌ | ❌ | Emit an error. (The other considered option was: Remove `Version` from `PackageReference`, Add `PackageVersion` to the `Directory.Packages.Props` file. Use `Version` from `PackageReference` if it exists otherwise use latest version from the package sources. However, this might require more user research.) | ✔️ |
+| 10 | ✔️ | ❌ | ❌ | ✔️ | Emit an error. (The other considered option was: Remove `Version` from `PackageReference`, Add `PackageVersion` to the `Directory.Packages.Props` file. Use `Version` passed in the commandline.  However, this might require more user research.) | ✔️ |
+| 11 | ✔️ | ❌ | ✔️ | ❌ | No-op. (The other considered option was: Update `PackageVersion` in the `Directory.Packages.Props` file,  use latest version from the package sources. However, we decided it would be best to only update a version when the user explicitly passes in the commandline argument.) | ✔️ |
 | 12 | ✔️ | ❌ | ✔️ | ✔️ | Update `PackageVersion` in the `Directory.Packages.Props` file, use version specified in the commandline. | ✔️ |
-| 13 | ✔️ | ✔️ |❌  | ❌ | Update `VersionOverride` in the existing `PackageReference` item, use latest version from the package sources. | ✔️ |
+| 13 | ✔️ | ✔️ |❌  | ❌ | No-op. | ✔️ |
 | 14 | ✔️ | ✔️ | ❌ | ✔️ | Update `VersionOverride` in the existing `PackageReference` item, use version specified in the commandline. | ✔️ |
-| 15 | ✔️ | ✔️ | ✔️ | ❌ | Update `VersionOverride` in the existing `PackageReference` item, use latest version from the package sources. | ✔️ |
+| 15 | ✔️ | ✔️ | ✔️ | ❌ | No-op. | ✔️ |
 | 16 | ✔️ | ✔️ | ✔️ | ✔️ | Update `VersionOverride` in the existing `PackageReference` item, use version specified in the commandline. | ✔️ |
 
 ### Technical explanation
@@ -144,6 +144,8 @@ NuGet restore operation generates `{projectName}.nuget.dgspec.json` file that fi
     1. Project1 will evaluate the Directory.Packages.props file in the Repository\Solution1\ directory.
     2. Project2 will evaluate the Directory.Packages.props file in the Repository\ directory.    
     Sourced from <https://devblogs.microsoft.com/nuget/introducing-central-package-management/>
-- The abscence of `Directory.Packages.Props` file for CPM onboarded projects fallback to the current behavior that is adding/updating `PackageReference` & `Version` to the project file. As per [Jeff Kluge's](https://github.com/jeffkl) comment [on a GitHub issue](https://github.com/NuGet/Home/issues/11903#issuecomment-1161996051), `At this time, the customers must use a file named Directory.Packages.props or set an MSBuild property to indicate what file you want to use. Using other files and importing it manually is not a supported scenario.`.
-- Scenarios `9`, `10` and `11` mentioned in the `Functional explanation` requires clarity about the command functionality. Currently there are 2 behaviors defined for these scenarios in this proposal.
-- `dotnet add package` by design supports only `PackageReference` style projects. Hence `Packages.Config` style projects remain unsupported.
+
+    Another potential solution would be to create a command line argument that takes in the `Directory.packages.props` file's path that the user intends to update, rather than choosing the closest props file by deafult. 
+- The absence of the `Directory.Packages.Props` file for CPM onboarded projects means that the project is not onboarded to CPM. As per [Jeff Kluge's](https://github.com/jeffkl) comment [on a GitHub issue](https://github.com/NuGet/Home/issues/11903#issuecomment-1161996051), `At this time, the customers must use a file named Directory.Packages.props or set an MSBuild property to indicate what file you want to use. Using other files and importing it manually is not a supported scenario.`. Therefore the tool will fall back to the current behavior that is adding/updating the `PackageReference` & `Version` in the project file.
+    - If a user wants to onboard to CPM, they will have to create the `Directory.Packages.Props` explicitly through a CLI commandline argument/CLI command or manually. This will ensure that the file is created in the intended location. In any case, the `Directory.Packages.Props` file will not be implicitly created for the user.
+- `dotnet add package` by design supports only `PackageReference` style projects. Hence `Packages.Config` style projects remain unsupported. If a user does try to use a `Packages.Config` style project with CPM, an error message should be displayed.
