@@ -8,11 +8,11 @@
 
 The dotnet add package command allows users to add or update a package reference in a project file through the Dotnet CLI. However, when this command is used in a project that has been onboarded to Central Package Management (CPM), it poses an issue as this error is thrown: `error: NU1008: Projects that use central package version management should not define the version on the PackageReference items but on the PackageVersion items: [PackageName]`.
 
-The main goal is to add support for `dotnet add package` to be used with projects onboarded onto CPM. Regardless of whether the package has already been added to the project or not, the command should allow users to add packages or update the package version in the `Directory.packages.props` file.
+The main goal is to add support for `dotnet add package` to be used with projects onboarded onto CPM. Regardless of whether the package has already been added to the project or not, the command should allow users to add packages or update the package version in the `Directory.Packages.props` file.
 
 ## Motivation
 
-Projects onboarded to CPM use a `Directory.packages.props` file in the root of the repo where package versions are defined centrally. Ideally, when the `dotnet add package` command is used, the package version should only be added to the corresponding package in the `Directory.packages.props` file. However, currently the command attempts to add the package version to the `<PackageReference />` in the project which conflicts with the CPM requirements that package versions must only be in the `Directory.packages.props` file.
+Projects onboarded to CPM use a `Directory.Packages.props` file in the root of the repo where package versions are defined centrally. Ideally, when the `dotnet add package` command is used, the package version should only be added to the corresponding package in the `Directory.Packages.props` file. However, currently the command attempts to add the package version to the `<PackageReference />` in the project which conflicts with the CPM requirements that package versions must only be in the `Directory.Packages.props` file.
 
 Users wanting to use CPM onboarded projects and dotnet CLI commands will be benefited.
 
@@ -20,7 +20,7 @@ Users wanting to use CPM onboarded projects and dotnet CLI commands will be bene
 
 ### Functional explanation
 
-When `dotnet add package` is executed in a project onboarded to CPM (meaning that the `Directory.packages.props` file exists) there are a few scenarios that must be considered.
+When `dotnet add package` is executed in a project onboarded to CPM (meaning that the `Directory.Packages.props` file exists) there are a few scenarios that must be considered.
 
 | Scenario # | PackageReference exists? | VersionOverride exists? | PackageVersion exists? | Is Version passed from the commandline? | New behavior in dotnet CLI | In Scope |
 | ---- |----- | ----- | ---- |---- | ----- | ---- |
@@ -130,7 +130,7 @@ NuGet restore operation generates `{projectName}.nuget.dgspec.json` file that fi
 
 ## Unresolved Questions
 
-- Scenarios with multiple `Directory.Packages.props` are out of scope for now. In case there are multiple `Directory.packages.props` files in the repo, the props file that is closest must be considered.
+- Scenarios with multiple `Directory.Packages.props` are out of scope for now. In case there are multiple `Directory.Packages.props` files in the repo, the props file that is closest must be considered.
     ```
     Repository
     |-- Directory.Packages.props
