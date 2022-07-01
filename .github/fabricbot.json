@@ -674,11 +674,11 @@
           {
             "name": "noActivitySince",
             "parameters": {
-              "days": 60
+              "days": 15
             }
           }
         ],
-        "taskName": "[stale PR] [5-5] Close PRs with no activity over 60 days after warn (except Community PRs)",
+        "taskName": "[stale PR] [5-5] Close PRs with no activity over 15 days after warn (except Community PRs)",
         "actions": [
           {
             "name": "closeIssue",
