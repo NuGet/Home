@@ -43,8 +43,8 @@ When `dotnet add package` is executed in a project onboarded to CPM (meaning tha
 
 ### Technical explanation
 
-NuGet restore operation generates `{projectName}.nuget.dgspec.json` file that file that maintains a project's top-level dependencies along with other metadata for `PackageReference` style projects. 
-- `dgspec.json` file will have `centralPackageVersionsManagementEnabled` property set to `true` for projects onboarded onto CPM.
+The `dotnet add [package]` command generates a `{projectName}.nuget.dgspec.json` file that that maintains a project's top-level dependencies along with other metadata for `PackageReference` style projects. 
+- The `dgspec.json` file will have `centralPackageVersionsManagementEnabled` property set to `true` for projects onboarded onto CPM.
 - `dotnet add package` command currently access [`ProjectRestoreMetadata`](https://github.com/NuGet/NuGet.Client/blob/dev/src/NuGet.Core/NuGet.ProjectModel/ProjectRestoreMetadata.cs) to perform preview restore.
 - [`ProjectRestoreMetadata.CentralPackageVersionsEnabled`](https://github.com/NuGet/NuGet.Client/blob/dev/src/NuGet.Core/NuGet.ProjectModel/ProjectRestoreMetadata.cs#L119) flag will be accessed while executing `dotnet add package` command to verify if the project has onboarded onto CPM. If yes, the scenarios listed in the functional explanation will be handled accordingly.
 - Leverage the existing functionality in [`MSBuildAPIUtility.cs`](https://github.com/NuGet/NuGet.Client/blob/dev/src/NuGet.Core/NuGet.CommandLine.XPlat/Utility/MSBuildAPIUtility.cs) to modify the `PackageReference` items in project and `PackageVersion` items in the `Directory.Packages.Props` file.
