@@ -412,7 +412,7 @@
             }
           }
         ],
-        "taskName": "[stale PR] [5-1] Search for community PRs with no activity over 30 days and warn. (except draft PRs and Community PRs)",
+        "taskName": "[stale PR] [5-1] Search for PRs with no activity over 30 days and warn. (except draft PRs and Community PRs)",
         "actions": [
           {
             "name": "addLabel",
