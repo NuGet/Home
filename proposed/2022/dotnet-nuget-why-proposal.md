@@ -47,7 +47,7 @@ The package for whom the dependency graph has to be identified. Package name wil
 
 - -f|--framework <FRAMEWORK>
 
-Search package depdnency graph only for a specific target framework.
+Search package dependency graph for a specific target framework.
 
 - -?|-h|--help
 
@@ -116,7 +116,9 @@ When a user highlights a transitive package, they will see a pop-up that display
 
 Add a [--version <VERSION>] option to the command if the user wants to print dependency graphs for a specific version of the package. See NuGet package versioning for more information.
 
-Add an option to allow the customer to look up transitive dependencies of more than one package. For example, allow the customer to do something like: `dotnet nuget why [<PROJECT>|<SOLUTION>] packages package1, package2` or `dotnet nuget why [<PROJECT>|<SOLUTION>] package 'nuget.*'`.
+Allow the customer to look up transitive dependencies of more than one package. For example: `dotnet nuget why [<PROJECT>|<SOLUTION>] packages package1, package2` or `dotnet nuget why [<PROJECT>|<SOLUTION>] package 'nuget.*'`.
+
+Allow the customer to transitive dependencies of more than one framework. For example: `--framework net6.0 --framework netstandard2.0`.
 
 Create a better visualization of the dependency graph that is printed by the `dotnet nuget why` command by displaying a tree rather than just printing out a list of dependencies. 
 
