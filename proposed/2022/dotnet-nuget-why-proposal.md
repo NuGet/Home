@@ -47,7 +47,7 @@ The package for whom the dependency graph has to be identified. Package name wil
 
 - -f|--framework <FRAMEWORK>
 
-Search package dependency graph for a specific target framework.
+Print out the dependency graph of a given package for a specific target framework.
 
 - -?|-h|--help
 
@@ -61,12 +61,16 @@ Prints out a description of how to use the command.
 dotnet nuget why packageA
 
 Project 'projectNameA' has the following dependency graph for 'packageA'
-   [net6.0]: Microsoft.ML (1.0.0) -> Microsoft.ML.Util (1.0.0) -> packageA (1.0.0)
-   [net472] Microsoft.ML (1.0.0) -> Microsoft.ML.Util (1.0.0) -> packageA (1.0.0)
+   [net6.0]: 
+      Microsoft.ML (1.0.0) -> Microsoft.ML.Util (1.0.0) -> packageA (1.0.0)
+   [net472]:
+      Microsoft.ML (1.0.0) -> Microsoft.ML.Util (1.0.0) -> packageA (1.0.0)
 
 Project 'projectNameB' has the following dependency graph for 'packageA'
-   [net6.0]: Microsoft.ML (1.1.0) -> Microsoft.ML.Util (1.1.0) -> packageA (1.1.0)
-   [net472] Microsoft.ML (1.1.0) -> Microsoft.ML.Util (1.1.0) -> packageA (1.1.0)
+   [net6.0]:
+      Microsoft.ML (1.1.0) -> Microsoft.ML.Util (1.1.0) -> packageA (1.1.0)
+   [net472]:
+      Microsoft.ML (1.1.0) -> Microsoft.ML.Util (1.1.0) -> packageA (1.1.0)
 ```
 
 - List dependency graph of a package given `package id` when there is a diamond dependency (a package is brought in by more than one path).
@@ -75,8 +79,9 @@ Project 'projectNameB' has the following dependency graph for 'packageA'
 dotnet nuget why packageA
 
 Project 'projectNameA' has the following dependency graph for 'packageA'
-   [net6.0]: Microsoft.ML (1.0.0) -> Microsoft.ML.Util (1.0.0) -> packageA (1.0.0)
-   [net6.0] Microsoft.ML (1.0.0) -> Microsoft.ML.SampleUtils (1.0.0) -> packageA (1.0.0)
+   [net6.0]:
+      Microsoft.ML (1.0.0) -> Microsoft.ML.Util (1.0.0) -> packageA (1.0.0)
+      Microsoft.ML (1.0.0) -> Microsoft.ML.SampleUtils (1.0.0) -> packageA (1.0.0)
 ```
 
 - List dependency graph of a package given `package id` and `target framework`.
@@ -85,10 +90,12 @@ Project 'projectNameA' has the following dependency graph for 'packageA'
 dotnet nuget why packageA -f net6.0
 
 Project 'projectNameA' has the following dependency graph for 'packageA'
-   [net6.0]: Microsoft.ML (1.0.0) -> Microsoft.ML.Util (1.0.0) -> packageA (1.0.0)
+   [net6.0]:
+      Microsoft.ML (1.0.0) -> Microsoft.ML.Util (1.0.0) -> packageA (1.0.0)
 
 Project 'projectNameB' has the following dependency graph for 'packageA'
-   [net6.0]: Microsoft.ML (1.1.0) -> Microsoft.ML.Util (1.1.0) -> packageA (1.1.0)
+   [net6.0]:
+      Microsoft.ML (1.1.0) -> Microsoft.ML.Util (1.1.0) -> packageA (1.1.0)
 ```
 
 ## Drawbacks 
