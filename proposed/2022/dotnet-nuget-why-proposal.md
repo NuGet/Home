@@ -102,11 +102,6 @@ When a user highlights a transitive package, they will see a pop-up that display
 
 ![](../../meta/resources/TransitiveDependencies/TransitiveVSPMUI.png)
 
-
-## Unresolved Questions
-
-Projects that use `packages.config` format are out of scope for this effort because the XML file contains a flat list of both direct and transitive package dependencies. Customers cannot visualize the dependency graph from the file itself but it would be easy to update the package version of a transitive depedency if there are any security vulnerabilities in the current version.
-
 ## Additional improvements
 
 Add a [--version <VERSION>] option to the command if the user wants to print dependency graphs for a specific version of the package. See NuGet package versioning for more information.
