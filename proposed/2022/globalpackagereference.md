@@ -7,14 +7,14 @@
 
 ## Summary
 <!-- One-paragraph description of the proposal. -->
-A common pattern in repositories is to have every project in the tree reference packages that are used for development purposes only.  This includes
+A common pattern in repositories is to have every project in the tree reference packages that are used for build purposes only.  This includes
 packages that provide assembly versioning, signing, code analysis, etc.  We want to provide a built-in mechanism for users to define packages that
-are used by every project but only for development purposes.
+are used by every project but only for build purposes.
 
 ## Motivation 
 <!-- Why are we doing this? What pain points does this solve? What is the expected outcome? -->
-Users can manually reference the package in a common import like Directory.Build.props but there is no built-in safe guards to ensure that they don't
-accidentally consume more assets than just development assets.  For example, you don't want to have a package's compile-time assets be referenced by
+Users can manually reference the package in a common import like `Directory.Build.props` but there is no built-in safe guards to ensure that they don't
+accidentally consume more assets than just build-related assets.  For example, you don't want to have a package's compile-time assets be referenced by
 every assembly in your repository.  Instead, individual projects should express their build time dependencies and project references should receive
 them transitively.  But you should not need to add a package reference in order to have your whole tree use code analysis or assembly versioning.
 
@@ -24,7 +24,7 @@ them transitively.  But you should not need to add a package reference in order 
 <!-- Explain the proposal as if it were already implemented and you're teaching it to another person. -->
 <!-- Introduce new concepts, functional designs with real life examples, and low-fidelity mockups or  pseudocode to show how this proposal would look. -->
 We'll introduce a new MSBuild item group named `<GlobalPackageReference />` which will define packages that every project should reference but has
-default metadata to ensure that only package assets related to development purposes are used.
+default metadata to ensure that only package assets related to build purposes are used.
 
 **NOTE:** This functionality will only be enabled if a user has opt-ed into [Central Package Management (CPM)](https://docs.microsoft.com/nuget/consume-packages/central-package-management).
 
@@ -44,7 +44,7 @@ default metadata to ensure that only package assets related to development purpo
 * PrivateAssets = `All`
 
 This ensures that when these repository-wide packages are consumed, they don't flow to downstream dependencies and only include assets related to
-development.
+build.
 
 This will be achieved using an MSBuild [ItemDefinitionGroup](https://docs.microsoft.com/en-us/visualstudio/msbuild/item-definitions):
 ```xml
@@ -57,7 +57,7 @@ This will be achieved using an MSBuild [ItemDefinitionGroup](https://docs.micros
         is not recommended.  You should only have "global" references to packages that are used for
         build.
       -->
-      <IncludeAssets Condition="'$(RestoreEnableGlobalPackageReferenceDevelopmentDependencyOnly)' != 'false'">Analyzers;Build;BuildMultitargeting;BuildTransitive</IncludeAssets>
+      <IncludeAssets Condition="'$(RestoreEnableGlobalPackageReferenceIncludeAssetsBuildAnalyzers)' != 'false'">Analyzers;Build;BuildMultitargeting;BuildTransitive</IncludeAssets>
       <!--
         Default global package references to have all assets private.  This is because global package
         references are generally stuff like versioning, signing, etc and should not flow to downstream
@@ -75,7 +75,7 @@ The following MSBuild properties can be set to change the functionality:
 |---|---|---|
 | `ManagePackageVersionsCentrally` | Enables or disables central package management and all dependent features | `false` |
 | `RestoreEnableGlobalPackageReference` | Enables or disables just the concept of `GlobalPackageReference` | `true` |
-| `RestoreEnableGlobalPackageReferenceDevelopmentDependencyOnly` | Enables or disables defaulting the `IncludeAssets` metadata for global package references | `true` |
+| `RestoreEnableGlobalPackageReferenceIncludeAssetsBuildAnalyzers` | Enables or disables defaulting the `IncludeAssets` metadata for global package references | `true` |
 | `RestoreEnableGlobalPackageReferencePrivateAssetsAll` | Enables or disables defaulting the `PrivateAssets` metadata for global package references | `true`|
 
 `GlobalPackageReference` items will then be copied to the `PackageReference` item group along with their metadata:
