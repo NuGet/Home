@@ -106,7 +106,7 @@ The NuGet restore operation downloads other packages during dependency resolutio
 
 We could have considered a minor tweak to the existing experience of “dotnet list package --include-transitive” to provide the user with a sense of a package's dependencies. This could have been a new column next to “Resolved” called “Transitively Referenced” that had a list of the top-level packages that requested the dependency. The corresponding tracking issue can be found here: https://github.com/NuGet/Home/issues/11625. Unfortunately, this solution doesn't provide an easy way to identify the dependency graph `(starting from project -> top-level package -> transitive-dependency (1) -> ..-> transitive dependency (n))` for a particular package.
 
-![](../../meta/resources/TransitiveDependencies/TransitiveDotNetCLI.png)
+![](../../meta/resources/TransitiveDependencies/DotNetCLI.png)
 
 ## Prior Art
 
