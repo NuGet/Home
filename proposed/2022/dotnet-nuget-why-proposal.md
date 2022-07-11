@@ -15,7 +15,7 @@ However, in comparison to Visual Studio, the dotnet CLI does not provide insight
 
 ## Motivation
 
-A developer should be able to understand where every package in a solution/project originated from. This can help them understand complex dependency chains they may have within their projects. Having this understanding can help a developer promote a transitive dependency quickly & easily to a top-level dependency in case there is a security concern or conflict. The `dotnet nuget why` command aims to help developers understand package dependency chains.
+A developer should be able to understand where every package in a solution/project originated from. This can help them understand complex dependency chains they may have within their projects. Having this understanding can help a developer promote a transitive dependency quickly & easily to a top-level dependency in case there is a security concern or conflict.
 
 ## Explanation
 
