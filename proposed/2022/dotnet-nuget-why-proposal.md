@@ -98,11 +98,9 @@ Project 'projectNameB' has the following dependency graph for 'packageA'
       Microsoft.ML (1.1.0) -> Microsoft.ML.Util (1.1.0) -> packageA (1.1.0)
 ```
 
-## Drawbacks 
+## Limitations 
 
-The contents of the `project.assets.json` will be helpful in understanding the dependency graph of a given package but there are a few limitations:
-
--  There may be some packages in the file that are not part of the final graph because the NuGet restore operation downloads other packages during dependency resolution. The absence of a package id and version in the `project.assets.json` file indicates that a package was downloaded during dependency resolution but is not part of the final dependency graph.
+The NuGet restore operation downloads other packages during dependency resolution which are not part of the final dependency graph that the `dotnet nuget why` command prints out. The absence of a package id and version in the `project.assets.json` file indicates that a package was downloaded during dependency resolution but is not part of the final dependency graph.
 
 ## Rationale and Alternatives
 
@@ -112,15 +110,17 @@ We could have considered a minor tweak to the existing experience of “dotnet l
 
 ## Prior Art
 
-Within Visual Studio, there will be a new panel within the Visual Studio Package Manager UI named “Transitive Packages” in which all transitive packages will be displayed to the user. For the sake of not confusing the user, there will be an additional header titled “Top-level Packages”.
+Within Visual Studio, there is a new panel in the Package Manager UI called “Transitive Packages” in which all transitive packages are displayed to the user. There is also an additional header titled “Top-level Packages”.
 
-When a user highlights a transitive package, they will see a pop-up that displays how the transitive dependency originated & what top-level package(s) are bringing it in.
+When a user highlights a transitive package, they will see a pop-up that displays what top-level package(s) are bringing it in.
 
 ![](../../meta/resources/TransitiveDependencies/TransitiveVSPMUI.png)
 
+However, this still does not provide the user with enough detail about how transitive packages originate, therefore we propose the `dotnet nuget why` command.
+
 ## Additional improvements
 
-Add a [--version <VERSION>] option to the command if the user wants to print dependency graphs for a specific version of the package. See NuGet package versioning for more information.
+Add a [--version <VERSION>] option to the command if the user wants to print dependency graphs for a specific version of the package. NuGet currently `flattens`, so it only allows one version of a package per framework to be resolved. See NuGet package versioning for more information.
 
 Allow the customer to look up transitive dependencies of more than one package. For example: `dotnet nuget why [<PROJECT>|<SOLUTION>] packages package1, package2` or `dotnet nuget why [<PROJECT>|<SOLUTION>] package 'nuget.*'`.
 
@@ -128,7 +128,7 @@ Allow the customer to transitive dependencies of more than one framework. For ex
 
 Create a better visualization of the dependency graph that is printed by the `dotnet nuget why` command by displaying a tree rather than just printing out a list of dependencies. 
 
-Packages acquired through `PackageDownload` are recorded in the `project.assets.json` file under project -> frameworks -> {frameworkName} -> downloadDependencies. However, since they are recorded under `downloadDependcies` rather than `dependencies` they are not included in the current output of the `dotnet nuget why` command. In the future packages acquired through `PackageDownload` can be included in the output of the `dotnet nuget why` command.
+Packages acquired through `PackageDownload` are recorded in the `project.assets.json` file under `project -> frameworks -> {frameworkName} -> downloadDependencies`. However, since they are recorded under `downloadDependcies` rather than `dependencies` they are not included in the current output of the `dotnet nuget why` command. In the future packages acquired through `PackageDownload` can be included in the output of the `dotnet nuget why` command.
 
 ## Appendix
 
