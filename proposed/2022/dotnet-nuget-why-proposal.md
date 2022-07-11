@@ -103,7 +103,6 @@ Project 'projectNameB' has the following dependency graph for 'packageA'
 The contents of the `project.assets.json` will be helpful in understanding the dependency graph of a given package but there are a few limitations:
 
 -  There may be some packages in the file that are not part of the final graph because the NuGet restore operation downloads other packages during dependency resolution. The absence of a package id and version in the `project.assets.json` file indicates that a package was downloaded during dependency resolution but is not part of the final dependency graph.
-- Packages acquired through `PackageDownload` are not tied to the project in any way beyond acquisition. These packages are not recorded in the final graph that `project.assets.json` maintains, however they are recorded under project -> frameworks -> {frameworkName} -> downloadDependencies.
 
 ## Rationale and Alternatives
 
@@ -128,6 +127,8 @@ Allow the customer to look up transitive dependencies of more than one package. 
 Allow the customer to transitive dependencies of more than one framework. For example: `--framework net6.0 --framework netstandard2.0`.
 
 Create a better visualization of the dependency graph that is printed by the `dotnet nuget why` command by displaying a tree rather than just printing out a list of dependencies. 
+
+Packages acquired through `PackageDownload` are recorded in the `project.assets.json` file under project -> frameworks -> {frameworkName} -> downloadDependencies. However, since they are recorded under `downloadDependcies` rather than `dependencies` they are not included in the current output of the `dotnet nuget why` command. In the future packages acquired through `PackageDownload` can be included in the output of the `dotnet nuget why` command.
 
 ## Appendix
 
