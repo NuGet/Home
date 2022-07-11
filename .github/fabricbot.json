@@ -821,7 +821,7 @@
             }
           }
         ],
-        "taskName": "[Managed stale WaitingForCustomer] Search for WaitingForCustomer issues with no activity over 14 days and warn.",
+        "taskName": "[Manage stale WaitingForCustomer issues] Search for WaitingForCustomer issues with no activity over 14 days and warn.",
         "actions": [
           {
             "name": "addLabel",
@@ -833,6 +833,151 @@
             "name": "addReply",
             "parameters": {
               "comment": "This issue has been automatically marked as stale because we have not received a response in 14 days. It will be closed if no further activity occurs within another 14 days of this comment."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "taskType": "scheduled",
+      "capabilityId": "ScheduledSearch",
+      "subCapability": "ScheduledSearch",
+      "version": "1.0",
+      "config": {
+        "frequency": [
+          {
+            "weekDay": 0,
+            "hours": [
+              0,
+              3,
+              6,
+              9,
+              12,
+              15,
+              18,
+              21
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 1,
+            "hours": [
+              0,
+              3,
+              6,
+              9,
+              12,
+              15,
+              18,
+              21
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 2,
+            "hours": [
+              0,
+              3,
+              6,
+              9,
+              12,
+              15,
+              18,
+              21
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 3,
+            "hours": [
+              0,
+              3,
+              6,
+              9,
+              12,
+              15,
+              18,
+              21
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 4,
+            "hours": [
+              0,
+              3,
+              6,
+              9,
+              12,
+              15,
+              18,
+              21
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 5,
+            "hours": [
+              0,
+              3,
+              6,
+              9,
+              12,
+              15,
+              18,
+              21
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 6,
+            "hours": [
+              0,
+              3,
+              6,
+              9,
+              12,
+              15,
+              18,
+              21
+            ],
+            "timezoneOffset": -7
+          }
+        ],
+        "searchTerms": [
+          {
+            "name": "hasLabel",
+            "parameters": {
+              "label": "Status:No recent activity"
+            }
+          },
+          {
+            "noActivitySince": "14",
+            "parameters": {
+              "days": 14
+            }
+          },
+          {
+            "name": "isIssue",
+            "parameters": {}
+          },
+          {
+            "name": "isOpen",
+            "parameters": {}
+          }
+        ],
+        "taskName": "[Close stale WaitingForCustomer issues] Search for stale WaitingForCustomer issues with no activity over 14 days and warn.",
+        "actions": [
+          {
+            "name": "removeLabel",
+            "parameters": {
+              "label": "Status:No recent activity"
+            }
+          },
+          {
+            "name": "addLabel",
+            "parameters": {
+              "label": "Resolution:NeedMoreInfo"
             }
           }
         ]
