@@ -130,7 +130,7 @@
         "eventNames": [
           "issue_comment"
         ],
-        "taskName": "[Manage \"WaitingFor\" labels] [4-2] Replace tag \"WaitingForCustomer\" with \"WaitingForClientTeam\" when the author comments on an issue. Also remove `Status: No Recent Activity` if it's been set.",
+        "taskName": "[Manage \"WaitingFor\" labels] [4-2] Replace tag \"WaitingForCustomer\" with \"WaitingForClientTeam\" when the author comments on an issue. Also remove `Status:No recent activity` if it's been set.",
         "actions": [
           {
             "name": "removeLabel",
