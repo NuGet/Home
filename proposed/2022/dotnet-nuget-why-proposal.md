@@ -41,7 +41,7 @@ The project or solution file to operate on. If not specified, the command search
 
 - PACKAGE_NAME
 
-The package for whom the dependency graph has to be identified. Package name wildcards are not supported.
+The exact package name/id for which the dependency graph has to be identified. Package name wildcards are not supported.
 
 #### Options
 
@@ -98,10 +98,6 @@ Project 'projectNameB' has the following dependency graph for 'packageA'
       Microsoft.ML (1.1.0) -> Microsoft.ML.Util (1.1.0) -> packageA (1.1.0)
 ```
 
-## Limitations 
-
-The NuGet restore operation downloads other packages during dependency resolution which are not part of the final dependency graph that the `dotnet nuget why` command prints out. The absence of a package id and version in the `project.assets.json` file indicates that a package was downloaded during dependency resolution but is not part of the final dependency graph.
-
 ## Rationale and Alternatives
 
 We could have considered a minor tweak to the existing experience of “dotnet list package --include-transitive” to provide the user with a sense of a package's dependencies. This could have been a new column next to “Resolved” called “Transitively Referenced” that had a list of the top-level packages that requested the dependency. The corresponding tracking issue can be found here: https://github.com/NuGet/Home/issues/11625. Unfortunately, this solution doesn't provide an easy way to identify the dependency graph `(starting from project -> top-level package -> transitive-dependency (1) -> ..-> transitive dependency (n))` for a particular package.
@@ -129,6 +125,8 @@ Allow the customer to transitive dependencies of more than one framework. For ex
 Create a better visualization of the dependency graph that is printed by the `dotnet nuget why` command by displaying a tree rather than just printing out a list of dependencies. 
 
 Packages acquired through `PackageDownload` are recorded in the `project.assets.json` file under `project -> frameworks -> {frameworkName} -> downloadDependencies`. However, since they are recorded under `downloadDependcies` rather than `dependencies` they are not included in the current output of the `dotnet nuget why` command. In the future packages acquired through `PackageDownload` can be included in the output of the `dotnet nuget why` command.
+
+The NuGet restore operation downloads other packages during dependency resolution which are not part of the final dependency graph that the `dotnet nuget why` command prints out. The absence of a package id and version in the `project.assets.json` file indicates that a package was downloaded during dependency resolution but is not part of the final dependency graph. In the future these other packages can also be included in the dependency graph that the `dotnet nuget why` command prints out.
 
 ## Appendix
 
