@@ -40,7 +40,7 @@ default metadata to ensure that only package assets related to build purposes ar
 <!-- Explain the proposal in sufficient detail with implementation details, interaction models, and clarification of corner cases. -->
 `<GlobalPackageReference />` will just be syntactical sugar for a `<PackageReference />` with the following metadata:
 
-* IncludeAssets = `Analyzers;Build;BuildMultitargeting;BuildTransitive`
+* IncludeAssets = `Runtime; Build; Native; ContentFiles; Analyzers`
 * PrivateAssets = `All`
 
 This ensures that when these repository-wide packages are consumed, they don't flow to downstream dependencies and only include assets related to
@@ -51,13 +51,13 @@ This will be achieved using an MSBuild [ItemDefinitionGroup](https://docs.micros
   <ItemDefinitionGroup Condition="'$(ManagePackageVersionsCentrally)' == 'true' And '$(RestoreEnableGlobalPackageReference)' != 'false'">
     <GlobalPackageReference>
       <!--
-        Default global package references to only consume the Analyzers and Build logic in a package.
-        This helps ensure that the package assets are not passed to the compiler or copied to the
-        output directory.  Having a compile-time reference to a package for all projects in a tree
-        is not recommended.  You should only have "global" references to packages that are used for
-        build.
+        Default global package references to only consume the Analyzers and Build logic in a package,
+        which is the same for development dependencies.  This helps ensure that the package assets
+        are not passed to the compiler or copied to the output directory.  Having a compile-time
+        reference to a package for all projects in a tree is not recommended.  You should only have
+       "global" references to packages that are used for build.
       -->
-      <IncludeAssets Condition="'$(RestoreEnableGlobalPackageReferenceIncludeAssetsBuildAnalyzers)' != 'false'">Analyzers;Build;BuildMultitargeting;BuildTransitive</IncludeAssets>
+      <IncludeAssets Condition="'$(RestoreEnableGlobalPackageReferenceIncludeAssetsBuildAnalyzers)' != 'false'">runtime;build;native;contentfiles;analyzers</IncludeAssets>
       <!--
         Default global package references to have all assets private.  This is because global package
         references are generally stuff like versioning, signing, etc and should not flow to downstream
