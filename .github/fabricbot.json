@@ -697,98 +697,49 @@
           {
             "weekDay": 0,
             "hours": [
-              0,
-              3,
-              6,
-              9,
-              12,
-              15,
-              18,
-              21
+              6
             ],
             "timezoneOffset": -7
           },
           {
             "weekDay": 1,
             "hours": [
-              0,
-              3,
-              6,
-              9,
-              12,
-              15,
-              18,
-              21
+              6
             ],
             "timezoneOffset": -7
           },
           {
             "weekDay": 2,
             "hours": [
-              0,
-              3,
-              6,
-              9,
-              12,
-              15,
-              18,
-              21
+              6
             ],
             "timezoneOffset": -7
           },
           {
             "weekDay": 3,
             "hours": [
-              0,
-              3,
-              6,
-              9,
-              12,
-              15,
-              18,
-              21
+              6
             ],
             "timezoneOffset": -7
           },
           {
             "weekDay": 4,
             "hours": [
-              0,
-              3,
-              6,
-              9,
-              12,
-              15,
-              18,
-              21
+              6
             ],
             "timezoneOffset": -7
           },
           {
             "weekDay": 5,
             "hours": [
-              0,
-              3,
-              6,
-              9,
-              12,
-              15,
-              18,
-              21
+              6
             ],
             "timezoneOffset": -7
           },
           {
             "weekDay": 6,
             "hours": [
-              0,
-              3,
-              6,
-              9,
-              12,
-              15,
-              18,
-              21
+              6
             ],
             "timezoneOffset": -7
           }
@@ -848,98 +799,49 @@
           {
             "weekDay": 0,
             "hours": [
-              0,
-              3,
-              6,
-              9,
-              12,
-              15,
-              18,
-              21
+              6
             ],
             "timezoneOffset": -7
           },
           {
             "weekDay": 1,
             "hours": [
-              0,
-              3,
-              6,
-              9,
-              12,
-              15,
-              18,
-              21
+              6
             ],
             "timezoneOffset": -7
           },
           {
             "weekDay": 2,
             "hours": [
-              0,
-              3,
-              6,
-              9,
-              12,
-              15,
-              18,
-              21
+              6
             ],
             "timezoneOffset": -7
           },
           {
             "weekDay": 3,
             "hours": [
-              0,
-              3,
-              6,
-              9,
-              12,
-              15,
-              18,
-              21
+              6
             ],
             "timezoneOffset": -7
           },
           {
             "weekDay": 4,
             "hours": [
-              0,
-              3,
-              6,
-              9,
-              12,
-              15,
-              18,
-              21
+              6
             ],
             "timezoneOffset": -7
           },
           {
             "weekDay": 5,
             "hours": [
-              0,
-              3,
-              6,
-              9,
-              12,
-              15,
-              18,
-              21
+              6
             ],
             "timezoneOffset": -7
           },
           {
             "weekDay": 6,
             "hours": [
-              0,
-              3,
-              6,
-              9,
-              12,
-              15,
-              18,
-              21
+              6
             ],
             "timezoneOffset": -7
           }
