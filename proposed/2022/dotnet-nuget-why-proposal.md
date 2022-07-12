@@ -83,6 +83,9 @@ Sample `project.assets.json` file:
           ...
       },
   },
+  "libraries": {
+    ...
+  },
   "projectFileDependencyGroups": {
     "net6.0": [
       "Microsoft.ML >= 1.7.1",
