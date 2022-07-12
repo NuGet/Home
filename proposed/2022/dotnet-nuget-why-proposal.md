@@ -23,6 +23,88 @@ A developer should be able to understand where every package in a solution/proje
 
 The NuGet restore operation generates a `project.assets.json` file under the `obj` folder for `PackageReference` style project. This file maintains a project's dependency graph. Therefore, this file can be used in order to produce a dependency graph when the `dotnet nuget why` command is called. 
 
+Sample `project.assets.json` file:
+
+```
+{
+  "version": 3,
+  "targets": {
+    "net6.0": {
+      "Microsoft.CSharp/4.3.0": {
+        "type": "package",
+        "dependencies": {
+          "System.Collections": "4.3.0",
+          "System.Diagnostics.Debug": "4.3.0",
+          "System.Dynamic.Runtime": "4.3.0",
+          "System.Globalization": "4.3.0",
+          "System.Linq": "4.3.0",
+          "System.Linq.Expressions": "4.3.0",
+          "System.ObjectModel": "4.3.0",
+          "System.Reflection": "4.3.0",
+          "System.Reflection.Extensions": "4.3.0",
+          "System.Reflection.Primitives": "4.3.0",
+          "System.Reflection.TypeExtensions": "4.3.0",
+          "System.Resources.ResourceManager": "4.3.0",
+          "System.Runtime": "4.3.0",
+          "System.Runtime.Extensions": "4.3.0",
+          "System.Runtime.InteropServices": "4.3.0",
+          "System.Threading": "4.3.0"
+        },
+        "compile": {
+          ...
+          }
+        },
+        "runtime": {
+          ...
+        }
+      },
+      "Microsoft.ML/1.7.1": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.ML.CpuMath": "1.7.1",
+          "Microsoft.ML.DataView": "1.7.1",
+          "Newtonsoft.Json": "10.0.3",
+          "System.CodeDom": "4.4.0",
+          "System.Collections.Immutable": "1.5.0",
+          "System.Memory": "4.5.3",
+          "System.Reflection.Emit.Lightweight": "4.3.0",
+          "System.Threading.Channels": "4.7.1"
+        },
+        "compile": {
+          ...
+        },
+        "runtime": {
+          ...
+        },
+        "build": {
+          ...
+        },
+        "runtimeTargets": {
+          ...
+      },
+  },
+  "projectFileDependencyGroups": {
+    "net6.0": [
+      "Microsoft.ML >= 1.7.1",
+      "Microsoft.ML.SampleUtils >= 0.19.1"
+    ]
+  },
+  "packageFolders": {
+    ...
+  },
+  "project": {
+    "version": "1.0.0",
+    "restore": {
+      ...
+    },
+    "frameworks": {
+      ...
+    }
+  }
+}
+
+```
+
 ### Technical Explanation
 
 The `dotnet nuget why` command will print out the dependency graph of a given package only if it is part of the final graph.
