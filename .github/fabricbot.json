@@ -752,7 +752,7 @@
             }
           },
           {
-            "noActivitySince": "14",
+            "name": "noActivitySince",
             "parameters": {
               "days": 14
             }
@@ -854,7 +854,7 @@
             }
           },
           {
-            "noActivitySince": "14",
+            "name": "noActivitySince",
             "parameters": {
               "days": 14
             }
