@@ -130,7 +130,7 @@
         "eventNames": [
           "issue_comment"
         ],
-        "taskName": "[Manage \"WaitingFor\" labels] [4-2] Replace tag \"WaitingForCustomer\" with \"WaitingForClientTeam\" when the author comments on an issue. Also remove `Status: No Recent Activity` if it's been set.",
+        "taskName": "[Manage \"WaitingFor\" labels] [4-2] Replace tag \"WaitingForCustomer\" with \"WaitingForClientTeam\" when the author comments on an issue. Also remove `Status:No recent activity` if it's been set.",
         "actions": [
           {
             "name": "removeLabel",
@@ -683,6 +683,208 @@
           {
             "name": "closeIssue",
             "parameters": {}
+          }
+        ]
+      }
+    },
+    {
+      "taskType": "scheduled",
+      "capabilityId": "ScheduledSearch",
+      "subCapability": "ScheduledSearch",
+      "version": "1.0",
+      "config": {
+        "frequency": [
+          {
+            "weekDay": 0,
+            "hours": [
+              6
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 1,
+            "hours": [
+              6
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 2,
+            "hours": [
+              6
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 3,
+            "hours": [
+              6
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 4,
+            "hours": [
+              6
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 5,
+            "hours": [
+              6
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 6,
+            "hours": [
+              6
+            ],
+            "timezoneOffset": -7
+          }
+        ],
+        "searchTerms": [
+          {
+            "name": "hasLabel",
+            "parameters": {
+              "label": "WaitingForCustomer"
+            }
+          },
+          {
+            "name": "noActivitySince",
+            "parameters": {
+              "days": 14
+            }
+          },
+          {
+            "name": "isIssue",
+            "parameters": {}
+          },
+          {
+            "name": "isOpen",
+            "parameters": {}
+          },
+          {
+            "name": "noLabel",
+            "parameters": {
+              "label": "Status:No recent activity"
+            }
+          }
+        ],
+        "taskName": "[Manage stale WaitingForCustomer issues] Search for WaitingForCustomer issues with no activity over 14 days and warn.",
+        "actions": [
+          {
+            "name": "addLabel",
+            "parameters": {
+              "label": "Status:No recent activity"
+            }
+          },
+          {
+            "name": "addReply",
+            "parameters": {
+              "comment": "This issue has been automatically marked as stale because we have not received a response in 14 days. It will be closed if no further activity occurs within another 14 days of this comment."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "taskType": "scheduled",
+      "capabilityId": "ScheduledSearch",
+      "subCapability": "ScheduledSearch",
+      "version": "1.0",
+      "config": {
+        "frequency": [
+          {
+            "weekDay": 0,
+            "hours": [
+              6
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 1,
+            "hours": [
+              6
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 2,
+            "hours": [
+              6
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 3,
+            "hours": [
+              6
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 4,
+            "hours": [
+              6
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 5,
+            "hours": [
+              6
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 6,
+            "hours": [
+              6
+            ],
+            "timezoneOffset": -7
+          }
+        ],
+        "searchTerms": [
+          {
+            "name": "hasLabel",
+            "parameters": {
+              "label": "Status:No recent activity"
+            }
+          },
+          {
+            "name": "noActivitySince",
+            "parameters": {
+              "days": 14
+            }
+          },
+          {
+            "name": "isIssue",
+            "parameters": {}
+          },
+          {
+            "name": "isOpen",
+            "parameters": {}
+          }
+        ],
+        "taskName": "[Close stale WaitingForCustomer issues] Search for stale WaitingForCustomer issues with no activity over 14 days and warn.",
+        "actions": [
+          {
+            "name": "closeIssue",
+            "parameters": {}
+          },
+          {
+            "name": "removeLabel",
+            "parameters": {
+              "label": "Status:No recent activity"
+            }
+          },
+          {
+            "name": "addLabel",
+            "parameters": {
+              "label": "Resolution:NeedMoreInfo"
+            }
           }
         ]
       }
