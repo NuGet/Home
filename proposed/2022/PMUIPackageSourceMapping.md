@@ -1,11 +1,11 @@
-# PMUI 
+# Package Source Mapping in PMUI 
 * Start Date: 6/25/22
 * Authors: Ella McNally
 * Issue: https://github.com/NuGet/Home/issues/11797
 
 ## Summary
 
-Currently there is no support for package source mapping in the PMUI. I will add a feature that allows the user to choose if they want to map the package to the source chosen when they install. I will also add error messages that tells the user if restore has problems with the mapping. This feature is a portion of what was discussed in a previous spec. https://github.com/NuGet/Home/blob/dev/implemented/2021/PackageSourceMapping.md
+Currently there is no support for package source mapping in the PMUI. I will add a feature that allows the user to choose if they want to map the package to the source chosen when they install. This feature is a portion of what was discussed in a previous spec. https://github.com/NuGet/Home/blob/dev/implemented/2021/PackageSourceMapping.md
 
 ## Motivation
 
@@ -15,7 +15,7 @@ Adding support for package source mapping in PMUI will allow user to make/view p
 
 ### Functional Explanation
 
-The user will be able to choose whether or not they want to make a mapping to the source in the package source combobox in the details pane. There will be a new checkbox below the package version dropdown which the user can check if they want to map the package they are installing to the source they've selected above. The checkbox will be grayed out and will not allow the user to make a mapping if `All` sources are selected from the dropdown. It would not make sense for a user to make a mapping from one package to all sources. The added checkbox will make the details pane look like:
+On the details pane there will be two `RadioButtons` that allow the user to choose if they want to add a mapping to the package from the selected source when they `Install`/`Update` or if they only want to use existing mappings. These `RadioButtons` will always be shown even if package source mapping is not enabled, but neither button will have to be selected to install. Package source mapping can be enabled by the user choosing the `RadioButton` that adds a new mapping. Once package source mapping is enabled, the user must select one of the two `RadioButtons` to install. The `Use only existing mappings` option will be selected by default once package source mapping is enabled. The existing mappings will not be shown, but there will be a link to the package source mapping options page so the user can view the mappings. The link will be a settings icon next to the `RadioButton` (similar to the settings button next to the sources dropdown in the top right of the PMUI). The details pane will look like:
 
 <!--![image 1](PMUI_Mockup_1.jpg)-->
  
@@ -23,26 +23,18 @@ The existing preview dialog that shows when the user hits `Install` or `Update` 
 
 <!--![image 2](PMUI_Mockup_2.jpg)-->
 
-When the user installs a package with the new checkbox, one of 6 scenarios will happen. These 6 scenarios are in the table below:
+When the user installs a package with the new checkbox, one of 9 scenarios will happen. These scenarios are in the table below:
 
 | |Package Source Mapping is not enabled | Package Source Mapping is enabled and the package has previous mappings | Package Source Mapping is enabled and the package does not have previous mappings |
 |---|---|---|---|
-|Checked | Package source mapping is enabled. New mapping is created. Package is now mapped to only the new source| New mapping is created. Package is now mapped to the new source in addition to previous mappings | New mapping is created. Package is now mapped to only the new source.|
-|Not Checked | Package source mapping is not enabled. Restore works as normal| No new mappings are made. Package only has previous mappings| |
+|`Add additional mapping to source` | Package source mapping is enabled. New mapping is created. Package is now mapped to only the new source| New mapping is created. Package is now mapped to the new source in addition to previous mappings | New mapping is created. Package is now mapped to only the new source.|
+|`Use only existing mappings` | Not possible since this button will be greyed out (since there are no existing mappings)| No new mappings are made. Package only has previous mappings| Not possible since this button will be greyed out (since there are no existing mappings). User must select `Add additional mapping to source` to install. |
+|Neither is checked| Package Source Mapping is not enabled. Restore works as normal | Not possible since `Use only existing mappings` will be chosen by default once package source mapping is enabled| Not possible since `Use only existing mappings` will be chosen by default once package source mapping is enabled (unless there are no existing mappings in which case the user must select the other option to `Install`)|
 
-#### Error Messages
+#### Restore Errors
 
-There are a few errors the user could make while trying to install or update a package with a mapping that would make restore fail. I will address those errors with a popup telling the user what did not work. First, there could be issues with the transitive packages. Maybe there are transitive packages that are already mapped to a different source or the source that the user is trying to map a package to does not support some of the transitive packages. In either case, a popup would appear telling the user that the package source mapping could not be made. The popup would have a grid with a column showing the top level package and all of the transitive packages, a column showing if each package already has a mapping (if so what source it is mapped to previously), and whether the source supports the package. This error message will look like:
+There are a few errors the user could make while trying to install or update a package with a mapping that would make `Restore` fail. First, there could be issues with the transitive packages. Maybe there are transitive packages that are already mapped to a different source or the source that the user is trying to map a package to does not support some of the transitive packages. Additionally, if the user tries to update a package if that package has an existing mapping, then the mapping could be to a different source than the one chosen from the package source dropdown when `Update` is clicked. The user could also try to update a package that is already mapped to a different source (like the last scenario), but the source it is mapped to does not support the version they are trying to update to. I will not add anything to the PMUI addressing these errors. Instead, `Restore` will fail, and the PMUI will look just as it did before the user tried to install the package. The user can see why `Restore` failed in the output window. 
 
-<!--![image 3](PMUI_Mockup_3.jpg)-->
-
-Two more scenarios could arise when a user tries to update a package if that package has an exisiting mapping. First, the mapping could be to a different source than the one chose from the package source dropdown when `Update` is clicked. In this case, the user would get a popup error message telling them that it cannot update because the package already has a mapping to a different source and ask if the user would like to update using the other source instead. The user could click `OK` to update using the other source or `Cancel`. 
-
-<!--![image 4](PMUI_Mockup_4.jpg)-->
-
-The second scenario would be if the user tries to update a package that is already mapped to a different source (like the first scenario), but the source it is mapped to does not support the version they are trying to update to. In this case, the same popup error message would tell the user that the package is mapped to a different source, and that source does not support the version they are trying to install. The user would not be able to click `OK` in this case because restore would not be able to make this update.
-
-<!--![image 5](PMUI_Mockup_5.jpg)-->
 
 ### Technical Explanation
 
@@ -72,7 +64,7 @@ In this example, the user had `nuget.org` selected from the source dropdown. The
 
 On the previous spec, there was a pin icon next to the sources dropdown to pin a source instead of a checkbox in the details pane. I thought the pin was confusing since there was nothing to explain what it did. Also the same pin icon is used to different actions already in VS like to pin a file at the top of the screen. It would be confusing to have the same button do different tasks in different parts of VS.
 
-Here is the the mockup for the pin icon:
+Here is the mockup for the pin icon:
 
 ![Options 3](../../meta/resources/PackageSourceMapping/VS.png)
 
@@ -80,10 +72,9 @@ Here is the the mockup for the pin icon:
 
 ## Unresolved Questions
 
+Should there be an explicit way to enable or disable package source mapping in the UI? e.g. a `Checkbox` above the `RadioButtons` that says "enable/disable package source mapping?". Currently, package source mapping will be enabled when the user makes the first mapping and disabled when all mappings are removed. 
+
 ## Future Possibilities 
 
-<!--would it be an error if the user unchecks the box? What if it disables psm?-->
-<!--can the mappings be overwritten?-->
-<!--When a user selects a package they have already installed, they will see mappings they have previously made in the details pane under version.-->
-<!--Will the preview be able to be turned off or will it always show if there is a conflict? or preview is permanent if package source mapping is enabled? -->
+Currently there will not be any error messages in the UI if restore fails while trying to `Install`/`Update`. If there is time later, some error messages could be added saying which packages (including transitives) failed to install and why (maybe they have previous mappings to a different source or the source being mapped to does not support the version, etc...).
 
