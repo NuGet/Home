@@ -17,11 +17,11 @@ Adding support for package source mapping in PMUI will allow user to make/view p
 
 On the details pane there will be two `RadioButtons` that allow the user to choose if they want to add a mapping to the package from the selected source when they `Install`/`Update` or if they only want to use existing mappings. These `RadioButtons` will always be shown even if package source mapping is not enabled, but neither button will have to be selected to install. Package source mapping can be enabled by the user choosing the `RadioButton` that adds a new mapping. Once package source mapping is enabled, the user must select one of the two `RadioButtons` to install. The `Use only existing mappings` option will be selected by default once package source mapping is enabled. The existing mappings will not be shown, but there will be a link to the package source mapping options page so the user can view the mappings. The link will be a settings icon next to the `RadioButton` (similar to the settings button next to the sources dropdown in the top right of the PMUI). The details pane will look like:
 
-<!--![image 1](PMUI_Mockup_1.jpg)-->
+![PMUI 1](../../meta/resources/PackageSourceMapping/PMUI_details.png)
  
 The existing preview dialog that shows when the user hits `Install` or `Update` will be modified to list the mapping they just made under the version. The user already has the option to disable this preview dialog, so if they choose to disable it, there will be nothing telling them what mappings they made. The changes to the preview window will look like:
 
-<!--![image 2](PMUI_Mockup_2.jpg)-->
+![PMUI 2](../../meta/resources/PackageSourceMapping/PMUI_preview.png)
 
 When the user installs a package with the new checkbox, one of 9 scenarios will happen. These scenarios are in the table below:
 
@@ -30,6 +30,8 @@ When the user installs a package with the new checkbox, one of 9 scenarios will 
 |`Add additional mapping to source` | Package source mapping is enabled. New mapping is created. Package is now mapped to only the new source| New mapping is created. Package is now mapped to the new source in addition to previous mappings | New mapping is created. Package is now mapped to only the new source.|
 |`Use only existing mappings` | Not possible since this button will be greyed out (since there are no existing mappings)| No new mappings are made. Package only has previous mappings| Not possible since this button will be greyed out (since there are no existing mappings). User must select `Add additional mapping to source` to install. |
 |Neither is checked| Package Source Mapping is not enabled. Restore works as normal | Not possible since `Use only existing mappings` will be chosen by default once package source mapping is enabled| Not possible since `Use only existing mappings` will be chosen by default once package source mapping is enabled (unless there are no existing mappings in which case the user must select the other option to `Install`)|
+
+<!--show label saying there are no existing mappings if use existing mappins is greyed out-->
 
 #### Restore Errors
 
