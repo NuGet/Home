@@ -15,7 +15,7 @@ Adding support for package source mapping in PMUI will allow user to make/view p
 
 ### Functional Explanation
 
-On the details pane there will be two `RadioButtons` that allow the user to choose if they want to add a mapping to the package from the selected source when they `Install`/`Update` or if they only want to use existing mappings. These `RadioButtons` will always be shown even if package source mapping is not enabled, but neither button will have to be selected to install. Package source mapping can be enabled by the user choosing the `RadioButton` that adds a new mapping. Once package source mapping is enabled, the user must select one of the two `RadioButtons` to install. The `Use only existing mappings` option will be selected by default once package source mapping is enabled. The existing mappings will not be shown, but there will be a link to the package source mapping options page so the user can view the mappings. The link will be a settings icon next to the `RadioButton` (similar to the settings button next to the sources dropdown in the top right of the PMUI). The details pane will look like:
+On the details pane there will be two `RadioButtons` that allow the user to choose if they want to add a mapping to the package from the selected source when they `Install`/`Update` or if they only want to use existing mappings. These `RadioButtons` will always be shown even if package source mapping is not enabled, but neither button will have to be selected to install. Package source mapping can be enabled by the user choosing the `RadioButton` that adds a new mapping. Once package source mapping is enabled, the user must select one of the two `RadioButtons` to install. The `Use only existing mappings` option will be selected by default once package source mapping is enabled. The existing mappings will not be shown, but there will be a link to the package source mapping options page so the user can view the mappings. If package source mapping is enabled, but there are no existing mappings, then the `Use only existing mappings` button will be disabled. A label will also appear under the `Use only existing mappings` button if it is disabled that says there are no existing mappings. The link will be a settings icon next to the `RadioButton` (similar to the settings button next to the sources dropdown in the top right of the PMUI). The details pane will look like:
 
 ![PMUI 1](../../meta/resources/PackageSourceMapping/PMUI_details_pane.png)
  
@@ -31,7 +31,6 @@ When the user installs a package with the new checkbox, one of 9 scenarios will 
 |`Use only existing mappings` | Not possible since this button will be greyed out (since there are no existing mappings)| No new mappings are made. Package only has previous mappings| Not possible since this button will be greyed out (since there are no existing mappings). User must select `Add additional mapping to source` to install. |
 |Neither is checked| Package Source Mapping is not enabled. Restore works as normal | Not possible since `Use only existing mappings` will be chosen by default once package source mapping is enabled| Not possible since `Use only existing mappings` will be chosen by default once package source mapping is enabled (unless there are no existing mappings in which case the user must select the other option to `Install`)|
 
-<!--show label saying there are no existing mappings if use existing mappins is greyed out-->
 
 #### Restore Errors
 
@@ -40,7 +39,7 @@ There are a few errors the user could make while trying to install or update a p
 
 ### Technical Explanation
 
-The mapping will not be written to the config until the user selects `OK` on the preview dialog popup. A mapping will only be written to the config if the user selects the checkbox in the details pane. <!--if not checked then key=* ? Does the user have to make a mapping? Maybe if user does not check the box and package source mapping is already enabled then they will get a message saying they should make a mapping--> 
+The mapping will not be written to the config until the user selects `OK` on the preview dialog popup. A mapping will only be written to the config if the user selects the checkbox in the details pane.
 
 **Example 1** 
 
@@ -79,4 +78,3 @@ Should there be an explicit way to enable or disable package source mapping in t
 ## Future Possibilities 
 
 Currently there will not be any error messages in the UI if restore fails while trying to `Install`/`Update`. If there is time later, some error messages could be added saying which packages (including transitives) failed to install and why (maybe they have previous mappings to a different source or the source being mapped to does not support the version, etc...).
-
