@@ -44,26 +44,26 @@ Majority users who use `~/.nuget/NuGet/NuGet.Config` will not be affected. Users
 Users who encounter this issue might not be aware of the document.
 
 ## Considerations
-1. In addition to the proposed solution, 2 of other solutions were considered.
-### Update the document, warn/inform users who has both paths and the warning/log links to the updated document.
+### 1. In addition to the proposed solution, 2 of other solutions were considered.
+#### **Solution 1:** 
 If NuGet detects two paths both exists, warn users and link the document in the warning/information.
 
-#### Implementation
+**Implementation:**
 Add following steps when trying to get user-wide config file path from .NET Core code path on Linux/Mac:
 Check if the config files exist in both .nuget and .config path.
 If yes, NuGet will show a warning/information links to the updated document.
 If not, nothing will be changed.
 
-#### Pros: 
+**Pros:** 
 The updated document will have a higher visibility when it's link is in warnings. Not sure about if it's just an info in the log. 
 
-#### Cons: 
+**Cons:** 
 Users who have already consolidated the two paths by following the instructions in the updated document will still see the warning/information. It might be annoying.
 
-### Update the document, warn users who has both paths(no symbolic link is detected), warn users and link to the updated document.
+#### **Solution 2:**
 If NuGet detects two paths both exists, and neither of them is the symbolic link path, warn users and link the document in the warning/information.
 
-#### Implementation
+**Implementation:**
 Add following steps when trying to get user-wide config file path from .NET Core code path on Linux/Mac:
 Check:
 1.If the config files exist in both .nuget and .config path. 
@@ -71,13 +71,13 @@ Check:
 If 1 is yes, and 2 is no, NuGet will show a warning/information links to the updated document.
 Otherwise, nothing will be changed.
 
-#### Pros: 
+**Pros:** 
 The updated document will have a higher visibility when it's link is in warnings. Users who have already consolidated the two paths by following the instructions in the updated document will not receive this warning.
 
-#### Cons: 
+**Cons:** 
 To identify if a path is a symbolic link or not, we need to use the [File.ResolveLinkTarget(String, Boolean) Method](https://docs.microsoft.com/en-us/dotnet/api/system.io.file.resolvelinktarget?view=net-6.0). It's only available in .NET 6 or later. To be able to use this API, we will have to retarget the projects related to this change to .NET 6. The cost of this work is high considering we only want to show a warning to the right users.
 
-2. How to raise the awareness of the updated document about the user-wide NuGet.Config file?
+### 2. How to raise the awareness of the updated document about the user-wide NuGet.Config file if using the proposed solution?
 Add the link of updated document into the related issues/feedback tickets.
 https://github.com/NuGet/Home/issues/4413
 https://github.com/NuGet/Home/issues/4095
