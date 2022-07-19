@@ -197,7 +197,7 @@ When a user highlights a transitive package, they will see a pop-up that display
 
 ![](../../meta/resources/TransitiveDependencies/TransitiveVSPMUI.png)
 
-However, this still does not provide the user with enough detail about how transitive packages originate, therefore we propose the `dotnet nuget why` command.
+However, the Package Manager UI view still does not provide the user with enough detail about how transitive packages originate; for example, transitive dependencies that are brought in by a project are hidden. Therefore we propose the `dotnet nuget why` command.
 
 ## Additional improvements
 
