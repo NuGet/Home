@@ -772,6 +772,139 @@ Outputs json for format version 1, if it's not specified then latest version'll 
 }
 ```
 
+### Error handling
+
+In case of an error it would be written into `problems` section. But in case there is parameter, options error then it may defaults back to console output instead of json output.
+Also in case of runtime there's error then it may not show json output at all because it needs all the data for json output before display.
+
+#### `> dotnet list package`
+
+`MyProjectB.csproj` was not restored.
+
+```dotnetcli
+Project 'MyProjectA' has the following package references
+   [netcoreapp3.1]:
+   Top-level Package                      Requested             Resolved
+   > Microsoft.Extensions.Primitives      [1.0.0, 5.0.0]        1.0.0
+   > NuGet.Commands                       4.8.0-preview3.5278   4.8.0-preview3.5278
+   > Text2Xml.Lib                         [1.1.2, 2.0.0)        1.1.2
+
+No assets file was found for `C:\Users\userA\repos\MainApp\src\lib\MyProjectB.csproj`. Please run restore before running this command.
+```
+
+#### `> dotnet list package --format json`
+
+```json
+{
+  "version": 1,
+  "parameters": "",
+  "problems": [
+    "No assets file was found for `C:/Users/userA/repos/MainApp/src/lib/MyProjectB.csproj`. Please run restore before running this command."
+  ],
+  "projects": [
+    {
+      "path": "src/lib/MyProjectA.csproj",
+      "frameworks": [
+        {
+          "framework": "netcoreapp3.1",
+          "topLevelPackages": [
+            {
+              "id": "Microsoft.Extensions.Primitives",
+              "requestedVersion": "[1.0.0, 5.0.0]",
+              "resolvedVersion": "1.0.0"
+            },
+            {
+              "id": "NuGet.Commands",
+              "requestedVersion": "4.8.0-preview3.5278",
+              "resolvedVersion": "4.8.0-preview3.5278"
+            },
+            {
+              "id": "Text2Xml.Lib",
+              "requestedVersion": "[1.1.2, 2.0.0)",
+              "resolvedVersion": "1.1.2"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+```
+
+#### `> dotnet list NonExisting.csproj package`
+
+`NonExisting.csproj` doesn't exist or wrong path.
+
+```dotnetcli
+Could not find file or directory 'C:\Users\userA\repos\MainApp\src\lib\NonExisting.csproj'.
+```
+
+#### `> dotnet list package --format json`
+
+```json
+{
+  "version": 1,
+  "parameters": "",
+  "problems": [
+    "Could not find file or directory 'C:/Users/userA/repos/MainApp/src/lib/NonExisting.csproj'"
+  ]
+}
+```
+
+#### `> dotnet list package`
+
+`MyProjectB` is package.config type project, so it's not supported.
+
+```dotnetcli
+Project 'MyProjectA' has the following package references
+   [netcoreapp3.1]:
+   Top-level Package                      Requested             Resolved
+   > Microsoft.Extensions.Primitives      [1.0.0, 5.0.0]        1.0.0
+   > NuGet.Commands                       4.8.0-preview3.5278   4.8.0-preview3.5278
+   > Text2Xml.Lib                         [1.1.2, 2.0.0)        1.1.2
+
+The project `C:\Users\userA\repos\MainApp\src\lib\MyProjectB.csproj` uses package.config for NuGet packages, while the command works only with package reference projects.
+```
+
+#### `> dotnet list package --format json`
+
+```json
+{
+  "version": 1,
+  "parameters": "",
+  "problems": [
+    "The project `C:/Users/userA/repos/MainApp/src/lib/MyProjectB.csproj`` uses package.config for NuGet packages, while the command works only with package reference projects."
+  ],
+  "projects": [
+    {
+      "path": "src/lib/MyProjectA.csproj",
+      "frameworks": [
+        {
+          "framework": "netcoreapp3.1",
+          "topLevelPackages": [
+            {
+              "id": "Microsoft.Extensions.Primitives",
+              "requestedVersion": "[1.0.0, 5.0.0]",
+              "resolvedVersion": "1.0.0"
+            },
+            {
+              "id": "NuGet.Commands",
+              "requestedVersion": "4.8.0-preview3.5278",
+              "resolvedVersion": "4.8.0-preview3.5278"
+            },
+            {
+              "id": "Text2Xml.Lib",
+              "requestedVersion": "[1.1.2, 2.0.0)",
+              "resolvedVersion": "1.1.2"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+```
+
 ## Compatibility
 
 We start with `version 1`, as long as we don't remove or rename then it'll be backward compatible. In case [we change version](https://stackoverflow.com/a/13945074) just add new properties, keep old ones even it's not used.
