@@ -774,7 +774,9 @@ Outputs json for format version 1, if it's not specified then latest version'll 
 
 ### Error handling
 
-In case of an error it would be written into `problems` section. But in case there is parameter, options error then it may defaults back to console output instead of json output.
+In case of an error it would be written into `problems` section and return non-zero error exit code to indicate there had been some error to help scripting use cases.
+For current implementation we'll returns general error code `1` from application, more specific error code for each error scenario is not considered in this spec scope.
+In case there is parameter, options error then it may defaults back to console output instead of json output.
 Also in case of runtime there's error then it may not show json output at all because it needs all the data for json output before display.
 
 #### `> dotnet list package`
@@ -799,7 +801,10 @@ No assets file was found for `C:\Users\userA\repos\MainApp\src\lib\MyProjectB.cs
   "version": 1,
   "parameters": "",
   "problems": [
-    "No assets file was found for `C:/Users/userA/repos/MainApp/src/lib/MyProjectB.csproj`. Please run restore before running this command."
+    {
+        "project": "src/lib/MyProjectA.csproj",
+        "message": "No assets file was found for `C:/Users/userA/repos/MainApp/src/lib/MyProjectB.csproj`. Please run restore before running this command."
+    }
   ],
   "projects": [
     {
@@ -846,7 +851,10 @@ Could not find file or directory 'C:\Users\userA\repos\MainApp\src\lib\NonExisti
   "version": 1,
   "parameters": "",
   "problems": [
-    "Could not find file or directory 'C:/Users/userA/repos/MainApp/src/lib/NonExisting.csproj'"
+    {
+        "project": "src/lib/NonExisting.csproj",
+        "message": "Could not find file or directory 'C:/Users/userA/repos/MainApp/src/lib/NonExisting.csproj'"
+    }
   ]
 }
 ```
@@ -873,7 +881,10 @@ The project `C:\Users\userA\repos\MainApp\src\lib\MyProjectB.csproj` uses packag
   "version": 1,
   "parameters": "",
   "problems": [
-    "The project `C:/Users/userA/repos/MainApp/src/lib/MyProjectB.csproj`` uses package.config for NuGet packages, while the command works only with package reference projects."
+    {
+        "project": "src/lib/MyProjectB.csproj",
+        "message": "The project `C:/Users/userA/repos/MainApp/src/lib/MyProjectB.csproj`` uses package.config for NuGet packages, while the command works only with package reference projects."
+    }
   ],
   "projects": [
     {
@@ -900,6 +911,28 @@ The project `C:\Users\userA\repos\MainApp\src\lib\MyProjectB.csproj` uses packag
           ]
         }
       ]
+    }
+  ]
+}
+```
+
+#### `> dotnet list package --format json --output-version 3`
+
+Since output version `3` is not available, then it'll default to latest available version, and log about unsupported format version request into json result.
+
+```json
+{
+  "version": 1,
+  "parameters": "",
+  "problems": [
+    {
+        "message": "Unsupported output format version 3 was requested. Defaulting to latest available format version 1."
+    }
+  ],
+  "projects": [
+    {
+      "path": "src/lib/MyProjectA.csproj",
+      ...
     }
   ]
 }
@@ -937,7 +970,7 @@ Please note, except "tab completion" (for dotnet) part all changes would be insi
   * Direct/top level packages point to dependency packages. >> Could be included, down side is duplicate information, increase json size. Also I feel https://github.com/NuGet/Home/issues/11553 addresses this issue better, because in the end who transitive dependency brought in is more important than what dependencies exist under each top package.
   * Content hash. >> It's very easy to include it, question is how about source? Related issue https://github.com/NuGet/Home/issues/11552
 
-* [npm ls --json](https://gist.github.com/erdembayar/ddfbf9c160fbb8a0e31e3596f03ee906), [npm outdated -json](https://gist.github.com/erdembayar/12030f1db89ad9f2e206f2b6ff7d740f) Actually it's less sophisticated than what we have, because it doesn't have multi TFM and projects concept.
+* [npm ls --json](https://gist.github.com/erdembayar/ddfbf9c160fbb8a0e31e3596f03ee906), [npm outdated -json](https://gist.github.com/erdembayar/12030f1db89ad9f2e206f2b6ff7d740f) Actually it's less sophisticated than what we have, because it doesn't have multi TFM and projects concept. In case of any error it adds it into `problems` section just as array of strings.
 
 ## Future Possibilities
 
@@ -955,4 +988,4 @@ If we address them in plain `dotnet list package` then we'll address in `json ou
 
 * [--all option](https://github.com/NuGet/Home/issues/11551) for dotnet list package.
 
-* Return different exit codes if any vulnerabilities, deprecations, outdated package is [detected](https://github.com/NuGet/Home/blob/dotnet-audit/proposed/2021/DotNetAudit.md#dotnet-audit-exit-codes).
+* Return [different exit codes](https://tldp.org/LDP/abs/html/exitcodes.html) if there is any error while rendering json output or if any vulnerabilities, deprecations, outdated package is [detected](https://github.com/NuGet/Home/blob/dotnet-audit/proposed/2021/DotNetAudit.md#dotnet-audit-exit-codes). It's important choose to the exit codes and provide easy ways to look up docs on each error code (see [example](https://github.com/dotnet/templating/blob/main/docs/Exit-Codes.md#106)). We could enhance `problems` section to include `errorCode` for easy lookup later.
