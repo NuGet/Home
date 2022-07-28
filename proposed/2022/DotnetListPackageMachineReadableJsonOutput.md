@@ -774,8 +774,7 @@ Outputs json for format version 1, if it's not specified then latest version'll 
 
 ### Error handling
 
-In case of an error it would be written into `problems` section and return non-zero error exit code to indicate there had been some error to help scripting use cases.
-For current implementation we'll returns general error code `1` from application, more specific error code for each error scenario is not considered in this spec scope.
+In case of an error it would be written into `problems` section and return non-0 error exit code to indicate there had been some error to help scripting use cases.
 In case there is parameter, options error then it may defaults back to console output instead of json output.
 Also in case of runtime there's error then it may not show json output at all because it needs all the data for json output before display.
 
