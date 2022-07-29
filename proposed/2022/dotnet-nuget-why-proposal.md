@@ -122,7 +122,7 @@ dotnet nuget why -h|--help
 
 - PROJECT | SOLUTION
 
-The project or solution file to operate on. If not specified, the command searches the current directory for one. If more than one solution is found, an error is thrown. If more than one project is found, the dependency graph for each project is printed. 
+The project or solution file to operate on. If more than one solution is found, an error is thrown. If more than one project is found, the dependency graph for each project is printed. 
 
 - PACKAGE_NAME
 
@@ -200,6 +200,7 @@ When a user highlights a transitive package, they will see a pop-up that display
 However, the Package Manager UI view still does not provide the user with enough detail about how transitive packages originate; for example, transitive dependencies that are brought in by a project are hidden. Therefore we propose the `dotnet nuget why` command.
 
 ## Additional improvements
+If not specified, the command searches the current directory for one.
 
 Add a [--version <VERSION>] option to the command if the user wants to print dependency graphs for a specific version of the package. NuGet currently `flattens`, so it only allows one version of a package per framework to be resolved. See NuGet package versioning for more information.
 
@@ -212,6 +213,8 @@ Create a better visualization of the dependency graph that is printed by the `do
 Packages acquired through `PackageDownload` are recorded in the `project.assets.json` file under `project -> frameworks -> {frameworkName} -> downloadDependencies`. However, since they are recorded under `downloadDependcies` rather than `dependencies` they are not included in the current output of the `dotnet nuget why` command. In the future packages acquired through `PackageDownload` can be included in the output of the `dotnet nuget why` command.
 
 The NuGet restore operation downloads other packages during dependency resolution which are not part of the final dependency graph that the `dotnet nuget why` command prints out. The absence of a package id and version in the `project.assets.json` file indicates that a package was downloaded during dependency resolution but is not part of the final dependency graph. In the future these other packages can also be included in the dependency graph that the `dotnet nuget why` command prints out.
+
+Use non-zero exit codes for errors such as when the `project.assets.json` file is not present or the package is not found in the `project.assets.json` file.
 
 ## Appendix
 
