@@ -775,8 +775,10 @@ Outputs json for format version 1, if it's not specified then latest version'll 
 ### Error handling
 
 In case of an error it would be written into `problems` section and return non-0 error exit code to indicate there had been some error to help scripting use cases.
-In case there is parameter, options error then it may defaults back to console output instead of json output.
-Also in case of runtime there's error then it may not show json output at all because it needs all the data for json output before display.
+
+In case of runtime there's error then it may not show json output at all because it needs all the data for json output before display.
+
+In case there is parameter, options error then it may defaults back to console output instead of json output, for example: `dotnet list package -include-transitive --format json`, because that option/parameter validation for `-include-transitive` happen way before `list package` code execution. But `dotnet list package -framework net7.0` wouldn't fail even though `net7.0` is not valid framework at this moment, it would simply return empty result.
 
 #### `> dotnet list package`
 
