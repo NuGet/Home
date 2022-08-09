@@ -40,7 +40,7 @@ default metadata to ensure that only package assets related to build purposes ar
 <!-- Explain the proposal in sufficient detail with implementation details, interaction models, and clarification of corner cases. -->
 `<GlobalPackageReference />` will just be syntactical sugar for a `<PackageReference />` with the following metadata:
 
-* IncludeAssets = `Runtime; Build; Native; ContentFiles; Analyzers`
+* IncludeAssets = `runtime; build; native; contentfiles; analyzers`
 * PrivateAssets = `All`
 
 This ensures that when these repository-wide packages are consumed, they don't flow to downstream dependencies and only include assets related to
@@ -64,7 +64,7 @@ This will be achieved by copying the `GlobalPackageReference` items to `PackageR
       Add GlobalPackageReference items to the PackageReference item group with no version.  The PackageVersion items are added
       in the CollectCentralPackageVersions target.
 
-      Global package references only include the same assets as a development dependency (Analyzers;Build;BuildMultitargeting;BuildTransitive)
+      Global package references only include the same assets as a development dependency (runtime; build; native; contentfiles; analyzers)
       because those kind of packages are the best candidate for a global package reference.  They are generally packages that
       extend the build.
 
@@ -74,7 +74,7 @@ This will be achieved by copying the `GlobalPackageReference` items to `PackageR
     -->
     <PackageReference Include="@(GlobalPackageReference)"
                       Version=""
-                      IncludeAssets="Analyzers;Build;BuildMultitargeting;BuildTransitive"
+                      IncludeAssets="runtime; build; native; contentfiles; analyzers"
                       PrivateAssets="All" />
   </ItemGroup>
 </Target>
