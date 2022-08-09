@@ -46,27 +46,38 @@ default metadata to ensure that only package assets related to build purposes ar
 This ensures that when these repository-wide packages are consumed, they don't flow to downstream dependencies and only include assets related to
 build.
 
-This will be achieved using an MSBuild [ItemDefinitionGroup](https://docs.microsoft.com/en-us/visualstudio/msbuild/item-definitions):
+This will be achieved by copying the `GlobalPackageReference` items to `PackageReference` and `PackageVersion` items:
 ```xml
-  <ItemDefinitionGroup Condition="'$(ManagePackageVersionsCentrally)' == 'true' And '$(RestoreEnableGlobalPackageReference)' != 'false'">
-    <GlobalPackageReference>
-      <!--
-        Default global package references to only consume the Analyzers and Build logic in a package,
-        which is the same for development dependencies.  This helps ensure that the package assets
-        are not passed to the compiler or copied to the output directory.  Having a compile-time
-        reference to a package for all projects in a tree is not recommended.  You should only have
-       "global" references to packages that are used for build.
-      -->
-      <IncludeAssets Condition="'$(RestoreEnableGlobalPackageReferenceIncludeAssetsBuildAnalyzers)' != 'false'">runtime;build;native;contentfiles;analyzers</IncludeAssets>
-      <!--
-        Default global package references to have all assets private.  This is because global package
-        references are generally stuff like versioning, signing, etc and should not flow to downstream
-        dependencies.  Also, global package references are already referenced by every project in the
-        tree so we don't need them to be transitive.
-      -->
-      <PrivateAssets Condition="'$(RestoreEnableGlobalPackageReferencePrivateAssetsAll)' != 'false'">All</PrivateAssets>
-    </GlobalPackageReference>
-  </ItemDefinitionGroup>
+<Target Name="CollectCentralPackageVersions" Returns="@(PackageVersion)">
+  <ItemGroup Condition="'$(ManagePackageVersionsCentrally)' == 'true' And '$(RestoreEnableGlobalPackageReference)' != 'false'">
+    <!--
+      Add GlobalPackageReference items to the PackageVersion item group with the version.  The PackageReference items are added
+      in the CollectPackageReferences target.
+    -->
+    <PackageVersion Include="@(GlobalPackageReference)" Version="%(Version)" />
+  </ItemGroup>
+</Target>
+
+<Target Name="CollectPackageReferences" Returns="@(PackageReference)" >
+  <ItemGroup Condition="'$(ManagePackageVersionsCentrally)' == 'true' And '$(RestoreEnableGlobalPackageReference)' != 'false'">
+    <!--
+      Add GlobalPackageReference items to the PackageReference item group with no version.  The PackageVersion items are added
+      in the CollectCentralPackageVersions target.
+
+      Global package references only include the same assets as a development dependency (Analyzers;Build;BuildMultitargeting;BuildTransitive)
+      because those kind of packages are the best candidate for a global package reference.  They are generally packages that
+      extend the build.
+
+      Global package references have all assets private because central package references are generally packages that provide
+      versioning, signing, etc and should not flow to downstream dependencies.  Also, central package references are already
+      referenced by every project in the tree so they don't need to be transitive.
+    -->
+    <PackageReference Include="@(GlobalPackageReference)"
+                      Version=""
+                      IncludeAssets="Analyzers;Build;BuildMultitargeting;BuildTransitive"
+                      PrivateAssets="All" />
+  </ItemGroup>
+</Target>
 ```
 
 The following MSBuild properties can be set to change the functionality:
@@ -75,17 +86,6 @@ The following MSBuild properties can be set to change the functionality:
 |---|---|---|
 | `ManagePackageVersionsCentrally` | Enables or disables central package management and all dependent features | `false` |
 | `RestoreEnableGlobalPackageReference` | Enables or disables just the concept of `GlobalPackageReference` | `true` |
-| `RestoreEnableGlobalPackageReferenceIncludeAssetsBuildAnalyzers` | Enables or disables defaulting the `IncludeAssets` metadata for global package references | `true` |
-| `RestoreEnableGlobalPackageReferencePrivateAssetsAll` | Enables or disables defaulting the `PrivateAssets` metadata for global package references | `true`|
-
-`GlobalPackageReference` items will then be copied to the `PackageReference` item group along with their metadata:
-```xml
-<ItemGroup>
-  <PackageReference Include="@(GlobalPackageReference)" Version="" />
-  <PackageVersion Include="@(GlobalPackageReference)" Version="%(Version)" />
-</ItemGroup>
-```
-
 
 ## Drawbacks
 <!-- Why should we not do this? -->
