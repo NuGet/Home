@@ -5,13 +5,13 @@
 
 ## Summary
 
-NuGet.exe does support packing SDK-based, or PackageReference projects in general.
+NuGet.exe does not support packing SDK-based, or PackageReference projects in general.
 If you run NuGet.exe pack on an SDK-based csproj, it will pack, but it will do it incorrectly.
 The proposal is to `error` whenever a SDK-based csproj pack is attempted, instructing the user to use `msbuild /t:pack` or `dotnet.exe pack` instead.
 
 ## Motivation
 
-NuGet.exe does support packing SDK-based, or PackageReference projects in general.
+NuGet.exe does not support packing SDK-based, or PackageReference projects in general.
 If you run NuGet.exe pack on an SDK-based csproj, it will pack, but it will do it incorrectly.
 The pack SDK experience for PackageReference projects knows how to automatically manage the dependencies and makes multitargeted projects extremely easy to pack.
 It is recommended that SDK projects are managed by using `dotnet.exe` instead.
