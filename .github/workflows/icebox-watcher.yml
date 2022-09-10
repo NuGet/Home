@@ -2,6 +2,8 @@ name: IceBox Upvote Watcher
 on:
   schedule:
     - cron: '34 13 * * *'
+permissions:
+  issues: write
 jobs:
   Run-IceBox-Watcher:
     runs-on: ubuntu-latest
