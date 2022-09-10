@@ -1,0 +1,9 @@
+name: IceBox Upvote Watcher
+jobs:
+  Run-IceBox-Watcher:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install GithubIssueTagger
+        run: dotnet tool install --global NuGet.Internal.GitHubIssueTagger --source https://nuget.pkg.github.com/nuget/index.json
+      - name: Run IceBox watcher
+        run: GithubIssueTagget IceBox
