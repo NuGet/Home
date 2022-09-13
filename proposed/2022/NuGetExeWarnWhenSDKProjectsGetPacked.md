@@ -60,7 +60,8 @@ The parsing fails early.
 When someone attempts to run pack on an SDK-based project, NuGet will fail with the following error:
 
 ```console
-Error NU5049: NuGet.exe does not support packing SDK-based projects, use `dotnet pack` to pack this project instead.
+Error NU5049: The `pack` command for SDK-style projects is not supported, use `dotnet pack` to pack this project instead.
+
 ```
 
 ### Technical explanation
