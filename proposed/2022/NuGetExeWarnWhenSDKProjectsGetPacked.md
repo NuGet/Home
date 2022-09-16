@@ -6,13 +6,13 @@
 ## Summary
 
 NuGet.exe does not support packing SDK-based, or PackageReference projects in general.
-If you run NuGet.exe pack on an SDK-based csproj, it will pack, but it will do it incorrectly.
+If you run NuGet.exe pack on an SDK-based csproj, it might pack, but it will do it incorrectly.
 The proposal is to `error` whenever a SDK-based csproj pack is attempted, instructing the user to use `msbuild /t:pack` or `dotnet.exe pack` instead.
 
 ## Motivation
 
 NuGet.exe does not support packing SDK-based, or PackageReference projects in general.
-If you run NuGet.exe pack on an SDK-based csproj, it will pack, but it will do it incorrectly.
+If you run NuGet.exe pack on an SDK-based csproj, it might pack, but it will do it incorrectly.
 The pack SDK experience for PackageReference projects knows how to automatically manage the dependencies and makes multitargeted projects extremely easy to pack.
 It is recommended that SDK projects are managed by using `dotnet.exe` instead.
 
@@ -60,9 +60,10 @@ The parsing fails early.
 When someone attempts to run pack on an SDK-based project, NuGet will fail with the following error:
 
 ```console
-Error NU5049: The `pack` command for SDK-style projects is not supported, use `dotnet pack` to pack this project instead.
-
+Error NU5049: The `pack` command for SDK-style projects is not supported, use `dotnet pack` to pack this project instead. You may set the ENABLE_LEGACY_NUGETEXE_CSPROJ_PACK environment variable to revert to the previous packing behavior.
 ```
+
+This *breaking change* will be announced via blog well before the NuGet.exe carrying the change ships.
 
 ### Technical explanation
 
@@ -79,9 +80,9 @@ To determine whether a project is `.NET SDK` based, we will evaluate the project
 
 - Do nothing. This would mean just acknowledging that SDK-based projects support in NuGet.exe would not be added and not do anything to help migrate users to `dotnet.exe pack` and `msbuild /t:pack`.
 - Add full pack SDK support into NuGet.exe. While not impossible, this creates maintainability considerations. dotnet.exe has a more involved support for the SDK-based PackageReference projects, and as such is considered to be the `right tool for the job`.
-- Call `msbuild /t:pack` from NuGet.exe. This has the same considerations as the previos approach that `dotnet.exe` sohuld be recommended as the right tool for the job.
+- Call `msbuild /t:pack` from NuGet.exe. This has the same considerations as the previos approach that `dotnet.exe` should be recommended as the right tool for the job.
 This is also likely to quietly change the behavior for certain users and change the type of package they're generating.
-A change like this likely has a lot more merit in 2018, than 2022 given how long dotnet.exe has been out.
+A change like this likely has a lot more merit in 2018, than 2022 given how long dotnet.exe has been the recommended tool for SDK based projects..
 - Add a warning and proceed packing.
   - A behavior change to an error in a minor version can be considered disruptive. This is one of those special cases where the disruption might be warranted.
   Instead of an error, we could add a warning instead. Given that NuGet.exe pack by default will usually raise a bunch of warnings, it is likely that if warnings were good enough, the customers would have reviewed said warnings and figured out that all those warnings cannot be addressed correctly.
@@ -92,8 +93,6 @@ A change like this likely has a lot more merit in 2018, than 2022 given how long
 N/A
 
 ## Unresolved Questions
-
-- Is it ok if we error in a NuGet.exe minor version? Scenario was likely broken already.
 
 ## Future Possibilities
 
