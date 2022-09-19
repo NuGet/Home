@@ -96,4 +96,4 @@ N/A
 
 ## Future Possibilities
 
-- We can consider *warning* when `NuGet.exe pack` is being used on csproj PackageReference projects. Given that you need to undergo a manual migration to PackageReference, this isn't likely to be a priority scenario.
+- We can consider *warning* or *erroring* when `NuGet.exe pack` is being used on csproj PackageReference projects. Given that you need to undergo a manual migration to PackageReference, this isn't likely to be a priority scenario.
