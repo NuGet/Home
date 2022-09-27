@@ -473,6 +473,118 @@ Project `MyProjectB` has the following vulnerable packages
 }
 ```
 
+#### `> dotnet list package --vulnerable`
+There's no vulnerable package in a project.
+
+```dotnetcli
+The following sources were used:
+   https://api.nuget.org/v3/index.json
+   https://apidev.nugettest.org/v3-index/index.json
+
+The given project `MyProjectC` has no vulnerable packages given the current sources.
+```
+
+### `> dotnet list package --vulnerable --format json`
+There's no vulnerable package in a project.
+
+```json
+{
+  "version": 1,
+  "parameters": "--vulnerable",
+   "sources": [
+    "https://api.nuget.org/v3/index.json",
+    "https://apidev.nugettest.org/v3-index/index.json"
+  ],
+  "projects": [
+    {
+      "path": "src/lib/MyProjectC.csproj",
+      "frameworks": [
+        {
+          "framework": "netcoreapp3.1",
+          "topLevelPackages": [
+            ]
+        },
+        {
+          "framework": "net5.0",
+          "topLevelPackages": [
+            ]
+        }
+      ]
+    }
+  ]
+}
+```
+
+#### `> dotnet list package --vulnerable`
+For multi-target framework a project only 1 framework has a vulnerability.
+
+```dotnetcli
+The following sources were used:
+   https://api.nuget.org/v3/index.json
+   https://apidev.nugettest.org/v3-index/index.json
+
+Project `MyProjectC` has the following vulnerable packages
+   [netcoreapp3.1]:
+   Top-level Package      Requested   Resolved   Severity   Advisory URL
+   > DotNetNuke.Core      6.0.0       6.0.0      High       https://github.com/advisories/GHSA-g8j6-m4p7-5rfq
+                                                 Moderate   https://github.com/advisories/GHSA-v76m-f5cx-8rg4
+                                                 Critical   https://github.com/advisories/GHSA-x8f7-h444-97w4
+                                                 Moderate   https://github.com/advisories/GHSA-5c66-x4wm-rjfx
+                                                 High       https://github.com/advisories/GHSA-x2rg-fmcv-crq5
+                                                 High       https://github.com/advisories/GHSA-j3g9-6fx5-gjv7
+                                                 High       https://github.com/advisories/GHSA-xx3h-j3cx-8qfj
+                                                 Moderate   https://github.com/advisories/GHSA-5whq-j5qg-wjvp
+
+   [net5.0]: No vulnerable packages for this framework.
+```
+
+### `> dotnet list package --vulnerable --format json`
+For multi-target framework a project only 1 framework has a vulnerability.
+
+```json
+{
+  "version": 1,
+  "parameters": "--vulnerable",
+   "sources": [
+    "https://api.nuget.org/v3/index.json",
+    "https://apidev.nugettest.org/v3-index/index.json"
+  ],
+  "projects": [
+    {
+      "path": "src/lib/MyProjectC.csproj",
+      "frameworks": [
+        {
+          "framework": "netcoreapp3.1",
+          "topLevelPackages": [
+              {
+                "id": "DotNetNuke.Core",
+                "requestedVersion": "6.0.0",
+                "resolvedVersion": "6.0.0",
+                "vulnerabilities" : [
+                  {
+                      "severity":"High",
+                      "advisoryurl":"https://github.com/advisories/GHSA-g8j6-m4p7-5rfq"
+                  },
+                  {
+                      "severity":"Moderate",
+                      "advisoryurl":"https://github.com/advisories/GHSA-v76m-f5cx-8rg4"
+                  },
+      ...
+                  ]
+              }
+            ]
+        },
+        {
+          "framework": "net5.0",
+          "topLevelPackages": [
+           ]
+        }
+      ]
+    }
+  ]
+}
+```
+
 #### `> dotnet list package --include-transitive`
 
 ```dotnetcli
