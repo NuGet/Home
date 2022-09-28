@@ -1029,6 +1029,43 @@ The project `C:\Users\userA\repos\MainApp\src\lib\MyProjectB.csproj` uses packag
 }
 ```
 
+#### `> dotnet list package --highest-minor`
+
+Given '--include-prerelease', '--highest-minor', and '--highest-patch' options are only designed to use together with `--outdated` argument it would output `The command option(s) '--include-prerelease', '--highest-minor', and '--highest-patch' are ignored by this command.` warning.
+
+```dotnetcli
+The command option(s) '--include-prerelease', '--highest-minor', and '--highest-patch' are ignored by this command.
+Project 'MyProjectC' has the following package references
+   [netcoreapp3.1]:
+   Top-level Package      Requested   Resolved
+   > DotNetNuke.Core      6.0.0       6.0.0
+   > Newtonsoft.Json      13.0.1      13.0.1
+
+   [net5.0]: No packages were found for this framework.
+```
+
+#### `> dotnet list package --highest-minor --format json`
+
+Json output for above case.
+
+```json
+{
+  "version": 1,
+  "parameters": "--highest-minor",
+  "problems": [
+    {
+        "message": "The command option(s) '--include-prerelease', '--highest-minor', and '--highest-patch' are ignored by this command."
+    }
+  ],
+  "projects": [
+    {
+      "path": "src/lib/MyProjectC.csproj",
+      ...
+    }
+  ]
+}
+```
+
 #### `> dotnet list package --format json --output-version 3`
 
 Since output version `3` is not available, then it'll default to latest available version, and log about unsupported format version request into json result.
@@ -1036,7 +1073,7 @@ Since output version `3` is not available, then it'll default to latest availabl
 ```json
 {
   "version": 1,
-  "parameters": "",
+  "parameters": "--output-version 3",
   "problems": [
     {
         "message": "Unsupported output format version 3 was requested. Defaulting to latest available format version 1."
