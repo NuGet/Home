@@ -867,6 +867,102 @@ Project `MyProjectB` has the following deprecated packages
 }
 ```
 
+#### `> dotnet list package --vulnerable --include-transitive`
+For multi-target framework a project only 1 framework has a vulnerability.
+
+```dotnetcli
+The following sources were used:
+   https://api.nuget.org/v3/index.json
+
+Project `MyProjectE` has the following vulnerable packages
+   [netcoreapp3.1]:
+   Top-level Package      Requested             Resolved              Severity   Advisory URL
+   > DotNetNuke.Core      6.0.0                 6.0.0                 High       https://github.com/advisories/GHSA-g8j6-m4p7-5rfq
+                                                                      Moderate   https://github.com/advisories/GHSA-v76m-f5cx-8rg4
+                                                                      Critical   https://github.com/advisories/GHSA-x8f7-h444-97w4
+                                                                      Moderate   https://github.com/advisories/GHSA-5c66-x4wm-rjfx
+                                                                      High       https://github.com/advisories/GHSA-x2rg-fmcv-crq5
+                                                                      High       https://github.com/advisories/GHSA-j3g9-6fx5-gjv7
+                                                                      High       https://github.com/advisories/GHSA-xx3h-j3cx-8qfj
+                                                                      Moderate   https://github.com/advisories/GHSA-5whq-j5qg-wjvp
+   > NuGet.Commands       4.8.0-preview3.5278   4.8.0-preview3.5278   Moderate   https://github.com/advisories/GHSA-3885-8gqc-3wpf
+
+   Transitive Package                    Resolved   Severity   Advisory URL
+   > Newtonsoft.Json                     9.0.1      High       https://github.com/advisories/GHSA-5crp-9r3c-p9vr
+   > System.Net.Http                     4.3.0      High       https://github.com/advisories/GHSA-7jgj-8wvc-jh57
+   > System.Text.RegularExpressions      4.3.0      Moderate   https://github.com/advisories/GHSA-cmhx-cq75-c4mj
+```
+
+### `> dotnet list package --vulnerable --include-transitive --format json`
+For multi-target framework a project only 1 framework has a vulnerability.
+
+```json
+{
+  "version": 1,
+  "parameters": "--vulnerable",
+   "sources": [
+    "https://api.nuget.org/v3/index.json",
+    "https://apidev.nugettest.org/v3-index/index.json"
+  ],
+  "projects": [
+    {
+      "path": "src/lib/MyProjectC.csproj",
+      "frameworks": [
+        {
+          "framework": "netcoreapp3.1",
+          "topLevelPackages": [
+              {
+                "id": "DotNetNuke.Core",
+                "requestedVersion": "6.0.0",
+                "resolvedVersion": "6.0.0",
+                "vulnerabilities" : [
+                  {
+                      "severity":"High",
+                      "advisoryurl":"https://github.com/advisories/GHSA-g8j6-m4p7-5rfq"
+                  },
+                  {
+                      "severity":"Moderate",
+                      "advisoryurl":"https://github.com/advisories/GHSA-v76m-f5cx-8rg4"
+                  },
+      ...
+                  ]
+              }
+            ],
+            "transitivePackages": [
+              {
+                "id": "Newtonsoft.Json",
+                "resolvedVersion": "9.0.1",
+                "vulnerabilities" : [
+                  {
+                      "severity":"High",
+                      "advisoryurl":"https://github.com/advisories/GHSA-5crp-9r3c-p9vr"
+                  }
+                ]
+              },
+              {
+                "id": "System.Net.Http",
+                "resolvedVersion": "4.3.0",
+                "vulnerabilities" : [
+                  {
+                      "severity":"High",
+                      "advisoryurl":"https://github.com/advisories/GHSA-7jgj-8wvc-jh57"
+                  }
+                ]
+              }
+      ...
+            ]
+        },
+        {
+          "framework": "net5.0",
+          "topLevelPackages": [
+           ]
+        }
+      ]
+    }
+  ]
+}
+```
+
 #### `> dotnet list package --format json --output-version 1`
 
 Outputs json for format version 1, if it's not specified then latest version'll be used by default.
@@ -915,7 +1011,7 @@ No assets file was found for `C:\Users\userA\repos\MainApp\src\lib\MyProjectB.cs
   "parameters": "",
   "problems": [
     {
-        "project": "src/lib/MyProjectA.csproj",
+        "project": "src/lib/MyProjectB.csproj",
         "message": "No assets file was found for `C:/Users/userA/repos/MainApp/src/lib/MyProjectB.csproj`. Please run restore before running this command."
     }
   ],
