@@ -98,6 +98,11 @@ Alternatively, the VS extension scenario would be something like:
 
 ### Technical explanation
 
+Implementing this feature will require several large and in some cases, breaking changes.
+The breaking changes are not necessarily in the completely new NuGet and .NET SDK version, but for some scenarios where different versions of the tooling are combined.
+
+Fortunately, attempting any of the to be enabled scenarios with current versions of the tooling will lead to an obvious issue.
+
 ## NuGet challenges to get there
 
 While this scenario does have a number of interesting uses, there are many commands that would be affected by NuGet supporting this. 
