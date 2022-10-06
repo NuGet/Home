@@ -34,8 +34,7 @@ For the following table assume `NU1603` is being raised during restore.
 | TreatWarningsAsErrors | NoWarn | WarningsAsErrors | WarningsNotAsErrors | Behavior | Explanation |
 |-----------------------|--------|------------------|---------------------|----------|-------------|
 | true | | | | All warnings are treated as errors | |
-| true | | | | All warnings are treated as errors | |
-| true | | NU1603 |  | Succeeds with no warning. | NU1603 is raised, but because of no warn it won't be shown. |
+| true | NU1603 | |  | Succeeds with no warning. | NU1603 is raised, but because of no warn it won't be shown. |
 | false | | NU1603 | | NU1603 is upgraded to an error. | Only a certain list of warnings are being treated as errors |
 | true | | | NU1603 | Succeeds with a warning. | Only NU1603 is a warning. If any other warning is raised, it'll be upgraded to an error |
 | true | NU1603 | | NU1603 | Succeeds. No warning. | NoWarn takes precedence over both WarningAsErrors and WarningNotAsErrors. |
