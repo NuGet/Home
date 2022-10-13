@@ -141,6 +141,46 @@ Project 'MyProjectB' has the following package references
 }
 ```
 
+#### `> dotnet list package`
+Project with an auto-referenced package.
+
+```dotnetcli
+Project 'MyProjectF' has the following package references
+   [netstandard2.0]:
+   Top-level Package             Requested   Resolved
+   > NETStandard.Library   (A)   [2.0.3, )   2.0.3
+
+(A) : Auto-referenced package.
+```
+
+#### `> dotnet list package --format json`
+Project with an auto-referenced package.
+
+```json
+{
+  "version": 1,
+  "parameters": "",
+  "projects": [
+    {
+      "path": "src/lib/MyProjectF.csproj",
+      "frameworks": [
+        {
+          "framework": "netstandard2.0",
+          "topLevelPackages": [
+            {
+              "id": "NETStandard.Library",
+              "requestedVersion": "[2.0.3, )",
+              "resolvedVersion": "2.0.3",
+              "autoReferenced": "true"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+```
+
 #### `> dotnet list package --outdated`
 
 ```dotnetcli
