@@ -1052,7 +1052,7 @@ No assets file was found for `C:\Users\userA\repos\MainApp\src\lib\MyProjectB.cs
   "problems": [
     {
         "project": "src/lib/MyProjectB.csproj",
-        "message": "No assets file was found for `C:/Users/userA/repos/MainApp/src/lib/MyProjectB.csproj`. Please run restore before running this command."
+        "error": "No assets file was found for `C:/Users/userA/repos/MainApp/src/lib/MyProjectB.csproj`. Please run restore before running this command."
     }
   ],
   "projects": [
@@ -1102,7 +1102,7 @@ Could not find file or directory 'C:\Users\userA\repos\MainApp\src\lib\NonExisti
   "problems": [
     {
         "project": "src/lib/NonExisting.csproj",
-        "message": "Could not find file or directory 'C:/Users/userA/repos/MainApp/src/lib/NonExisting.csproj'"
+        "error": "Could not find file or directory 'C:/Users/userA/repos/MainApp/src/lib/NonExisting.csproj'"
     }
   ]
 }
@@ -1132,7 +1132,7 @@ The project `C:\Users\userA\repos\MainApp\src\lib\MyProjectB.csproj` uses packag
   "problems": [
     {
         "project": "src/lib/MyProjectB.csproj",
-        "message": "The project `C:/Users/userA/repos/MainApp/src/lib/MyProjectB.csproj`` uses package.config for NuGet packages, while the command works only with package reference projects."
+        "error": "The project `C:/Users/userA/repos/MainApp/src/lib/MyProjectB.csproj`` uses package.config for NuGet packages, while the command works only with package reference projects."
     }
   ],
   "projects": [
@@ -1190,14 +1190,39 @@ Json output for above case.
   "parameters": "--highest-minor",
   "problems": [
     {
-        "message": "The command option(s) '--include-prerelease', '--highest-minor', and '--highest-patch' are ignored by this command."
+        "warning": "The command option(s) '--include-prerelease', '--highest-minor', and '--highest-patch' are ignored by this command."
     }
   ],
   "projects": [
+  ]
+}
+```
+
+#### `> dotnet list package --vulnerable`
+
+Warning for `Http source used` in printed.
+
+```dotnetcli
+The following sources were used:
+   http://apidev.nugettest.org/v3-index/index.json
+
+warn : You are running the 'list package' operation with an 'HTTP' source, 'nugettest [http://apidev.nugettest.org/v3-index/index.json]'. Non-HTTPS access will be removed in a future version. Consider migrating to an 'HTTPS' source.
+```
+
+#### `> dotnet list package --vulnerable --format json`
+
+Warning for `Http source used` is included in json.
+
+```json
+{
+  "version": 1,
+  "parameters": "--vulnerable",
+  "problems": [
     {
-      "path": "src/lib/MyProjectC.csproj",
-      ...
+    	"warning": "You are running the 'list package' operation with an 'HTTP' source, 'nugettest [http://apidev.nugettest.org/v3-index/index.json]'. Non-HTTPS access will be removed in a future version. Consider migrating to an 'HTTPS' source."
     }
+  ],
+  "projects": [
   ]
 }
 ```
