@@ -1,0 +1,718 @@
+&nbsp;
+<div class="form-row" style="text-align: center;">
+<div class="html-caption-container">
+<div class="form-heading">
+<div class="form-row">
+
+<strong>Thanks to generous supporters like you, North Shore Animal League America has saved more than 1,100,000 animals to date. We save nearly 18,000 dogs, cats, puppies, and kittens annually. Many of these have been the victims of animal abuse and animal cruelty.</strong> <strong>Your tax-deductible donation helps us continue the critical hands-on work we do for the animals that come through our doors each day. We rescue animals from overcrowded municipal shelters, save them from puppy mills and natural disasters, and provide them with high-quality medical care to rehabilitate them and prepare them for adoption.</strong>
+
+</div>
+<div class="form-heading-image">
+
+<strong><!--main image:--><img src="../images/content/pagebuilder/donate-image-senior.jpg" alt="" width="300" height="auto" border="0" /></strong>
+
+</div>
+</div>
+</div>
+</div>
+<h3>Select Your Donation Type</h3>
+<div class="form-row">
+<div class="html-caption-container">
+<div class="monthly-option">
+<div class="monthly__radios">
+<h5><input id="monthly__radio--1" name="monthly__radio" type="radio" value="1" />
+<label for="monthly__radio--1">One-time</label></h5>
+<h5><input id="monthly__radio--2" name="monthly__radio" type="radio" value="2" />
+<label for="monthly__radio--2">Monthly</label></h5>
+</div>
+<div class="callout--monthly">
+<div class="arrow-up__cont">
+<div class="arrow-up"></div>
+</div>
+<h4 class="monthly-note">*The best way to save animals year-round</h4>
+</div>
+</div>
+<h2 class="">Select Your Donation Amount</h2>
+</div>
+</div>
+<div id="level_flexible_row">
+<div class="don-standard-levels form-row">
+<div class="levels-label"></div>
+<div id="level_flexible_row" class="form-row form-donation-level">
+<div id="level_flexiblegift_type_Row" class="form-row field-required hidden">
+<div class="form-content monthly-option">
+<fieldset><legend> Gift type:
+</legend>
+<div class="monthly__radios">
+<div class="designated-giving-recurring-row"><input id="level_flexiblegift_type1" name="level_flexiblegift_type" type="radio" value="1" />
+<label for="level_flexiblegift_type1">One-time gift</label></div>
+<div class="designated-giving-recurring-row"><input id="level_flexiblegift_type2" checked="checked" name="level_flexiblegift_type" type="radio" value="2" />
+<label for="level_flexiblegift_type2">Sustaining gift</label></div>
+</div></fieldset>
+<div class="arrow-up"></div>
+</div>
+<p class="monthly-note hidden">The best way to save animals year-round</p>
+
+</div>
+</div>
+<pre><strong>Select Your Donation Amount</strong></pre>
+</div>
+</div>
+<div id="level_flexible_row">
+<div class="don-standard-levels form-row">
+<div id="level_flexible_row" class="form-row form-donation-level">
+<div class="form-content">
+<p style="text-align: left;"><span class="FormLabelText">Select Gift Amount:</span></p>
+
+<div class="donation-level-general-ask" style="text-align: left;"></div>
+<div class="donation-levels">
+<div class="donation-level-container" style="text-align: left;">
+<div class="form-content">
+<div class="donation-level-input-container form-input">
+<pre class="donation-level-label-input-container">$15.00<input id="level_flexibleexpanded12751" name="level_flexibleexpanded" type="radio" value="12751" />
+
+
+<span style="background-color: var(--global--color-background); color: var(--global--color-primary); font-family: var(--global--font-secondary); font-size: var(--global--font-size-base);">$25.00</span><input id="level_flexibleexpanded12752" name="level_flexibleexpanded" type="radio" value="12752" />
+
+
+</pre>
+</div>
+</div>
+</div>
+<div class="form-content">
+<div class="donation-level-input-container form-input">
+
+<span style="background-color: var(--global--color-background); color: var(--global--color-primary); font-family: var(--global--font-secondary); font-size: var(--global--font-size-base);">$35.00</span><input id="level_flexibleexpanded12754" name="level_flexibleexpanded" type="radio" value="12754" />
+
+&nbsp;
+
+<span style="color: var(--global--color-primary); font-family: var(--global--font-secondary); font-size: var(--global--font-size-base); background-color: var(--global--color-background);">$50.00</span><input id="level_flexibleexpanded12753" name="level_flexibleexpanded" type="radio" value="12753" />
+
+&nbsp;
+
+</div>
+</div>
+<pre class="donation-level-container" style="text-align: left;"></pre>
+<div class="form-content">
+<div class="donation-level-input-container form-input">
+
+<span style="background-color: var(--global--color-background); color: var(--global--color-primary); font-family: var(--global--font-secondary); font-size: var(--global--font-size-base);">$100.00</span><input id="level_flexibleexpanded12763" name="level_flexibleexpanded" type="radio" value="12763" />
+
+&nbsp;
+
+</div>
+</div>
+<pre class="donation-level-container" style="text-align: left;"></pre>
+<div class="form-content">
+<div class="donation-level-input-container form-input">
+<div><span style="color: var(--global--color-primary); font-family: var(--global--font-secondary); font-size: var(--global--font-size-base); background-color: var(--global--color-background);">$200.00</span><input id="level_flexibleexpanded12759" name="level_flexibleexpanded" type="radio" value="12759" /></div>
+</div>
+</div>
+<div class="donation-level-container" style="text-align: left;">
+<div class="form-content">
+<div></div>
+<div class="donation-level-label-container"><strong>Surprise Us?</strong></div>
+<div class="donation-level-user-entered"><label for="level_flexibleexpanded12759amount"><span class="aural-only">Enter amount</span></label>
+<input id="level_flexibleexpanded12759amount" maxlength="50" name="level_flexibleexpanded12759amount" size="12" type="text" value="" /></div>
+<pre class="donation-level-input-container form-input"><span style="background-color: var(--global--color-background); color: var(--global--color-primary); font-family: var(--global--font-secondary); font-size: var(--global--font-size-base);">Gift type:</span></pre>
+<label for="level_flexiblegift_type1">One-time gift</label><input id="level_flexiblegift_type1" name="level_flexiblegift_type" type="radio" value="1" />
+
+</div>
+<div id="level_flexiblegift_type_Row" class="form-row field-required">
+<div class="form-content">
+<div class="designated-giving-recurring-row"><label for="level_flexible-gift_type2">Sustaining gift</label><input id="level_flexiblegift_type2" name="level_flexiblegift_type" type="radio" value="2" /></div>
+</div>
+</div>
+<div id="level_flexibleduration_row" class="form-row form-selectlist">
+<div class="form-content">
+
+<label class="FormLabel" for="level_flexibleduration">Select a Gift Duration:</label>
+<select name="level_flexibleduration" size="1">
+<option></option><optgroup label="Monthly">
+<option value="M:0">Forever(Monthly)</option>
+<option value="M:2">2 months</option>
+<option value="M:3">3 months</option>
+<option value="M:4">4 months</option>
+<option value="M:5">5 months</option>
+<option value="M:6">6 months</option>
+<option value="M:7">7 months</option>
+<option value="M:8">8 months</option></optgroup>
+</select>
+
+</div>
+</div>
+</div>
+<p style="text-align: left;">Your Information</p>
+
+<div id="billing_first_name_row" class="form-row form-text" style="text-align: left;">
+<pre class="form-content"><label for="billing_first_namename">*First Name</label><input id="billing_first_namename" maxlength="50" name="billing_first_namename" type="text" value="" /></pre>
+<label style="background-color: var(--global--color-background); color: var(--global--color-primary); font-family: var(--global--font-secondary); font-size: var(--global--font-size-base);" for="billing_last_namename">*Last Name</label><input id="billing_last_namename" maxlength="50" name="billing_last_namename" type="text" value="" />
+
+</div>
+<div class="form-content">
+
+<label style="background-color: var(--global--color-background); color: var(--global--color-primary); font-family: var(--global--font-secondary); font-size: var(--global--font-size-base);" for="donor_email_addressname">*Email</label> <input id="donor_email_addressname" maxlength="255" name="donor_email_addressname" type="text" value="" />
+
+</div>
+<div class="form-content"><label style="color: var(--global--color-primary); font-family: var(--global--font-secondary); font-size: var(--global--font-size-base); background-color: var(--global--color-background);" for="donor_phonename">*Phone </label><input id="donor_phonename" maxlength="50" name="donor_phonename" type="text" value="" /></div>
+<div class="form-content">
+
+<strong><span style="background-color: var(--global--color-background); color: var(--global--color-primary); font-family: var(--global--font-secondary); font-size: var(--global--font-size-base);">Billing Information</span></strong>
+
+</div>
+<div id="billing_addr_street1_row" class="form-row form-text" style="text-align: left;">
+<pre class="form-content"><label for="billing_addr_street1name">*Street 1</label><input id="billing_addr_street1name" maxlength="50" name="billing_addr_street1name" type="text" value="" />
+
+</pre>
+<div class="form-content">
+<pre><span style="background-color: var(--global--color-background); color: var(--global--color-primary); font-family: var(--global--font-secondary); font-size: var(--global--font-size-base);"><span style="background-color: var(--global--color-background); color: var(--global--color-primary); font-family: var(--global--font-secondary); font-size: var(--global--font-size-base);">*Street 2</span></span><input id="billing_addr_street2name" maxlength="50" name="billing_addr_street2name" type="text" value="" />
+
+<label style="background-color: var(--global--color-background); color: var(--global--color-primary); font-family: var(--global--font-secondary); font-size: var(--global--font-size-base);" for="billing_addr_cityname">*City</label><input id="billing_addr_cityname" maxlength="50" name="billing_addr_cityname" type="text" value="" />
+
+<span style="background-color: var(--global--color-background); color: var(--global--color-primary); font-family: var(--global--font-secondary); font-size: var(--global--font-size-base);">*State</span><select id="billing_addr_state" name="billing_addr_state" size="1">
+<option></option>
+<option value="AK">AK - Alaska</option>
+<option value="AL">AL - Alabama</option>
+<option value="AR">AR - Arkansas</option>
+<option value="AZ">AZ - Arizona</option>
+<option value="CA">CA - California</option>
+<option value="CO">CO - Colorado</option>
+<option value="CT">CT - Connecticut</option>
+<option value="DC">DC - District of Columbia</option>
+<option value="DE">DE - Delaware</option>
+<option value="FL">FL - Florida</option>
+<option value="GA">GA - Georgia</option>
+<option value="HI">HI - Hawaii</option>
+<option value="IA">IA - Iowa</option>
+<option value="ID">ID - Idaho</option>
+<option value="IL">IL - Illinois</option>
+<option value="IN">IN - Indiana</option>
+<option value="KS">KS - Kansas</option>
+<option value="KY">KY - Kentucky</option>
+<option value="LA">LA - Louisiana</option>
+<option value="MA">MA - Massachusetts</option>
+<option value="MD">MD - Maryland</option>
+<option value="ME">ME - Maine</option>
+<option value="MI">MI - Michigan</option>
+<option value="MN">MN - Minnesota</option>
+<option value="MO">MO - Missouri</option>
+<option value="MS">MS - Mississippi</option>
+<option value="MT">MT - Montana</option>
+<option value="NC">NC - North Carolina</option>
+<option value="ND">ND - North Dakota</option>
+<option value="NE">NE - Nebraska</option>
+<option value="NH">NH - New Hampshire</option>
+<option value="NJ">NJ - New Jersey</option>
+<option value="NM">NM - New Mexico</option>
+<option value="NV">NV - Nevada</option>
+<option value="NY">NY - New York</option>
+<option value="OH">OH - Ohio</option>
+<option value="OK">OK - Oklahoma</option>
+<option value="OR">OR - Oregon</option>
+<option value="PA">PA - Pennsylvania</option>
+<option value="RI">RI - Rhode Island</option>
+<option value="SC">SC - South Carolina</option>
+<option value="SD">SD - South Dakota</option>
+<option value="TN">TN - Tennessee</option>
+<option value="TX">TX - Texas</option>
+<option value="UT">UT - Utah</option>
+<option value="VA">VA - Virginia</option>
+<option value="VT">VT - Vermont</option>
+<option value="WA">WA - Washington</option>
+<option value="WI">WI - Wisconsin</option>
+<option value="WV">WV - West Virginia</option>
+<option value="WY">WY - Wyoming</option>
+<option value="AS">AS - American Samoa</option>
+<option value="FM">FM - Federated States of Micronesia</option>
+<option value="GU">GU - Guam</option>
+<option value="MH">MH - Marshall Islands</option>
+<option value="MP">MP - Northern Mariana Islands</option>
+<option value="PR">PR - Puerto Rico</option>
+<option value="PW">PW - Palau</option>
+<option value="VI">VI - Virgin Islands</option>
+<option value="AA">AA - Armed Forces Americas</option>
+<option value="AE">AE - Armed Forces</option>
+<option value="AP">AP - Armed Forces Pacific</option>
+<option value="AB">AB - Alberta</option>
+<option value="BC">BC - British Columbia</option>
+<option value="MB">MB - Manitoba</option>
+<option value="NB">NB - New Brunswick</option>
+<option value="NL">NL - Newfoundland and Labrador</option>
+<option value="NS">NS - Nova Scotia</option>
+<option value="NT">NT - Northwest Territories</option>
+<option value="NU">NU - Nunavut</option>
+<option value="ON">ON - Ontario</option>
+<option value="PE">PE - Prince Edward Island</option>
+<option value="QC">QC - Quebec</option>
+<option value="SK">SK - Saskatchewan</option>
+<option value="YT">YT - Yukon</option>
+<option value="None">None</option>
+
+
+
+
+
+
+
+
+
+
+
+</select></pre>
+</div>
+</div>
+<div id="billing_addr_state_row" class="form-row form-selectlist" style="text-align: left;">
+<div class="form-content"></div>
+<div class="form-content"><span class="&quot;field-requiredspan" style="background-color: var(--global--color-background); color: var(--global--color-primary); font-family: var(--global--font-secondary); font-size: var(--global--font-size-base);"><span class="&quot;field-requiredspan"><label for="billing_addr_zipname">*Zip Code</label></span></span><input id="billing_addr_zipname" maxlength="50" name="billing_addr_zipname" type="text" value="" /></div>
+<div></div>
+<div class="form-content"><span style="background-color: var(--global--color-background); color: var(--global--color-primary); font-family: var(--global--font-secondary); font-size: var(--global--font-size-base);">*Country</span></div>
+</div>
+<div id="billing_addr_zip_row" class="form-row form-text" style="text-align: left;">
+<div class="form-content">
+
+<select id="billing_addr_country" name="billing_addr_country" size="1" onchange="fire_obs_comp_event('billing_addr_country', this)">
+<option></option>
+<option selected="selected" value="United States">United States</option>
+<option value="Afghanistan">Afghanistan</option>
+<option value="Aland Islands">Aland Islands</option>
+<option value="Albania">Albania</option>
+<option value="Algeria">Algeria</option>
+<option value="American Samoa">American Samoa</option>
+<option value="Andorra">Andorra</option>
+<option value="Angola">Angola</option>
+<option value="Anguilla">Anguilla</option>
+<option value="Antarctica">Antarctica</option>
+<option value="Antigua and Barbuda">Antigua and Barbuda</option>
+<option value="Argentina">Argentina</option>
+<option value="Armenia">Armenia</option>
+<option value="Aruba">Aruba</option>
+<option value="Australia">Australia</option>
+<option value="Austria">Austria</option>
+<option value="Azerbaijan">Azerbaijan</option>
+<option value="Bahamas">Bahamas</option>
+<option value="Bahrain">Bahrain</option>
+<option value="Bangladesh">Bangladesh</option>
+<option value="Barbados">Barbados</option>
+<option value="Belarus">Belarus</option>
+<option value="Belgium">Belgium</option>
+<option value="Belize">Belize</option>
+<option value="Benin">Benin</option>
+<option value="Bermuda">Bermuda</option>
+<option value="Bhutan">Bhutan</option>
+<option value="Bolivarian Republic of Venezuela">Bolivarian Republic of Venezuela</option>
+<option value="Bonaire, Sint Eustatios and Saba">Bonaire, Sint Eustatios and Saba</option>
+<option value="Bosnia and Herzegovina">Bosnia and Herzegovina</option>
+<option value="Botswana">Botswana</option>
+<option value="Bouvet Island">Bouvet Island</option>
+<option value="Brazil">Brazil</option>
+<option value="British Indian Ocean Territory">British Indian Ocean Territory</option>
+<option value="Brunei Darussalam">Brunei Darussalam</option>
+<option value="Bulgaria">Bulgaria</option>
+<option value="Burkina Faso">Burkina Faso</option>
+<option value="Burundi">Burundi</option>
+<option value="Cambodia">Cambodia</option>
+<option value="Cameroon">Cameroon</option>
+<option value="Canada">Canada</option>
+<option value="Cape Verde">Cape Verde</option>
+<option value="Cayman Islands">Cayman Islands</option>
+<option value="Central African Republic">Central African Republic</option>
+<option value="Chad">Chad</option>
+<option value="Chile">Chile</option>
+<option value="China">China</option>
+<option value="Christmas Island">Christmas Island</option>
+<option value="Cocos (Keeling) Islands">Cocos (Keeling) Islands</option>
+<option value="Colombia">Colombia</option>
+<option value="Comoros">Comoros</option>
+<option value="Congo">Congo</option>
+<option value="Cook Islands">Cook Islands</option>
+<option value="Costa Rica">Costa Rica</option>
+<option value="Cote D'Ivoire">Cote D'Ivoire</option>
+<option value="Croatia">Croatia</option>
+<option value="Cuba">Cuba</option>
+<option value="Curacao">Curacao</option>
+<option value="Cyprus">Cyprus</option>
+<option value="Czech Republic">Czech Republic</option>
+<option value="Democratic People's Republic of Korea">Democratic People's Republic of Korea</option>
+<option value="The Democratic Republic of the Congo">The Democratic Republic of the Congo</option>
+<option value="Denmark">Denmark</option>
+<option value="Djibouti">Djibouti</option>
+<option value="Dominica">Dominica</option>
+<option value="Dominican Republic">Dominican Republic</option>
+<option value="Ecuador">Ecuador</option>
+<option value="Egypt">Egypt</option>
+<option value="El Salvador">El Salvador</option>
+<option value="Equatorial Guinea">Equatorial Guinea</option>
+<option value="Eritrea">Eritrea</option>
+<option value="Estonia">Estonia</option>
+<option value="Ethiopia">Ethiopia</option>
+<option value="Falkland Islands (Malvinas)">Falkland Islands (Malvinas)</option>
+<option value="Faroe Islands">Faroe Islands</option>
+<option value="Federated States of Micronesia">Federated States of Micronesia</option>
+<option value="Fiji">Fiji</option>
+<option value="Finland">Finland</option>
+<option value="The Former Yugoslav Republic of Macedonia">The Former Yugoslav Republic of Macedonia</option>
+<option value="France">France</option>
+<option value="French Guiana">French Guiana</option>
+<option value="French Polynesia">French Polynesia</option>
+<option value="French Southern Territories">French Southern Territories</option>
+<option value="Gabon">Gabon</option>
+<option value="Gambia">Gambia</option>
+<option value="Georgia">Georgia</option>
+<option value="Germany">Germany</option>
+<option value="Ghana">Ghana</option>
+<option value="Gibraltar">Gibraltar</option>
+<option value="Greece">Greece</option>
+<option value="Greenland">Greenland</option>
+<option value="Grenada">Grenada</option>
+<option value="Guadeloupe">Guadeloupe</option>
+<option value="Guam">Guam</option>
+<option value="Guatemala">Guatemala</option>
+<option value="Guernsey">Guernsey</option>
+<option value="Guinea">Guinea</option>
+<option value="Guinea-Bissau">Guinea-Bissau</option>
+<option value="Guyana">Guyana</option>
+<option value="Haiti">Haiti</option>
+<option value="Heard Island and McDonald Islands">Heard Island and McDonald Islands</option>
+<option value="Holy See (Vatican City State)">Holy See (Vatican City State)</option>
+<option value="Honduras">Honduras</option>
+<option value="Hong Kong">Hong Kong</option>
+<option value="Hungary">Hungary</option>
+<option value="Iceland">Iceland</option>
+<option value="India">India</option>
+<option value="Indonesia">Indonesia</option>
+<option value="Iraq">Iraq</option>
+<option value="Ireland">Ireland</option>
+<option value="Islamic Republic of Iran">Islamic Republic of Iran</option>
+<option value="Isle of Man">Isle of Man</option>
+<option value="Israel">Israel</option>
+<option value="Italy">Italy</option>
+<option value="Jamaica">Jamaica</option>
+<option value="Japan">Japan</option>
+<option value="Jersey">Jersey</option>
+<option value="Jordan">Jordan</option>
+<option value="Kazakhstan">Kazakhstan</option>
+<option value="Kenya">Kenya</option>
+<option value="Kiribati">Kiribati</option>
+<option value="Kuwait">Kuwait</option>
+<option value="Kyrgyzstan">Kyrgyzstan</option>
+<option value="Laos People's Democratic Republic">Laos People's Democratic Republic</option>
+<option value="Latvia">Latvia</option>
+<option value="Lebanon">Lebanon</option>
+<option value="Lesotho">Lesotho</option>
+<option value="Liberia">Liberia</option>
+<option value="Libya">Libya</option>
+<option value="Liechtenstein">Liechtenstein</option>
+<option value="Lithuania">Lithuania</option>
+<option value="Luxembourg">Luxembourg</option>
+<option value="Macao">Macao</option>
+<option value="Madagascar">Madagascar</option>
+<option value="Malawi">Malawi</option>
+<option value="Malaysia">Malaysia</option>
+<option value="Maldives">Maldives</option>
+<option value="Mali">Mali</option>
+<option value="Malta">Malta</option>
+<option value="Marshall Islands">Marshall Islands</option>
+<option value="Martinique">Martinique</option>
+<option value="Mauritania">Mauritania</option>
+<option value="Mauritius">Mauritius</option>
+<option value="Mayotte">Mayotte</option>
+<option value="Mexico">Mexico</option>
+<option value="Monaco">Monaco</option>
+<option value="Mongolia">Mongolia</option>
+<option value="Montenegro">Montenegro</option>
+<option value="Montserrat">Montserrat</option>
+<option value="Morocco">Morocco</option>
+<option value="Mozambique">Mozambique</option>
+<option value="Myanmar">Myanmar</option>
+<option value="Namibia">Namibia</option>
+<option value="Nauru">Nauru</option>
+<option value="Nepal">Nepal</option>
+<option value="Netherlands">Netherlands</option>
+<option value="New Caledonia">New Caledonia</option>
+<option value="New Zealand">New Zealand</option>
+<option value="Nicaragua">Nicaragua</option>
+<option value="Niger">Niger</option>
+<option value="Nigeria">Nigeria</option>
+<option value="Niue">Niue</option>
+<option value="Norfolk Island">Norfolk Island</option>
+<option value="Northern Mariana Islands">Northern Mariana Islands</option>
+<option value="Norway">Norway</option>
+<option value="Oman">Oman</option>
+<option value="Pakistan">Pakistan</option>
+<option value="Palau">Palau</option>
+<option value="Palestinian Territory, Occupied">Palestinian Territory, Occupied</option>
+<option value="Panama">Panama</option>
+<option value="Papua New Guinea">Papua New Guinea</option>
+<option value="Paraguay">Paraguay</option>
+<option value="Peru">Peru</option>
+<option value="Philippines">Philippines</option>
+<option value="Pitcairn">Pitcairn</option>
+<option value="Plurinational State of Bolivia">Plurinational State of Bolivia</option>
+<option value="Poland">Poland</option>
+<option value="Portugal">Portugal</option>
+<option value="Puerto Rico">Puerto Rico</option>
+<option value="Qatar">Qatar</option>
+<option value="Republic of Korea">Republic of Korea</option>
+<option value="Republic of Moldova">Republic of Moldova</option>
+<option value="Reunion">Reunion</option>
+<option value="Romania">Romania</option>
+<option value="Russian Federation">Russian Federation</option>
+<option value="Rwanda">Rwanda</option>
+<option value="Saint Barthelemy">Saint Barthelemy</option>
+<option value="Saint Helena, Ascension and Tristan da Cunha">Saint Helena, Ascension and Tristan da Cunha</option>
+<option value="Saint Kitts and Nevis">Saint Kitts and Nevis</option>
+<option value="Saint Lucia">Saint Lucia</option>
+<option value="Saint Martin (French)">Saint Martin (French)</option>
+<option value="Saint Pierre and Miquelon">Saint Pierre and Miquelon</option>
+<option value="Saint Vincent and the Grenadines">Saint Vincent and the Grenadines</option>
+<option value="Samoa">Samoa</option>
+<option value="San Marino">San Marino</option>
+<option value="Sao Tome and Principe">Sao Tome and Principe</option>
+<option value="Saudi Arabia">Saudi Arabia</option>
+<option value="Senegal">Senegal</option>
+<option value="Serbia">Serbia</option>
+<option value="Seychelles">Seychelles</option>
+<option value="S. Georgia &amp; S. Sandwich Isls.">S. Georgia &amp; S. Sandwich Isls.</option>
+<option value="Sierra Leone">Sierra Leone</option>
+<option value="Singapore">Singapore</option>
+<option value="Sint Maarten (Dutch)">Sint Maarten (Dutch)</option>
+<option value="Slovakia">Slovakia</option>
+<option value="Slovenia">Slovenia</option>
+<option value="Solomon Islands">Solomon Islands</option>
+<option value="Somalia">Somalia</option>
+<option value="South Africa">South Africa</option>
+<option value="South Sudan">South Sudan</option>
+<option value="Spain">Spain</option>
+<option value="Sri Lanka">Sri Lanka</option>
+<option value="Sudan">Sudan</option>
+<option value="Suriname">Suriname</option>
+<option value="Svalbard and Jan Mayen">Svalbard and Jan Mayen</option>
+<option value="Swaziland">Swaziland</option>
+<option value="Sweden">Sweden</option>
+<option value="Switzerland">Switzerland</option>
+<option value="Syrian Arab Republic">Syrian Arab Republic</option>
+<option value="Taiwan, Province of China">Taiwan, Province of China</option>
+<option value="Tajikistan">Tajikistan</option>
+<option value="Thailand">Thailand</option>
+<option value="Timor-Leste">Timor-Leste</option>
+<option value="Togo">Togo</option>
+<option value="Tokelau">Tokelau</option>
+<option value="Tonga">Tonga</option>
+<option value="Trinidad and Tobago">Trinidad and Tobago</option>
+<option value="Tunisia">Tunisia</option>
+<option value="Turkey">Turkey</option>
+<option value="Turkmenistan">Turkmenistan</option>
+<option value="Turks and Caicos Islands">Turks and Caicos Islands</option>
+<option value="Tuvalu">Tuvalu</option>
+<option value="Uganda">Uganda</option>
+<option value="Ukraine">Ukraine</option>
+<option value="United Arab Emirates">United Arab Emirates</option>
+<option value="United Kingdom">United Kingdom</option>
+<option value="United Republic of Tanzania">United Republic of Tanzania</option>
+<option value="Uruguay">Uruguay</option>
+<option value="USA Minor Outlying Islands">USA Minor Outlying Islands</option>
+<option value="Uzbekistan">Uzbekistan</option>
+<option value="Vanuatu">Vanuatu</option>
+<option value="Viet Nam">Viet Nam</option>
+<option value="Virgin Islands (British)">Virgin Islands (British)</option>
+<option value="Virgin Islands (USA)">Virgin Islands (USA)</option>
+<option value="Wallis and Futuna">Wallis and Futuna</option>
+<option value="Western Sahara">Western Sahara</option>
+<option value="Yemen">Yemen</option>
+<option value="Zambia">Zambia</option>
+<option value="Zimbabwe">Zimbabwe</option>
+</select>
+
+<input id="donor_remember_mename" checked="checked" name="donor_remember_mename" type="checkbox" /><span style="background-color: var(--global--color-background); color: var(--global--color-primary); font-family: var(--global--font-secondary); font-size: var(--global--font-size-base);">Remember Me</span>
+
+</div>
+</div>
+<div id="select_grid_row" class="form-row form-text" style="text-align: center;">
+<div class="form-content">
+
+<span style="background-color: var(--global--color-background); color: var(--global--color-primary); font-family: var(--global--font-secondary); font-size: var(--global--font-size-base);">If you donate and have not already registered, you will receive periodic updates and communications from North Shore Animal League America.</span>
+
+</div>
+</div>
+<div class="form-row" style="text-align: center;">
+<div class="html-caption-container">
+<p style="font-size: .75em; color: #7c858c;"><span class="privacy-statement">If you donate and have not already registered, you will receive periodic updates and communications from North Shore Animal League America.</span></p>
+
+</div>
+</div>
+<p style="text-align: left;">Is This a Gift?<input id="tribute_show_honor_fieldsname" name="tribute_show_honor_fieldsname" type="checkbox" /></p>
+<p style="text-align: left;"><label style="color: var(--global--color-primary); font-family: var(--global--font-secondary); font-size: var(--global--font-size-base); background-color: var(--global--color-background);" for="tribute_honoree_first_namename">*</label><label style="color: var(--global--color-primary); font-family: var(--global--font-secondary); font-size: var(--global--font-size-base); background-color: var(--global--color-background);" for="tribute_honoree_first_namename">First Name</label><input id="tribute_honoree_first_namename" maxlength="50" name="tribute_honoree_first_namename" type="text" value="" /></p>
+
+<div id="tribute_honoree_last_name_row" class="form-row form-text" style="text-align: left;">
+<div class="form-content"><label for="tribute_honoree_last_namename">*Last Name</label><input id="tribute_honoree_last_namename" maxlength="50" name="tribute_honoree_last_namename" type="text" value="" /></div>
+</div>
+<div id="send_ecard_row" class="form-row form-checkbox" style="text-align: left;">
+<div class="form-content">
+
+<span class="check-box-form-label-text">Would you like to send an eCard?</span>
+
+<label for="send_ecardname">Yes, this is a gift </label><input id="send_ecardname" name="send_ecardname" type="checkbox" />
+
+<span style="background-color: var(--global--color-background); color: var(--global--color-primary); font-family: var(--global--font-secondary); font-size: var(--global--font-size-base);">Select an eCard:</span>
+
+</div>
+</div>
+<div id="select_grid_row" class="form-row form-text" style="text-align: left;">
+<div class="form-content">
+
+<label style="background-color: var(--global--color-background); color: var(--global--color-primary); font-family: var(--global--font-secondary); font-size: var(--global--font-size-base);" for="tribute_ecard_subjectname">eCard Subject</label><input id="tribute_ecard_subjectname" maxlength="50" name="tribute_ecard_subjectname" type="text" value="" />
+
+</div>
+</div>
+<div id="tribute_ecard_subject_row" class="form-row form-text" style="text-align: left;">
+<div class="form-content">
+
+<input id="tribute_ecard_subjectsubmit" name="tribute_ecard_subjectsubmit" type="hidden" value="true" />
+
+<noscript>&nbsp;</noscript>
+
+</div>
+</div>
+<label for="tribute_ecard_messagename">eCard Message</label><textarea id="tribute_ecard_messagename" cols="60" name="tribute_ecard_messagename" rows="4">Messages must be a maximum of 250 characters, including spacing and punctuation.</textarea>
+<p style="text-align: left;"><label style="background-color: var(--global--color-background); color: var(--global--color-primary); font-family: var(--global--font-secondary); font-size: var(--global--font-size-base);" for="ecard_recpientsname">Recipient email addresses</label><textarea id="ecard_recpientsname" style="width: 380px; height: 43px;" cols="60" name="ecard_recpientsname" rows="4"></textarea></p>
+
+<pre style="text-align: left;"><span style="background-color: var(--global--color-background); color: var(--global--color-primary); font-family: var(--global--font-secondary); font-size: var(--global--font-size-base);">Send eCard on:</span></pre>
+<div id="ecard_send_date_row" class="form-row form-date" style="text-align: center;">
+<div class="form-content" style="text-align: left;"><select id="ecard_send_date_MONTH" title="Month" name="ecard_send_date_MONTH">
+<option value="1">Jan</option>
+<option value="2">Feb</option>
+<option value="3">Mar</option>
+<option value="4">Apr</option>
+<option value="5">May</option>
+<option value="6">Jun</option>
+<option value="7">Jul</option>
+<option value="8">Aug</option>
+<option value="9">Sep</option>
+<option selected="selected" value="10">Oct</option>
+<option value="11">Nov</option>
+<option value="12">Dec</option>
+</select><select id="ecard_send_date_DAY" title="Day" name="ecard_send_date_DAY">
+<option value="1">1</option>
+<option value="2">2</option>
+<option value="3">3</option>
+<option value="4">4</option>
+<option selected="selected" value="5">5</option>
+<option value="6">6</option>
+<option value="7">7</option>
+<option value="8">8</option>
+<option value="9">9</option>
+<option value="10">10</option>
+<option value="11">11</option>
+<option value="12">12</option>
+<option value="13">13</option>
+<option value="14">14</option>
+<option value="15">15</option>
+<option value="16">16</option>
+<option value="17">17</option>
+<option value="18">18</option>
+<option value="19">19</option>
+<option value="20">20</option>
+<option value="21">21</option>
+<option value="22">22</option>
+<option value="23">23</option>
+<option value="24">24</option>
+<option value="25">25</option>
+<option value="26">26</option>
+<option value="27">27</option>
+<option value="28">28</option>
+<option value="29">29</option>
+<option value="30">30</option>
+<option value="31">31</option>
+</select><select id="ecard_send_date_YEAR" title="Year" name="ecard_send_date_YEAR">
+<option value="2032">2032</option>
+<option value="2031">2031</option>
+<option value="2030">2030</option>
+<option value="2029">2029</option>
+<option value="2028">2028</option>
+<option value="2027">2027</option>
+<option value="2026">2026</option>
+<option value="2025">2025</option>
+<option value="2024">2024</option>
+<option value="2023">2023</option>
+<option selected="selected" value="2022">2022</option>
+</select></div>
+</div>
+<div id="ecard_send_date_row" class="form-row form-date" style="text-align: center;">
+<div class="form-content">
+
+&nbsp;
+
+<label for="e_card_copy_sendername">Send me a copy of the card.</label><input id="e_card_copy_sendername" name="e_card_copy_sendername" type="checkbox" />
+<input id="e_card_copy_sendersubmit" name="e_card_copy_sendersubmit" type="hidden" value="true" /><button id="nullbtn" class="step-button action-button" title="Reloads page. " name="nullbtn" type="submit" value="Preview eCard">Preview eCard</button>
+
+<span style="font-family: var(--heading--font-family); font-size: var(--heading--font-size-h3); font-weight: var(--heading--font-weight); letter-spacing: var(--heading--letter-spacing-h3); background-color: var(--global--color-background); color: var(--global--color-primary);">Payment Method:</span>
+<pre style="text-align: left;"><input id="payment_typepay_typeradiocredit" checked="checked" name="payment_typepay_typeradio" type="radio" value="credit" /><label style="font-family: var(--global--font-secondary); font-weight: var(--heading--font-weight); letter-spacing: var(--heading--letter-spacing-h3); color: var(--global--color-primary); background-color: var(--global--color-background); font-size: var(--global--font-size-base);" for="payment_typepay_typeradiocredit"><a class="payment-type-label">Credit Card</a></label></pre>
+<pre style="text-align: left;"><input id="payment_typepay_typeradiopaypal" name="payment_typepay_typeradio" type="radio" value="paypal" /><label style="font-family: var(--global--font-secondary); font-weight: var(--heading--font-weight); letter-spacing: var(--heading--letter-spacing-h3); color: var(--global--color-primary); background-color: var(--global--color-background); font-size: var(--global--font-size-base);" for="payment_typepay_typeradiopaypal"><img class="alignnone" src="../images/payment/paypal-logo.png" alt="Pay with Paypal" width="152" height="30" /></label></pre>
+</div>
+</div>
+<div class="payment-type-element-container">
+<div class="payment-type-selection-container payment-field-container">
+<div id="payment_typepay_typeradio_row" class="form-row">
+<div class="form-content">
+<div id="payment_cc_container" class="payment-field-container" style="text-align: center;">
+<pre style="text-align: left;"><strong>Credit Card Information:</strong></pre>
+<h3 style="text-align: left;"><label style="background-color: var(--global--color-background); color: var(--global--color-primary); font-family: var(--global--font-secondary); font-size: var(--global--font-size-base);" for="payment_typecc_numbername">Credit Card Number:</label><input id="payment_typecc_numbername" autocomplete="off" maxlength="22" name="payment_typecc_numbername" type="text" value="" /></h3>
+<h3 style="text-align: left;"><span style="background-color: var(--global--color-background); color: var(--global--color-primary); font-family: var(--global--font-secondary); font-size: var(--global--font-size-base);">Expiration Date</span></h3>
+<div id="payment_typecc_exp_date_row" class="form-row form-date" style="text-align: left;">
+<div class="form-content"><select id="payment_typecc_exp_date_MONTH" name="payment_typecc_exp_date_MONTH">
+<option value="1"></option>
+<option value="1">01</option>
+<option value="2">02</option>
+<option value="3">03</option>
+<option value="4">04</option>
+<option value="5">05</option>
+<option value="6">06</option>
+<option value="7">07</option>
+<option value="8">08</option>
+<option value="9">09</option>
+<option selected="selected" value="10">10</option>
+<option value="11">11</option>
+<option value="12">12</option>
+</select><select id="payment_typecc_exp_date_YEAR" name="payment_typecc_exp_date_YEAR">
+<option selected="selected" value="2022">2022</option>
+<option value="2023">2023</option>
+<option value="2024">2024</option>
+<option value="2025">2025</option>
+<option value="2026">2026</option>
+<option value="2027">2027</option>
+<option value="2028">2028</option>
+<option value="2029">2029</option>
+<option value="2030">2030</option>
+<option value="2031">2031</option>
+<option value="2032">2032</option>
+</select></div>
+</div>
+<div id="payment_typecc_cvv_row" class="form-row form-text cvv-input">
+<div class="form-content" style="text-align: left;"><label for="payment_typecc_cvvname"><span class="FormLabelText">CVV Number:</span></label><input id="payment_typecc_cvvname" autocomplete="off" maxlength="4" name="payment_typecc_cvvname" type="text" value="" /></div>
+<div style="text-align: left;"></div>
+<pre class="form-content"><span style="font-family: var(--heading--font-family); font-size: var(--heading--font-size-h3); font-weight: var(--heading--font-weight); letter-spacing: var(--heading--letter-spacing-h3); background-color: var(--global--color-background); color: var(--global--color-primary);">Check Information</span></pre>
+</div>
+</div>
+<pre class="cover-fee" style="text-align: center;"><input id="cover-fee-yes" name="fee-cover" type="checkbox" /> <label for="cover-fee-yes">Yes, I want 100% to go to North Shore Animal League America. Please increase my amount by 3% to cover all credit card transaction fees.</label></pre>
+<div class="button-container clearfix">
+<div class="button-sub-container" style="text-align: center;"></div>
+</div>
+</div>
+<div class="button-container clearfix">
+<div class="button-sub-container">
+<h2 style="text-align: center;"><button id="pstep_finish" class="step-button action-button finish-step" name="pstep_finish" type="submit" value="Make Your Donation">Make Your Donation</button></h2>
+</div>
+</div>
+<h5><input id="idb" name="idb" type="hidden" value="847408685" /></h5>
+<h5></h5>
+<h5></h5>
+<h5></h5>
+<h5><strong><span style="color: #7c858c; font-size: 0.75em; background-color: var(--global--color-background); font-family: var(--global--font-secondary);">Please note that the option to add the transaction processing fee to your gift will apply to your gift today and any future monthly gifts.</span></strong></h5>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>```````````
