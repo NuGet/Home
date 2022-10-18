@@ -1020,13 +1020,23 @@ Outputs json for format version 1, if it's not specified then latest version'll 
 }
 ```
 
-### Error handling
+### Error/Warning handling
 
-In case of an error it would be written into `problems` section and return non-0 error exit code to indicate there had been some error to help scripting use cases.
+In case of an `error` it would be written into `problems` section and return non-0 error exit code if there is any `error` to indicate there had been some error to help scripting use case. Note: `Warnings` in `problems` section are not considered as `error`.
 
-In case of runtime there's error then it may not show json output at all because it needs all the data for json output before display.
-
-In case there is parameter, options error then it may defaults back to console output instead of json output, for example: `dotnet list package -include-transitive --format json`, because that option/parameter validation for `-include-transitive` happen way before `list package` code execution. But `dotnet list package -framework net7.0` wouldn't fail even though `net7.0` is not valid framework at this moment, it would simply return empty result.
+| # | Scenario | Behavior in dotnet cli | Exit code
+|---|---|---|---|
+| 1 | Missing .net sdk/runtime installion| No json output, show missing .net sdk/runtime installation error in console | ?
+| 1 | Runtime error | No json output, because it needs all the data for json output, normal error stack output in console| 1
+| 1 | Parameter/options typo error | May defaults back to console output instead of json output, for example: `dotnet list package -include-transitive --format json` (here `-include-transitive` is missing another `-` in front), because that option/parameter validation for `-include-transitive` happen way before `list package` code execution | 1
+| 1 | Passing unsupported targetframe | `dotnet list package -framework net9.0` wouldn't fail even though `net9.0` is not valid framework at this moment, it would simply return empty result.  | 0
+| 1 | Asset file missing | Error would be in problems section of json, see below. | 1
+| 1 | Non-existing csproj file path | Error would be in problems section of json, see below. | 1
+| 1 | Package.config project | Error would be in problems section of json, see below. | 1
+| 1 | Incompatible option combination | Warning would be in problems section of json, see below. | 0
+| 1 | Use of not secure http source | Warning would be in problems section of json, see below. | 0
+| 1 | Unsupported output format | Defaults back to console output, for example: `dotnet list package --format yaml` | 1
+| 1 | Unsupported output version | Warning would be in problems section of json, defaults to latest supported version 1, see below. | 0
 
 #### `> dotnet list package`
 
