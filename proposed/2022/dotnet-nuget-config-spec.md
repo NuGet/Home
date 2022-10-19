@@ -35,9 +35,12 @@ You may refer to [How settings are applied](https://learn.microsoft.com/en-us/nu
 
 Prints out a description of how to use the command.
 
+- --current-directory
+Run this command as if current directory is set to the specified directory.
+
 #### Examples
 
-- List all the NuGet configuration file that will be applied.
+- List all the NuGet configuration file that will be applied, when invoking NuGet command in the current directory.
 
 ```
 dotnet nuget config list
@@ -49,12 +52,21 @@ C:\Program Files (x86)\NuGet\Config\Microsoft.VisualStudio.FallbackLocation.conf
 C:\Program Files (x86)\NuGet\Config\Microsoft.VisualStudio.Offline.config
 ```
 
+- List all the NuGet configuration file that will be applied, when invoking NuGet command in the specific directory.
+```
+dotnet nuget config list --current-directory c:\repos\Solution
+
+c:\repos\Solution\NuGet.Config
+C:\Users\username\AppData\Roaming\NuGet\NuGet.Config
+C:\Program Files (x86)\NuGet\Config\Microsoft.VisualStudio.FallbackLocation.config
+C:\Program Files (x86)\NuGet\Config\Microsoft.VisualStudio.Offline.config
+```
+
 ## Future Work
 The `dotnet nuget config list` is a community ask. We will consider adding more commands, like add/update/delete, in the future.
 
 ## Open Questions
-1. Shall we add `working directory` as an option? So that people could check different NuGet configuration lists without changing current directory.
-2. Do we need to add this into NuGet.exe CLI?
+1. Do we need to add this into NuGet.exe CLI?
 
 ## Considerations
 1. NuGet.exe [config command](https://learn.microsoft.com/en-us/nuget/reference/cli-reference/cli-ref-config) is implemented. But there is no `list` command. And the behavior is confusing (the `set` command will set the property which appears last when loading, so sometimes it's not updating the closest NuGet configuration file). Do we want to implement those subcommand(e.g.`set`) in the future in dotnet.exe differently?
