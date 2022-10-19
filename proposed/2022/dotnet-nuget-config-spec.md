@@ -36,6 +36,7 @@ You may refer to [How settings are applied](https://learn.microsoft.com/en-us/nu
 Prints out a description of how to use the command.
 
 - --current-directory
+
 Run this command as if current directory is set to the specified directory.
 
 #### Examples
