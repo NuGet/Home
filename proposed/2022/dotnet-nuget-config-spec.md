@@ -1,21 +1,21 @@
-# dotnet nuget config command
+# NuGet configuration CLI for dotnet.exe
 
 - Author: [Heng Liu](https://github.com/heng-liu)
 - GitHub Issue [8420](https://github.com/NuGet/Home/issues/8420)
 
 ## Problem Background
 
-Currently, there is no command for NuGet users to know about the NuGet configuration file locations. This is inconvienient for both NuGet users and NuGet team. When NuGet users want to figure out where is the merged configuration coming from, or when NuGet team tries to diagnose issues but needs all the configuration files, this command will be helpful.
+Currently, there is no NuGet configuration CLI for dotnet.exe. It's inconvenient for NuGet users to know about the NuGet configuration file locations and figure out where is the merged configuration coming from. 
 
 ## Who are the customers
 
 This feature is for dotnet.exe users.
 
 ## Goals
-Design and implement `dotnet nuget config list` commands.
+Design and implement `dotnet nuget config` command.
 
 ## Non-Goals
-Design and implement other `dotnet nuget config` commands. E.g. add/update/delete
+Design and implement `dotnet nuget config` command with commands other than `list`, E.g. add/update/delete
 
 ## Solution
 The following command will be implemented in the `dotnet.exe` CLI.
@@ -49,10 +49,13 @@ C:\Program Files (x86)\NuGet\Config\Microsoft.VisualStudio.FallbackLocation.conf
 C:\Program Files (x86)\NuGet\Config\Microsoft.VisualStudio.Offline.config
 ```
 
-### Future Work
+## Future Work
 The `dotnet nuget config list` is a community ask. We will consider adding more commands, like add/update/delete, in the future.
 
 ## Open Questions
 1. Shall we add `working directory` as an option? So that people could check different NuGet configuration lists without changing current directory.
 2. Do we need to add this into NuGet.exe CLI?
+
+## Considerations
+1. NuGet.exe [config command](https://learn.microsoft.com/en-us/nuget/reference/cli-reference/cli-ref-config) is implemented. But there is no `list` command. And the behavior is confusing (the `set` command will set the property which appears last when loading, so sometimes it's not updating the closest NuGet configuration file). Do we want to implement those subcommand(e.g.`set`) in the future in dotnet.exe differently?
 
