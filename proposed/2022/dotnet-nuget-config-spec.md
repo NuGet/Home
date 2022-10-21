@@ -30,14 +30,15 @@ If no command is specified, the command will default to list.
 Lists all the NuGet configuration file locations. This command will include all the NuGet configuration file that will be applied, when invoking NuGet command from the current working directory path. The listed NuGet configuration files are in priority order. So the order of loading those configurations is reversed, that is, loading order is from the bottom to the top. So the configuration on the top will apply.
 You may refer to [How settings are applied](https://learn.microsoft.com/en-us/nuget/consume-packages/configuring-nuget-behavior#how-settings-are-applied) for more details. 
 
+#### Arguments
+- CURRENT_DIRECTORY
+
+Run this command as if current directory is set to the specified directory.
+
 #### Options
 - -?|-h|--help
 
 Prints out a description of how to use the command.
-
-- --current-directory
-
-Run this command as if current directory is set to the specified directory.
 
 #### Examples
 
@@ -46,18 +47,21 @@ Run this command as if current directory is set to the specified directory.
 ```
 dotnet nuget config list
 
-c:\repos\Solution\Project\NuGet.Config
-c:\repos\Solution\NuGet.Config
+C:\Test\Repos\Solution\NuGet.Config
+C:\Test\Repos\NuGet.Config
+C:\Test\NuGet.Config
 C:\Users\username\AppData\Roaming\NuGet\NuGet.Config
 C:\Program Files (x86)\NuGet\Config\Microsoft.VisualStudio.FallbackLocation.config
 C:\Program Files (x86)\NuGet\Config\Microsoft.VisualStudio.Offline.config
 ```
 
 - List all the NuGet configuration file that will be applied, when invoking NuGet command in the specific directory.
-```
-dotnet nuget config list --current-directory c:\repos\Solution
 
-c:\repos\Solution\NuGet.Config
+```
+dotnet nuget config list  C:\Test\Repos
+
+C:\Test\Repos\NuGet.Config
+C:\Test\NuGet.Config
 C:\Users\username\AppData\Roaming\NuGet\NuGet.Config
 C:\Program Files (x86)\NuGet\Config\Microsoft.VisualStudio.FallbackLocation.config
 C:\Program Files (x86)\NuGet\Config\Microsoft.VisualStudio.Offline.config
