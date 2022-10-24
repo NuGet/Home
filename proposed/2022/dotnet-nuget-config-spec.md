@@ -23,7 +23,6 @@ The following command will be implemented in the `dotnet.exe` CLI.
 ### `dotnet nuget config`
 
 #### Commands
-If no command is specified, the command will default to list.
 
 - List
 
@@ -31,11 +30,13 @@ Lists all the NuGet configuration file locations. This command will include all 
 You may refer to [How settings are applied](https://learn.microsoft.com/en-us/nuget/consume-packages/configuring-nuget-behavior#how-settings-are-applied) for more details. 
 
 #### Arguments
+
 - CURRENT_DIRECTORY
 
 Run this command as if current directory is set to the specified directory.
 
 #### Options
+
 - -?|-h|--help
 
 Prints out a description of how to use the command.
