@@ -69,11 +69,16 @@ C:\Program Files (x86)\NuGet\Config\Microsoft.VisualStudio.Offline.config
 ```
 
 ## Future Work
-The `dotnet nuget config list` is a community ask. We will consider adding more commands, like add/update/delete, in the future.
+1. The `dotnet nuget config list` is a community ask. We will consider adding more commands, like add/update/delete, in the future.
+2. We will discuss if adding this command into NuGet.exe CLI, in the future.
+3. NuGet.exe [config command](https://learn.microsoft.com/en-us/nuget/reference/cli-reference/cli-ref-config) is implemented. But there is no `list` command. And the behavior is confusing (the `set` command will set the property which appears last when loading, so sometimes it's not updating the closest NuGet configuration file). Do we want to implement those subcommand(e.g.`set`) in the future in dotnet.exe differently?
 
 ## Open Questions
-1. Do we need to add this into NuGet.exe CLI?
+1. When the specified `CURRENT_DIRECTORY` doesn't exist, shall we list user-wide and machine-wide config files? Or show a warning saying the working directory doesn't exist? Or do both?
+
+I prefer do just a warning, or do both. 
+When user has a spelling mistake when passing `CURRENT_DIRECTORY` without knowing, if we don't show a warning, that would mislead the user.
+Showing them user-wide and machine-wide config files could provide extra info and may help them to understand the example of a right path. But since this is not a real scenario (It's impossible that a real `CURRENT_DIRECTORY` doesn't exist), this adds very limited value.
 
 ## Considerations
-1. NuGet.exe [config command](https://learn.microsoft.com/en-us/nuget/reference/cli-reference/cli-ref-config) is implemented. But there is no `list` command. And the behavior is confusing (the `set` command will set the property which appears last when loading, so sometimes it's not updating the closest NuGet configuration file). Do we want to implement those subcommand(e.g.`set`) in the future in dotnet.exe differently?
 
