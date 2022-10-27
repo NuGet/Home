@@ -1036,7 +1036,8 @@ In case of an `error` it would be written into `problems` section and return non
 | 1 | Incompatible option combination | Warning would be in problems section of json, see below. | 0
 | 1 | Use of not secure http source | Warning would be in problems section of json, see below. | 0
 | 1 | Unsupported output format | Defaults back to console output, for example: `dotnet list package --format yaml` | 1
-| 1 | Unsupported output version | Warning would be in problems section of json, defaults to latest supported version 1, see below. | 0
+| 1 | Unsupported output version | if it's for json output then no json output, error out unsupported output version , see below | 1
+| 1 | Unsupported output version | if it's for console output then it's ignored, versioning is not considered for console output | 0
 
 #### `> dotnet list package`
 
@@ -1237,26 +1238,20 @@ Warning for `Http source used` is included in json.
 }
 ```
 
+#### `> dotnet list package --format yaml`
+
+Output format yaml is not supported, error out.
+
+```dotnetcli
+error: Invalid value yaml provided for output format. The accepted values are console, json.
+```
+
 #### `> dotnet list package --format json --output-version 3`
 
-Since output version `3` is not available, then it'll default to latest available version, and log about unsupported format version request into json result.
+Output version `3` is not supported, error out instead of defaulting to any version, because defaulting to any version might give false negative which hides actual serious issue in report details.
 
-```json
-{
-  "version": 1,
-  "parameters": "--output-version 3",
-  "problems": [
-    {
-        "message": "Unsupported output format version 3 was requested. Defaulting to latest available format version 1."
-    }
-  ],
-  "projects": [
-    {
-      "path": "src/lib/MyProjectA.csproj",
-      ...
-    }
-  ]
-}
+```dotnetcli
+error: Unsupported output format version 3 was requested.  The accepted format version value is 1.
 ```
 
 ## Compatibility
