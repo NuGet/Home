@@ -76,9 +76,9 @@ C:\Program Files (x86)\NuGet\Config\Microsoft.VisualStudio.Offline.config
 ## Open Questions
 1. When the specified `CURRENT_DIRECTORY` doesn't exist, shall we list user-wide and machine-wide config files? Or show a warning saying the working directory doesn't exist? Or do both?
 
-I prefer do just a warning, or do both. 
-When user has a spelling mistake when passing `CURRENT_DIRECTORY` without knowing, if we don't show a warning, that would mislead the user.
-Showing them user-wide and machine-wide config files could provide extra info and may help them to understand the example of a right path. But since this is not a real scenario (It's impossible that a real `CURRENT_DIRECTORY` doesn't exist), this adds very limited value.
+We decided to show a warning/error. 
+When user has a spelling mistake when passing `CURRENT_DIRECTORY` without knowing, if we don't show a warning/error, that would mislead the user.
+Showing them user-wide and machine-wide config files doesn't help.
 
 ## Considerations
 
