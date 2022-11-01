@@ -1062,8 +1062,9 @@ No assets file was found for `C:\Users\userA\repos\MainApp\src\lib\MyProjectB.cs
   "parameters": "",
   "problems": [
     {
+        "level" : "error",
         "project": "src/lib/MyProjectB.csproj",
-        "error": "No assets file was found for `C:/Users/userA/repos/MainApp/src/lib/MyProjectB.csproj`. Please run restore before running this command."
+        "text": "No assets file was found for `C:/Users/userA/repos/MainApp/src/lib/MyProjectB.csproj`. Please run restore before running this command."
     }
   ],
   "projects": [
@@ -1112,8 +1113,9 @@ Could not find file or directory 'C:\Users\userA\repos\MainApp\src\lib\NonExisti
   "parameters": "",
   "problems": [
     {
+        "level" : "error",
         "project": "src/lib/NonExisting.csproj",
-        "error": "Could not find file or directory 'C:/Users/userA/repos/MainApp/src/lib/NonExisting.csproj'"
+        "text": "Could not find file or directory 'C:/Users/userA/repos/MainApp/src/lib/NonExisting.csproj'"
     }
   ]
 }
@@ -1142,8 +1144,9 @@ The project `C:\Users\userA\repos\MainApp\src\lib\MyProjectB.csproj` uses packag
   "parameters": "",
   "problems": [
     {
+        "level" : "error",
         "project": "src/lib/MyProjectB.csproj",
-        "error": "The project `C:/Users/userA/repos/MainApp/src/lib/MyProjectB.csproj`` uses package.config for NuGet packages, while the command works only with package reference projects."
+        "text": "The project `C:/Users/userA/repos/MainApp/src/lib/MyProjectB.csproj`` uses package.config for NuGet packages, while the command works only with package reference projects."
     }
   ],
   "projects": [
@@ -1201,7 +1204,8 @@ Json output for above case.
   "parameters": "--highest-minor",
   "problems": [
     {
-        "warning": "The command option(s) '--include-prerelease', '--highest-minor', and '--highest-patch' are ignored by this command."
+        "level" : "warning",
+        "text": "The command option(s) '--include-prerelease', '--highest-minor', and '--highest-patch' are ignored by this command."
     }
   ],
   "projects": [
@@ -1230,7 +1234,8 @@ Warning for `Http source used` is included in json.
   "parameters": "--vulnerable",
   "problems": [
     {
-    	"warning": "You are running the 'list package' operation with an 'HTTP' source, 'nugettest [http://apidev.nugettest.org/v3-index/index.json]'. Non-HTTPS access will be removed in a future version. Consider migrating to an 'HTTPS' source."
+      "level" : "warning",
+      "text": "You are running the 'list package' operation with an 'HTTP' source, 'nugettest [http://apidev.nugettest.org/v3-index/index.json]'. Non-HTTPS access will be removed in a future version. Consider migrating to an 'HTTPS' source."
     }
   ],
   "projects": [
