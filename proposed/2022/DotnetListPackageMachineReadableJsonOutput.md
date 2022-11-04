@@ -1037,7 +1037,7 @@ In case of an `error` it would be written into `problems` section and return non
 | 1 | Use of not secure http source | Warning would be in problems section of json, see below. | 0
 | 1 | Unsupported output format | Defaults back to console output, for example: `dotnet list package --format yaml` | 1
 | 1 | Unsupported output version | if it's for json output then no json output, error out unsupported output version , see below | 1
-| 1 | Unsupported output version | if it's for console output then it's ignored, versioning is not considered for console output | 0
+| 1 | Unsupported output version | if it's for console output then error out unsupported output version , see below | 1
 
 #### `> dotnet list package`
 
@@ -1252,6 +1252,14 @@ error: Invalid value yaml provided for output format. The accepted values are co
 ```
 
 #### `> dotnet list package --format json --output-version 3`
+
+Output version `3` is not supported, error out instead of defaulting to any version, because defaulting to any version might give false negative which hides actual serious issue in report details.
+
+```dotnetcli
+error: Unsupported output format version 3 was requested.  The accepted format version value is 1.
+```
+
+#### `> dotnet list package --format console --output-version 3`
 
 Output version `3` is not supported, error out instead of defaulting to any version, because defaulting to any version might give false negative which hides actual serious issue in report details.
 
