@@ -1722,7 +1722,7 @@
             }
           }
         ],
-        "taskName": "[Close stale icebox][4-1] Search \"Status:Inactive\" but without \"Status:Excluded from icebox cleanup\" and \"Triage:NeedsTriageDiscussion\", add \"Icebox cleanup candidate\" and show a warning."
+        "taskName": "[Close stale icebox][3-1] Search \"Status:Inactive\" but without \"Status:Excluded from icebox cleanup\" and \"Triage:NeedsTriageDiscussion\", add \"Icebox cleanup candidate\" and show a warning."
       }
     },
     {
@@ -1851,12 +1851,12 @@
             }
           }
         ],
-        "taskName": "[Close stale icebox][4-2] Close \"Icebox cleanup candidate\" if no activity within 14 days.",
+        "taskName": "[Close stale icebox][3-2] Close \"Icebox cleanup candidate\" if no activity within 14 days.",
         "actions": [
           {
             "name": "addReply",
             "parameters": {
-              "comment": "This issue will now be closed since it had been marked Icebox cleanup candidate, but received no further activity in the past 14 days. It is still possible to reopen or comment on the issue, but please note that the issue will be locked if it remains inactive for another 30 days."
+              "comment": "This issue will now be closed since it had been marked Icebox cleanup candidate, but received no further activity in the past 14 days. "
             }
           },
           {
@@ -1914,146 +1914,13 @@
         "eventNames": [
           "issue_comment"
         ],
-        "taskName": "[Close stale icebox][4-3] For \"Icebox cleanup candidate\" issues, if there is any comments, add \"Triage:NeedsTriageDiscussion\" label",
+        "taskName": "[Close stale icebox][3-3] For \"Icebox cleanup candidate\" issues, if there is any comments, add \"Triage:NeedsTriageDiscussion\" label",
         "actions": [
           {
             "name": "addLabel",
             "parameters": {
               "label": "Triage:NeedsTriageDiscussion"
             }
-          }
-        ]
-      }
-    },
-    {
-      "taskType": "scheduled",
-      "capabilityId": "ScheduledSearch",
-      "subCapability": "ScheduledSearch",
-      "version": "1.1",
-      "config": {
-        "frequency": [
-          {
-            "weekDay": 0,
-            "hours": [
-              2,
-              6,
-              10,
-              14,
-              18,
-              22
-            ],
-            "timezoneOffset": -7
-          },
-          {
-            "weekDay": 1,
-            "hours": [
-              2,
-              6,
-              10,
-              14,
-              18,
-              22
-            ],
-            "timezoneOffset": -7
-          },
-          {
-            "weekDay": 2,
-            "hours": [
-              2,
-              6,
-              10,
-              14,
-              18,
-              22
-            ],
-            "timezoneOffset": -7
-          },
-          {
-            "weekDay": 3,
-            "hours": [
-              2,
-              6,
-              10,
-              14,
-              18,
-              22
-            ],
-            "timezoneOffset": -7
-          },
-          {
-            "weekDay": 4,
-            "hours": [
-              2,
-              6,
-              10,
-              14,
-              18,
-              22
-            ],
-            "timezoneOffset": -7
-          },
-          {
-            "weekDay": 5,
-            "hours": [
-              2,
-              6,
-              10,
-              14,
-              18,
-              22
-            ],
-            "timezoneOffset": -7
-          },
-          {
-            "weekDay": 6,
-            "hours": [
-              2,
-              6,
-              10,
-              14,
-              18,
-              22
-            ],
-            "timezoneOffset": -7
-          }
-        ],
-        "searchTerms": [
-          {
-            "name": "isClosed",
-            "parameters": {}
-          },
-          {
-            "name": "isIssue",
-            "parameters": {}
-          },
-          {
-            "name": "hasLabel",
-            "parameters": {
-              "label": "Icebox cleanup candidate"
-            }
-          },
-          {
-            "name": "noActivitySince",
-            "parameters": {
-              "days": 30
-            }
-          },
-          {
-            "name": "isUnlocked",
-            "parameters": {}
-          },
-          {
-            "name": "hasLabel",
-            "parameters": {
-              "label": "internal-debugging"
-            }
-          }
-        ],
-        "taskName": "[Close stale icebox][4-4] For closed \"Icebox cleanup candidate\" issues, lock them after 30 days.",
-        "actions": [
-          {
-            "name": "lockIssue",
-            "parameters": {}
           }
         ]
       }
