@@ -185,6 +185,7 @@ C:\Program Files (x86)\NuGet\Config\Microsoft.VisualStudio.FallbackLocation.conf
 C:\Program Files (x86)\NuGet\Config\Microsoft.VisualStudio.Offline.config
 ```
 
+#### Commands
 
 - Set
 
@@ -282,8 +283,9 @@ dotnet nuget config unset defaultPushSource --config-file C:\Users\username\AppD
 3. NuGet.exe [config command](https://learn.microsoft.com/en-us/nuget/reference/cli-reference/cli-ref-config) is implemented. But there is no `list` command. And the behavior is confusing (the `set` command will set the property which appears last when loading, so sometimes it's not updating the closest NuGet configuration file). Do we want to implement those subcommand(e.g.`set`) in the future in dotnet.exe differently?
 
 ## Open Questions
-1. What are the recommended verbs in dotnet command when setting and unsetting values?  ('set' and 'unset' work or not?)
-2. `Get` is not mentioned in this doc. It may cause some confusions:
+1. To show configuration files locations, is it better to use `--verbosity` option or some option named like `--show-path`? (git command is using `--show-origin` for similar purpose)
+2. What are the recommended verbs in dotnet command when setting and unsetting values?  ('set' and 'unset' work or not?)
+3. `Get` is not mentioned in this doc. It may cause some confusions:
    Should `get` work for settings not in config section? (It's workable, but then we will miss `set` and `unset` for those as those are not doable)
    Should `get` get the settings from a specific config file(like `set` and `unset`), or get the merged settings from multiple config files?
 
