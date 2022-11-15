@@ -291,10 +291,8 @@ dotnet nuget config unset defaultPushSource --config-file C:\Users\username\AppD
 
 ## Considerations
 1. Will this command help with diagnosing incorrect setting format?
-No. Incorrect NuGet settings should have seperate error/warning message to tell the customer what's wrong in the setting file. If we have incorrect NuGet settings, all NuGet command, including `dotnet nuget config` command, should display the same error/warning message.
-E.g. if we have an invalid XML problem in one of the NuGet configuration file, running all NuGet command will get an error as following:
-```
+<br />No. Incorrect NuGet settings should have seperate error/warning message to tell the customer what's wrong in the setting file. If we have incorrect NuGet settings, all NuGet command, including `dotnet nuget config` command, should display the same error/warning message.
+<br />E.g. if we have an invalid XML problem in one of the NuGet configuration file, running all NuGet command will get an error as following:
 dotnet nuget list source
 error: NuGet.Config is not valid XML. Path: 'C:\Users\username\Source\Repos\NuGet.Config'.
 error:   The 'disabledPackageSources' start tag on line 19 position 4 does not match the end tag of 'configuration'. Line 20, position 3.
-```
