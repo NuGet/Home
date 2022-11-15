@@ -186,12 +186,106 @@ C:\Program Files (x86)\NuGet\Config\Microsoft.VisualStudio.Offline.config
 ```
 
 
+- Set
+
+Set the NuGet configuration settings. 
+
+This command will set the value of a specified NuGet configuration setting.
+
+Please note this command only manages settings in [config section](https://learn.microsoft.com/en-us/nuget/reference/nuget-config-file#config-section).
+For other settings not in config section, we have/will have other commands. E.g. for [trustedSigners section](https://learn.microsoft.com/en-us/nuget/reference/nuget-config-file#trustedsigners-section), we have [dotnet nuget trust](https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-nuget-trust) command.
+
+#### Arguments
+
+- SETTING_KEY
+
+Specify the key of the settings that are to be set.
+
+If the specified `SETTING_KEY` is not a key in [config section](https://learn.microsoft.com/en-us/nuget/reference/nuget-config-file#config-section), an error is displayed indicating the `SETTING_KEY` could not be set.
+
+- SETTING_VALUE
+
+Set the value of the SETTING_KEY to SETTING_VALUE.
+
+#### Options
+- --config-file
+
+Specify the config file path to add the setting key-value pair. If it's not specified, the config file with highest priority will be updated.
+
+- -?|-h|--help
+
+Prints out a description of how to use the command.
+
+#### Examples
+
+- Set the `signatureValidationMode` to true in the closest NuGet configuration file.
+
+```
+dotnet nuget config set signatureValidationMode require
+
+```
+
+- Set the `defaultPushSource` in the specified NuGet configuration file.
+
+```
+dotnet nuget config set defaultPushSource https://MyRepo/ES/api/v2/package --config-file C:\Users\username\AppData\Roaming\NuGet\NuGet.Config
+
+```
+
+- Unset
+
+Remove the NuGet configuration settings. 
+
+This command will remove the key-value pair from a specified NuGet configuration setting.
+
+Please note this command only manages settings in [config section](https://learn.microsoft.com/en-us/nuget/reference/nuget-config-file#config-section).
+For other settings not in config section, we have/will have other commands. E.g. for [trustedSigners section](https://learn.microsoft.com/en-us/nuget/reference/nuget-config-file#trustedsigners-section), we have [dotnet nuget trust](https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-nuget-trust) command.
+
+#### Arguments
+
+- SETTING_KEY
+
+Specify the key of the settings that are to be removed.
+
+If the specified `SETTING_KEY` is not a key in [config section](https://learn.microsoft.com/en-us/nuget/reference/nuget-config-file#config-section), an error is displayed indicating the `SETTING_KEY` could not be set.
+
+
+#### Options
+
+- --config-file
+
+Specify the config file path to remove the setting key-value pair. If it's not specified, the config file with highest priority will be updated.
+
+- -?|-h|--help
+
+Prints out a description of how to use the command.
+
+#### Examples
+
+- Unset the `signatureValidationMode` in the closest NuGet configuration file.
+
+```
+dotnet nuget config unset signatureValidationMode
+
+```
+
+- Unset the `defaultPushSource` in the specified NuGet configuration file.
+
+```
+dotnet nuget config unset defaultPushSource --config-file C:\Users\username\AppData\Roaming\NuGet\NuGet.Config
+
+```
+
 ## Future Work
 1. The `dotnet nuget config list` is a community ask. We will consider adding more commands, like add/update/delete, in the future.
 2. We will discuss if adding this command into NuGet.exe CLI, in the future.
 3. NuGet.exe [config command](https://learn.microsoft.com/en-us/nuget/reference/cli-reference/cli-ref-config) is implemented. But there is no `list` command. And the behavior is confusing (the `set` command will set the property which appears last when loading, so sometimes it's not updating the closest NuGet configuration file). Do we want to implement those subcommand(e.g.`set`) in the future in dotnet.exe differently?
 
 ## Open Questions
+1. What are the recommended verbs in dotnet command when setting and unsetting values?  ('set' and 'unset' work or not?)
+2. `Get` is not mentioned in this doc. It may cause some confusions:
+   Should `get` work for settings not in config section? (It's workable, but then we will miss `set` and `unset` for those as those are not doable)
+   Should `get` get the settings from a specific config file(like `set` and `unset`), or get the merged settings from multiple config files?
 
 ## Considerations
 
