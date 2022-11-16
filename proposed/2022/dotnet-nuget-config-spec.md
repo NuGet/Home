@@ -24,11 +24,12 @@ The following command will be implemented in the `dotnet.exe` CLI.
 
 #### Commands
 
-- List
+- Path
 
-Lists all the NuGet configuration settings. 
+List all the paths of NuGet configuration files that will be applied, when invoking NuGet command from the current working directory path.
 
-This command will list merged NuGet configuration settings from one or multiple NuGet configuration files that will be applied, when invoking NuGet command from the current working directory path. 
+The listed NuGet configuration files are in priority order. So the order of loading those configurations is reversed, that is, loading order is from the bottom to the top. So the configuration on the top will apply.
+You may refer to [How settings are applied](https://learn.microsoft.com/en-us/nuget/consume-packages/configuring-nuget-behavior#how-settings-are-applied) for more details. 
 
 #### Arguments
 
@@ -42,13 +43,6 @@ If the specified `WORKING_DIRECTORY` doesn't exist, an error is displayed indica
 > If `WORKING_DIRECTORY` (or its parent directories) is not accessible, the command will ignore any NuGet configuration files under those directories without any warning/error. This is aligned with other NuGet commands.
 
 #### Options
-- -v|--verbosity <LEVEL>
-
-Sets the verbosity level of the command. Allowed values are q[uiet], m[inimal], n[ormal], d[etailed], and diag[nostic]. The default is minimal. 
-When the verbosity level is detailed or diagnostic, the command will display all the NuGet configuration file that will be applied, when invoking NuGet command from the current working directory path.
-
-The listed NuGet configuration files are in priority order. So the order of loading those configurations is reversed, that is, loading order is from the bottom to the top. So the configuration on the top will apply.
-You may refer to [How settings are applied](https://learn.microsoft.com/en-us/nuget/consume-packages/configuring-nuget-behavior#how-settings-are-applied) for more details. 
 
 - -?|-h|--help
 
@@ -59,25 +53,7 @@ Prints out a description of how to use the command.
 - List all the NuGet configuration file that will be applied, when invoking NuGet command in the current directory.
 
 ```
-dotnet nuget config list --verbosity detailed
-
-<configuration>
-  <packageSources>
-    <add key="nuget.org" value="https://api.nuget.org/v3/index.json" protocolVersion="3" />
-    <add key="Microsoft Visual Studio Offline Packages" value="C:\Program Files (x86)\Microsoft SDKs\NuGetPackages\" />
-  </packageSources>
-  <packageRestore>
-    <add key="enabled" value="False" />
-    <add key="automatic" value="False" />
-  </packageRestore>
-  <bindingRedirects>
-    <add key="skip" value="False" />
-  </bindingRedirects>
-  <packageManagement>
-    <add key="format" value="0" />
-    <add key="disabled" value="False" />
-  </packageManagement>
-</configuration>
+dotnet nuget config path 
 
 C:\Test\Repos\Solution\NuGet.Config
 C:\Test\Repos\NuGet.Config
@@ -87,29 +63,10 @@ C:\Program Files (x86)\NuGet\Config\Microsoft.VisualStudio.FallbackLocation.conf
 C:\Program Files (x86)\NuGet\Config\Microsoft.VisualStudio.Offline.config
 ```
 
-- List all the NuGet configuration file that will be applied, when invoking NuGet command in the specific directory.
+- List all the paths of NuGet configuration files that will be applied, when invoking NuGet command in the specific directory.
 
 ```
-dotnet nuget config list  C:\Test\Repos --verbosity detailed
-
-<configuration>
-  <packageSources>
-    <add key="nuget.org" value="https://api.nuget.org/v3/index.json" protocolVersion="3" />
-    <add key="Microsoft Visual Studio Offline Packages" value="C:\Program Files (x86)\Microsoft SDKs\NuGetPackages\" />
-    <add key="Test Package source" value="C:\work" />
-  </packageSources>
-  <packageRestore>
-    <add key="enabled" value="False" />
-    <add key="automatic" value="False" />
-  </packageRestore>
-  <bindingRedirects>
-    <add key="skip" value="False" />
-  </bindingRedirects>
-  <packageManagement>
-    <add key="format" value="0" />
-    <add key="disabled" value="False" />
-  </packageManagement>
-</configuration>
+dotnet nuget config path  C:\Test\Repos
 
 C:\Test\Repos\NuGet.Config
 C:\Test\NuGet.Config
@@ -118,36 +75,10 @@ C:\Program Files (x86)\NuGet\Config\Microsoft.VisualStudio.FallbackLocation.conf
 C:\Program Files (x86)\NuGet\Config\Microsoft.VisualStudio.Offline.config
 ```
 
-- List only the NuGet configuration settings, when invoking NuGet command in the specific directory.
-
-```
-dotnet nuget config list  C:\Test\Repos
-
-<configuration>
-  <packageSources>
-    <add key="nuget.org" value="https://api.nuget.org/v3/index.json" protocolVersion="3" />
-    <add key="Microsoft Visual Studio Offline Packages" value="C:\Program Files (x86)\Microsoft SDKs\NuGetPackages\" />
-    <add key="Test Package source" value="C:\work" />
-  </packageSources>
-  <packageRestore>
-    <add key="enabled" value="False" />
-    <add key="automatic" value="False" />
-  </packageRestore>
-  <bindingRedirects>
-    <add key="skip" value="False" />
-  </bindingRedirects>
-  <packageManagement>
-    <add key="format" value="0" />
-    <add key="disabled" value="False" />
-  </packageManagement>
-</configuration>
-
-```
-
 - List all the NuGet configuration file that will be applied, but passing a non-exsiting `WORKING_DIRECTORY`.
 
 ```
-dotnet nuget config list  C:\Test\NonExistingRepos
+dotnet nuget config path  C:\Test\NonExistingRepos
 
 Error: The path "C:\Test\NonExistingRepos" doesn't exist.
 ```
@@ -157,26 +88,7 @@ Error: The path "C:\Test\NonExistingRepos" doesn't exist.
 The configuration file under C:\Test\AccessibleRepos\NotAccessibleSolution\NuGet.Config will be ignored without any warning or error.
 
 ```
-dotnet nuget config list  C:\Test\AccessibleRepos\NotAccessibleSolution -v d
-
-<configuration>
-  <packageSources>
-    <add key="nuget.org" value="https://api.nuget.org/v3/index.json" protocolVersion="3" />
-    <add key="Microsoft Visual Studio Offline Packages" value="C:\Program Files (x86)\Microsoft SDKs\NuGetPackages\" />
-    <add key="Test Package source" value="C:\work" />
-  </packageSources>
-  <packageRestore>
-    <add key="enabled" value="False" />
-    <add key="automatic" value="False" />
-  </packageRestore>
-  <bindingRedirects>
-    <add key="skip" value="False" />
-  </bindingRedirects>
-  <packageManagement>
-    <add key="format" value="0" />
-    <add key="disabled" value="False" />
-  </packageManagement>
-</configuration>
+dotnet nuget config list  C:\Test\AccessibleRepos\NotAccessibleSolution
 
 C:\Test\AccessibleRepos\NuGet.Config
 C:\Test\NuGet.Config
@@ -186,6 +98,11 @@ C:\Program Files (x86)\NuGet\Config\Microsoft.VisualStudio.Offline.config
 ```
 
 #### Commands
+- Get
+
+Get the list of all the NuGet configuration settings. 
+
+This command will list merged NuGet configuration settings from one or multiple NuGet configuration files that will be applied, when invoking NuGet command from the current working directory path. 
 
 - Set
 
@@ -212,6 +129,11 @@ Set the value of the SETTING_KEY to SETTING_VALUE.
 - --config-file
 
 Specify the config file path to add the setting key-value pair. If it's not specified, the config file with highest priority will be updated.
+
+- -v|--verbosity <LEVEL>
+
+Sets the verbosity level of the command. Allowed values are q[uiet], m[inimal], n[ormal], d[etailed], and diag[nostic]. The default is minimal. 
+When the verbosity level is detailed or diagnostic, 
 
 - -?|-h|--help
 
@@ -274,6 +196,32 @@ dotnet nuget config unset signatureValidationMode
 
 ```
 dotnet nuget config unset defaultPushSource --config-file C:\Users\username\AppData\Roaming\NuGet\NuGet.Config
+
+```
+
+- List only the NuGet configuration settings, when invoking NuGet command in the specific directory.
+
+```
+dotnet nuget config list  C:\Test\Repos
+
+<configuration>
+  <packageSources>
+    <add key="nuget.org" value="https://api.nuget.org/v3/index.json" protocolVersion="3" />
+    <add key="Microsoft Visual Studio Offline Packages" value="C:\Program Files (x86)\Microsoft SDKs\NuGetPackages\" />
+    <add key="Test Package source" value="C:\work" />
+  </packageSources>
+  <packageRestore>
+    <add key="enabled" value="False" />
+    <add key="automatic" value="False" />
+  </packageRestore>
+  <bindingRedirects>
+    <add key="skip" value="False" />
+  </bindingRedirects>
+  <packageManagement>
+    <add key="format" value="0" />
+    <add key="disabled" value="False" />
+  </packageManagement>
+</configuration>
 
 ```
 
