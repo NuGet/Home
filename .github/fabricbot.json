@@ -1575,6 +1575,355 @@
           }
         ]
       }
+    },
+    {
+      "taskType": "scheduled",
+      "capabilityId": "ScheduledSearch",
+      "subCapability": "ScheduledSearch",
+      "version": "1.1",
+      "config": {
+        "frequency": [
+          {
+            "weekDay": 0,
+            "hours": [
+              3,
+              7,
+              11,
+              15,
+              19,
+              23
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 1,
+            "hours": [
+              3,
+              7,
+              11,
+              15,
+              19,
+              23
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 2,
+            "hours": [
+              3,
+              7,
+              11,
+              15,
+              19,
+              23
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 3,
+            "hours": [
+              3,
+              7,
+              11,
+              15,
+              19,
+              23
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 4,
+            "hours": [
+              3,
+              7,
+              11,
+              15,
+              19,
+              23
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 5,
+            "hours": [
+              3,
+              7,
+              11,
+              15,
+              19,
+              23
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 6,
+            "hours": [
+              3,
+              7,
+              11,
+              15,
+              19,
+              23
+            ],
+            "timezoneOffset": -7
+          }
+        ],
+        "searchTerms": [
+          {
+            "name": "isOpen",
+            "parameters": {}
+          },
+          {
+            "name": "isIssue",
+            "parameters": {}
+          },
+          {
+            "name": "hasLabel",
+            "parameters": {
+              "label": "Status:Inactive"
+            }
+          },
+          {
+            "name": "noLabel",
+            "parameters": {
+              "label": "Status:Excluded from icebox cleanup"
+            }
+          },
+          {
+            "name": "noLabel",
+            "parameters": {
+              "label": "Triage:NeedsTriageDiscussion"
+            }
+          },
+          {
+            "name": "noLabel",
+            "parameters": {
+              "label": "Icebox cleanup candidate"
+            }
+          },
+          {
+            "name": "hasLabel",
+            "parameters": {
+              "label": "internal-debugging"
+            }
+          }
+        ],
+        "actions": [
+          {
+            "name": "addLabel",
+            "parameters": {
+              "label": "Icebox cleanup candidate"
+            }
+          },
+          {
+            "name": "addReply",
+            "parameters": {
+              "comment": "Due to lack of recent activity, this issue has been marked as a candidate for icebox cleanup. It will be closed if no further activity occurs within 14 more days. Any new comment (by anyone, not necessarily the author) will add a `Triage:NeedsTriageDiscussion` label and lead to a triaging process.\nThis process is part of the experimental [Stale icebox issues cleanup](https://github.com/NuGet/Home/issues/12113) we are currently trialing. Please share any feedback you might have in the linked issue.\n"
+            }
+          }
+        ],
+        "taskName": "[Close stale icebox][3-1] Search \"Status:Inactive\" but without \"Status:Excluded from icebox cleanup\" and \"Triage:NeedsTriageDiscussion\", add \"Icebox cleanup candidate\" and show a warning."
+      }
+    },
+    {
+      "taskType": "scheduled",
+      "capabilityId": "ScheduledSearch",
+      "subCapability": "ScheduledSearch",
+      "version": "1.1",
+      "config": {
+        "frequency": [
+          {
+            "weekDay": 0,
+            "hours": [
+              2,
+              6,
+              10,
+              14,
+              18,
+              22
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 1,
+            "hours": [
+              2,
+              6,
+              10,
+              14,
+              18,
+              22
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 2,
+            "hours": [
+              2,
+              6,
+              10,
+              14,
+              18,
+              22
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 3,
+            "hours": [
+              2,
+              6,
+              10,
+              14,
+              18,
+              22
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 4,
+            "hours": [
+              2,
+              6,
+              10,
+              14,
+              18,
+              22
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 5,
+            "hours": [
+              2,
+              6,
+              10,
+              14,
+              18,
+              22
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 6,
+            "hours": [
+              2,
+              6,
+              10,
+              14,
+              18,
+              22
+            ],
+            "timezoneOffset": -7
+          }
+        ],
+        "searchTerms": [
+          {
+            "name": "isOpen",
+            "parameters": {}
+          },
+          {
+            "name": "isIssue",
+            "parameters": {}
+          },
+          {
+            "name": "hasLabel",
+            "parameters": {
+              "label": "Icebox cleanup candidate"
+            }
+          },
+          {
+            "name": "noLabel",
+            "parameters": {
+              "label": "Triage:NeedsTriageDiscussion"
+            }
+          },
+          {
+            "name": "noActivitySince",
+            "parameters": {
+              "days": 14
+            }
+          },
+          {
+            "name": "hasLabel",
+            "parameters": {
+              "label": "internal-debugging"
+            }
+          }
+        ],
+        "taskName": "[Close stale icebox][3-2] Close \"Icebox cleanup candidate\" if no activity within 14 days.",
+        "actions": [
+          {
+            "name": "addReply",
+            "parameters": {
+              "comment": "This issue will now be closed since it had been marked Icebox cleanup candidate, but received no further activity in the past 14 days. "
+            }
+          },
+          {
+            "name": "closeIssue",
+            "parameters": {}
+          }
+        ]
+      }
+    },
+    {
+      "taskType": "trigger",
+      "capabilityId": "IssueResponder",
+      "subCapability": "IssueCommentResponder",
+      "version": "1.0",
+      "config": {
+        "conditions": {
+          "operator": "and",
+          "operands": [
+            {
+              "name": "isOpen",
+              "parameters": {}
+            },
+            {
+              "name": "isAction",
+              "parameters": {
+                "action": "created"
+              }
+            },
+            {
+              "name": "hasLabel",
+              "parameters": {
+                "label": "Icebox cleanup candidate"
+              }
+            },
+            {
+              "operator": "not",
+              "operands": [
+                {
+                  "name": "hasLabel",
+                  "parameters": {
+                    "label": "Triage:NeedsTriageDiscussion"
+                  }
+                }
+              ]
+            },
+            {
+              "name": "hasLabel",
+              "parameters": {
+                "label": "internal-debugging"
+              }
+            }
+          ]
+        },
+        "eventType": "issue",
+        "eventNames": [
+          "issue_comment"
+        ],
+        "taskName": "[Close stale icebox][3-3] For \"Icebox cleanup candidate\" issues, if there is any comments, add \"Triage:NeedsTriageDiscussion\" label",
+        "actions": [
+          {
+            "name": "addLabel",
+            "parameters": {
+              "label": "Triage:NeedsTriageDiscussion"
+            }
+          }
+        ]
+      }
     }
   ],
   "userGroups": []
