@@ -1700,12 +1700,6 @@
             "parameters": {
               "label": "Icebox cleanup candidate"
             }
-          },
-          {
-            "name": "hasLabel",
-            "parameters": {
-              "label": "internal-debugging"
-            }
           }
         ],
         "actions": [
@@ -1843,12 +1837,6 @@
             "parameters": {
               "days": 14
             }
-          },
-          {
-            "name": "hasLabel",
-            "parameters": {
-              "label": "internal-debugging"
-            }
           }
         ],
         "taskName": "[Close stale icebox][3-2] Close \"Icebox cleanup candidate\" if no activity within 14 days.",
@@ -1901,12 +1889,6 @@
                   }
                 }
               ]
-            },
-            {
-              "name": "hasLabel",
-              "parameters": {
-                "label": "internal-debugging"
-              }
             }
           ]
         },
