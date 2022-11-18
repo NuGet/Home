@@ -31,18 +31,17 @@ List all the paths of NuGet configuration files that will be applied, when invok
 The listed NuGet configuration files are in priority order. So the order of loading those configurations is reversed, that is, loading order is from the bottom to the top. So the configuration on the top will apply.
 You may refer to [How settings are applied](https://learn.microsoft.com/en-us/nuget/consume-packages/configuring-nuget-behavior#how-settings-are-applied) for more details. 
 
-#### Arguments
 
-- WORKING_DIRECTORY
+#### Options
+
+- --working-directory
 
 Run this command as if working directory is set to the specified directory.
 
-If the specified `WORKING_DIRECTORY` doesn't exist, an error is displayed indicating the `WORKING_DIRECTORY` doesn't exist.
+If the specified `--working-directory` doesn't exist, an error is displayed indicating the `--working-directory` doesn't exist.
 
 > [!Note]
-> If `WORKING_DIRECTORY` (or its parent directories) is not accessible, the command will ignore any NuGet configuration files under those directories without any warning/error. This is aligned with other NuGet commands.
-
-#### Options
+> If `--working-directory` (or its parent directories) is not accessible, the command will ignore any NuGet configuration files under those directories without any warning/error. This is aligned with other NuGet commands.
 
 - -?|-h|--help
 
@@ -66,7 +65,7 @@ C:\Program Files (x86)\NuGet\Config\Microsoft.VisualStudio.Offline.config
 - List all the paths of NuGet configuration files that will be applied, when invoking NuGet command in the specific directory.
 
 ```
-dotnet nuget config path  C:\Test\Repos
+dotnet nuget config path  --working-directory C:\Test\Repos
 
 C:\Test\Repos\NuGet.Config
 C:\Test\NuGet.Config
@@ -78,7 +77,7 @@ C:\Program Files (x86)\NuGet\Config\Microsoft.VisualStudio.Offline.config
 - List all the NuGet configuration file that will be applied, but passing a non-exsiting `WORKING_DIRECTORY`.
 
 ```
-dotnet nuget config path  C:\Test\NonExistingRepos
+dotnet nuget config path  --working-directory C:\Test\NonExistingRepos
 
 Error: The path "C:\Test\NonExistingRepos" doesn't exist.
 ```
@@ -88,7 +87,7 @@ Error: The path "C:\Test\NonExistingRepos" doesn't exist.
 The configuration file under C:\Test\AccessibleRepos\NotAccessibleSolution\NuGet.Config will be ignored without any warning or error.
 
 ```
-dotnet nuget config list  C:\Test\AccessibleRepos\NotAccessibleSolution
+dotnet nuget config list  --working-directory C:\Test\AccessibleRepos\NotAccessibleSolution
 
 C:\Test\AccessibleRepos\NuGet.Config
 C:\Test\NuGet.Config
@@ -100,9 +99,141 @@ C:\Program Files (x86)\NuGet\Config\Microsoft.VisualStudio.Offline.config
 #### Commands
 - Get
 
-Get the list of all the NuGet configuration settings. 
+Get the NuGet configuration settings that will be applied. 
 
-This command will list merged NuGet configuration settings from one or multiple NuGet configuration files that will be applied, when invoking NuGet command from the current working directory path. 
+If CONFIG_KEY is not specified, this command will list all merged NuGet configuration settings from multiple NuGet configuration files that will be applied, when invoking NuGet command from the current working directory path. 
+
+#### Arguments
+
+- CONFIG_KEY
+
+Get the effective value of the specified configuration settings of the [config section](https://learn.microsoft.com/en-us/nuget/reference/nuget-config-file#config-section). Please note this is the result of che 
+
+> [!Note]
+> The CONFIG_KEY could only be one of the valid key in config section. 
+For other sections, like package source section, we have/will have specific command [dotnet nuget list source](https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-nuget-list-source).
+
+#### Options
+
+- --working-directory
+
+Run this command as if working directory is set to the specified directory.
+
+If the specified `--working-directory` doesn't exist, an error is displayed indicating the `--working-directory` doesn't exist.
+
+> [!Note]
+> If `--working-directory` (or its parent directories) is not accessible, the command will ignore any NuGet configuration files under those directories without any warning/error. This is aligned with other NuGet commands.
+
+- -?|-h|--help
+
+Prints out a description of how to use the command.
+
+- -v|--verbosity <LEVEL>
+
+Sets the verbosity level of the command. Allowed values are q[uiet], m[inimal], n[ormal], d[etailed], and diag[nostic]. The default is minimal. 
+
+When the verbosity level is detailed or diagnostic, the source(NuGet configuration file path) will be show besides the configuration settings.
+
+#### Examples
+
+- Get all the NuGet configuration settings that will be applied, when invoking NuGet command in the current directory.
+
+```
+dotnet nuget config get
+
+<configuration>
+  <packageSources>
+    <add key="source1" value="https://test/source1/v3/index.json" />
+    <add key="source2" value="https://test/source2/v3/index.json" />
+  </packageSources>
+  <packageSourceMapping>
+    <clear />
+    <packageSource key = "source1">
+      <package pattern="microsoft.*" />
+      <package pattern="nuget.*" />
+    </packageSource>
+    <packageSource key = "source2">
+      <package pattern="system.*" />
+    </packageSource>
+  </packageSourceMapping>
+  <packageRestore>
+    <add key="enabled" value="False" />
+    <add key="automatic" value="False" />
+  </packageRestore>
+</configuration>
+
+```
+- Get all the NuGet configuration settings that will be applied, when invoking NuGet command in the specific directory.
+
+```
+dotnet nuget config get --working-directory C:\Test\Repos
+
+<configuration>
+  <packageSources>
+    <add key="source1" value="https://test/source1/v3/index.json" />
+    <add key="source2" value="https://test/source2/v3/index.json" />
+  </packageSources>
+  <packageSourceMapping>
+    <clear />
+    <packageSource key = "source1">
+      <package pattern="microsoft.*" />
+      <package pattern="nuget.*" />
+    </packageSource>
+    <packageSource key = "source2">
+      <package pattern="system.*" />
+    </packageSource>
+  </packageSourceMapping>
+  <packageRestore>
+    <add key="enabled" value="False" />
+    <add key="automatic" value="False" />
+  </packageRestore>
+</configuration>
+
+```
+
+- Get all the NuGet configuration settings that will be applied, when invoking NuGet command in the current directory. Show the source(nuget configuration file path) of each configuration settings/child items.
+
+```
+dotnet nuget config get -v d
+
+<configuration>
+  <packageSources>
+    <add key="source1" value="https://test/source1/v3/index.json" />   <!-- file: C:\Test\Repos\Solution\NuGet.Config -->
+    <add key="source2" value="https://test/source2/v3/index.json" />   <!-- file: C:\Test\Repos\NuGet.Config -->
+  </packageSources>
+  <packageSourceMapping>
+    <clear />                                 <!-- file: C:\Users\username\AppData\Roaming\NuGet\NuGet.Config -->
+    <packageSource key = "source1">           <!-- file: C:\Test\Repos\Solution\NuGet.Config -->
+      <package pattern="microsoft.*" />
+      <package pattern="nuget.*" />
+    </packageSource>
+    <packageSource key = "source2">           <!-- file: C:\Test\Repos\NuGet.Config -->
+      <package pattern="system.*" />
+    </packageSource>
+  </packageSourceMapping>
+</configuration>
+
+```
+
+- Get `http_proxy` from config section, when invoking NuGet command in the current directory.
+
+```
+dotnet nuget config get http_proxy 
+
+http://company-squid:3128@contoso.com"
+
+```
+
+- Get `http_proxy` from config section, when `http_proxy` is not set in any of the NuGet configuration files.
+
+```
+dotnet nuget config get http_proxy 
+
+Key 'http_proxy' not found.
+
+```
+
+#### Commands
 
 - Set
 
@@ -111,29 +242,25 @@ Set the NuGet configuration settings.
 This command will set the value of a specified NuGet configuration setting.
 
 Please note this command only manages settings in [config section](https://learn.microsoft.com/en-us/nuget/reference/nuget-config-file#config-section).
-For other settings not in config section, we have/will have other commands. E.g. for [trustedSigners section](https://learn.microsoft.com/en-us/nuget/reference/nuget-config-file#trustedsigners-section), we have [dotnet nuget trust](https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-nuget-trust) command.
+For other settings not in config section, we have/will have other dedicated commands. E.g. for [trustedSigners section](https://learn.microsoft.com/en-us/nuget/reference/nuget-config-file#trustedsigners-section), we have [dotnet nuget trust](https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-nuget-trust) command.
 
 #### Arguments
 
-- SETTING_KEY
+- CONFIG_KEY
 
 Specify the key of the settings that are to be set.
 
-If the specified `SETTING_KEY` is not a key in [config section](https://learn.microsoft.com/en-us/nuget/reference/nuget-config-file#config-section), an error is displayed indicating the `SETTING_KEY` could not be set.
+If the specified `CONFIG_KEY` is not a key in [config section](https://learn.microsoft.com/en-us/nuget/reference/nuget-config-file#config-section), a message is displayed indicating the `CONFIG_KEY` could not be set.
 
-- SETTING_VALUE
+- CONFIG_VALUE
 
-Set the value of the SETTING_KEY to SETTING_VALUE.
+Set the value of the CONFIG_KEY to CONFIG_VALUE.
 
 #### Options
+
 - --config-file
 
-Specify the config file path to add the setting key-value pair. If it's not specified, the config file with highest priority will be updated.
-
-- -v|--verbosity <LEVEL>
-
-Sets the verbosity level of the command. Allowed values are q[uiet], m[inimal], n[ormal], d[etailed], and diag[nostic]. The default is minimal. 
-When the verbosity level is detailed or diagnostic, 
+Specify the config file path to add the setting key-value pair. If it's not specified, `%AppData%\NuGet\NuGet.Config` (Windows), or `~/.nuget/NuGet/NuGet.Config` or `~/.config/NuGet/NuGet.Config` (Mac/Linux) is used. See [On Mac/Linux, the user-level config file location varies by tooling.](https://learn.microsoft.com/en-us/nuget/consume-packages/configuring-nuget-behavior#on-maclinux-the-user-level-config-file-location-varies-by-tooling)
 
 - -?|-h|--help
 
@@ -155,6 +282,8 @@ dotnet nuget config set defaultPushSource https://MyRepo/ES/api/v2/package --con
 
 ```
 
+#### Commands
+
 - Unset
 
 Remove the NuGet configuration settings. 
@@ -166,12 +295,11 @@ For other settings not in config section, we have/will have other commands. E.g.
 
 #### Arguments
 
-- SETTING_KEY
+- CONFIG_KEY
 
 Specify the key of the settings that are to be removed.
 
-If the specified `SETTING_KEY` is not a key in [config section](https://learn.microsoft.com/en-us/nuget/reference/nuget-config-file#config-section), an error is displayed indicating the `SETTING_KEY` could not be set.
-
+If the specified `CONFIG_KEY` is not a key in [config section](https://learn.microsoft.com/en-us/nuget/reference/nuget-config-file#config-section), a message is displayed indicating the `CONFIG_KEY` could not be unset.
 
 #### Options
 
@@ -183,9 +311,17 @@ Specify the config file path to remove the setting key-value pair. If it's not s
 
 Prints out a description of how to use the command.
 
+- --config-file
+
+Specify the config file path to remove the setting key-value pair. If it's not specified, `%AppData%\NuGet\NuGet.Config` (Windows), or `~/.nuget/NuGet/NuGet.Config` or `~/.config/NuGet/NuGet.Config` (Mac/Linux) is used. See [On Mac/Linux, the user-level config file location varies by tooling.](https://learn.microsoft.com/en-us/nuget/consume-packages/configuring-nuget-behavior#on-maclinux-the-user-level-config-file-location-varies-by-tooling)
+
+- -?|-h|--help
+
+Prints out a description of how to use the command.
+
 #### Examples
 
-- Unset the `signatureValidationMode` in the closest NuGet configuration file.
+- Unset the `signatureValidationMode` in the user-wide NuGet configuration file.
 
 ```
 dotnet nuget config unset signatureValidationMode
@@ -196,32 +332,6 @@ dotnet nuget config unset signatureValidationMode
 
 ```
 dotnet nuget config unset defaultPushSource --config-file C:\Users\username\AppData\Roaming\NuGet\NuGet.Config
-
-```
-
-- List only the NuGet configuration settings, when invoking NuGet command in the specific directory.
-
-```
-dotnet nuget config list  C:\Test\Repos
-
-<configuration>
-  <packageSources>
-    <add key="nuget.org" value="https://api.nuget.org/v3/index.json" protocolVersion="3" />
-    <add key="Microsoft Visual Studio Offline Packages" value="C:\Program Files (x86)\Microsoft SDKs\NuGetPackages\" />
-    <add key="Test Package source" value="C:\work" />
-  </packageSources>
-  <packageRestore>
-    <add key="enabled" value="False" />
-    <add key="automatic" value="False" />
-  </packageRestore>
-  <bindingRedirects>
-    <add key="skip" value="False" />
-  </bindingRedirects>
-  <packageManagement>
-    <add key="format" value="0" />
-    <add key="disabled" value="False" />
-  </packageManagement>
-</configuration>
 
 ```
 
