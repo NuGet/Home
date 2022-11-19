@@ -15,7 +15,7 @@ This feature is for dotnet.exe users.
 Design and implement `dotnet nuget config` command.
 
 ## Non-Goals
-Design and implement `dotnet nuget config` command with commands other than `list`, e.g. add/update/delete
+Design and implement in the same way for NuGet.exe command.
 
 ## Solution
 The following command will be implemented in the `dotnet.exe` CLI.
@@ -101,13 +101,13 @@ C:\Program Files (x86)\NuGet\Config\Microsoft.VisualStudio.Offline.config
 
 Get the NuGet configuration settings that will be applied. 
 
-If CONFIG_KEY is not specified, this command will list all merged NuGet configuration settings from multiple NuGet configuration files that will be applied, when invoking NuGet command from the current working directory path. 
-
 #### Arguments
 
 - CONFIG_KEY
 
 Get the effective value of the specified configuration settings of the [config section](https://learn.microsoft.com/en-us/nuget/reference/nuget-config-file#config-section). Please note this is the result of che 
+
+If CONFIG_KEY is not specified, this command will get all merged NuGet configuration settings from multiple NuGet configuration files that will be applied, when invoking NuGet command from the current working directory path. 
 
 > [!Note]
 > The CONFIG_KEY could only be one of the valid key in config section. 
@@ -336,16 +336,20 @@ dotnet nuget config unset defaultPushSource --config-file C:\Users\username\AppD
 ```
 
 ## Future Work
-1. The `dotnet nuget config list` is a community ask. We will consider adding more commands, like add/update/delete, in the future.
-2. We will discuss if adding this command into NuGet.exe CLI, in the future.
-3. NuGet.exe [config command](https://learn.microsoft.com/en-us/nuget/reference/cli-reference/cli-ref-config) is implemented. But there is no `list` command. And the behavior is confusing (the `set` command will set the property which appears last when loading, so sometimes it's not updating the closest NuGet configuration file). Do we want to implement those subcommand(e.g.`set`) in the future in dotnet.exe differently?
+1. The `dotnet nuget config path/get` is a community ask. We will discuss if adding this command into NuGet.exe CLI, in the future.
+2. NuGet.exe [config command](https://learn.microsoft.com/en-us/nuget/reference/cli-reference/cli-ref-config) is implemented. 
+But the behavior is confusing: the `set` command will set the property which appears last when loading, so sometimes it's not updating the closest NuGet configuration file. We might need to change this behavior in the future. (Related code: https://github.com/NuGet/NuGet.Client/blob/dev/src/NuGet.Core/NuGet.Configuration/Settings/Settings.cs#L229)
 
 ## Open Questions
 1. To show configuration files locations, is it better to use `--verbosity` option or some option named like `--show-path`? (git command is using `--show-origin` for similar purpose)
-2. What are the recommended verbs in dotnet command when setting and unsetting values?  ('set' and 'unset' work or not?)
-3. `Get` is not mentioned in this doc. It may cause some confusions:
-   Should `get` work for settings not in config section? (It's workable, but then we will miss `set` and `unset` for those as those are not doable)
-   Should `get` get the settings from a specific config file(like `set` and `unset`), or get the merged settings from multiple config files?
+
+2. `dotnet nuget config get <CONFIG_KEY>` will get the value of the specifc config key (which is aligned with NuGet config command). But
+`dotnet nuget config get` will get all merged configuration settings in xml format, since many sections are not simple key-value pairs.
+ Do we need to have another verb for getting all merged configuration settings? 
+
+3. `dotnet nuget config get -v d` will display source of each configuration setting key, in a format of comment in xml file. So that people can still redirect the output into a file without breaking any syntax. Does that sound good to you?
+
+3. `--working-directory` is changed from an argument into an option. Because we could not differentiate `dotnet nuget config get <WORKING_DIRECTORY>` and `dotnet nuget config get <CONFIG_KEY>`. Any better ideas?
 
 ## Considerations
 1. Will this command help with diagnosing incorrect setting format?
