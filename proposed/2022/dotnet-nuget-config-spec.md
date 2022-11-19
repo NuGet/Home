@@ -74,7 +74,7 @@ C:\Program Files (x86)\NuGet\Config\Microsoft.VisualStudio.FallbackLocation.conf
 C:\Program Files (x86)\NuGet\Config\Microsoft.VisualStudio.Offline.config
 ```
 
-- List all the NuGet configuration file that will be applied, but passing a non-exsiting `WORKING_DIRECTORY`.
+- List all the NuGet configuration file that will be applied, but passing a non-exsiting `--working-directory`.
 
 ```
 dotnet nuget config path  --working-directory C:\Test\NonExistingRepos
@@ -82,7 +82,7 @@ dotnet nuget config path  --working-directory C:\Test\NonExistingRepos
 Error: The path "C:\Test\NonExistingRepos" doesn't exist.
 ```
 
-- List all the NuGet configuration file that will be applied, but passing an inaccessible `WORKING_DIRECTORY`: C:\Test\AccessibleRepos\NotAccessibleSolution. 
+- List all the NuGet configuration file that will be applied, but passing an inaccessible `--working-directory`: C:\Test\AccessibleRepos\NotAccessibleSolution. 
 
 The configuration file under C:\Test\AccessibleRepos\NotAccessibleSolution\NuGet.Config will be ignored without any warning or error.
 
@@ -338,7 +338,10 @@ dotnet nuget config unset defaultPushSource --config-file C:\Users\username\AppD
 ## Future Work
 1. The `dotnet nuget config path/get` is a community ask. We will discuss if adding this command into NuGet.exe CLI, in the future.
 2. NuGet.exe [config command](https://learn.microsoft.com/en-us/nuget/reference/cli-reference/cli-ref-config) is implemented. 
-But the behavior is confusing: the `set` command will set the property which appears last when loading, so sometimes it's not updating the closest NuGet configuration file. We might need to change this behavior in the future. (Related code: https://github.com/NuGet/NuGet.Client/blob/dev/src/NuGet.Core/NuGet.Configuration/Settings/Settings.cs#L229)
+But the behavior is confusing: the `set` command will set the property which appears last when loading(for all writable files), so it's not updating the closest NuGet configuration file, but the user-wide NuGet configuration file.(Related code: https://github.com/NuGet/NuGet.Client/blob/dev/src/NuGet.Core/NuGet.Configuration/Settings/Settings.cs#L229)
+We keep the behavior of `dotnet nuget config set` the same with above for now.
+But we might need to change this behavior in the future. 
+Considering this will be a breaking change, we will only consider doing it in main version change, if there are enough votes.
 
 ## Open Questions
 1. To show configuration files locations, is it better to use `--verbosity` option or some option named like `--show-path`? (git command is using `--show-origin` for similar purpose)
