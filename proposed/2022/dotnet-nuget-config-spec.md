@@ -305,14 +305,6 @@ If the specified `CONFIG_KEY` is not a key in [config section](https://learn.mic
 
 - --config-file
 
-Specify the config file path to remove the setting key-value pair. If it's not specified, the config file with highest priority will be updated.
-
-- -?|-h|--help
-
-Prints out a description of how to use the command.
-
-- --config-file
-
 Specify the config file path to remove the setting key-value pair. If it's not specified, `%AppData%\NuGet\NuGet.Config` (Windows), or `~/.nuget/NuGet/NuGet.Config` or `~/.config/NuGet/NuGet.Config` (Mac/Linux) is used. See [On Mac/Linux, the user-level config file location varies by tooling.](https://learn.microsoft.com/en-us/nuget/consume-packages/configuring-nuget-behavior#on-maclinux-the-user-level-config-file-location-varies-by-tooling)
 
 - -?|-h|--help
@@ -337,6 +329,7 @@ dotnet nuget config unset defaultPushSource --config-file C:\Users\username\AppD
 
 ## Future Work
 1. The `dotnet nuget config path/get` is a community ask. We will discuss if adding this command into NuGet.exe CLI, in the future.
+
 2. NuGet.exe [config command](https://learn.microsoft.com/en-us/nuget/reference/cli-reference/cli-ref-config) is implemented. 
 But the behavior is confusing: the `set` command will set the property which appears last when loading(for all writable files), so it's not updating the closest NuGet configuration file, but the user-wide NuGet configuration file.(Related code: https://github.com/NuGet/NuGet.Client/blob/dev/src/NuGet.Core/NuGet.Configuration/Settings/Settings.cs#L229)
 We keep the behavior of `dotnet nuget config set` the same with above for now.
