@@ -34,14 +34,14 @@ You may refer to [How settings are applied](https://learn.microsoft.com/en-us/nu
 
 #### Options
 
-- --working-directory
+- -w|--working-dir <WORKING_DIRECTORY>
 
 Run this command as if working directory is set to the specified directory.
 
-If the specified `--working-directory` doesn't exist, an error is displayed indicating the `--working-directory` doesn't exist.
+If the specified `--working-dir` doesn't exist, an error is displayed indicating the `--working-dir` doesn't exist.
 
 > [!Note]
-> If `--working-directory` (or its parent directories) is not accessible, the command will ignore any NuGet configuration files under those directories without any warning/error. This is aligned with other NuGet commands.
+> If `--working-dir` (or its parent directories) is not accessible, the command will ignore any NuGet configuration files under those directories without any warning/error. This is aligned with other NuGet commands.
 
 - -?|-h|--help
 
@@ -65,7 +65,7 @@ C:\Program Files (x86)\NuGet\Config\Microsoft.VisualStudio.Offline.config
 - List all the paths of NuGet configuration files that will be applied, when invoking NuGet command in the specific directory.
 
 ```
-dotnet nuget config path  --working-directory C:\Test\Repos
+dotnet nuget config path  --working-dir C:\Test\Repos
 
 C:\Test\Repos\NuGet.Config
 C:\Test\NuGet.Config
@@ -74,20 +74,20 @@ C:\Program Files (x86)\NuGet\Config\Microsoft.VisualStudio.FallbackLocation.conf
 C:\Program Files (x86)\NuGet\Config\Microsoft.VisualStudio.Offline.config
 ```
 
-- List all the NuGet configuration file that will be applied, but passing a non-exsiting `--working-directory`.
+- List all the NuGet configuration file that will be applied, but passing a non-exsiting `--working-dir`.
 
 ```
-dotnet nuget config path  --working-directory C:\Test\NonExistingRepos
+dotnet nuget config path  --working-dir C:\Test\NonExistingRepos
 
 Error: The path "C:\Test\NonExistingRepos" doesn't exist.
 ```
 
-- List all the NuGet configuration file that will be applied, but passing an inaccessible `--working-directory`: C:\Test\AccessibleRepos\NotAccessibleSolution. 
+- List all the NuGet configuration file that will be applied, but passing an inaccessible `--working-dir`: C:\Test\AccessibleRepos\NotAccessibleSolution. 
 
 The configuration file under C:\Test\AccessibleRepos\NotAccessibleSolution\NuGet.Config will be ignored without any warning or error.
 
 ```
-dotnet nuget config list  --working-directory C:\Test\AccessibleRepos\NotAccessibleSolution
+dotnet nuget config list  --working-dir C:\Test\AccessibleRepos\NotAccessibleSolution
 
 C:\Test\AccessibleRepos\NuGet.Config
 C:\Test\NuGet.Config
@@ -115,14 +115,14 @@ For other sections, like package source section, we have/will have specific comm
 
 #### Options
 
-- --working-directory
+- -w|--working-dir <WORKING_DIRECTORY>
 
 Run this command as if working directory is set to the specified directory.
 
-If the specified `--working-directory` doesn't exist, an error is displayed indicating the `--working-directory` doesn't exist.
+If the specified `--working-dir` doesn't exist, an error is displayed indicating the `--working-dir` doesn't exist.
 
 > [!Note]
-> If `--working-directory` (or its parent directories) is not accessible, the command will ignore any NuGet configuration files under those directories without any warning/error. This is aligned with other NuGet commands.
+> If `--working-dir` (or its parent directories) is not accessible, the command will ignore any NuGet configuration files under those directories without any warning/error. This is aligned with other NuGet commands.
 
 - -?|-h|--help
 
@@ -166,7 +166,7 @@ dotnet nuget config get
 - Get all the NuGet configuration settings that will be applied, when invoking NuGet command in the specific directory.
 
 ```
-dotnet nuget config get --working-directory C:\Test\Repos
+dotnet nuget config get --working-dir C:\Test\Repos
 
 <configuration>
   <packageSources>
@@ -345,7 +345,7 @@ Considering this will be a breaking change, we will only consider doing it in ma
 
 3. `dotnet nuget config get -v d` will display source of each configuration setting key, in a format of comment in xml file. So that people can still redirect the output into a file without breaking any syntax. Does that sound good to you?
 
-3. `--working-directory` is changed from an argument into an option. Because we could not differentiate `dotnet nuget config get <WORKING_DIRECTORY>` and `dotnet nuget config get <CONFIG_KEY>`. Any better ideas?
+3. `--working-dir` is changed from an argument into an option. Because we could not differentiate `dotnet nuget config get <WORKING_DIRECTORY>` and `dotnet nuget config get <CONFIG_KEY>`. Any better ideas?
 
 ## Considerations
 1. Will this command help with diagnosing incorrect setting format?
