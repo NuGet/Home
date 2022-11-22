@@ -22,9 +22,9 @@ The following command will be implemented in the `dotnet.exe` CLI.
 
 ### `dotnet nuget config`
 
-#### Commands
+### Commands
 
-- Path
+### Path
 
 List all the paths of NuGet configuration files that will be applied, when invoking NuGet command from the current working directory path.
 
@@ -87,7 +87,7 @@ Error: The path "C:\Test\NonExistingRepos" doesn't exist.
 The configuration file under C:\Test\AccessibleRepos\NotAccessibleSolution\NuGet.Config will be ignored without any warning or error.
 
 ```
-dotnet nuget config list  --working-dir C:\Test\AccessibleRepos\NotAccessibleSolution
+dotnet nuget config path  --working-dir C:\Test\AccessibleRepos\NotAccessibleSolution
 
 C:\Test\AccessibleRepos\NuGet.Config
 C:\Test\NuGet.Config
@@ -96,18 +96,20 @@ C:\Program Files (x86)\NuGet\Config\Microsoft.VisualStudio.FallbackLocation.conf
 C:\Program Files (x86)\NuGet\Config\Microsoft.VisualStudio.Offline.config
 ```
 
-#### Commands
-- Get
+### Get
 
 Get the NuGet configuration settings that will be applied. 
 
 #### Arguments
 
+- ALL
+
+Get all merged NuGet configuration settings from multiple NuGet configuration files that will be applied, when invoking NuGet command from the current working directory path. 
+
 - CONFIG_KEY
 
-Get the effective value of the specified configuration settings of the [config section](https://learn.microsoft.com/en-us/nuget/reference/nuget-config-file#config-section). Please note this is the result of che 
+Get the effective value of the specified configuration settings of the [config section](https://learn.microsoft.com/en-us/nuget/reference/nuget-config-file#config-section). 
 
-If CONFIG_KEY is not specified, this command will get all merged NuGet configuration settings from multiple NuGet configuration files that will be applied, when invoking NuGet command from the current working directory path. 
 
 > [!Note]
 > The CONFIG_KEY could only be one of the valid key in config section. 
@@ -139,79 +141,68 @@ When the verbosity level is detailed or diagnostic, the source(NuGet configurati
 - Get all the NuGet configuration settings that will be applied, when invoking NuGet command in the current directory.
 
 ```
-dotnet nuget config get
+dotnet nuget config get all
 
-<configuration>
-  <packageSources>
-    <add key="source1" value="https://test/source1/v3/index.json" />
-    <add key="source2" value="https://test/source2/v3/index.json" />
-  </packageSources>
-  <packageSourceMapping>
-    <clear />
-    <packageSource key = "source1">
-      <package pattern="microsoft.*" />
-      <package pattern="nuget.*" />
-    </packageSource>
-    <packageSource key = "source2">
-      <package pattern="system.*" />
-    </packageSource>
-  </packageSourceMapping>
-  <packageRestore>
-    <add key="enabled" value="False" />
-    <add key="automatic" value="False" />
-  </packageRestore>
-</configuration>
+packageSources:
+  "source1" value="https://test/source1/v3/index.json"
+  "source2" value="https://test/source2/v3/index.json"
+
+packageSourceMapping:
+  clear
+  "source1" 
+    pattern="microsoft.*"
+    pattern="nuget.*"
+  "source2" 
+    pattern="system.*"
+
+packageRestore:
+  "enabled" value="False"
+  "automatic" value="False"
 
 ```
 - Get all the NuGet configuration settings that will be applied, when invoking NuGet command in the specific directory.
 
 ```
-dotnet nuget config get --working-dir C:\Test\Repos
+dotnet nuget config get all --working-dir C:\Test\Repos
 
-<configuration>
-  <packageSources>
-    <add key="source1" value="https://test/source1/v3/index.json" />
-    <add key="source2" value="https://test/source2/v3/index.json" />
-  </packageSources>
-  <packageSourceMapping>
-    <clear />
-    <packageSource key = "source1">
-      <package pattern="microsoft.*" />
-      <package pattern="nuget.*" />
-    </packageSource>
-    <packageSource key = "source2">
-      <package pattern="system.*" />
-    </packageSource>
-  </packageSourceMapping>
-  <packageRestore>
-    <add key="enabled" value="False" />
-    <add key="automatic" value="False" />
-  </packageRestore>
-</configuration>
+packageSources:
+  "source1" value="https://test/source1/v3/index.json"
+  "source2" value="https://test/source2/v3/index.json"
+
+packageSourceMapping:
+  clear
+  "source1" 
+    pattern="microsoft.*"
+    pattern="nuget.*"
+  "source2" 
+    pattern="system.*"
+
+packageRestore:
+  "enabled" value="False"
+  "automatic" value="False"
 
 ```
 
 - Get all the NuGet configuration settings that will be applied, when invoking NuGet command in the current directory. Show the source(nuget configuration file path) of each configuration settings/child items.
 
 ```
-dotnet nuget config get -v d
+dotnet nuget config get all -v d
 
-<configuration>
-  <packageSources>
-    <add key="source1" value="https://test/source1/v3/index.json" />   <!-- file: C:\Test\Repos\Solution\NuGet.Config -->
-    <add key="source2" value="https://test/source2/v3/index.json" />   <!-- file: C:\Test\Repos\NuGet.Config -->
-  </packageSources>
-  <packageSourceMapping>
-    <clear />                                 <!-- file: C:\Users\username\AppData\Roaming\NuGet\NuGet.Config -->
-    <packageSource key = "source1">           <!-- file: C:\Test\Repos\Solution\NuGet.Config -->
-      <package pattern="microsoft.*" />
-      <package pattern="nuget.*" />
-    </packageSource>
-    <packageSource key = "source2">           <!-- file: C:\Test\Repos\NuGet.Config -->
-      <package pattern="system.*" />
-    </packageSource>
-  </packageSourceMapping>
-</configuration>
+packageSources:
+  "source1" value="https://test/source1/v3/index.json"     file: C:\Test\Repos\Solution\NuGet.Config
+  "source2" value="https://test/source2/v3/index.json"     file: C:\Test\Repos\NuGet.Config
+
+packageSourceMapping:
+  clear                                                   file: C:\Users\username\AppData\Roaming\NuGet\NuGet.Config
+  "source1"                                               file: C:\Test\Repos\Solution\NuGet.Config
+    pattern="microsoft.*"
+    pattern="nuget.*"
+  "source2" 
+    pattern="system.*"                                    file: C:\Test\Repos\NuGet.Config
+
+packageRestore:
+  "enabled" value="False"                                 file: C:\Users\username\AppData\Roaming\NuGet\NuGet.Config
+  "automatic" value="False"                               file: C:\Users\username\AppData\Roaming\NuGet\NuGet.Config
 
 ```
 
@@ -224,6 +215,15 @@ http://company-squid:3128@contoso.com"
 
 ```
 
+- Get `http_proxy` from config section, when invoking NuGet command in the current directory. Show the source(nuget configuration file path) of this configuration setting.
+
+```
+dotnet nuget config get http_proxy 
+
+http://company-squid:3128@contoso.com"         file: C:\Test\Repos\Solution\NuGet.Config
+
+```
+
 - Get `http_proxy` from config section, when `http_proxy` is not set in any of the NuGet configuration files.
 
 ```
@@ -233,9 +233,7 @@ Key 'http_proxy' not found.
 
 ```
 
-#### Commands
-
-- Set
+### Set
 
 Set the NuGet configuration settings. 
 
@@ -258,9 +256,9 @@ Set the value of the CONFIG_KEY to CONFIG_VALUE.
 
 #### Options
 
-- --config-file
+- --configfile <FILE>
 
-Specify the config file path to add the setting key-value pair. If it's not specified, `%AppData%\NuGet\NuGet.Config` (Windows), or `~/.nuget/NuGet/NuGet.Config` or `~/.config/NuGet/NuGet.Config` (Mac/Linux) is used. See [On Mac/Linux, the user-level config file location varies by tooling.](https://learn.microsoft.com/en-us/nuget/consume-packages/configuring-nuget-behavior#on-maclinux-the-user-level-config-file-location-varies-by-tooling)
+The NuGet configuration file (nuget.config) to use. If specified, only the settings from this file will be used. If it's not specified, `%AppData%\NuGet\NuGet.Config` (Windows), or `~/.nuget/NuGet/NuGet.Config` or `~/.config/NuGet/NuGet.Config` (Mac/Linux) is used. See [On Mac/Linux, the user-level config file location varies by tooling.](https://learn.microsoft.com/en-us/nuget/consume-packages/configuring-nuget-behavior#on-maclinux-the-user-level-config-file-location-varies-by-tooling)
 
 - -?|-h|--help
 
@@ -278,13 +276,11 @@ dotnet nuget config set signatureValidationMode require
 - Set the `defaultPushSource` in the specified NuGet configuration file.
 
 ```
-dotnet nuget config set defaultPushSource https://MyRepo/ES/api/v2/package --config-file C:\Users\username\AppData\Roaming\NuGet\NuGet.Config
+dotnet nuget config set defaultPushSource https://MyRepo/ES/api/v2/package --configfile C:\Users\username\AppData\Roaming\NuGet\NuGet.Config
 
 ```
 
-#### Commands
-
-- Unset
+### Unset
 
 Remove the NuGet configuration settings. 
 
@@ -303,9 +299,9 @@ If the specified `CONFIG_KEY` is not a key in [config section](https://learn.mic
 
 #### Options
 
-- --config-file
+- --configfile <FILE>
 
-Specify the config file path to remove the setting key-value pair. If it's not specified, `%AppData%\NuGet\NuGet.Config` (Windows), or `~/.nuget/NuGet/NuGet.Config` or `~/.config/NuGet/NuGet.Config` (Mac/Linux) is used. See [On Mac/Linux, the user-level config file location varies by tooling.](https://learn.microsoft.com/en-us/nuget/consume-packages/configuring-nuget-behavior#on-maclinux-the-user-level-config-file-location-varies-by-tooling)
+The NuGet configuration file (nuget.config) to use. If specified, only the settings from this file will be used. If it's not specified, `%AppData%\NuGet\NuGet.Config` (Windows), or `~/.nuget/NuGet/NuGet.Config` or `~/.config/NuGet/NuGet.Config` (Mac/Linux) is used. See [On Mac/Linux, the user-level config file location varies by tooling.](https://learn.microsoft.com/en-us/nuget/consume-packages/configuring-nuget-behavior#on-maclinux-the-user-level-config-file-location-varies-by-tooling)
 
 - -?|-h|--help
 
@@ -323,7 +319,7 @@ dotnet nuget config unset signatureValidationMode
 - Unset the `defaultPushSource` in the specified NuGet configuration file.
 
 ```
-dotnet nuget config unset defaultPushSource --config-file C:\Users\username\AppData\Roaming\NuGet\NuGet.Config
+dotnet nuget config unset defaultPushSource --configfile C:\Users\username\AppData\Roaming\NuGet\NuGet.Config
 
 ```
 
