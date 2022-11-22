@@ -326,13 +326,15 @@ But we might need to change this behavior in the future.
 Considering this will be a breaking change, we will only consider doing it in main version change, if there are enough votes.
 
 ## Open Questions
-1. Shall we use `dotnet nuget config get all` or `dotnet nuget config get` to get all configuration settings?
+1. Shall we use `dotnet nuget config path` or `dotnet nuget config paths` to get all configuration file paths?
 
-2. `--working-dir` is changed from an argument into an option. (Follow the example of Dotnet store command. It has -w|--working-dir <WORKING_DIRECTORY> option https://learn.microsoft.com/dotnet/core/tools/dotnet-store#optional-options). Any other thoughts?
+2. Shall we use `dotnet nuget config get all` or `dotnet nuget config get` to get all configuration settings?
 
-3. To show configuration files locations, is it better to use `--verbosity` option or some option named like `--show-path`? (git command is using `--show-origin` for similar purpose)
+3. `--working-dir` is changed from an argument into an option. (Follow the example of Dotnet store command. It has -w|--working-dir <WORKING_DIRECTORY> option https://learn.microsoft.com/dotnet/core/tools/dotnet-store#optional-options). Any other thoughts?
 
-4. `dotnet nuget config get <CONFIG_KEY>` will get the value of the specifc config key (which is aligned with NuGet config command). `dotnet nuget config get` will get all merged configuration settings(not XML format). Since many sections are not simple key-value pairs, we need to define the format of outputs when getting all merged configuration settings. We need to define formats for all kinds of config sections. Here is an example:
+4. To show configuration files locations, is it better to use `--verbosity` option or some option named like `--show-path`? (git command is using `--show-origin` for similar purpose)
+
+5. `dotnet nuget config get <CONFIG_KEY>` will get the value of the specifc config key (which is aligned with NuGet config command). `dotnet nuget config get` will get all merged configuration settings(not XML format). Since many sections are not simple key-value pairs, we need to define the format of outputs when getting all merged configuration settings. We need to define formats for all kinds of config sections. Here is an example:
 ```
 packageSources:
   clear
