@@ -144,20 +144,18 @@ When the verbosity level is detailed or diagnostic, the source(NuGet configurati
 dotnet nuget config get all
 
 packageSources:
-  "source1" value="https://test/source1/v3/index.json"
-  "source2" value="https://test/source2/v3/index.json"
+  clear
+  add key="source1" value="https://test/source1/v3/index.json"
+  add key="source2" value="https://test/source2/v3/index.json"
 
 packageSourceMapping:
   clear
-  "source1" 
-    pattern="microsoft.*"
-    pattern="nuget.*"
-  "source2" 
-    pattern="system.*"
+  packageSource key="source1"  pattern="microsoft.*","nuget.*"
+  packageSource key="source2"  pattern="system.*"
 
 packageRestore:
-  "enabled" value="False"
-  "automatic" value="False"
+  add key="enabled" value="False"
+  add key="automatic" value="False"
 
 ```
 - Get all the NuGet configuration settings that will be applied, when invoking NuGet command in the specific directory.
@@ -166,20 +164,18 @@ packageRestore:
 dotnet nuget config get all --working-dir C:\Test\Repos
 
 packageSources:
-  "source1" value="https://test/source1/v3/index.json"
-  "source2" value="https://test/source2/v3/index.json"
+  clear
+  add key="source1" value="https://test/source1/v3/index.json"
+  add key="source2" value="https://test/source2/v3/index.json"
 
 packageSourceMapping:
   clear
-  "source1" 
-    pattern="microsoft.*"
-    pattern="nuget.*"
-  "source2" 
-    pattern="system.*"
+  packageSource key="source1"  pattern="microsoft.*","nuget.*"
+  packageSource key="source2"  pattern="system.*"
 
 packageRestore:
-  "enabled" value="False"
-  "automatic" value="False"
+  add key="enabled" value="False"
+  add key="automatic" value="False"
 
 ```
 
@@ -189,20 +185,17 @@ packageRestore:
 dotnet nuget config get all -v d
 
 packageSources:
-  "source1" value="https://test/source1/v3/index.json"     file: C:\Test\Repos\Solution\NuGet.Config
-  "source2" value="https://test/source2/v3/index.json"     file: C:\Test\Repos\NuGet.Config
+  add key="source1" value="https://test/source1/v3/index.json"     file: C:\Test\Repos\Solution\NuGet.Config
+  add key="source2" value="https://test/source2/v3/index.json"     file: C:\Test\Repos\NuGet.Config
 
 packageSourceMapping:
-  clear                                                   file: C:\Users\username\AppData\Roaming\NuGet\NuGet.Config
-  "source1"                                               file: C:\Test\Repos\Solution\NuGet.Config
-    pattern="microsoft.*"
-    pattern="nuget.*"
-  "source2" 
-    pattern="system.*"                                    file: C:\Test\Repos\NuGet.Config
+  clear                                                            file: C:\Users\username\AppData\Roaming\NuGet\NuGet.Config
+  packageSource key="source1"  pattern="microsoft.*","nuget.*"     file: C:\Test\Repos\Solution\NuGet.Config
+  packageSource key="source2"  pattern="system.*"                  file: C:\Test\Repos\NuGet.Config                                 
 
 packageRestore:
-  "enabled" value="False"                                 file: C:\Users\username\AppData\Roaming\NuGet\NuGet.Config
-  "automatic" value="False"                               file: C:\Users\username\AppData\Roaming\NuGet\NuGet.Config
+  add key="enabled" value="False"                                 file: C:\Users\username\AppData\Roaming\NuGet\NuGet.Config
+  add key="automatic" value="False"                               file: C:\Users\username\AppData\Roaming\NuGet\NuGet.Config
 
 ```
 
@@ -335,13 +328,24 @@ Considering this will be a breaking change, we will only consider doing it in ma
 ## Open Questions
 1. To show configuration files locations, is it better to use `--verbosity` option or some option named like `--show-path`? (git command is using `--show-origin` for similar purpose)
 
-2. `dotnet nuget config get <CONFIG_KEY>` will get the value of the specifc config key (which is aligned with NuGet config command). But
-`dotnet nuget config get` will get all merged configuration settings in xml format, since many sections are not simple key-value pairs.
- Do we need to have another verb for getting all merged configuration settings? 
+2. `dotnet nuget config get <CONFIG_KEY>` will get the value of the specifc config key (which is aligned with NuGet config command). `dotnet nuget config get` will get all merged configuration settings(not XML format). Since many sections are not simple key-value pairs, we need to define the format of outputs when getting all merged configuration settings. We need to define formats for all kinds of config sections. Here is an example:
+```
+packageSources:
+  clear
+  add key="source1" value="https://test/source1/v3/index.json"
+  add key="source2" value="https://test/source2/v3/index.json"
 
-3. `dotnet nuget config get -v d` will display source of each configuration setting key, in a format of comment in xml file. So that people can still redirect the output into a file without breaking any syntax. Does that sound good to you?
+packageSourceMapping:
+  clear
+  packageSource key="source1"  pattern="microsoft.*","nuget.*"
+  packageSource key="source2"  pattern="system.*"
 
-3. `--working-dir` is changed from an argument into an option. Because we could not differentiate `dotnet nuget config get <WORKING_DIRECTORY>` and `dotnet nuget config get <CONFIG_KEY>`. Any better ideas?
+packageRestore:
+  add key="enabled" value="False"
+  add key="automatic" value="False"
+```
+
+3. `--working-dir` is changed from an argument into an option. (Follow the example of Dotnet store command. It has -w|--working-dir <WORKING_DIRECTORY> option https://learn.microsoft.com/dotnet/core/tools/dotnet-store#optional-options).
 
 ## Considerations
 1. Will this command help with diagnosing incorrect setting format?
