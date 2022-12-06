@@ -31,17 +31,18 @@ List all the paths of NuGet configuration files that will be applied, when invok
 The listed NuGet configuration files are in priority order. So the order of loading those configurations is reversed, that is, loading order is from the bottom to the top. So the configuration on the top will apply.
 You may refer to [How settings are applied](https://learn.microsoft.com/en-us/nuget/consume-packages/configuring-nuget-behavior#how-settings-are-applied) for more details. 
 
+#### Arguments
 
-#### Options
+- WORKING_DIRECTORY
 
-- -w|--working-dir <WORKING_DIRECTORY>
+Run this command as if working directory is set to the specified directory. If it's not specified, the current working directory will be used.
 
-Run this command as if working directory is set to the specified directory.
-
-If the specified `--working-dir` doesn't exist, an error is displayed indicating the `--working-dir` doesn't exist.
+If the specified `WORKING_DIRECTORY` doesn't exist, an error is displayed indicating the `WORKING_DIRECTORY` doesn't exist.
 
 > [!Note]
-> If `--working-dir` (or its parent directories) is not accessible, the command will ignore any NuGet configuration files under those directories without any warning/error. This is aligned with other NuGet commands.
+> If `WORKING_DIRECTORY` (or its parent directories) is not accessible, the command will ignore any NuGet configuration files under those directories without any warning/error. This is aligned with other NuGet commands.
+
+#### Options
 
 - -?|-h|--help
 
@@ -65,7 +66,7 @@ C:\Program Files (x86)\NuGet\Config\Microsoft.VisualStudio.Offline.config
 - List all the paths of NuGet configuration files that will be applied, when invoking NuGet command in the specific directory.
 
 ```
-dotnet nuget config path  --working-dir C:\Test\Repos
+dotnet nuget config path C:\Test\Repos
 
 C:\Test\Repos\NuGet.Config
 C:\Test\NuGet.Config
@@ -74,20 +75,20 @@ C:\Program Files (x86)\NuGet\Config\Microsoft.VisualStudio.FallbackLocation.conf
 C:\Program Files (x86)\NuGet\Config\Microsoft.VisualStudio.Offline.config
 ```
 
-- List all the NuGet configuration file that will be applied, but passing a non-exsiting `--working-dir`.
+- List all the NuGet configuration file that will be applied, but passing a non-existing argument `WORKING_DIRECTORY`.
 
 ```
-dotnet nuget config path  --working-dir C:\Test\NonExistingRepos
+dotnet nuget config path C:\Test\NonExistingRepos
 
 Error: The path "C:\Test\NonExistingRepos" doesn't exist.
 ```
 
-- List all the NuGet configuration file that will be applied, but passing an inaccessible `--working-dir`: C:\Test\AccessibleRepos\NotAccessibleSolution. 
+- List all the NuGet configuration file that will be applied, but passing an inaccessible `WORKING_DIRECTORY`: C:\Test\AccessibleRepos\NotAccessibleSolution. 
 
 The configuration file under C:\Test\AccessibleRepos\NotAccessibleSolution\NuGet.Config will be ignored without any warning or error.
 
 ```
-dotnet nuget config path  --working-dir C:\Test\AccessibleRepos\NotAccessibleSolution
+dotnet nuget config path C:\Test\AccessibleRepos\NotAccessibleSolution
 
 C:\Test\AccessibleRepos\NuGet.Config
 C:\Test\NuGet.Config
@@ -104,7 +105,7 @@ Get the NuGet configuration settings that will be applied.
 
 - ALL
 
-Get all merged NuGet configuration settings from multiple NuGet configuration files that will be applied, when invoking NuGet command from the current working directory path. 
+Get all merged NuGet configuration settings from multiple NuGet configuration files that will be applied, when invoking NuGet command from the working directory path. 
 
 - CONFIG_KEY
 
@@ -112,19 +113,19 @@ Get the effective value of the specified configuration settings of the [config s
 
 
 > [!Note]
-> The CONFIG_KEY could only be one of the valid key in config section. 
+> The CONFIG_KEY could only be one of the valid keys in config section. 
 For other sections, like package source section, we have/will have specific command [dotnet nuget list source](https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-nuget-list-source).
 
-#### Options
+- WORKING_DIRECTORY
 
-- -w|--working-dir <WORKING_DIRECTORY>
+Run this command as if working directory is set to the specified directory. If it's not specified, the current working directory will be used.
 
-Run this command as if working directory is set to the specified directory.
-
-If the specified `--working-dir` doesn't exist, an error is displayed indicating the `--working-dir` doesn't exist.
+If the specified `WORKING_DIRECTORY` doesn't exist, an error is displayed indicating the `WORKING_DIRECTORY` doesn't exist.
 
 > [!Note]
-> If `--working-dir` (or its parent directories) is not accessible, the command will ignore any NuGet configuration files under those directories without any warning/error. This is aligned with other NuGet commands.
+> If `WORKING_DIRECTORY` (or its parent directories) is not accessible, the command will ignore any NuGet configuration files under those directories without any warning/error. This is aligned with other NuGet commands.
+
+#### Options
 
 - -?|-h|--help
 
@@ -161,7 +162,7 @@ packageRestore:
 - Get all the NuGet configuration settings that will be applied, when invoking NuGet command in the specific directory.
 
 ```
-dotnet nuget config get all --working-dir C:\Test\Repos
+dotnet nuget config get all C:\Test\Repos
 
 packageSources:
   clear
@@ -233,7 +234,7 @@ Set the NuGet configuration settings.
 This command will set the value of a specified NuGet configuration setting.
 
 Please note this command only manages settings in [config section](https://learn.microsoft.com/en-us/nuget/reference/nuget-config-file#config-section).
-For other settings not in config section, we have/will have other dedicated commands. E.g. for [trustedSigners section](https://learn.microsoft.com/en-us/nuget/reference/nuget-config-file#trustedsigners-section), we have [dotnet nuget trust](https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-nuget-trust) command.
+For other settings not in config section, we have/will have other dedicated commands. E.g., for [trustedSigners section](https://learn.microsoft.com/en-us/nuget/reference/nuget-config-file#trustedsigners-section), we have [dotnet nuget trust](https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-nuget-trust) command.
 
 #### Arguments
 
@@ -328,13 +329,26 @@ Considering this will be a breaking change, we will only consider doing it in ma
 ## Open Questions
 1. Shall we use `dotnet nuget config path` or `dotnet nuget config paths` to get all configuration file paths?
 
+2. `WORKING_DIRECTORY` is changed from an option to an argument. So we have `dotnet nuget config path <WORKING_DIRECTORY>` and `dotnet nuget config get <ALL|CONFIG_KEY> <WORKING_DIRECTORY>`. Is it okey if we have two arguments in the second command? And if it's key, only the second argument could be optional, right? 
+
+3. To show configuration files locations, is it better to use `--verbosity` option or some option named like `--show-path`? (git command is using `--show-origin` for similar purpose)
+
+
+## Considerations
+1. Will this command help with diagnosing incorrect setting format?
+<br />No. Incorrect NuGet settings should have separate error/warning message to tell the customer what's wrong in the setting file. If we have incorrect NuGet settings, all NuGet command, including `dotnet nuget config` command, should display the same error/warning message.
+<br />E.g., if we have an invalid XML problem in one of the NuGet configuration file, running all NuGet command will get an error as following:
+```
+dotnet nuget list source
+error: NuGet.Config is not valid XML. Path: 'C:\Users\username\Source\Repos\NuGet.Config'.
+error:   The 'disabledPackageSources' start tag on line 19 position 4 does not match the end tag of 'configuration'. Line 20, position 3.
+```
+
 2. Shall we use `dotnet nuget config get all` or `dotnet nuget config get` to get all configuration settings?
+<br />We will use `dotnet nuget config get all` to get all configuration settings, or else, we could not differentiate `dotnet nuget config get <CONFIG_KEY>` and `dotnet nuget config get <WORKING_DIRECTORY>`.
 
-3. `--working-dir` is changed from an argument into an option. (Follow the example of Dotnet store command. It has -w|--working-dir <WORKING_DIRECTORY> option https://learn.microsoft.com/dotnet/core/tools/dotnet-store#optional-options). Any other thoughts?
 
-4. To show configuration files locations, is it better to use `--verbosity` option or some option named like `--show-path`? (git command is using `--show-origin` for similar purpose)
-
-5. `dotnet nuget config get <CONFIG_KEY>` will get the value of the specifc config key (which is aligned with NuGet config command). `dotnet nuget config get` will get all merged configuration settings(not XML format). Since many sections are not simple key-value pairs, we need to define the format of outputs when getting all merged configuration settings. We need to define formats for all kinds of config sections. Here is an example:
+3. `dotnet nuget config get <CONFIG_KEY>` will get the value of the specific config key (which is aligned with NuGet config command). `dotnet nuget config get` will get all merged configuration settings(not XML format). Since many sections are not simple key-value pairs, we need to define the format of outputs when getting all merged configuration settings. We need to define formats for all kinds of config sections. Here is an example:
 ```
 packageSources:
   clear
@@ -349,14 +363,4 @@ packageSourceMapping:
 packageRestore:
   add key="enabled" value="False"
   add key="automatic" value="False"
-```
-
-## Considerations
-1. Will this command help with diagnosing incorrect setting format?
-<br />No. Incorrect NuGet settings should have seperate error/warning message to tell the customer what's wrong in the setting file. If we have incorrect NuGet settings, all NuGet command, including `dotnet nuget config` command, should display the same error/warning message.
-<br />E.g. if we have an invalid XML problem in one of the NuGet configuration file, running all NuGet command will get an error as following:
-```
-dotnet nuget list source
-error: NuGet.Config is not valid XML. Path: 'C:\Users\username\Source\Repos\NuGet.Config'.
-error:   The 'disabledPackageSources' start tag on line 19 position 4 does not match the end tag of 'configuration'. Line 20, position 3.
 ```
