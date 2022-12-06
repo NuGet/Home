@@ -17,7 +17,7 @@ While we support basic affordances when browsing for NuGet packages in NuGet.org
 
 We ran a survey in 2022 regarding how developers currently feel about known security advisories and here is what we've learned:
 
-74% of developers would like to be notified of packages at restore/build time. 65% would like to see icons in the solution explorer for problematic packages. 42% of developers would like a security notification center in Visual Studio. 39% of developers would use a dotnet audit command.
+74% of developers would like to be notified of packages at restore/build time. 65% would like to see icons in the solution explorer for problematic packages. 42% of developers would like a security notification in Visual Studio's notification window. 39% of developers would use a dotnet audit command.
 
 ![Notified](./../../meta/resources/VulnerabilitiesInRestore/Notified.png)
 
@@ -60,7 +60,7 @@ For example, a developer might run `dotnet restore` explicitly or `dotnet add pa
 | NU1904 | critical |
 
 ```bash
-Found 2 vulnerabilities (1 moderate, 0 high, 1 critical) in 2 package(s)
+Found 2 vulnerabilities (0 low, 1 moderate, 0 high, 1 critical) in 2 package(s)
 
 warning NU1904: Package 'Contoso.Service.APIs' 1.0.3 has a known critical severity vulnerability, https://github.com/advisories/GHSA-1234-5678-9012.
 warning NU1902: Package 'Contoso.Forms' 8.4.1 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-1234-5678-9012.
@@ -69,7 +69,7 @@ warning NU1902: Package 'Contoso.Forms' 8.4.1 has a known moderate severity vuln
 If a package has more than 1 vulnerability, each vulnerability will have its own warning. These security issues are often likely independent and may require independent fixes.
 
 ```bash
-Found 2 vulnerabilities (1 moderate, 0 high, 1 critical) in 1 package(s)
+Found 2 vulnerabilities (0 low, 1 moderate, 0 high, 1 critical) in 1 package(s)
 
 warning NU1904: Package 'Contoso.Service.APIs' 1.0.3 has a known critical severity vulnerability, https://github.com/advisories/GHSA-1234-5678-9012
 warning NU1904: Package 'Contoso.Service.APIs' 1.0.3 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-1234-5678-90XY
@@ -84,8 +84,8 @@ No known vulnerabilties found for <project path>.
 In addition at normal verbosity, we will log a report for each project whose vulnerabilities were audited.
 
 ```bash
-Found 2 vulnerabilities (2 moderate, 0 high, 0 critical) in 2 package(s)
-[net7.0]:
+Found 2 vulnerabilities (0 low, 2 moderate, 0 high, 0 critical) in 2 package(s)
+
 Top-level Package       Requested	Resolved	Severity	Advisory URL
 > Contoso.Forms		8.4.1	        8.4.1		Moderate	https://github.com/advisories/GHSA-1234-5678-9012
 
@@ -282,6 +282,10 @@ An additional optimization would be to only check the vulnerabilities when we've
 - NPM automatically audits dependencies when packages are installed.
   - NPM achieves this by checking the vulnerabilities for the full graph, by submiting the graph to a compute resource that provides a list of the vulnerabilities.
   - The biggest difference is that NuGet restore is run significantly more frequently than npm install is. As such the performance is not as critical.
+- [pip-audit](https://github.com/pypa/pip-audit) scans for packages with known vulnerabilities using the Python Packaging Advisory Database. 
+- [cargo-audit](https://docs.rs/cargo-audit/latest/cargo_audit/) audits cargo.lock files for creates containing security vulnerabilities.
+- [snyk](https://snyk.io/product/open-source-security-management/) provides security tools for open source vulnerability scanning and CLI experiences.
+- [DependencyCheck](https://github.com/jeremylong/DependencyCheck) scans software for known vulnerabilities.
 
 ## Unresolved Questions
 
@@ -293,7 +297,10 @@ An additional optimization would be to only check the vulnerabilities when we've
 
 ## Future Possibilities
 
-Most of the [`Rationale and alternatives`](#rationale-and-alternatives) are really future possibilties on their own as they are not always exclusive to the current approach.
+- Vulnerability scanning can be extended to SBOMs.
+- Support can be added to automatically fix vulnerable dependencies (i.e. a fix experience in CLI / Tooling)
+
+Additionally, most of the [`Rationale and alternatives`](#rationale-and-alternatives) are really future possibilties on their own as they are not always exclusive to the current approach. Here's some further possibilities:
 
 ### Suppress advisories
 
