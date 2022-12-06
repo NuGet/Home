@@ -153,7 +153,7 @@ The client needs all the data to make decisions about vulnerability. In order to
   - `comment`, a user friendly description.
 - The vulnerability resource **must** at minimum contain 1 page.
 - The pages within the vulnerability resource **must** be exclusive.
-- The vulnerability resource **should** contain 2 pages.
+- The vulnerability resource may 2 pages.
   - One page, `base`, represents the data up to a certain point in time. This page **must** be updated periodically, based on a trigger.
   - The second page, `update`, represents the data from the last update of `base`, to present. This page **should** be updated with new data.
   - Periodically, for example once a month, the data from `update` **should** be migrated to `base`.
