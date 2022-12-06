@@ -2,8 +2,8 @@
 
 - [Jon Douglas](https://github.com/JonDouglas/), [Nikolche Kolev](https://github.com/nkolev92), [Peter Yu](https://github.com/ryuyu)
 - Start Date: (2022-04-26)
-- [#8087](https://github.com/NuGet/Home/issues/8087)
-- [#11549](https://github.com/NuGet/Home/pull/11549)
+- Issue: [#8087](https://github.com/NuGet/Home/issues/8087)
+- Related: [#11549](https://github.com/NuGet/Home/pull/11549)
 
 ## Summary
 
