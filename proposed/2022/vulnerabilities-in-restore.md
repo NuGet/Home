@@ -1,4 +1,4 @@
-# Vulnerabilities in restore
+# Auditing projects for package vulnerabilities during restore
 
 - [Jon Douglas](https://github.com/JonDouglas/), [Nikolche Kolev](https://github.com/nkolev92), [Peter Yu](https://github.com/ryuyu)
 - Issue: [#8087](https://github.com/NuGet/Home/issues/8087)
