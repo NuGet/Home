@@ -34,9 +34,16 @@ For the following table assume `PackPrivateAssetsFlow` is set `true` when creati
 | build | Enable source generator work | Build fails due to property/target value change |
 | analyzers | Code analyzers work | n/a |
 
-### Examples
+#### Examples
 
-#### Case 1
+##### Case 1
+
+Package reference in csproj file.
+
+```.net
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.2.138-beta" PrivateAssets="none" ExcludeAssets="build" />
+  </ItemGroup>
 
 Before change nuspec file:
 
@@ -58,7 +65,9 @@ After change nuspec file:
     </dependencies>
 ```
 
-**Case 2.**
+##### Case 2
+
+Package reference in csproj file.
 
 ```.net
   <ItemGroup>
