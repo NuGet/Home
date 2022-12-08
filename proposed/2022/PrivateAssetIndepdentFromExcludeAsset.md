@@ -31,7 +31,7 @@ For the following table assume `PackPrivateAssetsFlow` is set `true` when creati
 |-----------------------|--------------|-----------------|
 | compile | Expose new code, auto complete, intellicode, intellisense | Compile error due to naming ambiguity, run time error, NU1605 error |
 | runtime | Let provide new runtime dependency | Run time error |
-| build | Enable source generator work | Build fails due to property/target value change |
+| build | Enable msbuild imports | Build fails due to property/target value change |
 | analyzers | Code analyzers work | n/a |
 
 #### Examples
@@ -41,6 +41,11 @@ For the following table assume `PackPrivateAssetsFlow` is set `true` when creati
 Package reference in csproj file.
 
 ```.net
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <VersionSuffix>beta</VersionSuffix>
+    <PackPrivateAssetsFlow>True</PackPrivateAssetsFlow>
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.2.138-beta" PrivateAssets="none" ExcludeAssets="build" />
   </ItemGroup>
@@ -70,6 +75,11 @@ After change nuspec file:
 Package reference in csproj file.
 
 ```.net
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <VersionSuffix>beta</VersionSuffix>
+    <PackPrivateAssetsFlow>True</PackPrivateAssetsFlow>
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.2.138-beta" PrivateAssets="none" IncludeAssets="none" />    
   </ItemGroup>
@@ -111,7 +121,7 @@ We already have a [logic](hhttps://github.com/NuGet/NuGet.Client/blob/380415d812
 
 `<PackageReference Include="contoso" Version="1.1.1" PackPrivateAssetsFlow="true"/>`
 
-- We could make it opt-in option in nuget.config file, but it doesn't give customer to option to opt in/out for per project level.
+- We could make it opt-in option in `nuget.config` file, but it doesn't give customer to option to opt in/out for per project level.
 
 ```.net
    <config>
