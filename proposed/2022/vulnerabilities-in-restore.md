@@ -77,7 +77,8 @@ warning NU1904: Package 'Contoso.Service.APIs' 1.0.3 has a known moderate severi
 In cases where no known vulnerabilities are found, restore will provide a normal verbosity message for every project:
 
 ```bash
-No known vulnerabilties found for <project path>.
+No known vulnerabilities found for <project path>.
+
 ```
 
 In addition at normal verbosity, we will log a report for each project whose vulnerabilities were audited.
