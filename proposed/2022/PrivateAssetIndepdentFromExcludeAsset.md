@@ -8,7 +8,7 @@
 ## Summary
 
 <!-- One-paragraph description of the proposal. -->
-The `IncludeAssets`, `PrivateAssets` and `ExcludeAssets` metadata on `PackageReference` items control two different features. Firstly, which assets from a package that are included in the current project. Secondly, whether the assets will be listed in the package's dependency assets, for those assets to flow transitively, if the project is packed.
+The `IncludeAssets`/`ExcludeAssets`,  and `PrivateAssets` metadata on `PackageReference` items control two different features. Firstly, which assets from a package that are included in the current project. Secondly, whether the assets will be listed in the package's dependency assets, for those assets to flow transitively, if the project is packed.
 
 For example, `<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="all" />` means "Include the default assets in the current project, but if packed, all of the assets are excluded, so this package will not be a dependency".
 
@@ -16,11 +16,14 @@ Another example, `<PackageReference Include="NuGet.Protocol" Version="6.4.0" Pri
 
 A third example, `<PackageReference Include="Microsoft.Build" Version="17.0" ExcludeAssets="runtime" />` means "in the current project, make the `compile` assets available (so both intellisense and the compiler can access APIs from the package), but `Microsoft.Build`'s dlls are not copied to `bin` on build (`runtime` assets), and if the project is packed, then `runtime` assets also be excluded for the `Microsoft.Build` dependency for any project that references the current project's package.
 
-However, a scenario that is missing is "exclude a package asset from a current project, but do not exclude it from the dependency when the current project is packed". This missing feature is more obvious when looking at a project/flow matrix:
-||Flow transitively|Don't flow transitively|
-|--|--|--|
-|**Include in project**|IncludeAssets|PrivateAssets|
-|**Don't include in project**||ExcludeAssets|
+However, a scenario that is missing is "exclude a package asset from a current project, but do not exclude it from the dependency when the current project is packed". This missing feature is more obvious when looking at a project/flow matrix (see 3rd line):
+
+IncludeAssets|PrivateAssets|Flows transitively
+--|--|--
+yes|yes|yes
+yes|no|no
+no|yes|***no***
+no|no|no
 
 ## Motivation
 
