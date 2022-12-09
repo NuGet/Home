@@ -8,7 +8,7 @@
 ## Summary
 
 <!-- One-paragraph description of the proposal. -->
-Currently `IncludeAssets/ExcludeAssets` options take precedence over `PrivateAssets` asset control option when creating package, so in many cases `IncludeAssets/ExcludeAssets` options completely eclipse the `PrivateAssets` option so doesn't let assets flow to consuming parent project. This proposal introduces new a `PackPrivateAssetsFlow` opt-in property so it let `PrivateAssets` asset control option takes precedence over `IncludeAssets/ExcludeAssets` options to enable asset flow to consuming parent projects.
+Currently `IncludeAssets/ExcludeAssets` options take precedence over `PrivateAssets` asset control option when creating package, so in many cases `IncludeAssets/ExcludeAssets` options completely eclipse the `PrivateAssets` option so doesn't let assets flow to consuming parent project. This proposal introduces new a `PrivateAssetIndependent` opt-in property so it let `PrivateAssets` asset control option takes precedence over `IncludeAssets/ExcludeAssets` options to enable asset flow to consuming parent projects.
 
 ## Motivation
 
@@ -22,10 +22,10 @@ We couldn't make this default experience because it'll break customers who rely 
 
 <!-- Explain the proposal as if it were already implemented and you're teaching it to another person. -->
 <!-- Introduce new concepts, functional designs with real life examples, and low-fidelity mockups or  pseudocode to show how this proposal would look. -->
-The new ` PackPrivateAssetsFlow` property only affects pack operation (more specifically nuspec in nupkg file), but doesn't affect restore experience for current project so there would be no change in `project.assets.json` lock file.
+The new ` PrivateAssetIndependent` property only affects pack operation (more specifically nuspec in nupkg file), but doesn't affect restore experience for current project so there would be no change in `project.assets.json` lock file.
 Experience for parent consuming project would be affected by which asset from `compile, runtime, contentFiles, build, buildMultitargeting, buildTransitive, analyzers, native` are flowing into them.
 
-For the following table assume `PackPrivateAssetsFlow` is set `true` when creating package, iterating possible scenarios (not full list) for consuming parent project.
+For the following table assume `PrivateAssetIndependent` is set `true` when creating package, iterating possible scenarios (not full list) for consuming parent project.
 
 | Asset flowing to parent project | New feature enabled | Possible downside |
 |-----------------------|--------------|-----------------|
@@ -36,7 +36,7 @@ For the following table assume `PackPrivateAssetsFlow` is set `true` when creati
 
 #### Examples
 
-##### Case 1
+##### Case 1 for PackageReference
 
 Package reference in csproj file.
 
@@ -44,7 +44,7 @@ Package reference in csproj file.
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <VersionSuffix>beta</VersionSuffix>
-    <PackPrivateAssetsFlow>True</PackPrivateAssetsFlow>
+    <PrivateAssetIndependent>True</PrivateAssetIndependent>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.2.138-beta" PrivateAssets="none" ExcludeAssets="build" />
@@ -70,7 +70,7 @@ After change nuspec file:
     </dependencies>
 ```
 
-##### Case 2
+##### Case 2 for PackageReference
 
 Package reference in csproj file.
 
@@ -78,7 +78,7 @@ Package reference in csproj file.
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <VersionSuffix>beta</VersionSuffix>
-    <PackPrivateAssetsFlow>True</PackPrivateAssetsFlow>
+    <PrivateAssetIndependent>True</PrivateAssetIndependent>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.2.138-beta" PrivateAssets="none" IncludeAssets="none" />    
@@ -117,15 +117,11 @@ We already have a [logic](hhttps://github.com/NuGet/NuGet.Client/blob/380415d812
 <!-- Why is this the best design compared to other designs? -->
 <!-- What other designs have been considered and why weren't they chosen? -->
 <!-- What is the impact of not doing this? -->
-- We could make it per package level control metadata. But could be hard to use if the customer want to opt-in for all package references in current project.
-
-`<PackageReference Include="contoso" Version="1.1.1" PackPrivateAssetsFlow="true"/>`
-
 - We could make it opt-in option in `nuget.config` file, but it doesn't give customer to option to opt in/out for per project level.
 
 ```.net
    <config>
-    <add key="PackPrivateAssetsFlow" value="true" />
+    <add key="PrivateAssetIndependent" value="true" />
   </config>
 ```
 
