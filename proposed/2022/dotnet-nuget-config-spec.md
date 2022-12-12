@@ -24,7 +24,7 @@ The following command will be implemented in the `dotnet.exe` CLI.
 
 ### Commands
 
-### Path
+### Paths
 
 List all the paths of NuGet configuration files that will be applied, when invoking NuGet command from the current working directory path.
 
@@ -53,7 +53,7 @@ Prints out a description of how to use the command.
 - List all the NuGet configuration file that will be applied, when invoking NuGet command in the current directory.
 
 ```
-dotnet nuget config path 
+dotnet nuget config paths 
 
 C:\Test\Repos\Solution\NuGet.Config
 C:\Test\Repos\NuGet.Config
@@ -66,7 +66,7 @@ C:\Program Files (x86)\NuGet\Config\Microsoft.VisualStudio.Offline.config
 - List all the paths of NuGet configuration files that will be applied, when invoking NuGet command in the specific directory.
 
 ```
-dotnet nuget config path C:\Test\Repos
+dotnet nuget config paths C:\Test\Repos
 
 C:\Test\Repos\NuGet.Config
 C:\Test\NuGet.Config
@@ -78,7 +78,7 @@ C:\Program Files (x86)\NuGet\Config\Microsoft.VisualStudio.Offline.config
 - List all the NuGet configuration file that will be applied, but passing a non-existing argument `WORKING_DIRECTORY`.
 
 ```
-dotnet nuget config path C:\Test\NonExistingRepos
+dotnet nuget config paths C:\Test\NonExistingRepos
 
 Error: The path "C:\Test\NonExistingRepos" doesn't exist.
 ```
@@ -88,7 +88,7 @@ Error: The path "C:\Test\NonExistingRepos" doesn't exist.
 The configuration file under C:\Test\AccessibleRepos\NotAccessibleSolution\NuGet.Config will be ignored without any warning or error.
 
 ```
-dotnet nuget config path C:\Test\AccessibleRepos\NotAccessibleSolution
+dotnet nuget config paths C:\Test\AccessibleRepos\NotAccessibleSolution
 
 C:\Test\AccessibleRepos\NuGet.Config
 C:\Test\NuGet.Config
@@ -131,11 +131,9 @@ If the specified `WORKING_DIRECTORY` doesn't exist, an error is displayed indica
 
 Prints out a description of how to use the command.
 
-- -v|--verbosity <LEVEL>
+- --show-path
 
-Sets the verbosity level of the command. Allowed values are q[uiet], m[inimal], n[ormal], d[etailed], and diag[nostic]. The default is minimal. 
-
-When the verbosity level is detailed or diagnostic, the source(NuGet configuration file path) will be show besides the configuration settings.
+Indicate that the NuGet configuration file path will be show besides the configuration settings.
 
 #### Examples
 
@@ -183,7 +181,7 @@ packageRestore:
 - Get all the NuGet configuration settings that will be applied, when invoking NuGet command in the current directory. Show the source(nuget configuration file path) of each configuration settings/child items.
 
 ```
-dotnet nuget config get all -v d
+dotnet nuget config get all --show-path
 
 packageSources:
   add key="source1" value="https://test/source1/v3/index.json"     file: C:\Test\Repos\Solution\NuGet.Config
@@ -209,10 +207,10 @@ http://company-squid:3128@contoso.com"
 
 ```
 
-- Get `http_proxy` from config section, when invoking NuGet command in the current directory. Show the source(nuget configuration file path) of this configuration setting.
+- Get `http_proxy` from config section, when invoking NuGet command in the current directory. Show the nuget configuration file path of this configuration setting.
 
 ```
-dotnet nuget config get http_proxy 
+dotnet nuget config get http_proxy --show-path
 
 http://company-squid:3128@contoso.com"         file: C:\Test\Repos\Solution\NuGet.Config
 
@@ -318,7 +316,7 @@ dotnet nuget config unset defaultPushSource --configfile C:\Users\username\AppDa
 ```
 
 ## Future Work
-1. The `dotnet nuget config path/get` is a community ask. We will discuss if adding this command into NuGet.exe CLI, in the future.
+1. The `dotnet nuget config paths/get` is a community ask. We will discuss if adding this command into NuGet.exe CLI, in the future.
 
 2. NuGet.exe [config command](https://learn.microsoft.com/en-us/nuget/reference/cli-reference/cli-ref-config) is implemented. 
 But the behavior is confusing: the `set` command will set the property which appears last when loading(for all writable files), so it's not updating the closest NuGet configuration file, but the user-wide NuGet configuration file.(Related code: https://github.com/NuGet/NuGet.Client/blob/dev/src/NuGet.Core/NuGet.Configuration/Settings/Settings.cs#L229)
@@ -327,12 +325,8 @@ But we might need to change this behavior in the future.
 Considering this will be a breaking change, we will only consider doing it in main version change, if there are enough votes.
 
 ## Open Questions
-1. Shall we use `dotnet nuget config path` or `dotnet nuget config paths` to get all configuration file paths?
 
-2. `WORKING_DIRECTORY` is changed from an option to an argument. So we have `dotnet nuget config path <WORKING_DIRECTORY>` and `dotnet nuget config get <ALL|CONFIG_KEY> <WORKING_DIRECTORY>`. Is it okey if we have two arguments in the second command? And if it's key, only the second argument could be optional, right? 
-
-3. To show configuration files locations, is it better to use `--verbosity` option or some option named like `--show-path`? (git command is using `--show-origin` for similar purpose)
-
+1. `WORKING_DIRECTORY` is changed from an option to an argument. So we have `dotnet nuget config paths <WORKING_DIRECTORY>` and `dotnet nuget config get <ALL|CONFIG_KEY> <WORKING_DIRECTORY>`. Is it okey if we have two arguments in the second command? And if it's key, only the second argument could be optional, right? 
 
 ## Considerations
 1. Will this command help with diagnosing incorrect setting format?
@@ -364,3 +358,9 @@ packageRestore:
   add key="enabled" value="False"
   add key="automatic" value="False"
 ```
+
+4. Shall we use `dotnet nuget config path` or `dotnet nuget config paths` to get all configuration file paths?
+<br />Since it returns multiple paths, we will use `dotnet nuget config paths`.
+
+5. To show configuration files locations, is it better to use `--verbosity` option or some option named like `--show-path`? (git command is using `--show-origin` for similar purpose)
+<br />`--show-path` is better. Verbosity is something to apply to logging, not so much the output of a command like this. Also in most cases of the .NET CLI, the verbosity doesn't do anything unless it's a command that ends up running MSBuild.
