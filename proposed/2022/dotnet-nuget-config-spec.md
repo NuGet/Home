@@ -326,7 +326,6 @@ Considering this will be a breaking change, we will only consider doing it in ma
 
 ## Open Questions
 
-1. `WORKING_DIRECTORY` is changed from an option to an argument. So we have `dotnet nuget config paths <WORKING_DIRECTORY>` and `dotnet nuget config get <ALL|CONFIG_KEY> <WORKING_DIRECTORY>`. Is it okey if we have two arguments in the second command? And if it's key, only the second argument could be optional, right? 
 
 ## Considerations
 1. Will this command help with diagnosing incorrect setting format?
@@ -364,3 +363,7 @@ packageRestore:
 
 5. To show configuration files locations, is it better to use `--verbosity` option or some option named like `--show-path`? (git command is using `--show-origin` for similar purpose)
 <br />`--show-path` is better. Verbosity is something to apply to logging, not so much the output of a command like this. Also in most cases of the .NET CLI, the verbosity doesn't do anything unless it's a command that ends up running MSBuild.
+
+
+6. `WORKING_DIRECTORY` is changed from an option to an argument. So we have `dotnet nuget config paths <WORKING_DIRECTORY>` and `dotnet nuget config get <ALL|CONFIG_KEY> <WORKING_DIRECTORY>`. Is it okey if we have two arguments in the second command? And if it's okey, only the second argument could be optional, right? 
+<br /> Confirmed with .NET sdk folks. There is no problem of having two arguments in the command and the second argument could be optional.
