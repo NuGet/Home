@@ -133,7 +133,7 @@ Prints out a description of how to use the command.
 
 - --show-path
 
-Indicate that the NuGet configuration file path will be show besides the configuration settings.
+Indicate that the NuGet configuration file path will be shown besides the configuration settings.
 
 #### Examples
 
