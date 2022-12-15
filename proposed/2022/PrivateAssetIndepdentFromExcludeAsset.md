@@ -25,15 +25,16 @@ However, a scenario that is missing is "exclude a package asset from a current p
 `<PackageReference Include="Microsoft.Windows.CsWin32" Version="0.2.138-beta"  PrivateAssets="none" IncludeAssets="none" />`.
 This missing feature is more obvious when looking at a project/flow matrix below (see 3rd row), because `PrivateAssets` is not independent from `IncludeAssets`. We want to change that with opt-in property, it would let assets flow to the parent project on that case.
 
+Let's consider some particular asset (e.g. `build`, `compile`, or even `all`) that may appear in the list of `IncludeAssets` or `PrivateAssets` metadata. When it appears in one or both of these lists, they may interact to control whether the asset flows transitively. The ☑️ symbol means this asset is listed in that metadata, and 🔲 means it is _not_ listed. Note that presence in PrivateAssets indicates that an asset should *not* flow transitively.
+
 IncludeAssets|PrivateAssets|Flows transitively
 --|--|--
-yes|yes|yes
-yes|no|no
-no|yes|***no***
-no|no|no
+☑️ | 🔲 | ✅
+☑️ | ☑️ | ❌
+🔲 | 🔲 | ❌ (unexpected?)
+🔲 | ☑️ | ❌
 
-In above table `IncludeAssets` equals `yes` means `all` or `build` etc, but `no` means `none` or another non-intersecting asset with `PrivateAssets`.
-`PrivateAssets` equals `yes` means `all` or `build` etc, but `no` means `none` or another non-intersecting asset with `IncludeAssets`.
+Note how `PrivateAssets` can only subtract assets from the assets listed by `IncludeAssets`. It cannot *add* them by setting `PrivateAssets=none`. This means (without the feature described in this spec) that there is simply no way to flow an asset transitively that is not also directly consumed by the project.
 
 ### Consumption via project reference
 
