@@ -37,7 +37,7 @@ In above table `IncludeAssets` equals `yes` means `all` or `build` etc, but `no`
 
 ### Consumption via project reference
 
-The above observation applies Project2Project references for parent project too when `restore/build` operation happens.
+The above observation applies to `ProjectReference` from 'parent' projects too when `restore/build` operation happens.
 Let's say the current project is `LibraryProj.csproj` and parent project has `<ProjectReference Include="..\LibraryProj.csproj" />` reference to it.
 
 For example, `<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="none" />` in `LibraryProj.csproj` means  "Include the default assets in the current project, but all assets flow to parent project".
