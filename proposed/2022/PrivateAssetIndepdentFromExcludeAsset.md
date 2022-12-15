@@ -74,27 +74,16 @@ For the following table assume `PrivateAssetIndependent` opt-in property is set 
 | build | Enable msbuild imports | Build fails due to property/target value change |
 | analyzers | Code analyzers work | n/a |
 
-Here is summary for what would change for consuming `parent` project, see 3rd row ***bold*** note.
+Recall our table from earlier that shows which assets flow based on listing some asset in `IncludeAssets` and/or `PrivateAssets`. Below we add a 4th column that reveals the new flow behavior when the new behavior is activated:
 
-Here `IncludeAssets` equals `yes` means `all` or `build` etc, but `no` means `none` or another non-intersecting asset with `PrivateAssets`.
+IncludeAssets|PrivateAssets|Flows transitively (default)|Flows transitively (PrivateAssetIndependent=true)
+--|--|--|--
+☑️ | 🔲 | ✅ | ✅
+☑️ | ☑️ | ❌ | ❌
+🔲 | 🔲 | ❌ | ✅
+🔲 | ☑️ | ❌ | ❌
 
-Here `PrivateAssets` equals `yes` means `all` or `build` etc, but `no` means `none` or another non-intersecting asset with `IncludeAssets`.
-
-Before change for any given `asset`:
-IncludeAssets|PrivateAssets|Flows transitively
---|--|--
-yes|yes|yes
-yes|no|no
-no|yes|***no***
-no|no|no
-
-After change for any given `asset`:
-IncludeAssets|PrivateAsset|Flows transitively
---|--|--
-yes|yes|yes
-yes|no|no
-no|yes|***yes***
-no|no|no
+Notice how transitive flow is controlled exclusively by the `PrivateAssets` value when `PrivateAssetIndependent` is set to `true`.
 
 #### Examples
 
