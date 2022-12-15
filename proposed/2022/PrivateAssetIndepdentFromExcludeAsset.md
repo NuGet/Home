@@ -213,6 +213,10 @@ We already have a [logic](hhttps://github.com/NuGet/NuGet.Client/blob/380415d812
   </config>
 ```
 
+- Alternatively we could make it opt-in option as metadata on the PackageReference item, but most likely customers'll be planning on opting entire project/repos into this setting rather than try to make sense of specific references having different behavior.
+If we do keep it as item metadata, will it be harmless to add that metadata to all PackageReference items, such that we can add it to an ItemDefinition group so we can get the desired behavior everywhere, although we don't specify some of the other attributes like PrivateAssets or IncludeAssets on every PackageReference item.
+`<PackageReference Include="Microsoft.Windows.CsWin32" Version="0.2.138-beta" IncludeAssets="build" ExcludeTransitiveAssets="none" />`
+
 ## Prior Art
 
 <!-- What prior art, both good and bad are related to this proposal? -->
