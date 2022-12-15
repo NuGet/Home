@@ -171,6 +171,8 @@ After change nuspec file:
   </ItemGroup>
 ```
 
+And `PackageReference` in `refissue.csproj` file:
+
 ```.net
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
