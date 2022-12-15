@@ -42,7 +42,7 @@ Let's say the current project is `LibraryProj.csproj` and parent project has `<P
 
 For example, `<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="none" />` in `LibraryProj.csproj` means  "Include the default assets in the current project, but all assets flow to parent project".
 
-Another example, `<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0"  IncludeAssets="none" />` in `LibraryProj.csproj` means  "Consume the no assets in the current project, but default assets flow  to parent project".
+Another example, `<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0"  IncludeAssets="none" />` in `LibraryProj.csproj` means "Consume no assets in the current project, but default assets flow to parent project".
 
 However if we combine above examples where both cases some assets flowing to parent project, `<PackageReference Include="Microsoft.Windows.CsWin32" Version="0.2.138-beta"  PrivateAssets="none" IncludeAssets="none" />`, currently experience is no asset flows to into parent project even though it requested all assets flow to parent project (see above table 3rd row), because `PrivateAssets` is not independent from `IncludeAssets`. We want to change that with opt-in property, it would let assets flow to the parent project on that case.
 
