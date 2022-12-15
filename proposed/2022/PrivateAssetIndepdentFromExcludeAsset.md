@@ -109,7 +109,7 @@ Before change nuspec file:
 ```.net
     <dependencies>
       <group targetFramework=".NETStandard2.0">
-        <dependency id="Microsoft.Windows.CsWin32" version="0.2.138-beta" exclude="Runtime,Build,Native,Analyzers,BuildTransitive" />
+        <dependency id="Microsoft.Windows.CsWin32" version="0.2.138-beta" exclude="Runtime,Compile,Native,Analyzers,BuildTransitive" />
       </group>
     </dependencies>
 ```
