@@ -157,7 +157,7 @@ After change nuspec file:
 
 ##### Case for Project to Project reference
 
-Package reference in parent `ClassLibrary1` csproj file.
+`ProjectReference` in parent `ClassLibrary1` csproj file:
 
 ```.net
   <PropertyGroup>
