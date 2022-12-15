@@ -62,7 +62,7 @@ If the current project consuming any packages, then it can be transitively consu
 
 <!-- Explain the proposal as if it were already implemented and you're teaching it to another person. -->
 <!-- Introduce new concepts, functional designs with real life examples, and low-fidelity mockups or  pseudocode to show how this proposal would look. -->
-The new ` PrivateAssetIndependent` property let only `PrivateAssets` option to decide which assets flow to consuming parent project, but doesn't affect restore experience for current project so there would be no change in `project.assets.json` lock file, i.e it doesn't change `IncludeAssets/ExcludeAssets` calculation for current project.
+The new `PrivateAssetIndependent` property causes the `PrivateAssets` metadata to exclusively decide which assets flow to consuming parent project, but doesn't affect restore experience for current project so there would be no change in `project.assets.json` lock file, i.e it doesn't change `IncludeAssets/ExcludeAssets` calculation for current project.
 
 It'll change how `compile, runtime, contentFiles, build, buildMultitargeting, buildTransitive, analyzers, native` dependencies flow into the projects consuming it via `PackageReference` and `ProjectReference` references.
 
