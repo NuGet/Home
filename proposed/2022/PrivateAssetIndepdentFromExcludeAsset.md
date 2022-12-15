@@ -10,6 +10,7 @@
 <!-- One-paragraph description of the proposal. -->
 Currently asset consumption via `PrivateAssets` option experience for assets from transitive package in a project/package is not deterministic for parent consuming project, here `PrivateAssets` option calculation is not independent from `IncludeAssets/ExcludeAssets` option.
 This proposal introduces new a `PrivateAssetIndependent` opt-in property to make `PrivateAssets` option independent from `IncludeAssets/ExcludeAssets` option.
+In below both `Consumption via package reference` and `Consumption via project reference` sub-sections are explaining same things for 2 different scenarios. So, I intentionally choose bit examples in them to expose what problem we're solving with this new opt-in feature.
 
 ### Consumption via package reference
 
