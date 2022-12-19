@@ -17,16 +17,19 @@ Add the `dotnet nuget apikey set` command, to allow customers to set a nuget.org
 
 - `dotnet nuget apikey set`
 
-nuget.org is one of the only package sources that uses API keys (`X-NuGet-ApiKey` HTTP header), rather than source credentials (`Authorization` HTTP header).
-However, it is also one of the most important package sources, since it's the only default package source.
-Hence most package authors who want wide adoption of their packages publish to nuget.org.
+Some NuGet servers, most notibly nuget.org, use authentication via [API keys](https://learn.microsoft.com/nuget/reference/nuget-config-file#apikeys) ([custom `X-NuGet-ApiKey` HTTP header](https://learn.microsoft.com/nuget/api/package-publish-resource#request-parameters)), rather than [package source credentials](https://learn.microsoft.com/nuget/reference/nuget-config-file#packagesourcecredentials) ([HTTP standard `Authorization` header)](https://developer.mozilla.org/docs/Web/HTTP/Headers/Authorization), when pushing packages.
+While package source credentials were primarily designed to allow for private feeds, where authentication is needed to search, restore and install packages, several NuGet server implementations that support private feeds use the same package source credentials to authorize push, without the need to use NuGet's custom HTTP header.
+In any case, there are servers which require API keys.
+
+Customers who need to use API keys have two options.
+Either persist the secret in `nuget.config`, so that the `push` command line does not need to specify the secret, or to pass the API key on the `push` command line.
+Passing the API on the command line risks leaking secrets, for example a CI system might not mask the secret in logs, or the secret being persisted in a shell's history file.
+Therefore, risk can be reduced by providing customers commands to add and remove the API to the `NuGet.config` file, especially if it can be done in a way where the secret is not entered into, or output from, the console.
 
 In `nuget.config`, the API keys are in a different section to source credentials.
 There is a command `nuget.exe setapikey` to set the API key in a config file, however, `nuget.exe` does not ship in Visual Studio or the .NET SDK.
 Also, `nuget.exe` requires mono on Linux and Mac, since `nuget.exe` is built for the .NET Framework.
 Therefore, a command in the .NET SDK will significantly reduce the barrier for customers to set values in the `nuget.config` file.
-While `dotnet nuget push` provides a `--apikey` option, this increases the risk that the secret value is exposed in the CI log, whereas customers can more easily secure a separate command that modifies the `nuget.config` file.
-Especially if that command is capable of reading values from environment variables.
 
 - `dotnet nuget apikey unset`
 
@@ -37,7 +40,7 @@ Customers may want to remove secrets from their `NuGet.config` files, so an `uns
 Currently `nuget.config` `<apikeys>` section only supports encrypted values, via .NET's [`System.Security.Cryptography.ProtectedData` APIs](https://learn.microsoft.com/dotnet/api/system.security.cryptography.protecteddata).
 As the important message says on the docs page, on Windows it uses Windows' Data Protection API (DPAPI), which isn't supported on Linux or Mac, and [the .NET libraries team have no plans to support it since it will have different security promises than on Windows](https://github.com/dotnet/runtime/issues/22886).
 There is [an issue to consider another way of having less secure "encrypted" passwords](https://github.com/NuGet/Home/issues/1851) on Linux and Mac (like what Mono does for the `ProtectedData` API), but it hasn't been implemented yet.
-Therefore, in order to enable this feature, `<apikeys>` needs to support unencrypted (plain text) secrets (just as source credentials do).
+Therefore, in order for this feature not to be blocked, `<apikeys>` needs to support unencrypted (plain text) secrets (just as source credentials do).
 
 ## Explanation
 
@@ -134,7 +137,7 @@ In this case, treat the scenario like `defaultPushSource` doesn't exist, so that
 
 - `nuget.config` support for unencrypted `<apikeys>`
 
-We have got feedback in the past from customers who manually entered clear text package credentials where NuGet expects encrypted credentials, and NuGet will crash with an obscure error message that is not actionable by customers.
+We have got [feedback from customers](https://github.com/NuGet/Home/issues/3245) who manually entered clear text package credentials where NuGet expects encrypted credentials, and NuGet will crash with an obscure error message ("The parameter is incorrect") that is not actionable by customers.
 While we are working on API keys, I propose that we should additionally catch the decryption of encrypted API keys, and if DPAPI throws an exception, report a meaningful error message back to the customer.
 
 The `<packageSources>` section also uses the `<add key="string" value="string">` syntax that most other parts of `NuGet.config` use, but it also supports the `protocolVersion="int"` attribute.
