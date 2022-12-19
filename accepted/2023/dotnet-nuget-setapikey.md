@@ -18,8 +18,9 @@ Add the `dotnet nuget apikey set` command, to allow customers to set a nuget.org
 - `dotnet nuget apikey set`
 
 Some NuGet servers, most notibly nuget.org, use authentication via [API keys](https://learn.microsoft.com/nuget/reference/nuget-config-file#apikeys) ([custom `X-NuGet-ApiKey` HTTP header](https://learn.microsoft.com/nuget/api/package-publish-resource#request-parameters)), rather than [package source credentials](https://learn.microsoft.com/nuget/reference/nuget-config-file#packagesourcecredentials) ([HTTP standard `Authorization` header)](https://developer.mozilla.org/docs/Web/HTTP/Headers/Authorization), when pushing packages.
+Package source credentials can either be persisted in the `NuGet.config` file, or obtained via [an authentication provider](https://learn.microsoft.com/en-us/nuget/reference/extensibility/nuget-cross-platform-authentication-plugin), avoiding the need for the secret to be persisted in the `NuGet.config` file.
 While package source credentials were primarily designed to allow for private feeds, where authentication is needed to search, restore and install packages, several NuGet server implementations that support private feeds use the same package source credentials to authorize push, without the need to use NuGet's custom HTTP header.
-In any case, there are servers which require API keys.
+In any case, there are servers which require API keys to push packages.
 
 Customers who need to use API keys have two options.
 Either persist the secret in `nuget.config`, so that the `push` command line does not need to specify the secret, or to pass the API key on the `push` command line.
