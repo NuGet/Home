@@ -9,7 +9,7 @@
 
 <!-- One-paragraph description of the proposal. -->
 Currently asset consumption via `PrivateAssets` option experience for assets from transitive package in a project/package is not deterministic for parent consuming project, here `PrivateAssets` option calculation is not independent from `IncludeAssets/ExcludeAssets` option.
-This proposal introduces new a `PrivateAssetIndependent` opt-in property to make `PrivateAssets` option independent from `IncludeAssets/ExcludeAssets` option.
+This proposal introduces new a `PublicAssets` opt-in property to make `PrivateAssets` option independent from `IncludeAssets/ExcludeAssets` option.
 In below both `Consumption via package reference` and `Consumption via project reference` sub-sections are explaining same things for 2 different scenarios. So, I intentionally choose bit examples in them to expose what problem we're solving with this new opt-in feature.
 
 ### Consumption via package reference
@@ -63,11 +63,11 @@ If the current project consuming any packages, then it can be transitively consu
 
 <!-- Explain the proposal as if it were already implemented and you're teaching it to another person. -->
 <!-- Introduce new concepts, functional designs with real life examples, and low-fidelity mockups or  pseudocode to show how this proposal would look. -->
-The new `PrivateAssetIndependent` property causes the `PrivateAssets` metadata to exclusively decide which assets flow to consuming parent project, but doesn't affect restore experience for current project so there would be no change in `project.assets.json` lock file, i.e it doesn't change `IncludeAssets/ExcludeAssets` calculation for current project.
+The new `PublicAssets` property causes the `PrivateAssets` metadata to exclusively decide which assets flow to consuming parent project, but doesn't affect restore experience for current project so there would be no change in `project.assets.json` lock file, i.e it doesn't change `IncludeAssets/ExcludeAssets` calculation for current project.
 
 It'll change how `compile, runtime, contentFiles, build, buildMultitargeting, buildTransitive, analyzers, native` dependencies flow into the projects consuming it via `PackageReference` and `ProjectReference` references.
 
-For the following table assume `PrivateAssetIndependent` opt-in property is set `true` in current project, iterating possible scenarios (not full list) for consuming parent project.
+For the following table assume `PublicAssets` opt-in property is set `true` in current project, iterating possible scenarios (not full list) for consuming parent project.
 
 | Asset flowing to parent project | New feature enabled | Possible downside |
 |-----------------------|--------------|-----------------|
@@ -78,14 +78,14 @@ For the following table assume `PrivateAssetIndependent` opt-in property is set 
 
 Recall our table from earlier that shows which assets flow based on listing some asset in `IncludeAssets` and/or `PrivateAssets`. Below we add a 4th column that reveals the new flow behavior when the new behavior is activated:
 
-IncludeAssets|PrivateAssets|Flows transitively (default)|Flows transitively (PrivateAssetIndependent=true)
+IncludeAssets|PrivateAssets|Flows transitively (default)|Flows transitively (PublicAssets=true)
 --|--|--|--
 ☑️ | 🔲 | ✅ | ✅
 ☑️ | ☑️ | ❌ | ❌
 🔲 | 🔲 | ❌ | ✅
 🔲 | ☑️ | ❌ | ❌
 
-Notice how transitive flow is controlled exclusively by the `PrivateAssets` value when `PrivateAssetIndependent` is set to `true`.
+Notice how transitive flow is controlled exclusively by the `PrivateAssets` value when `PublicAssets` is set to `true`.
 
 #### Examples
 
@@ -97,7 +97,7 @@ Package reference in csproj file.
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <VersionSuffix>beta</VersionSuffix>
-    <PrivateAssetIndependent>True</PrivateAssetIndependent>
+    <PublicAssets>True</PublicAssets>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.2.138-beta" PrivateAssets="none" IncludeAssets="build" />
@@ -132,7 +132,7 @@ Package reference in csproj file.
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <VersionSuffix>beta</VersionSuffix>
-    <PrivateAssetIndependent>True</PrivateAssetIndependent>
+    <PublicAssets>True</PublicAssets>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.2.138-beta" PrivateAssets="none" IncludeAssets="none" />    
@@ -179,7 +179,7 @@ And `PackageReference` in `refissue.csproj` file:
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <VersionSuffix>beta</VersionSuffix>
-    <PrivateAssetIndependent>True</PrivateAssetIndependent>
+    <PublicAssets>True</PublicAssets>
   </PropertyGroup>
 
   <ItemGroup>
@@ -209,13 +209,13 @@ We already have a [logic](hhttps://github.com/NuGet/NuGet.Client/blob/380415d812
 
 ```.net
    <config>
-    <add key="PrivateAssetIndependent" value="true" />
+    <add key="PublicAssets" value="true" />
   </config>
 ```
 
 - Alternatively we could make it opt-in option as metadata on the PackageReference item, but most likely customers'll be planning on opting entire project/repos into this setting rather than try to make sense of specific references having different behavior.
 If we do keep it as item metadata, will it be harmless to add that metadata to all PackageReference items, such that we can add it to an ItemDefinition group so we can get the desired behavior everywhere, although we don't specify some of the other attributes like PrivateAssets or IncludeAssets on every PackageReference item.
-`<PackageReference Include="Microsoft.Windows.CsWin32" Version="0.2.138-beta" IncludeAssets="build" PrivateAssetIndependent="true" />`
+`<PackageReference Include="Microsoft.Windows.CsWin32" Version="0.2.138-beta" IncludeAssets="build" PublicAssets="true" />`
 
 - Also we could add yet another tag like `TransitiveAssets` or `ExcludeTransitiveAssets` to same existing `IncludeAssets/ExcludeAssets/PrivateAssets` tags, only difference is to control transitive asset flow. Technically it overlaps more with `PrivateAssets` in functionality, most likely we don't need `PrivateAssets` anymore if the new tag is introduced.
 `<PackageReference Include="Microsoft.Windows.CsWin32" Version="0.2.138-beta" IncludeAssets="build" ExcludeTransitiveAssets="none" />`
