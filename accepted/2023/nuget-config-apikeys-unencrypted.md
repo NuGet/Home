@@ -1,4 +1,4 @@
-# Title
+# Allow clear text API keys in nuget.config
 
 - Andy Zivkovic ([zivkan](https://github.com/zivkan))
 - Start Date (2022-12-15)
