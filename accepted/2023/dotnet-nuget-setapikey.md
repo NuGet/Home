@@ -57,7 +57,6 @@ Options:
   -f, --from-file            Treat the <VALUE> argument as a filename, whose contents contain the API key.
   -s, --source <SOURCE>      The package source which this API should be used with. [Required]
   --configfile               The nuget.config file to write the API key to. [Default: c:\users\zivkan\AppData\Roaming\NuGet\NuGet.Config]
-  --store-in-clear-text      Don't use .NET's ProtectedData APIs to encrypt API key. Required on platforms that don't support the API.
   -?, -h, --help             Show command line help.
 ```
 
@@ -183,3 +182,5 @@ However, I believe that reading from environment variables and files are suffici
 ## Future Possibilities
 
 <!-- What future possibilities can you think of that this proposal would help with? -->
+
+If [the spec to allow unencrypted API keys in `nuget.config` files](https://github.com/NuGet/Home/pull/12354) is accepted, then `dotnet nuget apikey set` should have a `--store-in-clear-text` argument to allow the API to be saved without encryption.
