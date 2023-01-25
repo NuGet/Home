@@ -294,6 +294,7 @@ An additional optimization would be to only check the vulnerabilities when we've
 <!-- What related issues would you consider out of scope for this proposal but can be addressed in the future? -->
 - Should the opt in property be named `NuGetVulnerabilityAudit`?
   - The motivation is that we might want to include deprecation in auditing at some point. Should customers that opted into vulnerability audit get that experience automatically even if they didn't intend to? Customers might only be interested in vulnerability auditing, but not deprecation auditing.
+- How does this feature support CPM? Do packages that are not restored but may have a vulnerable version get reported?
 
 ## Future Possibilities
 
