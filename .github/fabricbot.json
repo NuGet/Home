@@ -237,10 +237,21 @@
               "parameters": {}
             },
             {
-              "name": "activitySenderHasPermissions",
-              "parameters": {
-                "permissions": "write"
-              }
+              "operator": "or",
+              "operands": [
+                {
+                  "name": "activitySenderHasPermissions",
+                  "parameters": {
+                    "permissions": "write"
+                  }
+                },
+                {
+                  "name": "activitySenderHasPermissions",
+                  "parameters": {
+                    "permissions": "admin"
+                  }
+                }
+              ]
             }
           ]
         },
