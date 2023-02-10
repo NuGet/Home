@@ -6,7 +6,7 @@
 
 ## Summary
 
-Audit your dependencies when restoring your NuGet packages with security vulnerabilities reported to GitHub Advisory Database.
+Audit your dependencies when restoring your NuGet packages with known security vulnerabilities.
 
 ## Motivation
 
@@ -111,6 +111,15 @@ There is no support for excluding individual advisories at this time. Developers
 
 Given that restore would be raising a warning, the vulnerability information will automatically appear in the Solution Explorer.
 This is the primary motivation for having 1 error message per package.
+
+### Source of known vulnerabilities
+
+The proposal is that each NuGet feed will be responsible for providing the NuGet client with a list of known vulnerabilities.
+
+nuget.org currently gets its data from the GitHub Advisories Database.
+Therefore, upon initial release, anyone with `https://api.nuget.org/v3/index.json` as a package source and opts into the feature will have GitHub's advisories scanning their packages.
+The protocol format is designed to make it easy for other package sources to mirror nuget.org's known vulnerabilities, or [explicitly instruct the NuGet client to use nuget.org's vulnerability data](#allow-sources-to-upstream-vulnerability-information).
+Servers can also source their vulnerability data from other sources, as long as they transform the data into [the schema expected by the client](#dedicated-vulnerability-information-resource).
 
 ### Technical explanation
 
