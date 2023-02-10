@@ -125,9 +125,12 @@ Both of these can be achieved by adding a means to understand whether a source s
 
 When NuGet restores, we check whether a source supports vulnerabilities and if so it can go through a protocol of getting this information.
 
-The client needs all the data to make decisions about vulnerability. In order to not have the client redownload a file and limit the total number of HTTP calls we will ever make, the vulnerability resource will be an index that can contain multiple pages.
+The client needs all the data to make decisions about vulnerabilities.
+In order to reduce customer bandwidth in frequently re-downloading the vulnerability data, it is recommended for servers to partition the data into multiple files.
+Our recommendation is to have one file which new vulnerabilities are added into, and one or more files which contain historic vulnerabilities that is updated infrequently, allowing the client to re-use cached versions of the file(s).
+Periodically, the small file's data can be merged into the large file(s), and the small file cleared.
 
-- The vulnernability resource **must** be an array of objects.
+- The vulnerability resource **must** be an array of objects.
 - Each object **must** contain:
   - `@name`, a user friendly name for the page, **must** be unique.
   - `@id`, the url that contains the data.
@@ -135,12 +138,14 @@ The client needs all the data to make decisions about vulnerability. In order to
   - `comment`, a user friendly description.
 - The vulnerability resource **must** at minimum contain 1 page.
 - The pages within the vulnerability resource **must** be exclusive.
+
+One idea for data partitioning is:
 - The vulnerability resource may 2 pages.
-  - One page, `base`, represents the data up to a certain point in time. This page **must** be updated periodically, based on a trigger.
-  - The second page, `update`, represents the data from the last update of `base`, to present. This page **should** be updated with new data.
+  - One page, `base`, represents the data up to a certain point in time.
+  - The second page, `update`, represents the data from the last update of `base`, to present.
   - Periodically, for example once a month, the data from `update` **should** be migrated to `base`.
   - If an entry needs to be removed from `base`, `base` should be updated.
-- Other partioning strategies are workable as well, as long as only 2 pages are receiving all the new data.  
+- Other partitioning strategies are workable as well. It is up to the server implementation to be considerate to customers with low bandwidth or metered download allowances.
   
 This would allow for the client to do the following:
 
@@ -174,7 +179,7 @@ This should allow for incremental downloads over a short period of time, without
   - Advisory url, a url.
   - Versions, a version range in [NuGet range syntax](https://learn.microsoft.com/nuget/concepts/package-versioning#version-ranges) of affected package versions.
 - The package id **should** be lower case, but it **must** be a case insensitive string, expected to be a valid package id as prescribed by NuGet.
-- The version range **must** be a case insensitive and normalized (does not include the metadata information).
+- The version range **must** be case insensitive and normalized (does not include the metadata information). Server implementations written in .NET can use the `NuGet.Versioning` package's `VersionRange.ToNormalizedString()` method to get a compliant output.
 
 ```json
 {
