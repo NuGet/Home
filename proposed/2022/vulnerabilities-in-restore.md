@@ -187,43 +187,31 @@ This should allow for incremental downloads over a short period of time, without
 ```
 
 - The page within the vulnerability resource **must** have the `packageid` as a primary key.
-- The value of that **must** be an object with a normalized `package version` as a primary key.
 - The value of that **must** be an array of objects.
 - The objects within the array of objects **must** contain:
   - Severity, an `int`, where `0` means `low`, `1` means `medium`, `2` means `high`, `3` means `critical`
   - Advisory url, a url.
-- The package id **must** be a case insensitive string, expected to be a valid package id as prescribed by NuGet.
-- The version **must** be a case insensitive and normalized (does not include the metadata information).
+  - Versions, a version range in [NuGet range syntax](https://learn.microsoft.com/nuget/concepts/package-versioning#version-ranges) of affected package versions.
+- The package id **should** be lower case, but it **must** be a case insensitive string, expected to be a valid package id as prescribed by NuGet.
+- The version range **must** be a case insensitive and normalized (does not include the metadata information).
 
 ```json
 {
-  "adplug": {
-    "2.3.0-beta10": [
-      {
-        "severity": 1,
-        "advisoryUrl": "https://github.com/advisories/GHSA-874w-m2v2-1234"
-      },
-      {
-        "severity": 3,
-        "advisoryUrl": "https://github.com/advisories/GHSA-874w-m2v2-mj64"
-      }
-    ],
-    "2.3.0-beta100": [
-      {
-        "severity": 3,
-        "advisoryUrl": "https://github.com/advisories/GHSA-874w-m2v2-mj64"
-      }
-    ]
-  },
-  "Bond.Core.CSharp": {
-    "4.0.1": [
-      {
-        "severity": 2,
-        "advisoryUrl": "https://github.com/advisories/GHSA-rqrc-8q8f-cp9c"
-      }
-    ]
-  }
-} 
+  "adplug": [
+    {
+      "severity": 3,
+      "url": "https://github.com/advisories/GHSA-874w-m2v2-mj64",
+      "versions": "(, 2.3.1)"
+    }
+  ],
+  "bond.core.csharp": [
+    {
+      "severity": 2,
+      "url": "https://github.com/advisories/GHSA-rqrc-8q8f-cp9c",
+      "versions": "[3.0.0, 9.0.1]"
+    }
+  ]
+}
 ```
 
 Having a dedicated vulnerability information resource will allow upstreams to easily use the NuGet.org data within their source.
