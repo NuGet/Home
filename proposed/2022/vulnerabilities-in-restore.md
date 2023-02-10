@@ -58,6 +58,13 @@ For example, a developer might run `dotnet restore` explicitly or `dotnet add pa
 | NU1903 | high |
 | NU1904 | critical |
 
+When there are packages used by the project with vulnerabilities, they will be outjust like like any other warning or error:
+
+```text
+/path/to/project.csproj: warning NU1904: Package 'Contoso.Service.APIs' 1.0.3 has a known critical severity vulnerability, https://github.com/advisories/GHSA-1234-5678-9012.
+/path/to/project.csproj: warning NU1902: Package 'Contoso.Forms' 8.4.1 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-1234-5678-9012.
+```
+
 #### Enabling Vulnerability Auditing
 
 This feature will be opt-in to start and gather feedback from developers.
