@@ -49,7 +49,7 @@ If any vulnerabilities are found, the impact, appropriate remediation, and other
 
 For example, a developer might run `dotnet restore` explicitly or `dotnet add package` which runs restore implicitly. If a package being restored contains a known security advisory, they would see output at the bottom of the restore output that indicates how many vulnerabilities, a break-down of their severities, and the appropriate remediation action to take given the context of their environment. Below are a handful of concepts ranging from a low to high verbosity of information
 
-#### Warning codes and output
+#### Warning codes
 
 | Warning Code | Severity |
 |--------------|----------|
@@ -57,41 +57,6 @@ For example, a developer might run `dotnet restore` explicitly or `dotnet add pa
 | NU1902 | moderate |
 | NU1903 | high |
 | NU1904 | critical |
-
-```bash
-Found 2 vulnerabilities (0 low, 1 moderate, 0 high, 1 critical) in 2 package(s)
-
-warning NU1904: Package 'Contoso.Service.APIs' 1.0.3 has a known critical severity vulnerability, https://github.com/advisories/GHSA-1234-5678-9012.
-warning NU1902: Package 'Contoso.Forms' 8.4.1 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-1234-5678-9012.
-```
-
-If a package has more than 1 vulnerability, each vulnerability will have its own warning. These security issues are often likely independent and may require independent fixes.
-
-```bash
-Found 2 vulnerabilities (0 low, 1 moderate, 0 high, 1 critical) in 1 package(s)
-
-warning NU1904: Package 'Contoso.Service.APIs' 1.0.3 has a known critical severity vulnerability, https://github.com/advisories/GHSA-1234-5678-9012
-warning NU1904: Package 'Contoso.Service.APIs' 1.0.3 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-1234-5678-90XY
-```
-
-In cases where no known vulnerabilities are found, restore will provide a normal verbosity message for every project:
-
-```bash
-No known vulnerabilities found for <project path>.
-
-```
-
-In addition at normal verbosity, we will log a report for each project whose vulnerabilities were audited.
-
-```bash
-Found 2 vulnerabilities (0 low, 2 moderate, 0 high, 0 critical) in 2 package(s)
-
-Top-level Package       Requested	Resolved	Severity	Advisory URL
-> Contoso.Forms		8.4.1	        8.4.1		Moderate	https://github.com/advisories/GHSA-1234-5678-9012
-
-Transitive Package	Resolved	Severity	Advisory URL
-> Microsoft.Data.OData	5.2.0	        Moderate	https://github.com/advisories/GHSA-1234-5678-90XY
-```
 
 #### Enabling Vulnerability Auditing
 
@@ -372,6 +337,45 @@ While the nuget.org data only contains vulnerability information about packages 
 If this upstream approach is taken, it is very likely that the vulnerability checking has a lot of misses, but this is an understood trade-off.
 
 It is **very important* that if the upstream sources link to the nuget.org vulnerability, the actual nuget.org urls are used wherever possible, as this would allow the client to easily deduplicate the vulnerability information.
+
+### Command Line Restore output
+
+Restore output could be modified to make vulnerability information more explicit.
+
+```bash
+Found 2 vulnerabilities (0 low, 1 moderate, 0 high, 1 critical) in 2 package(s)
+
+warning NU1904: Package 'Contoso.Service.APIs' 1.0.3 has a known critical severity vulnerability, https://github.com/advisories/GHSA-1234-5678-9012.
+warning NU1902: Package 'Contoso.Forms' 8.4.1 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-1234-5678-9012.
+```
+
+If a package has more than 1 vulnerability, each vulnerability will have its own warning. These security issues are often likely independent and may require independent fixes.
+
+```bash
+Found 2 vulnerabilities (0 low, 1 moderate, 0 high, 1 critical) in 1 package(s)
+
+warning NU1904: Package 'Contoso.Service.APIs' 1.0.3 has a known critical severity vulnerability, https://github.com/advisories/GHSA-1234-5678-9012
+warning NU1904: Package 'Contoso.Service.APIs' 1.0.3 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-1234-5678-90XY
+```
+
+In cases where no known vulnerabilities are found, restore will provide a normal verbosity message for every project:
+
+```bash
+No known vulnerabilities found for <project path>.
+
+```
+
+In addition at normal verbosity, we will log a report for each project whose vulnerabilities were audited.
+
+```bash
+Found 2 vulnerabilities (0 low, 2 moderate, 0 high, 0 critical) in 2 package(s)
+
+Top-level Package       Requested	Resolved	Severity	Advisory URL
+> Contoso.Forms		8.4.1	        8.4.1		Moderate	https://github.com/advisories/GHSA-1234-5678-9012
+
+Transitive Package	Resolved	Severity	Advisory URL
+> Microsoft.Data.OData	5.2.0	        Moderate	https://github.com/advisories/GHSA-1234-5678-90XY
+```
 
 ### Providing vulnerability information through a json, remotely or locally
 
