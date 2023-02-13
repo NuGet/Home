@@ -58,12 +58,21 @@ For example, a developer might run `dotnet restore` explicitly or `dotnet add pa
 | NU1903 | high |
 | NU1904 | critical |
 
-When there are packages used by the project with vulnerabilities, they will be outjust like like any other warning or error:
+When there are packages used by the project with vulnerabilities, they will be output like like any other warning or error:
 
 ```text
 /path/to/project.csproj: warning NU1904: Package 'Contoso.Service.APIs' 1.0.3 has a known critical severity vulnerability, https://github.com/advisories/GHSA-1234-5678-9012.
 /path/to/project.csproj: warning NU1902: Package 'Contoso.Forms' 8.4.1 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-1234-5678-9012.
 ```
+
+If a package has more than 1 vulnerability, each vulnerability will have its own warning. These security issues are often likely independent and may be fixed in different versions.
+
+```bash
+/path/to/project.csproj: warning NU1904: Package 'Contoso.Service.APIs' 1.0.3 has a known critical severity vulnerability, https://github.com/advisories/GHSA-1234-5678-9012
+/path/to/project.csproj: warning NU1904: Package 'Contoso.Service.APIs' 1.0.3 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-1234-5678-90XY
+```
+
+Similarly, if a vulnerable package is either referenced directly by multiple projects, or a project reference causes a package to become a transitive package, it will be listed by each project affected.
 
 #### Enabling Vulnerability Auditing
 
@@ -77,12 +86,14 @@ In cases where a developer only cares about a certain threshold of advisory seve
 
 #### Excluding Advisories
 
-There is no support for excluding individual advisories at this time. Developers will be able to `<NoWarn>` the four `NU1901` -> `NU1904` warnings or set the `<NuGetAuditLevel>` to suppress certain severities.
+There is no support for excluding individual advisories at this time.
+Developers will be able to `<NoWarn>` the four `NU1901` -> `NU1904` warnings or set the `<NuGetAuditLevel>` to suppress certain severities.
+See the section [suppress advisories](#suppress-advisories), under the [future possibilities](#future-possibilities) section, for some early thoughts.
 
 #### Vulnerability warnings in  the solution explorer
 
 Given that restore would be raising a warning, the vulnerability information will automatically appear in the Solution Explorer.
-This is the primary motivation for having 1 error message per package.
+This is the primary motivation for having 1 message per package.
 
 ### Source of known vulnerabilities
 
@@ -92,6 +103,9 @@ nuget.org currently gets its data from the GitHub Advisories Database.
 Therefore, upon initial release, anyone with `https://api.nuget.org/v3/index.json` as a package source and opts into the feature will have GitHub's advisories scanning their packages.
 The protocol format is designed to make it easy for other package sources to mirror nuget.org's known vulnerabilities, or [explicitly instruct the NuGet client to use nuget.org's vulnerability data](#allow-sources-to-upstream-vulnerability-information).
 Servers can also source their vulnerability data from other sources, as long as they transform the data into [the schema expected by the client](#dedicated-vulnerability-information-resource).
+
+Servers that use nuget.org as an upstream source for their packages have multiple options in providing nuget.org's vulnerability information.
+See the [section on allowing source to upstream vulnerability information](#allow-sources-to-upstream-vulnerability-information).
 
 ### Technical explanation
 
@@ -118,7 +132,7 @@ Both of these can be achieved by adding a means to understand whether a source s
 ```json
     {
       "@id": "https://nikolchevulntest.blob.core.windows.net/newcontainer/vulnerabilityindex.json",
-      "@type": "VulnerabilityInfo/6.3.0",
+      "@type": "VulnerabilityInfo/6.6.0",
       "comment": "The endpoint for discovering information about vulnerabilities of packages in this package source."
     },
 ```
@@ -140,18 +154,19 @@ Periodically, the small file's data can be merged into the large file(s), and th
 - The pages within the vulnerability resource **must** be exclusive.
 
 One idea for data partitioning is:
-- The vulnerability resource may 2 pages.
+
+- The vulnerability resource contains 2 pages.
   - One page, `base`, represents the data up to a certain point in time.
   - The second page, `update`, represents the data from the last update of `base`, to present.
   - Periodically, for example once a month, the data from `update` **should** be migrated to `base`.
   - If an entry needs to be removed from `base`, `base` should be updated.
 - Other partitioning strategies are workable as well. It is up to the server implementation to be considerate to customers with low bandwidth or metered download allowances.
-  
+
 This would allow for the client to do the following:
 
 1. Fetch the main vulnerability resource if available.
-1. Compare its version of the base resource to the remote one, based on the updated property. Redownload if different.
-1. Compare its version of the update resource to the remote, based on the updated property. Redownload if different.
+1. Compare its version of the base resource to the remote one, based on the updated property. Re-download if different.
+1. Compare its version of the update resource to the remote, based on the updated property. Re-download if different.
 
 This should allow for incremental downloads over a short period of time, without an unnecessarily complex update protocol. Given that we're downloading a gziped version, it is unlikely that the payload size becomes a problem anytime soon.
 
@@ -177,7 +192,7 @@ This should allow for incremental downloads over a short period of time, without
 - The objects within the array of objects **must** contain:
   - Severity, an `int`, where `0` means `low`, `1` means `medium`, `2` means `high`, `3` means `critical`
   - Advisory url, a url.
-  - Versions, a version range in [NuGet range syntax](https://learn.microsoft.com/nuget/concepts/package-versioning#version-ranges) of affected package versions.
+  - Versions, a version range in [NuGet range syntax](https://learn.microsoft.com/nuget/concepts/package-versioning#version-ranges) of affected package versions. This can contain prerelease versions as appropriate.
 - The package id **should** be lower case, but it **must** be a case insensitive string, expected to be a valid package id as prescribed by NuGet.
 - The version range **must** be case insensitive and normalized (does not include the metadata information). Server implementations written in .NET can use the `NuGet.Versioning` package's `VersionRange.ToNormalizedString()` method to get a compliant output.
 
@@ -218,9 +233,9 @@ Instead of using the `custom` @updated property, we could instead use HTTP const
 
 - Use ETag instead of an intermediate resource. This would technically have 1 fewer call than the current proposal.
 - Use If-Modified-Since and simply always request both the base and update resources.
-- Version the vulnerabilities by the year informationw was known to source.
-  - Implement something similar to what the catalog is.
-  - This would allow certain vulnerabilities to never be redownloaded, but it will continously increased, even if it is unlikely to ever become unreasonable.
+- Version the vulnerabilities by the year information was known to source.
+  - Implement something similar to what the [catalog resource](https://learn.microsoft.com/en-us/nuget/api/catalog-resource) is.
+  - This would allow certain vulnerabilities to never be re-downloaded, but it will continuously increased, even if it is unlikely to ever become unreasonable.
 
 - Multiple resource files organized in buckets such as the first character of the package id or some other [arbitrary bucketing method](https://en.wikipedia.org/wiki/Consistent_hashing).
   - This will not improve the overall performance, but theoretically would limit the frequency of the data being refreshed.
@@ -251,12 +266,16 @@ Most restores are no-op and only checking vulnerabilities when restore actually 
 Sometimes restore use the local data from the global packages folder to complete a restore.
 An additional optimization would be to only check the vulnerabilities when we've already made any http call.
 
+A project that rarely changes package versions, and rarely installs or removes packages, will very infrequently fail NuGet's no-op check on a developer's machine.
+Therefore, developers working on such repositories will not provider NuGet many opportunities to check for vulnerabilities as part of a restore.
+However, it is expected that such projects will have a CI build which will perform a full restore, so this is not a scenario that we believe needs a design to mitigate at this time.
+
 ## Prior Art
 
 - NPM automatically audits dependencies when packages are installed.
-  - NPM achieves this by checking the vulnerabilities for the full graph, by submiting the graph to a compute resource that provides a list of the vulnerabilities.
-  - The biggest difference is that NuGet restore is run significantly more frequently than npm install is. As such the performance is not as critical.
-- [pip-audit](https://github.com/pypa/pip-audit) scans for packages with known vulnerabilities using the Python Packaging Advisory Database. 
+  - NPM achieves this by checking the vulnerabilities for the full graph, by submitting the graph to a compute resource that provides a list of the vulnerabilities.
+  - The biggest difference is that NuGet restore is run significantly more frequently than npm install is. As such npm's vulnerability checking performance is not as critical as NuGet's.
+- [pip-audit](https://github.com/pypa/pip-audit) scans for packages with known vulnerabilities using the Python Packaging Advisory Database.
 - [cargo-audit](https://docs.rs/cargo-audit/latest/cargo_audit/) audits cargo.lock files for creates containing security vulnerabilities.
 - [snyk](https://snyk.io/product/open-source-security-management/) provides security tools for open source vulnerability scanning and CLI experiences.
 - [DependencyCheck](https://github.com/jeremylong/DependencyCheck) scans software for known vulnerabilities.
@@ -275,7 +294,7 @@ An additional optimization would be to only check the vulnerabilities when we've
 - Vulnerability scanning can be extended to SBOMs.
 - Support can be added to automatically fix vulnerable dependencies (i.e. a fix experience in CLI / Tooling)
 
-Additionally, most of the [`Rationale and alternatives`](#rationale-and-alternatives) are really future possibilties on their own as they are not always exclusive to the current approach. Here's some further possibilities:
+Additionally, most of the [`Rationale and alternatives`](#rationale-and-alternatives) are really future possibilities on their own as they are not always exclusive to the current approach. Here's some further possibilities:
 
 ### Suppress advisories
 
@@ -288,7 +307,7 @@ An example of how the nuget.config could look like:
     <add key="https://github.com/advisories/GHSA-g3q9-xf95-8hp5" />
     <add key="https://github.com/advisories/GHSA-1234-5678-9012" />
   </suppressingVulnerabilities>
-```xml
+```
 
 An idea how the project side could look like:
 Today, you can suppress warnings by using their warning codes at both the project and the package level.
@@ -303,7 +322,6 @@ Example:
   <ItemGroup>
     <PackageReference Include="PackageId" Version="3.0.0" NoWarn="NU1901" />
   </ItemGroup>
-
 ```
 
 We can extend a similar functionality to the advisory urls via their own dedicated property.
@@ -324,7 +342,7 @@ The project level and package level metadata are not necessarily a package deal,
 
 ### Allow sources to upstream vulnerability information
 
-While the NuGet tooling does support multiple sources and a means to control which packages come from which source through [Package Source Mapping](https://learn.microsoft.com/en-us/nuget/consume-packages/package-source-mapping), all configurations are not going to contain nuget.org, and thus won't easily get the data curated from the [GitHub Advisory Database](https://devblogs.microsoft.com/nuget/how-to-scan-nuget-packages-for-security-vulnerabilities/).
+While the NuGet tooling supports multiple sources, not all configurations are going to contain nuget.org, and thus won't easily get the data curated from the [GitHub Advisory Database](https://devblogs.microsoft.com/nuget/how-to-scan-nuget-packages-for-security-vulnerabilities/).
 
 The [V3 protocol](https://learn.microsoft.com/en-us/nuget/api/overview) and the resource architecture would allow a source to link to a resource that may not be hosted by them.
 Not every source would want to setup a pipeline for processing vulnerability information. They can instead just "point" to the nuget.org information.
@@ -352,7 +370,7 @@ It is **very important* that if the upstream sources link to the nuget.org vulne
 
 ### Command Line Restore output
 
-Restore output could be modified to make vulnerability information more explicit.
+Restore output could be modified to provide a vulnerability summary.
 
 ```bash
 Found 2 vulnerabilities (0 low, 1 moderate, 0 high, 1 critical) in 2 package(s)
@@ -361,23 +379,14 @@ warning NU1904: Package 'Contoso.Service.APIs' 1.0.3 has a known critical severi
 warning NU1902: Package 'Contoso.Forms' 8.4.1 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-1234-5678-9012.
 ```
 
-If a package has more than 1 vulnerability, each vulnerability will have its own warning. These security issues are often likely independent and may require independent fixes.
-
-```bash
-Found 2 vulnerabilities (0 low, 1 moderate, 0 high, 1 critical) in 1 package(s)
-
-warning NU1904: Package 'Contoso.Service.APIs' 1.0.3 has a known critical severity vulnerability, https://github.com/advisories/GHSA-1234-5678-9012
-warning NU1904: Package 'Contoso.Service.APIs' 1.0.3 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-1234-5678-90XY
-```
-
-In cases where no known vulnerabilities are found, restore will provide a normal verbosity message for every project:
+In cases where no known vulnerabilities are found, restore can provide a normal verbosity message for every project:
 
 ```bash
 No known vulnerabilities found for <project path>.
 
 ```
 
-In addition at normal verbosity, we will log a report for each project whose vulnerabilities were audited.
+In addition at normal verbosity, we could log a report for each project whose vulnerabilities were audited.
 
 ```bash
 Found 2 vulnerabilities (0 low, 2 moderate, 0 high, 0 critical) in 2 package(s)
@@ -396,11 +405,17 @@ Whatever approach we take there will be a way to represent the vulnerability inf
 
 ### Surfacing deprecation information
 
-From a technical perspective, vulnerabilities and deprecation are *very* similar.
-Deprecation data tends to be more plentiful, and as such would be a more significant performance hit. Today, deprecation information is 10x the vulnerability information.
+Vulnerabilities and deprecation share some similarities.
+From a customer point of view, they often also wish to be aware when a package is deprecated.
+
+However, nuget.org's implementation is that package deprecation information is stored per-version, rather than as ranges, as GitHub's package vulnerability information is.
+NuGet.org also has a lot more deprecated package information than vulnerability information.
+Therefore, it would be a more significant performance hit.
+
+At the time of writing, a file containing deprecation information is 140x the size of the vulnerability information.
 
 ### Vulnerabilities in dependencies
 
-Due to the fact that NuGet flattens, thinking about a package having vulnerabilities is best thought of in the context of a project.
+Due to transitive packages, thinking about a package having vulnerabilities is best thought of in the context of a project.
 Having vulnerability data at restore time, would allow to potentially gather information about packages that themselves are not vulnerable, but bring in vulnerable packages within their graph.
 This information could be a helpful signal for package authors to update their dependency graph.
