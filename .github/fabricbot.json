@@ -434,7 +434,7 @@
           {
             "name": "addReply",
             "parameters": {
-              "comment": "This PR has been automatically marked as stale because it has no activity for **30 days**. It will be closed if no further activity occurs **within another 15 days** of this comment. If it is closed, you may reopen it anytime when you're ready again, as long as you don't delete the branch."
+              "comment": "This PR has been automatically marked as stale because it has no activity for **30 days**. It will be closed if no further activity occurs **within another 15 days** of this comment, unless it has a \"Status:Do not auto close\" label. If it is closed, you may reopen it anytime when you're ready again, as long as you don't delete the branch."
             }
           }
         ]
@@ -686,6 +686,12 @@
             "name": "noActivitySince",
             "parameters": {
               "days": 15
+            }
+          },
+          {
+            "name": "noLabel",
+            "parameters": {
+              "label": "Status:Do not auto close"
             }
           }
         ],
