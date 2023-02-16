@@ -67,6 +67,57 @@ The new `PublicAssets` property causes the `PrivateAssets` metadata to exclusive
 
 It'll change how `compile, runtime, contentFiles, build, buildMultitargeting, buildTransitive, analyzers, native` dependencies flow into the projects consuming it via `PackageReference` and `ProjectReference` references.
 
+Each asset is independent on/off binary switch, it's include or not included. Below snippet is from [PackageReference doc](https://learn.microsoft.com/en-us/nuget/consume-packages/package-references-in-project-files).
+
+| Tag | Description | Default Value |
+| --- | --- | --- |
+| IncludeAssets | These assets will be consumed | all |
+| ExcludeAssets | These assets will not be consumed | none |
+| PrivateAssets | These assets will be consumed but won't flow to the parent project | contentfiles;analyzers;build |
+
+Here `all` means include all of above `compile, runtime, contentFiles, build, buildMultitargeting, buildTransitive, analyzers, native` assets, `none` means no any asset, and they specified in [LibraryIncludeFlag.cs](https://github.com/NuGet/NuGet.Client/blob/dev/src/NuGet.Core/NuGet.LibraryModel/LibraryIncludeFlag.cs) as following.
+
+```csharp
+public enum LibraryIncludeFlags : ushort
+    {
+        None = 0,
+        Runtime = 1 << 0,
+        Compile = 1 << 1,
+        Build = 1 << 2,
+        Native = 1 << 3,
+        ContentFiles = 1 << 4,
+        Analyzers = 1 << 5,
+        BuildTransitive = 1 << 6,
+        All = Analyzers | Build | Compile | ContentFiles | Native | Runtime | BuildTransitive
+    }
+```
+
+For example, include `all` is `1111111`, but `none` is `0000000`.
+
+`IncludeAssets` and `ExcludeAssets` binary complimentary metadata, used to control asset consumption in current project, they can used as stand alone or combined to form the effective assets consumed by the package (this is a restore only concern).
+
+Effective asset control flag is calculated as bit masking:
+[LibraryIncludeFlags includeType = includeFlags & ~excludeFlags](https://github.com/NuGet/NuGet.Client/blob/5b0ee2562df6cf2c66cc9905a8a65f2b09ea5473/src/NuGet.Core/NuGet.Commands/RestoreCommand/Utility/MSBuildRestoreUtility.cs#L129)
+
+Example 1:
+`<PackageReference Include="Microsoft.Windows.CsWin32" Version="0.2.138-beta" PrivateAssets="runtime,build" IncludeAssets="compile,build,contentFiles" />`
+
+If we express `IncludeAssets` as enum:
+| runtime|compile|build|native|contentFiles|analyzers|buildTransitive
+|--|--|--|--|--|--| --
+| 0 | 1 | 1 | 0 | 1 | 0 | 0
+
+So, `includeFlags` is `0110100`.
+
+If we express `ExcludeAssets` as enum:
+| runtime|compile|build|native|contentFiles|analyzers|buildTransitive
+|--|--|--|--|--|--| --
+| 1 | 0 | 1 | 0 | 0 | 0 | 0
+
+So, `excludeFlags` is `1010000`.
+
+Finally, `effective assets flags for current project` = `includeFlags & ~excludeFlags` = `0110100` & ~`1010000` = `0110100` & `0101111` = `0100100`, this means `compile,contentFiles` asset from `Microsoft.Windows.CsWin32` package would be consumed by current package.
+
 For the following table assume `PublicAssets` opt-in property is set `true` in current project, iterating possible scenarios (not full list) for consuming parent project.
 
 | Asset flowing to parent project | New feature enabled | Possible downside |
