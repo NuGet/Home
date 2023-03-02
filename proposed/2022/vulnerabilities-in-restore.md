@@ -355,7 +355,7 @@ For example, an Azure Artifacts source could have this in their index.json:
 
   {
     "@id": "https://api.nuget.org/v3/vulnerability.json",
-    "@type": "VulnerabilityInfo/6.3.0",
+    "@type": "VulnerabilityInfo/6.6.0",
     "comment": "The base data for vulnerability update periodically"
   }
   ]
