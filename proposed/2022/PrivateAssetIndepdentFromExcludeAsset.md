@@ -14,7 +14,7 @@ In below both `Consumption via package reference` and `Consumption via project r
 
 ### Consumption via package reference
 
-The `IncludeAssets`/`ExcludeAssets`, and `PrivateAssets` metadata on `PackageReference` items control two different features. Firstly, which assets from a package that are included in the current project. Secondly, whether the assets will be listed in the package's dependency assets, for those assets to flow transitively, if the project is packed.
+The `IncludeAssets`/`ExcludeAssets`, and `PrivateAssets` metadata on `PackageReference` items control two different features. Firstly, which assets from a package that are included in the current project. Secondly, whether the assets will be listed in the package's dependency assets, for those assets to flow transitively, if the project is packed or restored.
 
 For example, `<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="all" />` means "Include the default assets in the current project, but if packed or consumed via a ProjectReference, all of the assets are excluded, so this package will not be a dependency".
 
@@ -44,7 +44,7 @@ Let's say the current project is `LibraryProj.csproj` and parent project has `<P
 
 For example, `<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="none" />` in `LibraryProj.csproj` means  "Include the default assets in the current project, but all assets flow to parent project".
 
-Another example, `<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0"  IncludeAssets="none" />` in `LibraryProj.csproj` means "Consume no assets in the current project, but default assets flow to parent project".
+Another example, `<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0"  IncludeAssets="none" />` in `LibraryProj.csproj` means "Consume no assets in the current project, but default assets([contentfiles;analyzers;build](https://learn.microsoft.com/en-us/nuget/consume-packages/package-references-in-project-files#controlling-dependency-assets)) will flow to parent project".
 
 However if we combine above examples where both cases some assets flowing to parent project, `<PackageReference Include="Microsoft.Windows.CsWin32" Version="0.2.138-beta"  PrivateAssets="none" IncludeAssets="none" />`, the current experience is that no asset flows into parent project even though it requested all assets flow to parent project (see above table 3rd row), because `PrivateAssets` is not independent from `IncludeAssets`. We want to change that with opt-in property, it would let assets flow to the parent project in that case.
 
@@ -122,7 +122,7 @@ For the following table assume `PublicAssets` opt-in property is set `true` in c
 
 | Asset flowing to parent project | New feature enabled | Possible downside |
 |-----------------------|--------------|-----------------|
-| compile | Expose new code, auto complete, intellicode, intellisense | Compile error due to naming ambiguity, run time error, NU1605 error |
+| compile | Expose new code, auto complete, intellicode, intellisense | Compile error due to naming ambiguity, run time error |
 | runtime | Let provide new runtime dependency | Run time error |
 | build | Enable msbuild imports | Build fails due to property/target value change |
 | analyzers | Code analyzers work | n/a |
@@ -244,7 +244,7 @@ After change, `Microsoft.Windows.CsWin32.props` file in `build` asset flow to Cl
 
 ### Technical explanation
 
-We already have a [logic](hhttps://github.com/NuGet/NuGet.Client/blob/380415d812681ebf1c8aa0bc21533d4710514fc3/src/NuGet.Core/NuGet.Commands/CommandRunners/PackCommandRunner.cs#L577-L582) that combines `IncludeAssets/ExcludeAssets` options with `PrivateAssets` for pack operation, we just make logic depending on opt-in property.
+We already have a [logic](https://github.com/NuGet/NuGet.Client/blob/380415d812681ebf1c8aa0bc21533d4710514fc3/src/NuGet.Core/NuGet.Commands/CommandRunners/PackCommandRunner.cs#L577-L582) that combines `IncludeAssets/ExcludeAssets` options with `PrivateAssets` for pack operation, we just make logic depending on opt-in property.
 
 ## Drawbacks
 
