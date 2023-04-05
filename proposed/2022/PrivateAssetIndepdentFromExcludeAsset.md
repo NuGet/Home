@@ -9,22 +9,22 @@
 
 <!-- One-paragraph description of the proposal. -->
 Currently asset consumption via `PrivateAssets` option experience for assets from transitive package in a project/package is not deterministic for parent consuming project, here `PrivateAssets` option calculation is not independent from `IncludeAssets/ExcludeAssets` option.
-This proposal introduces new a `PublicAssets` opt-in property to make `PrivateAssets` option independent from `IncludeAssets/ExcludeAssets` option.
+This proposal introduces new a `PublicAssets` option(metadata) which complements `PrivateAssets` option to make it independent from `IncludeAssets/ExcludeAssets` option.
 In below both `Consumption via package reference` and `Consumption via project reference` sub-sections are explaining same things for 2 different scenarios. So, I intentionally choose bit examples in them to expose what problem we're solving with this new opt-in feature.
 
 ### Consumption via package reference
 
 The `IncludeAssets`/`ExcludeAssets`, and `PrivateAssets` metadata on `PackageReference` items control two different features. Firstly, which assets from a package that are included in the current project. Secondly, whether the assets will be listed in the package's dependency assets, for those assets to flow transitively, if the project is packed or restored.
 
-For example, `<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="all" />` means "Include the default assets in the current project, but if packed or consumed via a ProjectReference, all of the assets are excluded, so this package will not be a dependency".
+For example, `<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="all" />` means "Include the default assets([all](https://learn.microsoft.com/en-us/nuget/consume-packages/package-references-in-project-files#controlling-dependency-assets)) in the current project, but if packed or consumed via a ProjectReference, all of the assets are excluded, so this package will not be a transitive dependency".
 
-Another example, `<PackageReference Include="NuGet.Protocol" Version="6.4.0" PrivateAssets="compile" />` means "include the default assets in the current project, but if packed or consumed via a ProjectReference, the "compile" asset should be excluded from the package dependency, so that my package's dependencies do not leak APIs into projects using my package".
+Another example, `<PackageReference Include="NuGet.Protocol" Version="6.4.0" PrivateAssets="compile" />` means "include the default assets([all](https://learn.microsoft.com/en-us/nuget/consume-packages/package-references-in-project-files#controlling-dependency-assets)) in the current project, but if packed or consumed via a ProjectReference, the "compile" asset should be excluded from the package dependency, so that my package's dependencies do not leak APIs into projects using my package".
 
-A third example, `<PackageReference Include="Microsoft.Build" Version="17.0" ExcludeAssets="runtime" />` means "in the current project, make the `compile` assets available (so both intellisense and the compiler can access APIs from the package), but `Microsoft.Build`'s dlls are not copied to `bin` on build (`runtime` assets), and if the project is packed or consumed via a ProjectReference, then `runtime` assets also be excluded for the `Microsoft.Build` dependency for any project that references the current project's package.
+A third example, `<PackageReference Include="Microsoft.Build" Version="17.0" ExcludeAssets="runtime" />` means "in the current project, make the `compile` assets available (so both intellisense and the compiler can access APIs from the package), but `Microsoft.Build`'s dlls are not copied to `bin` on build (`runtime` assets), and if the project is packed or consumed via a ProjectReference, then `runtime`(+ `buildMultitargeting, buildTransitive, native`, by default `contentFiles, analyzers, native`) assets also be excluded for the `Microsoft.Build` dependency for any project that references the current project's package transitively.
 
 However, a scenario that is missing is "exclude a package asset from a current project, but do not exclude it from the dependency when the current project is packed", i.e
 `<PackageReference Include="Microsoft.Windows.CsWin32" Version="0.2.138-beta"  PrivateAssets="none" IncludeAssets="none" />`.
-This missing feature is more obvious when looking at a project/flow matrix below (see 3rd row), because `PrivateAssets` is not independent from `IncludeAssets`. We want to change that with opt-in property, it would let assets flow to the parent project on that case.
+This missing feature is more obvious when looking at a project/flow matrix below (see 3rd row), because `PrivateAssets` is not independent from `IncludeAssets`. We want to change that with opt-in metadata, it would let assets flow to the parent project on that case.
 
 Let's consider some particular asset (e.g. `build`, `compile`, or even `all`) that may appear in the list of `IncludeAssets` or `PrivateAssets` metadata. When it appears in one or both of these lists, they may interact to control whether the asset flows transitively. The ☑️ symbol means this asset is listed in that metadata, and 🔲 means it is _not_ listed. Note that presence in PrivateAssets indicates that an asset should *not* flow transitively.
 
@@ -42,17 +42,17 @@ Note how `PrivateAssets` can only subtract assets from the assets listed by `Inc
 The above observation applies to `ProjectReference` from 'parent' projects too when `restore/build` operation happens.
 Let's say the current project is `LibraryProj.csproj` and parent project has `<ProjectReference Include="..\LibraryProj.csproj" />` reference to it.
 
-For example, `<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="none" />` in `LibraryProj.csproj` means  "Include the default assets in the current project, but all assets flow to parent project".
+For example, `<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="none" />` in `LibraryProj.csproj` means  "Include the default assets([all](https://learn.microsoft.com/en-us/nuget/consume-packages/package-references-in-project-files#controlling-dependency-assets)) consumed in the current project, and all assets flow to parent project".
 
-Another example, `<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0"  IncludeAssets="none" />` in `LibraryProj.csproj` means "Consume no assets in the current project, but default assets([contentfiles;analyzers;build](https://learn.microsoft.com/en-us/nuget/consume-packages/package-references-in-project-files#controlling-dependency-assets)) will flow to parent project".
+Another example, `<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0"  IncludeAssets="none" />` in `LibraryProj.csproj` means "Consume no assets in the current project, but default assets([compile, runtime, buildMultitargeting, buildTransitive, native](https://learn.microsoft.com/en-us/nuget/consume-packages/package-references-in-project-files#controlling-dependency-assets)) will flow to parent project".
 
-However if we combine above examples where both cases some assets flowing to parent project, `<PackageReference Include="Microsoft.Windows.CsWin32" Version="0.2.138-beta"  PrivateAssets="none" IncludeAssets="none" />`, the current experience is that no asset flows into parent project even though it requested all assets flow to parent project (see above table 3rd row), because `PrivateAssets` is not independent from `IncludeAssets`. We want to change that with opt-in property, it would let assets flow to the parent project in that case.
+However if we combine above examples where both cases some assets flowing to parent project, `<PackageReference Include="Microsoft.Windows.CsWin32" Version="0.2.138-beta"  PrivateAssets="none" IncludeAssets="none" />`, the current experience is that no asset flows into parent project even though it requested all assets flow to parent project (see above table 3rd row), because `PrivateAssets` is not independent from `IncludeAssets`. We want to change that with opt-in metadata, it would let assets flow to the parent project in that case.
 
 ## Motivation
 
 <!-- Why are we doing this? What pain points does this solve? What is the expected outcome? -->
 A package author should be able to deterministically decide which asset flow to parent consuming projects when this project is consumed as package. It enables parent projects to consume transitive packages without having to directly reference them, therefore it reduces the number of packages developers need to keep track of. So, it'll give more flexible control to the package author, not less.
-We couldn't make this default experience because it'll break customers who rely on current behavior.
+We shouldn't break customers who rely on current behavior, that is why're introducing new `PublicAssets` metadata, which onboard to new experience explicitly.
 
 In addition to the above code author should be able to deterministically decide which asset flow to parent consuming projects when this project is consumed as project reference(P2Ps that reference this project).
 If the current project consuming any packages, then it can be transitively consumed by parent project if code author wants to.
@@ -63,7 +63,7 @@ If the current project consuming any packages, then it can be transitively consu
 
 <!-- Explain the proposal as if it were already implemented and you're teaching it to another person. -->
 <!-- Introduce new concepts, functional designs with real life examples, and low-fidelity mockups or  pseudocode to show how this proposal would look. -->
-The new `PublicAssets` property causes the `PrivateAssets` metadata to exclusively decide which assets flow to consuming parent project, but doesn't affect restore experience for current project so there would be no change in `project.assets.json` lock file, i.e it doesn't change `IncludeAssets/ExcludeAssets` calculation for current project.
+The new `PublicAssets` metadata complements the `PrivateAssets` metadata to exclusively decide which assets flow to consuming parent project, but doesn't affect restore experience for current project so there would be no change in `project.assets.json` lock file, i.e it doesn't change `IncludeAssets/ExcludeAssets` calculation for current project.
 
 It'll change how `compile, runtime, contentFiles, build, buildMultitargeting, buildTransitive, analyzers, native` dependencies flow into the projects consuming it via `PackageReference` and `ProjectReference` references.
 
@@ -74,6 +74,7 @@ Each asset is independent on/off binary switch, it's include or not included. Be
 | IncludeAssets | These assets will be consumed | all |
 | ExcludeAssets | These assets will not be consumed | none |
 | PrivateAssets | These assets will be consumed but won't flow to the parent project | contentfiles;analyzers;build |
+| PrivateAssets | These assets will be consumed | compile, runtime, ~contentFiles~, ~build~, buildMultitargeting, buildTransitive, ~analyzers~, native |
 
 Here `all` means include all of above `compile, runtime, contentFiles, build, buildMultitargeting, buildTransitive, analyzers, native` assets, `none` means no any asset, and they specified in [LibraryIncludeFlag.cs](https://github.com/NuGet/NuGet.Client/blob/dev/src/NuGet.Core/NuGet.LibraryModel/LibraryIncludeFlag.cs) as following.
 
@@ -118,7 +119,7 @@ So, `excludeFlags` is `1010000`.
 
 Finally, `effective assets flags for current project` = `includeFlags & ~excludeFlags` = `0110100` & ~`1010000` = `0110100` & `0101111` = `0100100`, this means `compile,contentFiles` asset from `Microsoft.Windows.CsWin32` package would be consumed by current package.
 
-For the following table assume `PublicAssets` opt-in property is set `true` in current project, iterating possible scenarios (not full list) for consuming parent project.
+For the following table assume `PublicAssets` opt-in metadata is set `true` in current project, iterating possible scenarios (not full list) for consuming parent project.
 
 | Asset flowing to parent project | New feature enabled | Possible downside |
 |-----------------------|--------------|-----------------|
