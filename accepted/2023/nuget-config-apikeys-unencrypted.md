@@ -51,34 +51,27 @@ The approach it takes to add `protocolVersion` can be copied to make the `encryp
 
 <!-- Why should we not do this? -->
 
+### Unencrypted secrets
+
+Since the API key is a secret, providing a way to reduce security is not be desirable.
+However, at the time that this design spec is being written, there is no alternative on Linux and Mac, making API keys in the `nuget.config` file a Windows-only feature, which is also not desirable.
+
+Risks related to allowing unencrypted secrets include:
+
+* nuget.config files are often commit into source control. A "small" mistake can cause credentials to be leaked publicly.
+* If the machine is accessible by multiple users, and the nuget.config containing the secret is readable by other users on the same system, the credential is not secure.
+* Malware will have effectively no layers of protection to read the secret. While malware can try to impersonate NuGet and decrypt secrets the same way that NuGet does, it at least requires the malware to have specific knowledge about NuGet. Generic malware that copies files will get full access to any secrets that are not encrypted.
+
 ### Backwards compatibility
 
 There are risks in changing the `nuget.config` schema, particularly around compatibility with older versions of NuGet.
 This includes NuGet.exe, the `dotnet` CLI, Visual Studio, Visual Studio for Mac, and possibly 3rd party IDEs such as JetBrains Rider.
 This is compounded by the fact that the `dotnet` CLI supports `global.json` to pin to older versions of the `dotnet` CLI (and therefore SDK) within a directory.
 
-Problems with the above proposal that extends the existing schema with an additional `encrypted="true/false"` property.
-
-1. Reading nuget.config from older versions of NuGet.
-
-It needs to be verified if older versions of NuGet will fail to load the file if it contains this unexpected attribute on the `<add>` element.
-However, even if it doesn't, since older versions of NuGet expect the value to be always encrypted, it will try to decrypt with DPAPI, and there's a very low chance that the value will decrypt, so it's likely that it will throw an exception saying that the value isn't valid.
-Customers in the past have given us feedback that NuGet does not gracefully handle this scenario and will crash with a very obscure error message that customers don't understand.
-
-This could be mitigated by persisting clear test API keys in a completely different section of the `nuget.config` file, such as `<clearApiKeys>`, which older versions of NuGet should ignore.
-
-2. Writing nuget.config from older versions of NuGet.
-
-If a customer runs any command that requires `nuget.config` to be modified, for example `dotnet nuget add source`, NuGet will deserialize the existing config, modify the value as per the command, and then serialize back to disk.
-Since older versions of NuGet don't know about the `encrypted="true/false"` attribute, this attribute will be lost, and then if a newer version of NuGet is run, it will assume that the value is encrypted, and then cause errors.
-
-If NuGet doesn't already handle maintaining sections of the config file that it doesn't know about, then there is no mitigation for this.
-Using a different section name, like `<clearApiKeys>` will still get lost, but at least it won't cause DPAPI to try to decrypt an unencrypted string, and therefore improving the error message will not be as important.
-
-### Unencrypted secrets
-
-Since the API key is a secret, providing a way to reduce security might not be desirable.
-However, at the time that this design spec is being written, there is no alternative on Linux and Mac, making API keys in the `nuget.config` file a Windows-only feature, which is also not desirable.
+From a quick test, it appears that the proposal does not cause issues with older versions of NuGet.
+Even adding an API key to a different source than already exists in the nuget.config file does not change the existing api key's value.
+However, my testing was not exhaustive, so it's possible there are scenarios where older versions of NuGet will fail with unexpected problems.
+At least it appears that common scenarios should be unaffected.
 
 ## Rationale and alternatives
 
@@ -96,6 +89,22 @@ If [NuGet supported encrypted secrets on Linux and Mac](https://github.com/NuGet
 <!-- Do other features exist in other ecosystems and what experience have their community had? -->
 <!-- What lessons from other communities can we learn from? -->
 <!-- Are there any resources that are relevant to this proposal? -->
+
+* clear text credentials
+
+NuGet.Config's `<packageSourceCredentials>` already supports clear text password.
+
+.NET's "secret manager" tool (`dotnet user-secrets`) does not encrypt secrets (seemingly on any platform): https://learn.microsoft.com/en-us/aspnet/core/security/app-secrets?view=aspnetcore-7.0&tabs=windows#secret-manager
+
+WinSCP appears to encrypt secrets using a master password that must be entered on every process launch, and their [documentation](https://winscp.net/eng/docs/guide_protecting_credentials_for_automation) state that there is no way to secure credentials for automation.
+They appear to allow credentials to be read from environment variables instead of providing a way to use clear text credentials.
+
+SSH private keys are saved in a directory where the ACL for the directory limits read to the owner.
+While the private key can be encrypted, decryption requires an interactive prompt to enter the password to decrypt the private key.
+But unencrypted private keys are allowed, which enables automation to use the private key, but also means there is no protection from malware from copying the private keys.
+I believe the directory ACL is validated on every command execution.
+
+* Config file schema change
 
 [`<packageSources>` already uses the `<add key="string" value="string">` syntax](https://learn.microsoft.com/en-us/nuget/reference/nuget-config-file#packagesources), but it also adds a `protocolVersion` attribute.
 
