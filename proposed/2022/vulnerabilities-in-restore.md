@@ -132,7 +132,7 @@ Both of these can be achieved by adding a means to understand whether a source s
 ```json
     {
       "@id": "https://nikolchevulntest.blob.core.windows.net/newcontainer/vulnerabilityindex.json",
-      "@type": "VulnerabilityInfo/6.6.0",
+      "@type": "VulnerabilityInfo/6.7.0",
       "comment": "The endpoint for discovering information about vulnerabilities of packages in this package source."
     },
 ```
@@ -358,7 +358,7 @@ For example, an Azure Artifacts source could have this in their index.json:
 
   {
     "@id": "https://api.nuget.org/v3/vulnerability.json",
-    "@type": "VulnerabilityInfo/6.6.0",
+    "@type": "VulnerabilityInfo/6.7.0",
     "comment": "The base data for vulnerability update periodically"
   }
   ]
