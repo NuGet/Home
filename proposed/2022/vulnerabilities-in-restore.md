@@ -146,7 +146,10 @@ Periodically, the small file's data can be merged into the large file(s), and th
 
 - The vulnerability resource **must** be an array of objects.
 - Each object **must** contain:
-  - `@name`, a user friendly name for the page, **must** be unique.
+  - `@name`, a short name for the page, used for caching, and has a few restrictions:
+    - **must** be unique.
+    - **must** be between 1 and 32 characters long.
+    - **must** only contain  characters `A` to `Z`, `a` to `z`, `0` to `9`, or be `-` or `_`.
   - `@id`, the url that contains the data.
   - `@updated`, a UTC timestamp when the content at `@id` was updated last.
   - `comment`, a user friendly description.
