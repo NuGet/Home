@@ -15,7 +15,7 @@ Below means assets `contentFiles, build, buildMultitargeting, buildTransitive, a
 
 `<PackageReference Include="PackageA" PrivateAssets="Runtime,Compile" ExcludedAssetsFlow="true" IncludeAssets = "none"/>`
 
-If `ExcludedAssetsFlow` if not present then it default false and it's ignored by older tooling. Also if it has non-boolean value then it would error out.
+If `ExcludedAssetsFlow` if not present, then it default false and it's ignored by older tooling. Also, if it has non-boolean value then it would error out.
 In below both `Consumption via package reference` and `Consumption via project reference` sub-sections are explaining same things for 2 different scenarios in details.
 
 ### Consumption via package reference
@@ -32,7 +32,7 @@ However, a scenario that is missing is "exclude a package asset from a current p
 `<PackageReference Include="Microsoft.Windows.CsWin32" Version="0.2.138-beta"  PrivateAssets="none" IncludeAssets="none" />`.
 This missing feature is more obvious when looking at a project/flow matrix below (see 3rd row), because `PrivateAssets` is not independent from `IncludeAssets/PrivateAssets`. We want to change that with opt-in `ExcludedAssetsFlow` boolean metadata, it would let assets flow to the parent project on that case.
 
-Let's consider some particular asset (e.g. `build`, `compile`, or even `all`) that may appear in the list of `IncludeAssets` or `PrivateAssets` metadata. When it appears in one or both of these lists, they may interact to control whether the asset flows transitively. The ☑️ symbol means this asset is listed in that metadata, and 🔲 means it is _not_ listed. Note that presence in PrivateAssets indicates that an asset should *not* flow transitively.
+Let's consider some particular asset (e.g., `build`, `compile`, or even `all`) that may appear in the list of `IncludeAssets` or `PrivateAssets` metadata. When it appears in one or both of these lists, they may interact to control whether the asset flows transitively. The ☑️ symbol means this asset is listed in that metadata, and 🔲 means it is _not_ listed. Note that presence in PrivateAssets indicates that an asset should *not* flow transitively.
 
 IncludeAssets|PrivateAssets|Flows transitively
 --|--|--
@@ -61,7 +61,7 @@ A package author should be able to decide which asset flow to parent consuming p
 We shouldn't break customers who rely on current behavior, that is why're introducing new boolean `ExcludedAssetsFlow` metadata, which lets `PrivateAssets` fully control transitive flow of assets independently of whether they are included in the current project.
 
 In addition to the above code author should be able to decide which asset flow to parent consuming projects when this project is consumed as project reference(P2Ps that reference this project).
-If the current project consuming any packages, then it can be transitively consumed by parent project if code author wants to.
+If the current project is consuming any packages, then it can be transitively consumed by parent project if code author wants to.
 
 ## Explanation
 
@@ -214,10 +214,10 @@ We already have a [logic](https://github.com/NuGet/NuGet.Client/blob/380415d8126
   </config>
 ```
 
-- Alternatively we could make it opt-in option as property on the project level, but doesn't give fine grained control given that only very few packages need this feature.
-Still we can onboard all packages using msbuild scripting.
+- Alternatively, we could make it opt-in option as property on the project level but doesn't give fine grained control given that only very few packages need this feature.
+Still, we can onboard all packages using msbuild scripting.
 
-- Also we could add yet another tag like `TransitiveAssets` or `ExcludeTransitiveAssets` to same existing `IncludeAssets/ExcludeAssets/PrivateAssets` tags, only difference is to control transitive asset flow. Technically it overlaps more with `PrivateAssets` in functionality, most likely we don't need `PrivateAssets` anymore if the new tag is introduced.
+- Also, we could add yet another tag like `TransitiveAssets` or `ExcludeTransitiveAssets` to same existing `IncludeAssets/ExcludeAssets/PrivateAssets` tags, the only difference is to control transitive asset flow. Technically it overlaps more with `PrivateAssets` in functionality, most likely we don't need `PrivateAssets` anymore if the new tag is introduced.
 `<PackageReference Include="Microsoft.Windows.CsWin32" Version="0.2.138-beta" IncludeAssets="build" ExcludeTransitiveAssets="none" />`
 
 ## Prior Art
