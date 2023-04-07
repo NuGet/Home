@@ -57,7 +57,7 @@ However if we combine above examples where both cases some assets flowing to par
 ## Motivation
 
 <!-- Why are we doing this? What pain points does this solve? What is the expected outcome? -->
-A package author should be able to deterministically decide which asset flow to parent consuming projects when this project is consumed as package. It enables parent projects to consume transitive packages without having to directly reference them, therefore it reduces the number of packages developers need to keep track of. So, it'll give more flexible control to the package author, not less.
+A package author should be able to decide which asset flow to parent consuming projects when this project is consumed as package. It enables parent projects to consume transitive packages without having to directly reference them, therefore it reduces the number of packages developers need to keep track of. So, it'll give more flexible control to the package author, not less.
 We shouldn't break customers who rely on current behavior, that is why're introducing new boolean `ExcludedAssetsFlow` metadata, which let explicitly set `PrivateAssets`.
 
 In addition to the above code author should be able to deterministically decide which asset flow to parent consuming projects when this project is consumed as project reference(P2Ps that reference this project).
