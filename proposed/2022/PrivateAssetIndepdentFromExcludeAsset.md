@@ -13,7 +13,7 @@ This proposal introduces new a boolean `ExcludedAssetsFlow` metadata to improve 
 
 Below means assets `contentFiles, build, buildMultitargeting, buildTransitive, analyzers, native` excluding `runtime and compile` assets would flow to referencing parent project even though they're not consumed by current project.
 
-`<PackageReference Include="PackageA" PrivateAssets="Runtime,Compile" ExcludedAssetsFlow="true" IncludeAssets = "none"/>`
+`<PackageReference Include="PackageA" PrivateAssets="Runtime;Compile" ExcludedAssetsFlow="true" IncludeAssets = "none"/>`
 
 If `ExcludedAssetsFlow` if not present, then it default false and it's ignored by older tooling. Also, if it has non-boolean value then it would error out.
 In below both `Consumption via package reference` and `Consumption via project reference` sub-sections are explaining same things for 2 different scenarios in details.
@@ -159,7 +159,7 @@ After change nuspec file:
     </dependencies>
 ```
 
-##### Case for Project to Project reference
+##### Case 1 for Project to Project reference
 
 `ProjectReference` in parent `ClassLibrary1` csproj file:
 
@@ -188,9 +188,89 @@ And `PackageReference` in `refissue.csproj` file:
   </ItemGroup>
 ```
 
-Before changing, `Microsoft.Windows.CsWin32.props` file in `build` asset doesn't flow to ClassLibrary1.csproj.nuget.g.props file in obj folder.
+Before changing, `Microsoft.Windows.CsWin32.props` file in `build` asset doesn't flow to `ClassLibrary1.csproj.nuget.g.props` file in `obj` folder.
 
-After change, `Microsoft.Windows.CsWin32.props` file in `build` asset flow to ClassLibrary1.csproj.nuget.g.props file in obj folder.
+After change, `Microsoft.Windows.CsWin32.props` file in `build` asset flow to `ClassLibrary1.csproj.nuget.g.props` file in `obj` folder.
+
+##### Case 2 for Project to Project reference
+
+`ProjectReference` in parent `ClassLibrary1` csproj file:
+
+```.net
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\refissue\refissue.csproj" PrivateAssets="none" ExcludedAssetsFlow="true"/>
+  </ItemGroup>
+```
+
+And `PackageReference` in `refissue.csproj` file:
+
+```.net
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <VersionSuffix>beta</VersionSuffix>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.2.138-beta" PrivateAssets="build"/>
+  </ItemGroup>
+```
+
+Before changing, `Microsoft.Windows.CsWin32.props` file in `build` asset doesn't flow to `ClassLibrary1.csproj.nuget.g.props` file in `obj` folder.
+
+After change, same as before.
+
+##### Case 3 for Project to Project reference
+
+`ProjectReference` in grandparent `Top` csproj file:
+
+```.net
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\intermediate\intermediate.csproj" />
+  </ItemGroup>
+```
+
+`ProjectReference` in parent `intermediate` csproj file:
+
+```.net
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\refissue\refissue.csproj" />
+  </ItemGroup>
+```
+
+And `PackageReference` in `refissue.csproj` file:
+
+```.net
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <VersionSuffix>beta</VersionSuffix>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.2.138-beta"  PrivateAssets="compile" IncludeAssets="none" ExcludedAssetsFlow="true" />
+  </ItemGroup>
+```
+
+Before changing, `Microsoft.Windows.CsWin32.props` file in `build` asset doesn't flow to `intermediate.csproj.nuget.g.props` file in `intermediate/obj` folder or `top.csproj.nuget.g.props` file in `top/obj` folder.
+
+After change, `Microsoft.Windows.CsWin32.props` file in `build` asset flow to `intermediate.csproj.nuget.g.props` file in `intermediate/obj` folder, but doesn't flow to `top.csproj.nuget.g.props` file in `top/obj` folder.
 
 ### Technical explanation
 
@@ -219,6 +299,9 @@ Still, we can onboard all packages using msbuild scripting.
 
 - Also, we could add yet another tag like `TransitiveAssets` or `ExcludeTransitiveAssets` to same existing `IncludeAssets/ExcludeAssets/PrivateAssets` tags, the only difference is to control transitive asset flow. Technically it overlaps more with `PrivateAssets` in functionality, most likely we don't need `PrivateAssets` anymore if the new tag is introduced.
 `<PackageReference Include="Microsoft.Windows.CsWin32" Version="0.2.138-beta" IncludeAssets="build" ExcludeTransitiveAssets="none" />`
+
+- We could introduce new syntax `{}` or `{!}` for PrivateAssets to signal that we need to clear default values and start again with new values. However, it would be difficult to perform MSBuild scripting/syntax operations on it, such as onboarding a whole project or solution.
+`<PackageReference Include="PackageA" PrivateAssets="{};Runtime;Compile" IncludeAssets = "none"/>`
 
 ## Prior Art
 
