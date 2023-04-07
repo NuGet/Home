@@ -8,9 +8,15 @@
 ## Summary
 
 <!-- One-paragraph description of the proposal. -->
-Currently asset consumption via `PrivateAssets` option experience for assets from transitive package in a project/package is not deterministic for parent consuming project, here `PrivateAssets` option calculation is not independent from `IncludeAssets/ExcludeAssets` option.
-This proposal introduces new a `PublicAssets` option(metadata) which complements `PrivateAssets` option to make it independent from `IncludeAssets/ExcludeAssets` option.
-In below both `Consumption via package reference` and `Consumption via project reference` sub-sections are explaining same things for 2 different scenarios. So, I intentionally choose bit examples in them to expose what problem we're solving with this new opt-in feature.
+Currently asset consumption via `PrivateAssets` option experience for assets from transitive package in a project/package is not deterministic for parent consuming project, here `PrivateAssets` option calculation is not independent from `IncludeAssets/ExcludeAssets` option, if an asset is not consumed in current project then it doesn't flow up the regardless of `PrivateAssets` option.
+This proposal introduces new a boolean `ExcludedAssetsFlow` metadata to improve experience for `PrivateAssets` option to make it independent from `IncludeAssets/ExcludeAssets` option, it'll make assets specified in `PrivateAssets` will flow regardless of `IncludeAssets/ExcludeAssets` option.
+
+Below means assets `contentFiles, build, buildMultitargeting, buildTransitive, analyzers, native` excluding `runtime and compile` assets would flow to referencing parent project even though they're not consumed by current project.
+
+`<PackageReference Include="PackageA" PrivateAssets="Runtime,Compile" ExcludedAssetsFlow="true" IncludeAssets = "none"/>`
+
+If `ExcludedAssetsFlow` if not present then it default false and it's ignored by older tooling. Also if it has non-boolean value then it would error out.
+In below both `Consumption via package reference` and `Consumption via project reference` sub-sections are explaining same things for 2 different scenarios in details.
 
 ### Consumption via package reference
 
@@ -18,13 +24,13 @@ The `IncludeAssets`/`ExcludeAssets`, and `PrivateAssets` metadata on `PackageRef
 
 For example, `<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="all" />` means "Include the default assets([all](https://learn.microsoft.com/en-us/nuget/consume-packages/package-references-in-project-files#controlling-dependency-assets)) in the current project, but if packed or consumed via a ProjectReference, all of the assets are excluded, so this package will not be a transitive dependency".
 
-Another example, `<PackageReference Include="NuGet.Protocol" Version="6.4.0" PrivateAssets="compile" />` means "include the default assets([all](https://learn.microsoft.com/en-us/nuget/consume-packages/package-references-in-project-files#controlling-dependency-assets)) in the current project, but if packed or consumed via a ProjectReference, the "compile" asset should be excluded from the package dependency, so that my package's dependencies do not leak APIs into projects using my package".
+Another example, `<PackageReference Include="NuGet.Protocol" Version="6.4.0" PrivateAssets="compile" />` means "include the default assets([all](https://learn.microsoft.com/en-us/nuget/consume-packages/package-references-in-project-files#controlling-dependency-assets)) in the current project, but if packed or consumed via a ProjectReference, the "compile" asset should be excluded from the package dependency, so that my package's dependencies do not leak APIs into projects using my package.
 
-A third example, `<PackageReference Include="Microsoft.Build" Version="17.0" ExcludeAssets="runtime" />` means "in the current project, make the `compile` assets available (so both intellisense and the compiler can access APIs from the package), but `Microsoft.Build`'s dlls are not copied to `bin` on build (`runtime` assets), and if the project is packed or consumed via a ProjectReference, then `runtime`(+ `buildMultitargeting, buildTransitive, native`, by default `contentFiles, analyzers, native`) assets also be excluded for the `Microsoft.Build` dependency for any project that references the current project's package transitively.
+A third example, `<PackageReference Include="Microsoft.Build" Version="17.0" ExcludeAssets="runtime" />` means "in the current project, make the `compile` assets available (so both intellisense and the compiler can access APIs from the package), but `Microsoft.Build`'s dlls are not copied to `bin` on build (`runtime` assets), and if the project is packed or consumed via a ProjectReference, then `runtime`(+ PrivateAssets default `contentFiles, analyzers, native`) asset also be excluded for the `Microsoft.Build` dependency for any project that references the current project's package transitively.
 
 However, a scenario that is missing is "exclude a package asset from a current project, but do not exclude it from the dependency when the current project is packed", i.e
 `<PackageReference Include="Microsoft.Windows.CsWin32" Version="0.2.138-beta"  PrivateAssets="none" IncludeAssets="none" />`.
-This missing feature is more obvious when looking at a project/flow matrix below (see 3rd row), because `PrivateAssets` is not independent from `IncludeAssets`. We want to change that with opt-in metadata, it would let assets flow to the parent project on that case.
+This missing feature is more obvious when looking at a project/flow matrix below (see 3rd row), because `PrivateAssets` is not independent from `IncludeAssets/PrivateAssets`. We want to change that with opt-in `ExcludedAssetsFlow` boolean metadata, it would let assets flow to the parent project on that case.
 
 Let's consider some particular asset (e.g. `build`, `compile`, or even `all`) that may appear in the list of `IncludeAssets` or `PrivateAssets` metadata. When it appears in one or both of these lists, they may interact to control whether the asset flows transitively. The ☑️ symbol means this asset is listed in that metadata, and 🔲 means it is _not_ listed. Note that presence in PrivateAssets indicates that an asset should *not* flow transitively.
 
@@ -42,17 +48,17 @@ Note how `PrivateAssets` can only subtract assets from the assets listed by `Inc
 The above observation applies to `ProjectReference` from 'parent' projects too when `restore/build` operation happens.
 Let's say the current project is `LibraryProj.csproj` and parent project has `<ProjectReference Include="..\LibraryProj.csproj" />` reference to it.
 
-For example, `<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="none" />` in `LibraryProj.csproj` means  "Include the default assets([all](https://learn.microsoft.com/en-us/nuget/consume-packages/package-references-in-project-files#controlling-dependency-assets)) consumed in the current project, and all assets flow to parent project".
+For example, `<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="none" />` in `LibraryProj.csproj` means  "Include the default assets([all](https://learn.microsoft.com/en-us/nuget/consume-packages/package-references-in-project-files#controlling-dependency-assets)) consumed in the current project, and all assets flow to parent project.
 
 Another example, `<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0"  IncludeAssets="none" />` in `LibraryProj.csproj` means "Consume no assets in the current project, but default assets([compile, runtime, buildMultitargeting, buildTransitive, native](https://learn.microsoft.com/en-us/nuget/consume-packages/package-references-in-project-files#controlling-dependency-assets)) will flow to parent project".
 
-However if we combine above examples where both cases some assets flowing to parent project, `<PackageReference Include="Microsoft.Windows.CsWin32" Version="0.2.138-beta"  PrivateAssets="none" IncludeAssets="none" />`, the current experience is that no asset flows into parent project even though it requested all assets flow to parent project (see above table 3rd row), because `PrivateAssets` is not independent from `IncludeAssets`. We want to change that with opt-in metadata, it would let assets flow to the parent project in that case.
+However if we combine above examples where both cases some assets flowing to parent project, `<PackageReference Include="Microsoft.Windows.CsWin32" Version="0.2.138-beta"  PrivateAssets="none" IncludeAssets="none" />`, the current experience is that no asset flows into parent project even though it requested all assets flow to parent project (see above table 3rd row), because `PrivateAssets` is not independent from `IncludeAssets`. We want to change that with opt-in `ExcludedAssetsFlow` boolean metadata, it would let assets flow to the parent project on that case.
 
 ## Motivation
 
 <!-- Why are we doing this? What pain points does this solve? What is the expected outcome? -->
 A package author should be able to deterministically decide which asset flow to parent consuming projects when this project is consumed as package. It enables parent projects to consume transitive packages without having to directly reference them, therefore it reduces the number of packages developers need to keep track of. So, it'll give more flexible control to the package author, not less.
-We shouldn't break customers who rely on current behavior, that is why're introducing new `PublicAssets` metadata, which onboard to new experience explicitly.
+We shouldn't break customers who rely on current behavior, that is why're introducing new boolean `ExcludedAssetsFlow` metadata, which let explicitly set `PrivateAssets`.
 
 In addition to the above code author should be able to deterministically decide which asset flow to parent consuming projects when this project is consumed as project reference(P2Ps that reference this project).
 If the current project consuming any packages, then it can be transitively consumed by parent project if code author wants to.
@@ -63,63 +69,11 @@ If the current project consuming any packages, then it can be transitively consu
 
 <!-- Explain the proposal as if it were already implemented and you're teaching it to another person. -->
 <!-- Introduce new concepts, functional designs with real life examples, and low-fidelity mockups or  pseudocode to show how this proposal would look. -->
-The new `PublicAssets` metadata complements the `PrivateAssets` metadata to exclusively decide which assets flow to consuming parent project, but doesn't affect restore experience for current project so there would be no change in `project.assets.json` lock file, i.e it doesn't change `IncludeAssets/ExcludeAssets` calculation for current project.
+The new `ExcludedAssetsFlow` boolean metadata complements the `PrivateAssets` metadata to exclusively decide which assets flow to consuming parent project, but doesn't affect restore experience for current project so there would be no change in `project.assets.json` lock file, i.e it doesn't change `IncludeAssets/ExcludeAssets` calculation for current project.
 
 It'll change how `compile, runtime, contentFiles, build, buildMultitargeting, buildTransitive, analyzers, native` dependencies flow into the projects consuming it via `PackageReference` and `ProjectReference` references.
 
-Each asset is independent on/off binary switch, it's include or not included. Below snippet is from [PackageReference doc](https://learn.microsoft.com/en-us/nuget/consume-packages/package-references-in-project-files).
-
-| Tag | Description | Default Value |
-| --- | --- | --- |
-| IncludeAssets | These assets will be consumed | all |
-| ExcludeAssets | These assets will not be consumed | none |
-| PrivateAssets | These assets will be consumed but won't flow to the parent project | contentfiles;analyzers;build |
-| PrivateAssets | These assets will be consumed | compile, runtime, ~contentFiles~, ~build~, buildMultitargeting, buildTransitive, ~analyzers~, native |
-
-Here `all` means include all of above `compile, runtime, contentFiles, build, buildMultitargeting, buildTransitive, analyzers, native` assets, `none` means no any asset, and they specified in [LibraryIncludeFlag.cs](https://github.com/NuGet/NuGet.Client/blob/dev/src/NuGet.Core/NuGet.LibraryModel/LibraryIncludeFlag.cs) as following.
-
-```csharp
-public enum LibraryIncludeFlags : ushort
-    {
-        None = 0,
-        Runtime = 1 << 0,
-        Compile = 1 << 1,
-        Build = 1 << 2,
-        Native = 1 << 3,
-        ContentFiles = 1 << 4,
-        Analyzers = 1 << 5,
-        BuildTransitive = 1 << 6,
-        All = Analyzers | Build | Compile | ContentFiles | Native | Runtime | BuildTransitive
-    }
-```
-
-For example, include `all` is `1111111`, but `none` is `0000000`.
-
-`IncludeAssets` and `ExcludeAssets` binary complimentary metadata, used to control asset consumption in current project, they can used as stand alone or combined to form the effective assets consumed by the package (this is a restore only concern).
-
-Effective asset control flag is calculated as bit masking:
-[LibraryIncludeFlags includeType = includeFlags & ~excludeFlags](https://github.com/NuGet/NuGet.Client/blob/5b0ee2562df6cf2c66cc9905a8a65f2b09ea5473/src/NuGet.Core/NuGet.Commands/RestoreCommand/Utility/MSBuildRestoreUtility.cs#L129)
-
-Example 1:
-`<PackageReference Include="Microsoft.Windows.CsWin32" Version="0.2.138-beta" PrivateAssets="runtime,build" IncludeAssets="compile,build,contentFiles" />`
-
-If we express `IncludeAssets` as enum:
-| runtime|compile|build|native|contentFiles|analyzers|buildTransitive
-|--|--|--|--|--|--| --
-| 0 | 1 | 1 | 0 | 1 | 0 | 0
-
-So, `includeFlags` is `0110100`.
-
-If we express `ExcludeAssets` as enum:
-| runtime|compile|build|native|contentFiles|analyzers|buildTransitive
-|--|--|--|--|--|--| --
-| 1 | 0 | 1 | 0 | 0 | 0 | 0
-
-So, `excludeFlags` is `1010000`.
-
-Finally, `effective assets flags for current project` = `includeFlags & ~excludeFlags` = `0110100` & ~`1010000` = `0110100` & `0101111` = `0100100`, this means `compile,contentFiles` asset from `Microsoft.Windows.CsWin32` package would be consumed by current package.
-
-For the following table assume `PublicAssets` opt-in metadata is set `true` in current project, iterating possible scenarios (not full list) for consuming parent project.
+For the following table assume `ExcludedAssetsFlow` opt-in metadata is set `true` in a package reference, iterating possible scenarios (not full list) for consuming parent project.
 
 | Asset flowing to parent project | New feature enabled | Possible downside |
 |-----------------------|--------------|-----------------|
@@ -128,16 +82,14 @@ For the following table assume `PublicAssets` opt-in metadata is set `true` in c
 | build | Enable msbuild imports | Build fails due to property/target value change |
 | analyzers | Code analyzers work | n/a |
 
-Recall our table from earlier that shows which assets flow based on listing some asset in `IncludeAssets` and/or `PrivateAssets`. Below we add a 4th column that reveals the new flow behavior when the new behavior is activated:
+Recall our table from earlier that shows which assets flow based on listing some asset in `IncludeAssets` and/or `PrivateAssets`. Below we add a 4th column that reveals the new flow behavior when the new behavior is activated, notice how transitive flow is controlled exclusively by the `PrivateAssets` value when `ExcludedAssetsFlow` is set to `true` in column3 and row 3:
 
-IncludeAssets|PrivateAssets|Flows transitively (default)|Flows transitively (PublicAssets=true)
+IncludeAssets|PrivateAssets|Flows transitively (current)|Flows transitively (ExcludedAssetsFlow=true)
 --|--|--|--
 ☑️ | 🔲 | ✅ | ✅
 ☑️ | ☑️ | ❌ | ❌
 🔲 | 🔲 | ❌ | ✅
 🔲 | ☑️ | ❌ | ❌
-
-Notice how transitive flow is controlled exclusively by the `PrivateAssets` value when `PublicAssets` is set to `true`.
 
 #### Examples
 
@@ -149,10 +101,9 @@ Package reference in csproj file.
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <VersionSuffix>beta</VersionSuffix>
-    <PublicAssets>True</PublicAssets>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.2.138-beta" PrivateAssets="none" IncludeAssets="build" />
+    <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.2.138-beta" PrivateAssets="none" IncludeAssets="build" ExcludedAssetsFlow="true" />
   </ItemGroup>
 ```
 
@@ -184,10 +135,9 @@ Package reference in csproj file.
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <VersionSuffix>beta</VersionSuffix>
-    <PublicAssets>True</PublicAssets>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.2.138-beta" PrivateAssets="none" IncludeAssets="none" />    
+    <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.2.138-beta" PrivateAssets="none" IncludeAssets="none" ExcludedAssetsFlow="true" />    
   </ItemGroup>
 ```
 
@@ -231,11 +181,10 @@ And `PackageReference` in `refissue.csproj` file:
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <VersionSuffix>beta</VersionSuffix>
-    <PublicAssets>True</PublicAssets>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.2.138-beta" PrivateAssets="none" ExcludeAssets="all" />
+    <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.2.138-beta" PrivateAssets="none" IncludeAssets="none" ExcludedAssetsFlow="true" />
   </ItemGroup>
 ```
 
@@ -245,12 +194,12 @@ After change, `Microsoft.Windows.CsWin32.props` file in `build` asset flow to Cl
 
 ### Technical explanation
 
-We already have a [logic](https://github.com/NuGet/NuGet.Client/blob/380415d812681ebf1c8aa0bc21533d4710514fc3/src/NuGet.Core/NuGet.Commands/CommandRunners/PackCommandRunner.cs#L577-L582) that combines `IncludeAssets/ExcludeAssets` options with `PrivateAssets` for pack operation, we just make logic depending on opt-in property.
+We already have a [logic](https://github.com/NuGet/NuGet.Client/blob/380415d812681ebf1c8aa0bc21533d4710514fc3/src/NuGet.Core/NuGet.Commands/CommandRunners/PackCommandRunner.cs#L577-L582) that combines `IncludeAssets/ExcludeAssets` options with `PrivateAssets` for pack and restore operation, we just make logic depending on opt-in metadata at package reference.
 
 ## Drawbacks
 
 <!-- Why should we not do this? -->
-- Might break some consuming projects, that is why it's opt-in feature. See table in #functional-explanation above for more details.
+- Might break some consuming projects, that is why it's per reference opt-in feature. See table in #functional-explanation above for more details.
 
 ## Rationale and alternatives
 
@@ -265,9 +214,8 @@ We already have a [logic](https://github.com/NuGet/NuGet.Client/blob/380415d8126
   </config>
 ```
 
-- Alternatively we could make it opt-in option as metadata on the PackageReference item, but most likely customers'll be planning on opting entire project/repos into this setting rather than try to make sense of specific references having different behavior.
-If we do keep it as item metadata, will it be harmless to add that metadata to all PackageReference items, such that we can add it to an ItemDefinition group so we can get the desired behavior everywhere, although we don't specify some of the other attributes like PrivateAssets or IncludeAssets on every PackageReference item.
-`<PackageReference Include="Microsoft.Windows.CsWin32" Version="0.2.138-beta" IncludeAssets="build" PublicAssets="true" />`
+- Alternatively we could make it opt-in option as property on the project level, but doesn't give fine grained control given that only very few packages need this feature.
+Still we can onboard all packages using msbuild scripting.
 
 - Also we could add yet another tag like `TransitiveAssets` or `ExcludeTransitiveAssets` to same existing `IncludeAssets/ExcludeAssets/PrivateAssets` tags, only difference is to control transitive asset flow. Technically it overlaps more with `PrivateAssets` in functionality, most likely we don't need `PrivateAssets` anymore if the new tag is introduced.
 `<PackageReference Include="Microsoft.Windows.CsWin32" Version="0.2.138-beta" IncludeAssets="build" ExcludeTransitiveAssets="none" />`
