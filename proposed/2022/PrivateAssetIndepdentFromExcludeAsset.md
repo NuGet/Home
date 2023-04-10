@@ -9,7 +9,7 @@
 
 <!-- One-paragraph description of the proposal. -->
 Currently asset consumption via `PrivateAssets` option experience for assets from transitive package in a project/package is not fully controllable by the project author for parent consuming project, here `PrivateAssets` option calculation is not independent from `IncludeAssets/ExcludeAssets` option, if an asset is not consumed in current project then it doesn't flow up the regardless of `PrivateAssets` option.
-This proposal introduces new a boolean `ExcludedAssetsFlow` metadata to improve experience for `PrivateAssets` option to make it independent from `IncludeAssets/ExcludeAssets` option, it'll make assets not specified in `PrivateAssets` will flow regardless of `IncludeAssets/ExcludeAssets` option.
+This proposal introduces new a boolean `ExcludedAssetsFlow` metadata to allow for `PrivateAssets` option to be independent from `IncludeAssets/ExcludeAssets` metadata, as it'll allow assets not specified in `PrivateAssets` to flow regardless of `IncludeAssets/ExcludeAssets` metadata.
 
 Below means assets `contentFiles, build, buildMultitargeting, buildTransitive, analyzers, native` excluding `runtime and compile` assets would flow to referencing parent project even though they're not consumed by current project.
 
