@@ -86,9 +86,6 @@ IncludeAssets|PrivateAssets|Flows transitively (current)|Flows transitively (Exc
 Package reference in csproj file.
 
 ```.net
-  <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.2.138-beta" PrivateAssets="none" IncludeAssets="build" ExcludedAssetsFlow="true" />
   </ItemGroup>
@@ -114,48 +111,11 @@ After change nuspec file:
     </dependencies>
 ```
 
-##### Case 2 for PackageReference
-
-Package reference in csproj file.
-
-```.net
-  <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-  </PropertyGroup>
-  <ItemGroup>
-    <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.2.138-beta" PrivateAssets="none" IncludeAssets="none" ExcludedAssetsFlow="true" />    
-  </ItemGroup>
-```
-
-Before change nuspec file:
-
-```.net
-    <dependencies>
-      <group targetFramework=".NETStandard2.0" />
-    </dependencies>
-```
-
-After change nuspec file:
-
-```.net
-    <dependencies>
-      <group targetFramework=".NETStandard2.0">
-        <dependency id="Microsoft.Windows.CsWin32" version="0.2.138-beta" include="All" />
-      </group>
-    </dependencies>
-```
-
 ##### Case 1 for Project to Project reference
 
 `ProjectReference` in parent `ClassLibrary1` csproj file:
 
 ```.net
-  <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\refissue\refissue.csproj" />
   </ItemGroup>
@@ -164,11 +124,6 @@ After change nuspec file:
 And `PackageReference` in `refissue.csproj` file:
 
 ```.net
-  <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <VersionSuffix>beta</VersionSuffix>
-  </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.2.138-beta" PrivateAssets="none" IncludeAssets="none" ExcludedAssetsFlow="true" />
   </ItemGroup>
@@ -183,12 +138,6 @@ After change, `Microsoft.Windows.CsWin32.props` file in `build` asset flow to `C
 `ProjectReference` in parent `ClassLibrary1` csproj file:
 
 ```.net
-  <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\refissue\refissue.csproj" PrivateAssets="none" ExcludedAssetsFlow="true"/>
   </ItemGroup>
@@ -197,11 +146,6 @@ After change, `Microsoft.Windows.CsWin32.props` file in `build` asset flow to `C
 And `PackageReference` in `refissue.csproj` file:
 
 ```.net
-  <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <VersionSuffix>beta</VersionSuffix>
-  </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.2.138-beta" PrivateAssets="build"/>
   </ItemGroup>
@@ -216,12 +160,6 @@ After change, same as before.
 `ProjectReference` in grandparent `Top` csproj file:
 
 ```.net
-  <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\intermediate\intermediate.csproj" />
   </ItemGroup>
@@ -230,12 +168,6 @@ After change, same as before.
 `ProjectReference` in parent `intermediate` csproj file:
 
 ```.net
-  <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\refissue\refissue.csproj" />
   </ItemGroup>
@@ -244,11 +176,6 @@ After change, same as before.
 And `PackageReference` in `refissue.csproj` file:
 
 ```.net
-  <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <VersionSuffix>beta</VersionSuffix>
-  </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.2.138-beta"  PrivateAssets="compile" IncludeAssets="none" ExcludedAssetsFlow="true" />
   </ItemGroup>
@@ -257,10 +184,6 @@ And `PackageReference` in `refissue.csproj` file:
 Before changing, `Microsoft.Windows.CsWin32.props` file in `build` asset doesn't flow to `intermediate.csproj.nuget.g.props` file in `intermediate/obj` folder or `top.csproj.nuget.g.props` file in `top/obj` folder.
 
 After change, `Microsoft.Windows.CsWin32.props` file in `build` asset flow to `intermediate.csproj.nuget.g.props` file in `intermediate/obj` folder, but doesn't flow to `top.csproj.nuget.g.props` file in `top/obj` folder.
-
-### Technical explanation
-
-We already have a [logic](https://github.com/NuGet/NuGet.Client/blob/380415d812681ebf1c8aa0bc21533d4710514fc3/src/NuGet.Core/NuGet.Commands/CommandRunners/PackCommandRunner.cs#L577-L582) that combines `IncludeAssets/ExcludeAssets` options with `PrivateAssets` for pack and restore operation, we just make logic depending on opt-in metadata at package reference.
 
 ## Drawbacks
 
