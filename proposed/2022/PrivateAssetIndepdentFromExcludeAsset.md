@@ -131,7 +131,6 @@ Package reference in csproj file.
 ```.net
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <VersionSuffix>beta</VersionSuffix>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.2.138-beta" PrivateAssets="none" IncludeAssets="none" ExcludedAssetsFlow="true" />    
