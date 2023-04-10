@@ -66,20 +66,11 @@ If the current project is consuming any packages, then it can be transitively co
 
 <!-- Explain the proposal as if it were already implemented and you're teaching it to another person. -->
 <!-- Introduce new concepts, functional designs with real life examples, and low-fidelity mockups or  pseudocode to show how this proposal would look. -->
-The new `ExcludedAssetsFlow` boolean metadata complements the `PrivateAssets` metadata to exclusively decide which assets flow to consuming parent project, but doesn't affect restore experience for current project so there would be no change in `project.assets.json` lock file, i.e it doesn't change `IncludeAssets/ExcludeAssets` calculation for current project.
+The new `ExcludedAssetsFlow` boolean metadata complements the `PrivateAssets` metadata to exclusively decide which assets flow to consuming parent project, but doesn't affect restore experience for current project so there would be no change in `project.assets.json` file, i.e it doesn't change `IncludeAssets/ExcludeAssets` calculation for current project.
 
 It'll change how `compile, runtime, contentFiles, build, buildMultitargeting, buildTransitive, analyzers, native` dependencies flow into the projects consuming it via `PackageReference` and `ProjectReference` references.
 
-For the following table assume `ExcludedAssetsFlow` opt-in metadata is set `true` in a package reference, iterating possible scenarios (not full list) for consuming parent project.
-
-| Asset flowing to parent project | New feature enabled | Possible downside |
-|-----------------------|--------------|-----------------|
-| compile | Expose new code, auto complete, intellicode, intellisense | Compile error due to naming ambiguity, run time error |
-| runtime | Let provide new runtime dependency | Run time error |
-| build | Enable msbuild imports | Build fails due to property/target value change |
-| analyzers | Code analyzers work | n/a |
-
-Recall our table from earlier that shows which assets flow based on listing some asset in `IncludeAssets` and/or `PrivateAssets`. Below we add a 4th column that reveals the new flow behavior when the new behavior is activated, notice how transitive flow is controlled exclusively by the `PrivateAssets` value when `ExcludedAssetsFlow` is set to `true` in column3 and row 3:
+Below we add a 4th column that reveals the new flow behavior when the new behavior is activated, notice how transitive flow is controlled exclusively by the `PrivateAssets` value when `ExcludedAssetsFlow` is set to `true` in column3 and row 3:
 
 IncludeAssets|PrivateAssets|Flows transitively (current)|Flows transitively (ExcludedAssetsFlow=true)
 --|--|--|--
@@ -97,7 +88,6 @@ Package reference in csproj file.
 ```.net
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <VersionSuffix>beta</VersionSuffix>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.2.138-beta" PrivateAssets="none" IncludeAssets="build" ExcludedAssetsFlow="true" />
@@ -290,7 +280,7 @@ We already have a [logic](https://github.com/NuGet/NuGet.Client/blob/380415d8126
   </config>
 ```
 
-- Alternatively, we could make it opt-in option as property on the project level but doesn't give fine grained control given that only very few packages need this feature.
+- We could make it opt-in option as property on the project level but doesn't give fine grained control given that only very few packages need this feature.
 Still, we can onboard all packages using msbuild scripting.
 
 - Also, we could add yet another tag like `TransitiveAssets` or `ExcludeTransitiveAssets` to same existing `IncludeAssets/ExcludeAssets/PrivateAssets` tags, the only difference is to control transitive asset flow. Technically it overlaps more with `PrivateAssets` in functionality, most likely we don't need `PrivateAssets` anymore if the new tag is introduced.
