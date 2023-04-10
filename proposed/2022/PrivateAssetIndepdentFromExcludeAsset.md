@@ -8,15 +8,12 @@
 ## Summary
 
 <!-- One-paragraph description of the proposal. -->
-Currently asset consumption via `PrivateAssets` option experience for assets from transitive package in a project/package is not fully controllable by the project author for parent consuming project, here `PrivateAssets` option calculation is not independent from `IncludeAssets/ExcludeAssets` option, if an asset is not consumed in current project then it doesn't flow up the regardless of `PrivateAssets` option.
+Currently, given a package within a project, what assets from the package/project flow transitive to a parent project is determined by PrivateAssets in combination with IncludeAssets/ExcludeAssets. In order for an asset to flow the parent, it has to be consumed by the current project.
 This proposal introduces new a boolean `ExcludedAssetsFlow` metadata to allow for `PrivateAssets` option to be independent from `IncludeAssets/ExcludeAssets` metadata, as it'll allow assets not specified in `PrivateAssets` to flow regardless of `IncludeAssets/ExcludeAssets` metadata.
 
 Below means assets `contentFiles, build, buildMultitargeting, buildTransitive, analyzers, native` excluding `runtime and compile` assets would flow to referencing parent project even though they're not consumed by current project.
 
 `<PackageReference Include="PackageA" PrivateAssets="Runtime;Compile" ExcludedAssetsFlow="true" IncludeAssets = "none"/>`
-
-If `ExcludedAssetsFlow` if not present, then it default false and it's ignored by older tooling. Also, if it has non-boolean value then it would error out.
-In below both `Consumption via package reference` and `Consumption via project reference` sub-sections are explaining same things for 2 different scenarios in details.
 
 ### Consumption via package reference
 
@@ -38,7 +35,7 @@ IncludeAssets|PrivateAssets|Flows transitively
 --|--|--
 ☑️ | 🔲 | ✅
 ☑️ | ☑️ | ❌
-🔲 | 🔲 | ❌ (unexpected?)
+🔲 | 🔲 | ❌
 🔲 | ☑️ | ❌
 
 Note how `PrivateAssets` can only subtract assets from the assets listed by `IncludeAssets`. It cannot *add* them by setting `PrivateAssets=none`. This means (without the feature described in this spec) that there is simply no way to flow an asset transitively that is not also directly consumed by the project.
