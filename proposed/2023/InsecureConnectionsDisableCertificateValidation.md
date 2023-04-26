@@ -57,7 +57,7 @@ A developer may have anywhere from 2+ sources defined in their projects based on
 </packageSources>
 ```
 
-#### Package Source NuGet Config (Alternate)
+#### Package Source NuGet Config (Alternate) - Not ideal for UX or discoverability.
 
 In the case that additional metadata cannot be added to the `<packageSources>` children, we can invent a new section similar to previously designed features where one can specify if a package source is deemed insecure or not. This will opt-out completely out of both scenarios.
 
@@ -99,6 +99,11 @@ There are a number of ideas and proposals on the GitHub issues listed above. I h
 
 By default, every secure connection NuGet makes is verified to be secure before the transfer takes place. Using these options makes the transfer insecure.
 
+Here are two other alternatives that could be considered although they add a bit of a barrier to use.
+
+1. Make this feature user-specific for the nuget.config & properties. It is suggested there are a couple existing nuget.config features(proxy for example) that are only enabled if they are found in the scope of the `user` settings. See https://learn.microsoft.com/nuget/consume-packages/configuring-nuget-behavior#how-settings-are-applied for more details.
+2. Add detection for common local network sources. This would require a known list of these sources and ensuring it covers the common scenarios. We currently do not know what these are and would have to extend more customer development to learn. To my knowledge at the time of writing this, no other ecosystem does this.
+
 ## Prior Art
 
 <!-- What prior art, both good and bad are related to this proposal? -->
@@ -117,8 +122,11 @@ By default, every secure connection NuGet makes is verified to be secure before 
 <!-- What related issues would you consider out of scope for this proposal but can be addressed in the future? -->
 - Are these the best descriptive names for these behaviors?
     - Could they be simplified more?
+        - Other suggestions are: `DisableHttpsCertificateValidation`, `DisableTLSCertificateValidation`, and `DisableSSLCertificateValidation` (SSL is deprecated).
+            - These suggestions are to not confuse the current [package signing verification](https://learn.microsoft.com/dotnet/core/tools/nuget-signed-package-verification) feautres.
 
 ## Future Possibilities
 
 <!-- What future possibilities can you think of that this proposal would help with? -->
 - This can help many companies and developers on their path to get to "HTTPS Everywhere". There are no known other possibilities at this time.
+- These flags can provide warnings in the far future when HTTPS adoption is significant.
