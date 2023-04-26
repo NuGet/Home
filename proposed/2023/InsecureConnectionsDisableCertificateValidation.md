@@ -130,3 +130,4 @@ Here are two other alternatives that could be considered although they add a bit
 <!-- What future possibilities can you think of that this proposal would help with? -->
 - This can help many companies and developers on their path to get to "HTTPS Everywhere". There are no known other possibilities at this time.
 - These flags can provide warnings in the far future when HTTPS adoption is significant.
+- Finer grain control of SSL checks can be added in the future if desired such as matching certificates to IP/DNS, ignoring validity dates, and overriding CA entries.
