@@ -1,15 +1,15 @@
 # Package Source Mapping in PMUI 
 * Start Date: 6/25/22
-* Authors: Ella McNally
+* Authors: Ella McNally, Donnie Goodson ([donnie-msft](https://github.com/donnie-msft))
 * Issue: https://github.com/NuGet/Home/issues/11797
 
 ## Summary
 
-Currently there is no support for package source mapping in the PMUI. I will add a feature that allows the user to choose if they want to map the package to the source chosen when they install. This feature is a portion of what was discussed in a previous spec. https://github.com/NuGet/Home/blob/dev/implemented/2021/PackageSourceMapping.md
+Currently, there is no support for package source mapping in the PMUI. This feature allows the user to choose if they want to map the package to the source chosen when they install or update. This feature is a portion of what was discussed in a previous spec: https://github.com/NuGet/Home/blob/dev/implemented/2021/PackageSourceMapping.md
 
 ## Motivation
 
-Adding support for package source mapping in PMUI will allow user to make/view package source mappings with more ease. It will also help the user be more aware of where their packages are coming from and what mappings they have already configured
+Adding support for package source mapping in PMUI will allow customers to onboard and manage package source mappings with more ease. It will also help the user be more aware of where their packages are coming from and what mappings they have already configured.
 
 ## Explanation
 
