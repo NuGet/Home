@@ -17,21 +17,19 @@ Also add `dotnet nuget apikey unset`, so customers can clean up secrets easily.
 <!-- Why are we doing this? What pain points does this solve? What is the expected outcome? -->
 
 Some NuGet servers, most notably nuget.org, use authentication via [API keys](https://learn.microsoft.com/nuget/reference/nuget-config-file#apikeys) ([custom `X-NuGet-ApiKey` HTTP header](https://learn.microsoft.com/nuget/api/package-publish-resource#request-parameters)), rather than [package source credentials](https://learn.microsoft.com/nuget/reference/nuget-config-file#packagesourcecredentials) ([HTTP standard `Authorization` header)](https://developer.mozilla.org/docs/Web/HTTP/Headers/Authorization), when pushing packages.
+
+Currently, customers who need to use API keys have two options.
+Either persist the secret in `nuget.config`, so that the `push` command line does not need to specify the secret, or to pass the API key on the `push` command line.
+Note that there is a feature request to allow ["push to obtain the API key from an environment variable](https://github.com/NuGet/Home/issues/12539), which will be the recommended solution for CI pipelines once implemented.
+A way to persist API keys will still be useful for developers who do not automate publishing their packages.
+
+Customers may want to remove secrets from their `nuget.config` files, so an `unset` command should be added.
+
+### More context on API keys vs credentials
+
 Package source credentials can either be persisted in the `nuget.config` file, or obtained via [an authentication provider](https://learn.microsoft.com/en-us/nuget/reference/extensibility/nuget-cross-platform-authentication-plugin), avoiding the need for the secret to be persisted in the `nuget.config` file.
 While package source credentials were primarily designed to allow for private feeds, where authentication is needed to search, restore and install packages, several NuGet server implementations that support private feeds use the same package source credentials to authorize push, without the need to use NuGet's custom HTTP header.
 In any case, there are servers which require API keys to push packages.
-
-Customers who need to use API keys have two options.
-Either persist the secret in `nuget.config`, so that the `push` command line does not need to specify the secret, or to pass the API key on the `push` command line.
-Passing the API on the command line risks leaking secrets, for example a CI system might not mask the secret in logs, or the secret being persisted in a shell's history file.
-Therefore, risk can be reduced by providing customers commands to add and remove the API to the `nuget.config` file, especially if it can be done in a way where the secret is not entered into, or output from, the console.
-
-In `nuget.config`, the API keys are in a different section to source credentials.
-There is a command `nuget.exe setapikey` to set the API key in a config file, however, `nuget.exe` does not ship in Visual Studio or the .NET SDK.
-Also, `nuget.exe` requires mono on Linux and Mac, since `nuget.exe` is built for the .NET Framework.
-Therefore, a command in the .NET SDK will significantly reduce the barrier for customers to set values in the `nuget.config` file.
-
-Customers may want to remove secrets from their `nuget.config` files, so an `unset` command should be added.
 
 ## Explanation
 
@@ -63,6 +61,7 @@ Options:
 Note on `--configfile`:
 
 NuGet has been using `--configfile`, rather than `--config-file` for multiple years, so this "incorrect" name is used to remain consistent with other commands.
+If the command line parsing library supports aliases (paricularly if the alias can be hidden from the help output), it would be great to support both.
 
 Additionally, since API keys are always secrets, `--configfile` will always default to the user-profile `nuget.config`
 See ["which nuget.config file" in the rationale and drawbacks section](#which-nugetconfig-file).
@@ -77,12 +76,6 @@ steps:
   variables:
     APIKEY: $(SECRET_API_KEY_FOR_NUGET_ORG)
 ```
-
-Note on `--source`:
-
-The technical feasibility needs to be checked, but `nuget.config` has a key `defaultPushSource`.
-When this is defined, `--source` should be optional and if `dotnet nuget apikey set` is run without specifying a value for `--source`, the default push source should be used.
-When none of the `nuget.config` files specify a `defaultPushSource`, then `--source` should be a required option.
 
 - `dotnet nuget apikey unset`
 
@@ -99,8 +92,6 @@ Options:
   -?, -h, --help             Show command line help.
 ```
 
-The note for `--source` applies from the above `dotnet nuget apikey set`.
-
 ### Technical explanation
 
 <!-- Explain the proposal in sufficient detail with implementation details, interaction models, and clarification of corner cases. -->
@@ -109,9 +100,6 @@ Some care needs to be taken when implementing the default values for options.
 
 For `--configfile`, Linux is case-sensitive, and a customer might be using `nuget.config` (or `NuGet.config`), rather than NuGet's default `NuGet.Config`.
 The default value factory will need to check the filesystem for which casing actually exists, and only fall back to the default casing if none are found.
-
-Similarly, if the default value factory for `--source` should handle when `nuget.config` files have errors that throw exceptions when loaded.
-In this case, treat the scenario like `defaultPushSource` doesn't exist, so that `--source` is a required option.
 
 Finally, NuGet has always been inconsistent in supporting URLs or source names in `--source` commands.
 I think it makes sense for NuGet to first assume that the value provided is a name, and try to look up a source with that name.
@@ -122,7 +110,8 @@ Therefore, customers should be able to use either name or URL.
 
 <!-- Why should we not do this? -->
 
-I don't believe there are any drawbacks to implementing the `dotnet nuget apikey` commands.
+NuGet.Config only supports "source API key", whereas push commands support separate source and symbols API keys.
+This proposal does not attempt to address this gap.
 
 ## Rationale and alternatives
 
@@ -137,15 +126,13 @@ The docs on [common NuGet configurations](https://learn.microsoft.com/nuget/cons
 When making a change, NuGet will look for the first file in that ordered list that contains the relevant section (first child of the XML root element).
 For example, `nuget.exe config` will look for the first file that contains `<config>`, and `dotnet nuget add source` will look for the first file that contains `<packageSources>`.
 While package sources, and certainly other config settings are valuable to be in a solution `nuget.config` file, and therefore commit into source control, accidentally committing a secret into source control is a security risk.
-Therefore, `dotnet nuget apikey set` will always default to the user scope `nuget.config` file.
+Therefore, `dotnet nuget apikey set` should always default to the user scope `nuget.config` file.
 
-On stateful CI agents, this poses a security risk.
-If the pipeline does not remove the API key from the user nuget.config, then other pipelines running on the same agent will be able to read the API key from the config file.
-However, a pipeline that fails to clean up after itself on a stateful CI agent (for example times out, or the agent crashes or restarts without waiting for the pipeline to finish) will similarly leave secrets that other pipelines can read.
-Although, if the secret is in a repo-specific directory, it will be less discoverable by other pipelines.
-But a balance needs to be made between defaults for devboxes or CI agents, since the preferred default for each scenario is different.
-If it were possible to easily detect when NuGet is running on a CI agent, it might be good to detect and change the defaults.
-However, [there is no standardization across CI platforms](https://adamj.eu/tech/2020/03/09/detect-if-your-tests-are-running-on-ci/).
+On stateful CI agents, the inverse is lower risk.
+Secrets saved to user-profile (CI agent's user account) will be shared among all pipelines running on that agent.
+Therefore, if one pipeline saves their API key to the user-profile `nuget.config` file, then all other pipelines running on the same machine will "see" that API key.
+However, even if the CI script persists the API key to the repo `nuget.config`, a malicious script could still read the file, it will just be explicit, whereas the user-profile leak could be accidental.
+For these reasons, [improving push to read API keys from environment variables](https://github.com/NuGet/Home/issues/12539) will be a better solution for all CI pipelines.
 
 ## Prior Art
 
@@ -156,10 +143,12 @@ However, [there is no standardization across CI platforms](https://adamj.eu/tech
 
 - `dotnet nuget apikey` commands `set` and `unset`
 
-The [`dotnet nuget config` spec](https://github.com/NuGet/Home/pull/12172) proposed `set` and `unset`, to mimic `git config` commands, rather than `add` and `remove` or `delete`, which commands like `dotnet add package` and `dotnet nuget add source` use.
+The [`dotnet nuget config` spec](https://github.com/NuGet/Home/pull/12172) proposed `set` and `unset`, to mimic `git config` commands.
+It is believed that "add" (and fail if already exists) vs "update" is not useful to customers.
 
 Some apps have a pre-defined environment variable name, rather than allowing customers to specify the environment variable name.
 For example, apps running on GitHub Actions expect to the a GitHub access token in the `GITHUB_TOKEN` environment variable.
+The [feature request to have push get API key from environment variables](https://github.com/NuGet/Home/issues/12539) proposes NuGet to use `NUGET_API_KEY` and `NUGET_SYMBOLS_API_KEY` environment variables.
 
 Some apps allow contents to be read from files by having the first character of the value be a `@`.
 NuGet does this with package source credentials, however, it has caused a significant amount of customer confusion because this `@filename` convention is not well known, and NuGet doesn't provide a clear error message.
@@ -175,9 +164,6 @@ However, I believe that reading from environment variables and files are suffici
 <!-- What parts of the proposal do you expect to resolve before this gets accepted? -->
 <!-- What parts of the proposal need to be resolved before the proposal is stabilized? -->
 <!-- What related issues would you consider out of scope for this proposal but can be addressed in the future? -->
-
-- Need to validate old nuget behavior when `apikeys` contains unexpected `encryption` element. Validate both read and write.
-- Have a quick play with System.CommandLine and validate that it's reasonable for default value factories to do non-trivial calculations, like find the correct case for `nuget.config` and load config files to check the value of `defaultPushSource`.
 
 ## Future Possibilities
 
