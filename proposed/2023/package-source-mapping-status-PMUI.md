@@ -45,7 +45,7 @@ Desired behavior for this status are below:
 A button to launch VS Settings to the `NuGet Package Source Mapping` settings page will be beside the label. The behavior is similar to the settings button beside the sources dropdown in the top right of the PM UI. 
 
 The result of pressing the button is shown in the following sample:
-![PM UI result of pressing the button that is a shortcut to VS Options page for Package Source Mappings](../../meta/resources/packageSourceMappingOptionsLink.png)
+![PM UI result of pressing the button that is a shortcut to VS Options page for Package Source Mappings](../../meta/resources/PackageSourceMapping/packageSourceMappingOptionsLink.png)
 
 Desired behavior for this shortcut are below:
   - VS Options shortcut from PMUI for PackageSourceMappings doesn't scroll to or select the Package ([#12608](https://github.com/NuGet/Home/issues/12608))
