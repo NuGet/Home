@@ -1,44 +1,42 @@
-# Package Source Mapping in PMUI 
+# Package Source Mapping Package Management Actions in the PM UI 
 * Start Date: 6/25/22
 * Authors: Ella McNally, Donnie Goodson ([donnie-msft](https://github.com/donnie-msft))
 * Issue: https://github.com/NuGet/Home/issues/11797
+* Status: Draft
 
 ## Summary
 
-Currently, there is no support for package source mapping in the NuGet Package Manager in VS (PM UI). We want to introduce mapping status for the package selected in the Details Pane of PM UI, as well as allow customers to choose whether to map the package to the selected source when they install or update. 
+Currently, Install/Update Package Management actions in the NuGet Package Manager in Visual Studio (PM UI) do not support creating new package source mappings. We want to allow customers to continue using Package Source Mapping as they use the PM UI to manage their packages. 
 
 Package Source Mapping in Restore was introduced in: https://github.com/NuGet/Home/blob/dev/implemented/2021/PackageSourceMapping.md
 
+Package Source Mapping Status in the PM UI was introduced in: [Package Source Mapping Package Management Status in the PM UI ](package-source-mapping-status-PMUI.md)
+
 ## Motivation
 
-Adding support for package source mapping in PM UI will allow customers to onboard and manage package source mappings more easily. It also increases awareness of where their packages will be coming from before initiating a package management action.
+Adding support for package source mapping actions in PM UI will allow customers to more seamlessly onboard and manage package source mappings while continuing to use the actions they are used to in the PM UI. It also increases awareness of where their packages will be coming from before initiating a package management action.
 
 ## Explanation
 
 ### Functional Explanation
 
-On the details pane there will be two new rows below the Install/Update buttons. 
+When a new package source mapping is being created, the Preview Window will appear showing which packages (the top-level and any transitive dependencies) will be mapped. 
 
-#### Row 1: Mapping Status and Settings link
+(TBD) It is not yet understood whether there will be a new afforance on the details pane in a new row below the Install/Update buttons, or if source mappings will be handled in the background.
 
-A label will appear under the `Install/Update` button indicating the Package Source Mapping status.
-
-A button to launch VS Settings to the NuGet Package Source Mapping settings page will be beside the label. The behavior is similar to the settings button beside the sources dropdown in the top right of the PM UI. The details pane will look like:
-
-![PMUI 1](../../meta/resources/PackageSourceMapping/PMUI_details_pane.png)
-
-#### Row 2: Consent to a New Mapping
+#### A Proposal for Consent to a new Source Mapping
  A `CheckBox` that allows the customer to choose if they want to add a mapping to the package from the selected source when they `Install`/`Update`. This `CheckBox` will always be shown even if package source mapping is not enabled. Package source mapping can be enabled by the customer checking the `CheckBox` to create the first mapping for the solution's settings. Once package source mapping is enabled, the customer must either have a mapping previously configured, or consent to a new mapping by checking the `CheckBox` to install. Otherwise, Restore will fail as it does today.
 
  PSM Enabled|Package Mapped|Current Behavior|Proposed Behavior
 ---|---|------|------|
 No|No|regular install|regular install
 Yes|No|Error in Error List|Preview Window appears showing mappings being created to selected source
-Yes|Yes|regular install|Allow creating new mapping to selected source for each newly installed package (including transitives)
+Yes|Yes|regular install|Allow creating an additional source mapping to selected source for each newly installed package (including transitives)
  
- The existing Preview Window dialog that shows when the customer hits `Install` or `Update` will be modified to list the mappings that will be made by their action. The customer already has the option to disable this preview dialog, so if they choose to disable it, there will be nothing telling them what mappings they made. The changes to the preview window will look like:
-
-![PMUI 2](../../meta/resources/PackageSourceMapping/PMUI_preview.png)
+ The existing Preview Window dialog that shows when the customer hits `Install` or `Update` will be modified to list the mappings that will be made by their action. The customer already has the option to disable this preview dialog, so if they choose to disable it, there will be nothing telling them what mappings they made. 
+ 
+ A proposal for the changes to the preview window:
+![PM UI - a proposal for the changes to the preview window](../../meta/resources/PackageSourceMapping/PMUI_preview.png)
 
 #### Restore Errors
 
@@ -46,9 +44,11 @@ There are a few errors the customer could make while trying to install or update
 
 The customer could also try to update a package that is already mapped to a different source, but the source it is mapped to does not support the version they are trying to update to. In these scenarios, `Restore` will fail in the same way it does today. The customer can see why `Restore` failed in the output window. 
 
-### Technical Explanation
+Currently, `NU1100` is used for both an incompatible TFM, and for a missing Package Source Mapping. 
+A proposal to make more specific errors for restore errors related to package source mapping has been made:
+- NU1100 is used for both TFM incompatibility and for an unresolved PackageSourceMapping [#12606](https://github.com/NuGet/Home/issues/12606)
 
-Package Source Mappings will be loaded from Settings when the PM UI is initialized and stored in a cache. Status for each selected package will be checked against this cache. Any changes to the Settings by external edits to the `nuget.config(s)` will invalidate this cache.
+### Technical Explanation
 
 Package Management action logic will pass down a new mapping package ID and source name to Restore. Preview Restore Utilities will look for this new mapping and use it in the preview restore: By appending 2 package patterns, a "*" and the new package ID, along with the new mapping source name to Settings in memory.
 
@@ -68,13 +68,16 @@ If the customer consents to the preview result, the new package source mappings 
 <packageSourceMapping>
     <packagesource key="nuget.org">
         <package pattern="Serilog" />
+        <package pattern="SerilogTransitiveA" />
+        <package pattern="SerilogTransitiveB" />
+        ...
     </packageSource>
 </packageSourceMapping>
 ```
 
 **Result:**
 
-In this example, the customer had `nuget.org` selected from the source dropdown. They clicked on the `Serilog` package on the installed tab, chose version `11.0.0`, and selected the checkbox to make a mapping from `Serilog` to `nuget.org`.
+In this example, the customer had `nuget.org` selected from the source dropdown. They selected the `Serilog` package on the installed tab, chose version `11.0.0`, and selected the checkbox to make a mapping from `Serilog` to `nuget.org`. A mapping was created for the top-level package and for two transitive packages, `SerilogTransitiveA` and `SerilogTransitiveB`, because the transitives did not have an existing mapping.
 
 ## Drawbacks
 
