@@ -80,6 +80,14 @@ This feature will be opt-in to start and gather feedback from developers.
 
 To enable the feature, a developer can add `<NuGetAudit>enable</NuGetAudit>` to their project file as a MSBuild property. To disable the feature, a developer can add `<NuGetAudit>disable</NuGetAudit>` or remove the property from the project file.
 
+#### Setting Vulnerability Auditing Modes
+
+There will be different modes to audit vulnerabilities based on the developer's or developer's team preference. To do this, a developer will opt-in to a feature called `<NuGetAuditMode>` which will have different modes such as `direct`, `transitive`, and `all`.
+
+These modes should be pretty straight-forward. `direct` will scan for any top-level vulnerabilities, `transitive` will scan for any transitive-level vulnerabilities, and `all` will scan for both top-level and transitive-level vulnerabilities. The default will be `direct` until the experience is ready to be `all` given that transitive vulnerabilities are the majority of vulnerability notices (90%+).
+
+When a known vulnerability is found that is of the `transitive` level, it will include the path to the project containing the top-level package and including the name and version of the package the vulnerable transitive dependency is coming from. Transitive level known vulnerabilities should not be a warning, but rather a message/informational MSBuild severity as they should not break builds but still be brought up in the Error List as informational.
+
 #### Setting an Audit Level
 
 In cases where a developer only cares about a certain threshold of advisory severity, they can set a MSBuild property to set a level such as `<NuGetAuditLevel>moderate</NuGetAuditLevel>` in which auditing will fail. Possible values match the OSV format of `low`, `moderate`, `high`, and `critical`.
