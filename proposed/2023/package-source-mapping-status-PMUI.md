@@ -11,7 +11,7 @@ Package Source Mapping in Restore was introduced in: https://github.com/NuGet/Ho
 
 ## Motivation
 
-Showing in the PM UI Details Pane the package source mapping status, as well as a shortcut to manage the mappings in the VS Options dialog, will allow customers to onboard to or see the state of their package source mappings at a glance. The knowledge of whether a package is already mapped may lead a customer to modify their source mappings using the existing VS Options dialog. 
+Showing in the PM UI Details Pane the package source mapping status, as well as a shortcut to manage the mappings in the VS Options dialog, will allow customers to onboard to, or see the state of, their package source mappings at a glance. The knowledge of whether a package is already mapped may lead a customer to modify their source mappings using the existing VS Options dialog.
 
 As customers begin seeing source mapping status in the PM UI and becoming more aware of the feature, we can learn more about what they want from the PM UI as far as package management actions (i.e., installing/updating a package). The goal is to let customers drive the next evolution of package source mapping in PM UI.
 
@@ -27,9 +27,9 @@ A label will appear under the `Install/Update` button indicating the Package Sou
 
 | Project Onboarded | Selected Package is Mapped | Status Icon | Status Text 
 |--------------|-----------|------------|------------|
-| Disabled |  N/A      | TBD | Package source mapping found. |
+| Disabled |  N/A      | TBD | Package source mapping is off. |
 | Onboarded  | Not Mapped  | TBD | Requires a package source mapping. |
-| Onboarded  | Mapped | TBD | Package source mapping is off. |
+| Onboarded  | Mapped | TBD | Package source mapping found. |
 
 Each of the above "Status Text" are shown in the following samples:
 ![PM UI Package Source Mapping "Not Onboarded" status](../../meta/resources/PackageSourceMapping/packageSourceMappingNotOnboarded.png)
