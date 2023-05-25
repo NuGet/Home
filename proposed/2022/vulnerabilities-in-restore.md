@@ -82,11 +82,11 @@ To enable the feature, a developer can add `<NuGetAudit>enable</NuGetAudit>` to 
 
 #### Setting Vulnerability Auditing Modes
 
-There will be different modes to audit vulnerabilities based on the developer's or developer's team preference. To do this, a developer will opt-in to a feature called `<NuGetAuditMode>` which will have different modes such as `direct`, `transitive`, and `all`.
+There will be different modes to audit vulnerabilities based on the developer's or developer's team preference. To do this, a developer will opt-in to a feature called `<NuGetAuditMode>` which will have different modes such as `direct`, and `all`.
 
-These modes should be pretty straight-forward. `direct` will scan for any top-level vulnerabilities, `transitive` will scan for any transitive-level vulnerabilities, and `all` will scan for both top-level and transitive-level vulnerabilities. The default will be `direct` until the experience is ready to be `all` given that transitive vulnerabilities are the majority of vulnerability notices (90%+).
+These modes should be pretty straight-forward. `direct` will scan for any top-level vulnerabilities, and `all` will scan for both top-level and transitive-level vulnerabilities. The default will be `direct` until the experience is ready to be `all` given that transitive vulnerabilities are the majority of vulnerability notices (90%+).
 
-When a known vulnerability is found that is of the `transitive` level, it will include the path to the project containing the top-level package and including the name and version of the package the vulnerable transitive dependency is coming from. Transitive level known vulnerabilities should not be a warning, but rather a message/informational MSBuild severity as they should not break builds but still be brought up in the Error List as informational.
+When a known vulnerability is found that is of the transitive level, it will include the path to the project containing the top-level package and including the name and version of the package the vulnerable transitive dependency is coming from. Transitive level known vulnerabilities should not be a warning, but rather a message/informational MSBuild severity as they should not break builds but still be brought up in the Error List as informational.
 
 #### Setting an Audit Level
 
@@ -304,6 +304,7 @@ However, it is expected that such projects will have a CI build which will perfo
 
 - Vulnerability scanning can be extended to SBOMs.
 - Support can be added to automatically fix vulnerable dependencies (i.e. a fix experience in CLI / Tooling)
+- Consideration of SDK/Framework scanning for implicit PackageReference that may be vulnernable.
 
 Additionally, most of the [`Rationale and alternatives`](#rationale-and-alternatives) are really future possibilities on their own as they are not always exclusive to the current approach. Here's some further possibilities:
 
