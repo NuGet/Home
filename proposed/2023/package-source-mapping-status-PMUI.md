@@ -27,9 +27,9 @@ A label will appear under the `Install/Update` button indicating the Package Sou
 
 | Project Onboarded | Selected Package is Mapped | Status Icon | Status Text 
 |--------------|-----------|------------|------------|
-| Disabled |  N/A      | TBD | Package source mapping is off. |
-| Onboarded  | Not Mapped  | TBD | Requires a package source mapping. |
-| Onboarded  | Mapped | TBD | Package source mapping found. |
+| Disabled |  N/A      | ![Status icon Offline](../../meta/resources/PackageSourceMapping/packageSourceMappingStatusIconOffline.png) | Package source mapping is off. |
+| Onboarded  | Not Mapped  | ![Status icon Offline](../../meta/resources/PackageSourceMapping/packageSourceMappingStatusIconOffline.png) | Requires a package source mapping. |
+| Onboarded  | Mapped | ![Status icon OK](../../meta/resources/PackageSourceMapping/packageSourceMappingStatusIconOK.png) | Package source mapping found. |
 
 Each of the above "Status Text" are shown in the following samples:
 ![PM UI Package Source Mapping "Not Onboarded" status](../../meta/resources/PackageSourceMapping/packageSourceMappingNotOnboarded.png)
