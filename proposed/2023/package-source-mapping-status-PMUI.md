@@ -27,7 +27,7 @@ A label will appear under the `Install/Update` button indicating the Package Sou
 
 | Project Onboarded | Selected Package is Mapped | Status Icon | Status Text 
 |--------------|-----------|------------|------------|
-| Disabled |  N/A      | ![Status icon Offline](../../meta/resources/PackageSourceMapping/packageSourceMappingStatusIconOffline.png) | Package source mapping is off. |
+| Disabled |  N/A      | ![Status icon Information](../../meta/resources/PackageSourceMapping/packageSourceMappingStatusInfo.png) | Package source mapping is off. |
 | Onboarded  | Not Mapped  | ![Status icon Offline](../../meta/resources/PackageSourceMapping/packageSourceMappingStatusIconOffline.png) | Requires a package source mapping. |
 | Onboarded  | Mapped | ![Status icon OK](../../meta/resources/PackageSourceMapping/packageSourceMappingStatusIconOK.png) | Package source mapping found. |
 
