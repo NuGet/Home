@@ -24,11 +24,17 @@ When a developer is using Visual Studio to search and manage NuGet packages, the
 
 The browse filter experience will allow the developer to filter results based on common concepts such as "frameworks", "prerelease", "owners", "download count", "license", and "created on". 
 
+![](resources/VSFilter/PackageOptions.png)
+
 The installed filter experience will allow the developer to filter results based on all the **browse filter** and additional package status filters such as "deprecated", "vulnerable", and "update".
+
+![](resources/VSFilter/PackageOptionsAndStatus.png)
 
 To apply filters, the developer will click the new filter button next to the search box. This will open up a new window of the possible filtering options to choose from.
 
 When a filter is selected, the filter will show up as a pill/badge affordance in the package list which can be removed by clicking on the "X" associated with the pill/badge. For some filters, they will support multiple values such as frameworks, owners, and licenses. For other filters, they will only support one value such as prerelease, download count, created on, etc. For filters that have popular values but also have custom values, a input box will be provided. For example the license filter will have popular OSS licenses, but with the ability to insert the name of a not well known license as well.
+
+![](resources/VSFilter/PillsAndSort.png)
 
 Whenever a filter is applied, it will additionally show up in the Visual Studio search box so that developers get used to the search prefix syntax and can apply filters more quickly in the future.
 
