@@ -4,6 +4,7 @@
 - Start Date (YYYY-MM-DD)
 - GitHub Issue (GitHub Issue link)
 - GitHub PR (GitHub PR link)
+- Status: Proposed
 
 ## Summary
 
