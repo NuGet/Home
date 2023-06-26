@@ -22,15 +22,13 @@ Otherwise, the proposal will be withdrawn by closing the PR with the reasoning m
 ## What happens when a proposal is accepted?
 A PR will be opened to move the proposal from `Proposed` to `Accepted` (eg, `accepted/<year>/your-proposal-name.md`). The PR can contain any edits to the original proposal can be made based on the acceptance criteria.
 
-The `Status` in the header of the document can reflect whether this proposal is:
-- `accepted` - The proposal has been accepted and work will be scheduled to implement it.
-- `implemented` - The proposal has already been accepted and implemented into the product.
-
 Once accepted, it will be scheduled by the NuGet contributors to be implemented or put up for grabs for anyone to implement by making a PR in the appropriate repository.
 
 ## What happens when a proposal is implemented?
 
-When the changes described in the accepted proposal have been implemented and merged into the relevant repository and due for release the corresponding proposal will remain in the `accepted` folder, with a PR changing the header from `Status: Accepted` to `Status: Implemented`. If you'd like to implement an `accepted` proposal, please make a PR in the appropriate repository and mention the proposal in the PR. 
+When the changes described in the accepted proposal have been implemented and merged into the relevant repository and due for release the corresponding proposal will remain in the `accepted` folder. The linked GitHub issue will be closed upon merging to the relevant branch. 
+
+If you'd like to implement an `accepted` proposal, please make a PR in the appropriate repository and mention the proposal in the PR. 
 
 ## What happens when a proposal is withdrawn?
 
