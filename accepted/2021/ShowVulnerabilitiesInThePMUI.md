@@ -1,9 +1,9 @@
 # Show NuGet Package Vulnerabilities in the Visual Studio Package Manager UI
 
-- Status: Implemented
 - Author(s): [Chris Gill](https://github.com/chgill-MSFT)
 - Issue: 
 - Type: Feature
+- Status: Implemented
 
 ## Description: What is it?
 
