@@ -4,6 +4,7 @@
 - 2021-05-12
 - GitHub Issue (GitHub Issue link) N/A
 - GitHub PR (GitHub PR link) N/A
+- Status: Implemented
 
 ## Summary
 

@@ -1,3 +1,5 @@
+- Status: Implemented
+
 # Using GitHub Project Boards for Customer Visibility and Tracking
 
 Our project boards will need to be created and accessed at the organizational level, not in any one repo (i.e. not in Home), because this is a restriction on project boards--if they're in a repo, they will be locked only to issues from that repo. Here's where ours will live: [https://github.com/orgs/NuGet/projects](https://github.com/orgs/NuGet/projects)
