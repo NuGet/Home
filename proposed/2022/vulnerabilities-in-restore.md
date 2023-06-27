@@ -305,6 +305,16 @@ However, it is expected that such projects will have a CI build which will perfo
 - Vulnerability scanning can be extended to SBOMs.
 - Support can be added to automatically fix vulnerable dependencies (i.e. a fix experience in CLI / Tooling)
 - Consideration of SDK/Framework scanning for implicit PackageReference that may be vulnernable.
+- Readiness to enable `<NuGetAuditMode>` to `all` for .NET/VS vNext:
+    - Customer feedback from .NET 8.
+    - Satisfaction of direct dependency scanning.
+    - Noise ratio of transitive dependency scanning (i.e. new warnings)
+    - Performance/scalability impact of transitive dependency scanning.
+    - Version resolution to ensure proper vulnerability reporting.
+    - UI/UX considerations for distinguishing direct/transitive vulnerability warnings.
+    - Incremental scanning/caching to avoid redundant scans.
+    - Documentation and education resources for the functionality.
+    - Prioritization and suppression of severity / advisories.
 
 Additionally, most of the [`Rationale and alternatives`](#rationale-and-alternatives) are really future possibilities on their own as they are not always exclusive to the current approach. Here's some further possibilities:
 
