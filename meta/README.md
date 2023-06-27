@@ -28,7 +28,7 @@ Once accepted, it will be scheduled by the NuGet contributors to be implemented 
 
 When the changes described in the accepted proposal have been implemented and merged into the relevant repository and due for release the corresponding proposal will remain in the `accepted` folder. The linked GitHub issue will be closed upon merging to the relevant branch. 
 
-If you'd like to implement an `accepted` proposal, please make a PR in the appropriate repository and mention the proposal in the PR. 
+If you'd like to implement an `accepted` proposal, please make a PR in the appropriate repository and mention the proposal in the PR and Issue. 
 
 ## What happens when a proposal is withdrawn?
 
