@@ -3,6 +3,7 @@
 - Author name [Drew Gillies](https://github.com/drewgillies) (@drewgillies)
 - Start Date 2021-05-24
 - GitHub Issue https://github.com/nuget/nugetgallery/issues/8462
+- Status: Implemented
 
 ## Summary
 

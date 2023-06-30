@@ -1,8 +1,8 @@
 # `dotnet nuget verify --verbosity`
 
-* Status: **Implemented**
-* Author: [Kartheek Penagamuri](https://github.com/kartheekp-ms)
-* Issue: [#10316](https://github.com/NuGet/Home/issues/10316) - dotnet nuget verify is too quiet
+- Author: [Kartheek Penagamuri](https://github.com/kartheekp-ms)
+- Issue: [#10316](https://github.com/NuGet/Home/issues/10316) - dotnet nuget verify is too quiet
+- Status: Implemented
 
 ## Problem background
 

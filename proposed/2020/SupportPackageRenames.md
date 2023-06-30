@@ -1,6 +1,5 @@
-Status: **Abandoned**
-
-Author: [Loïc Sharma](https://github.com/loic-sharma)
+- Author: [Loïc Sharma](https://github.com/loic-sharma)
+- Status: Withdrawn
 
 ## Issue
 The work for this feature and the discussion for this spec are tracked here - [NuGetGallery#7896](https://github.com/NuGet/NuGetGallery/issues/7896)
