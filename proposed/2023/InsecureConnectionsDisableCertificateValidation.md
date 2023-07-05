@@ -32,18 +32,6 @@ With this feedback in mind, we would like to ensure that we have a generally agr
 
 There will be multiple ways to opt-out of these two functionalities described above.
 
-#### Global NuGet.config
-
-A developer may choose to want a global setting applied to all sources in which they may allow insecure connections on any defined HTTP source and disable certificate validation on any defined HTTPS source.
-
-```
-<!-- Disables certification validation for all HTTPS sources and allows insecure connections from all  HTTP sources -->
-<config>
-    <add key="allowInsecureConnections" value="true" />
-    <add key="disableCertificateValidation" value="true" />
-</config>
-```
-
 #### Package Source NuGet Config
 
 A developer may have anywhere from 2+ sources defined in their projects based on recent survey data. Each package source has its own unique security requirements and a developer should have control on a per package source basis where they can apply the `disableCertificateValidation` property to a HTTPS source. If applied to a HTTP source, nothing will happen. A developer should also be able to apply the `allowInsecureConnections` property to a HTTP source. If applied to a HTTPS source, nothing will happen.
@@ -55,6 +43,20 @@ A developer may have anywhere from 2+ sources defined in their projects based on
     <add key="Contoso" value="http://contoso.com/packages/" allowInsecureConnections="true" />
     <add key="Test Source" value="c:\packages" />
 </packageSources>
+```
+
+### Redacted Functional Experiences (based on community feedback)
+
+#### Global NuGet.config
+
+A developer may choose to want a global setting applied to all sources in which they may allow insecure connections on any defined HTTP source and disable certificate validation on any defined HTTPS source.
+
+```
+<!-- Disables certification validation for all HTTPS sources and allows insecure connections from all  HTTP sources -->
+<config>
+    <add key="allowInsecureConnections" value="true" />
+    <add key="disableCertificateValidation" value="true" />
+</config>
 ```
 
 #### Package Source NuGet Config (Alternate) - Not ideal for UX or discoverability.
