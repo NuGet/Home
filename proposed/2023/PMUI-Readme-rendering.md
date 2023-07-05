@@ -17,7 +17,7 @@ In the latest NuGet in Visual Studio 17.5 customer survey, our team found that o
 
 The goal of this new experience would be to integrate the experience of viewing a rendered Readme directly into NuGet in Visual Studio. Additionally, we want to draw more attention to the README in general, and make it feel like an important and crucial element of a package.  
 
-The desired experience would somewhat mirror the user interface on NuGet.org, which already supports rendered Markdown viewing. When a customer views the package detail page of a package with an included markdown readme, they will see this proposed UI mock ![Mock](https://github.com/NuGet/Home/assets/89422562/95a72646-74fa-4532-bb99-4c9db6dbcda5)
+The desired experience would somewhat mirror the user interface on NuGet.org, which already supports rendered Markdown viewing. When a customer views the package detail page of a package with an included markdown readme, they will see this proposed UI mock ![Mock](https://github.com/NuGet/Home/assets/89422562/89b0295c-64d5-42a4-a52c-83dea2807edc)
 
 
 ### Technical Explanation
@@ -30,6 +30,7 @@ Currently, the Markdown editor team within Visual studio uses webview 2 to rende
 ## Drawbacks
 
 None
+
 
 ## Rationale and Alternatives
 
