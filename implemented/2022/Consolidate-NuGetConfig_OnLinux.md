@@ -1,7 +1,7 @@
 
 # Spec Name
 
-* Status: In Review
+* Status: Implemented
 * Author(s): [Heng Liu](https://github.com/heng-liu)
 * Issue: [4413](https://github.com/NuGet/Home/issues/4413) [MacOS, Linux] NuGet writes the NuGet.Config in ~/.config folder, but dotnet restore reads from ~/.nuget 
 
