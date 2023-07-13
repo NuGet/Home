@@ -13,6 +13,18 @@ This proposal represents a common ask for more filters and sorting options in th
 <!-- Why are we doing this? What pain points does this solve? What is the expected outcome? -->
 As NuGet continues to expand as a package ecosystem, there has become a dire need for being able to filter and sort packages through one's daily management in their IDE of choice. While NuGet.org supports a plethora of filters and sorts on the search experience today, we'd like to bring these similar experiences to the various tabs(browse, installed, etc) in Visual Studio to help aid various jobs-to-be-done when it comes down to package management.
 
+A recent survey in May 2023 suggests that over 31% of people do not feel like there are adequate sorting and filtering options in Visual Studio when asked. Common free-response to this question relate around the following:
+
+- "There are no filtering options"
+- "More search options would make this better"
+- "Would like to find packages by tags, authors, licenses, and more"
+- "There are no way to sort packages outside of creation date"
+- "I'm not aware of any filters but prerelease on/off"
+- "Often I'm looking for a widely-used and respected package and I have to filter and sort through random niche-market packages"
+- "I should be able to filter based on an official package source and license of a package"
+- "I manually have to use google or the console because desired results are too hard to find without filters"
+- "Filters and sorts do not match the website"
+
 ## Explanation
 
 ### Functional explanation
@@ -87,3 +99,4 @@ Additionally, the advanced search experience helps users learn the current prefi
 
 <!-- What future possibilities can you think of that this proposal would help with? -->
 - There is additionally a concept of "dependency sorting" which would sort dependencies based on the correct order to maintain compatibility such as updating versions. This could be a helpful feature if feasible / done correctly.
+- Ability for Visual Studio experiences to deep link specific filters and sorts for different development experiences. For example finding packages that are only supported for Blazor or another platform.
