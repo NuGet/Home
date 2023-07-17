@@ -34,12 +34,12 @@ There will be multiple ways to opt-out of these two functionalities described ab
 
 #### Package Source NuGet Config
 
-A developer may have anywhere from 2+ sources defined in their projects based on recent survey data. Each package source has its own unique security requirements and a developer should have control on a per package source basis where they can apply the `disableCertificateValidation` property to a HTTPS source. If applied to a HTTP source, nothing will happen. A developer should also be able to apply the `allowInsecureConnections` property to a HTTP source. If applied to a HTTPS source, nothing will happen.
+A developer may have anywhere from 2+ sources defined in their projects based on recent survey data. Each package source has its own unique security requirements and a developer should have control on a per package source basis where they can apply the `disableTLSCertificateValidation` property to a HTTPS source. If applied to a HTTP source, nothing will happen. A developer should also be able to apply the `allowInsecureConnections` property to a HTTP source. If applied to a HTTPS source, nothing will happen.
 
 ```
 <!-- Disables certification validation on a specific https source and allows insecure connections on a specific http source -->
 <packageSources>
-    <add key="nuget.org" value="https://api.nuget.org/v3/index.json" protocolVersion="3" disableCertificateValidation="true" />
+    <add key="nuget.org" value="https://api.nuget.org/v3/index.json" protocolVersion="3" disableTLSCertificateValidation="true" />
     <add key="Contoso" value="http://contoso.com/packages/" allowInsecureConnections="true" />
     <add key="Test Source" value="c:\packages" />
 </packageSources>
@@ -82,7 +82,7 @@ A developer may not want to check in an insecure configuration file and may want
 <!-- Explain the proposal in sufficient detail with implementation details, interaction models, and clarification of corner cases. -->
 This section will be filled out by the respective person picking up this work in more detail if more needs to be explained. 
 
-`HttpClient` and `HttpClientHandler` should be able to support this functionality easily such as a custom `ServerCertificateCustomValidationCallback` which always returns `true` meaning that any certificate presented by the server will be considered valid for the `disableCertificateValidation` functionality.
+`HttpClient` and `HttpClientHandler` should be able to support this functionality easily such as a custom `ServerCertificateCustomValidationCallback` which always returns `true` meaning that any certificate presented by the server will be considered valid for the `disableTLSCertificateValidation` functionality.
 
 As for `allowInsecureConnections`, this functionality should be fairly easy to revert the initial warning/error messages to take into account this new flag. Simply put, if there's no code flow to this property, a user will continue to see HTTPS warnings/errors encouraging best practice. 
 
