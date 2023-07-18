@@ -5,7 +5,7 @@
 
 ## Summary
 
-Support rendering markdown readmes in the package details page for NuGet in Visual Studio to make package affordances more accesible for customers browsing packages within the PMUI, and to increase motivation for high quality Readme inclusion for package authors. This will be part of a larger effort to enhance the experience around Readmes and increase their inclusion rate across packages in the NuGet ecosystem. 
+Support rendering markdown Readmes in the package details page for NuGet in Visual Studio to make package affordances more accessible for customers browsing packages within the PMUI, and to increase motivation for high quality Readme inclusion for package authors. This will be part of a larger effort to enhance the experience around Readmes and increase their inclusion rate across packages in the NuGet ecosystem.
 
 ## Motivation
 
