@@ -9,13 +9,13 @@ Support rendering markdown Readmes in the package details page for NuGet in Visu
 
 ## Motivation
 
-In the latest NuGet in Visual Studio 17.5 customer survey, our team found that one of the largest problems that our customers face while using NuGet in the Visual Studio ecosystem is around understanding package affordances – specifically calling out the usage of package metadata such as READMEs. Only 35.35% of survey respondents feel that they can adequately understand the affordances of a package (does it do what I need to to do when I need it?) while browsing and installing packages. Including a detailed README file and implementing features to facilitate README viewing and inclusion would positively impact this number.   
+In the latest NuGet in Visual Studio 17.5 customer survey, our team found that one of the largest problems that our customers face while using NuGet in the Visual Studio ecosystem is around understanding package affordances – specifically calling out the usage of package metadata such as Readmes. Only 35.35% of survey respondents feel that they can adequately understand the affordances of a package (does it do what I need to to do when I need it?) while browsing and installing packages. Including a detailed Readme file and implementing features to facilitate Readme viewing and inclusion would positively impact this number.   
 
 ## Explanation
 
 ### Functional Explanation
 
-The goal of this new experience would be to integrate the experience of viewing a rendered Readme directly into NuGet in Visual Studio. Additionally, we want to draw more attention to the README in general, and make it feel like an important and crucial element of a package.  
+The goal of this new experience would be to integrate the experience of viewing a rendered Readme directly into NuGet in Visual Studio. Additionally, we want to draw more attention to the Readme in general, and make it feel like an important and crucial element of a package.  
 
 The desired experience would somewhat mirror the user interface on NuGet.org, which already supports rendered Markdown viewing. When a customer views the package detail page of a package with an included markdown readme, they will see this proposed UI mock ![Mock](https://github.com/NuGet/Home/assets/89422562/89b0295c-64d5-42a4-a52c-83dea2807edc)
 
