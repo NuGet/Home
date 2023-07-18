@@ -1923,6 +1923,54 @@
           }
         ]
       }
+    },
+    {
+      "taskType": "trigger",
+      "capabilityId": "IssueResponder",
+      "subCapability": "IssuesOnlyResponder",
+      "version": "1.0",
+      "config": {
+        "conditions": {
+          "operator": "and",
+          "operands": [
+            {
+              "name": "isAssignedToSomeone",
+              "parameters": {}
+            },
+            {
+              "operator": "or",
+              "operands": [
+                {
+                  "name": "hasLabel",
+                  "parameters": {
+                    "label": "Type:Feature"
+                  }
+                },
+                {
+                  "name": "hasLabel",
+                  "parameters": {
+                    "label": "Type:DCR"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "eventType": "issue",
+        "eventNames": [
+          "issues",
+          "project_card"
+        ],
+        "taskName": "[Compliance tasks reminder] Reminder to incorporate compliance tasks into your estimates as this issue falls under the category of `DCR` or `Feature`.",
+        "actions": [
+          {
+            "name": "addReply",
+            "parameters": {
+              "comment": "${assignees} Please incorporate compliance tasks into your estimates as this issue falls under the category of `DCR` or `Feature`."
+            }
+          }
+        ]
+      }
     }
   ],
   "userGroups": []
