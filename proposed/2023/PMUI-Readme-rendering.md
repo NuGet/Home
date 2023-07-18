@@ -17,7 +17,11 @@ In the latest NuGet in Visual Studio 17.5 customer survey, our team found that o
 
 The goal of this new experience would be to integrate the experience of viewing a rendered Readme directly into NuGet in Visual Studio. Additionally, we want to draw more attention to the Readme in general, and make it feel like an important and crucial element of a package.  
 
-The desired experience would somewhat mirror the user interface on NuGet.org, which already supports rendered Markdown viewing. When a customer views the package detail page of a package with an included markdown readme, they will see this proposed UI mock ![Mock](https://github.com/NuGet/Home/assets/89422562/89b0295c-64d5-42a4-a52c-83dea2807edc)
+The desired experience would be similar to the current design of the package details page in NuGet in Visual Studio, but we would add a tab at the top of the view where the user could toggle back and forth to view the regular package details that exist currently, and a rendered Readme file (if a Readme exists in the package contents). The only change in the current package details page would be the removal of the "Readme: View Readme" list item. Below shows a mock of the desired view of both the Readme and the Package Details tabs: 
+
+![package details](https://github.com/NuGet/Home/assets/89422562/c106ca79-e26e-4b1d-b5ea-273651f79857)
+
+![Readme](https://github.com/NuGet/Home/assets/89422562/81b24877-f12f-4783-905c-4a155d3c7693)
 
 
 ### Technical Explanation
