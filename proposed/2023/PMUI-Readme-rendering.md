@@ -32,20 +32,26 @@ To render markdown in Visual Studio, we can use Markdig to convert the MD to HTM
 Currently, the Markdown editor team within Visual studio uses webview 2 to render their HTML for general MD rendering within Visual Studio. Using WebView2 would require us to use CSS to create our own styling for the rendered HTML. A drawback to their solution is that the markdown editor team mentioned that they are currently receiving a lot of accessibility bugs caused by their CSS, so this solution is not ideal. Daytona offers inbuilt styling, so using Daytona over WebView2 would avoid accessibility bugs, and cut out the effort required to write our own CSS styling. The markdown editor team is currently in the process of transitioning from using WebView2 to Daytona, and recommended that, if possible, our team should use Daytona from the beginning.
 
 ## Drawbacks
-
-None
-
+ Some potential drawbacks of adding this experience include: 
+ 
+* We would be changing a core experience in VS and that could potentially be disruptive for users who have been interacting with our UI for a long time, and are very familiar with the current functionality.
+* There is limited space to render a README in VS today compared to say NuGet.org or other package registry websites.
+* There might be a small performance hit to render the README or fetch it.
 
 ## Rationale and Alternatives
 
-An alternative here would be to include a link within the package detail page which would open up the rendered readme externally. Should we find complications with directly embedding the rendered readme into the packag detail page, this would be a proposed alternative.
+An alternative here would be to include a link within the package detail page which would open up the rendered readme externally. Should we find complications with directly embedding the rendered readme into the package detail page, this would be a proposed alternative.
+
+An alternate design would be to show the Package details tab first and most prominently by default when a user selects a package. 
+
+Additionally, since we do not know the users preference to seeing the Readme information first, or the package details tab first and most prominently, there are a few alternatives here that we can consider instead of choosing one to be the default. OPtions include: allowing the user to set their default tab in settings, or allowing the user to "pin" one tab or the other to be displayed as default. 
 
 
 ## Unresolved Questions
 
-None
+We do not know the current preference of people wanting to see a README or package information. Alternatives to address this question are presented in the section above. 
 
 
 ## Future Possibilities 
 
-TBD
+As a future possibility, we might want to continue to make the NuGet UI in Visual Studio more closely mirror and provide the affordances of the UI in NuGet.org -- i.e. the additon of seperate tabs for "Frameworks", "dependencies", etc.
