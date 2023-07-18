@@ -25,7 +25,7 @@ The desired experience would somewhat mirror the user interface on NuGet.org, wh
 To render markdown in Visual Studio, we can use Markdig to convert the MD to HTML, and then use either Webview2 or Daytona to render the HTML and stylize. 
 
 
-Currently, the Markdown editor team within Visual studio uses webview 2 to render tehir HTML for general MD rendering within Visual Studio. Using webview2 would require us to use CSS to create our own styling for the rendered HTML. A drawback to their solution is that the markdown editor team mentioned that they are currently recieving a lot of accessibility bugs caused by their CSS, so this solution is not ideal. Daytona offers inbuilt styling, so using Daytona over webview2 would avoid accesibility bugs, and cut out the effort required to write out own CSS styling. The markdown editor team is currently in the process of transitioning from using webview2 to Daytona, and reccomended that, if possible, our team should use Daytona off the bat.  
+Currently, the Markdown editor team within Visual studio uses webview 2 to render their HTML for general MD rendering within Visual Studio. Using WebView2 would require us to use CSS to create our own styling for the rendered HTML. A drawback to their solution is that the markdown editor team mentioned that they are currently receiving a lot of accessibility bugs caused by their CSS, so this solution is not ideal. Daytona offers inbuilt styling, so using Daytona over WebView2 would avoid accessibility bugs, and cut out the effort required to write our own CSS styling. The markdown editor team is currently in the process of transitioning from using WebView2 to Daytona, and recommended that, if possible, our team should use Daytona from the beginning.
 
 ## Drawbacks
 
