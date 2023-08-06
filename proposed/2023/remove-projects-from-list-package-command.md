@@ -1,17 +1,17 @@
-# Support excluding projects from transitive dependencies
+# Remove projects from list package command
 
 - Author Name [Greybird](https://github.com/Greybird)
 - Start Date 2023-07-11
 - GitHub Issue [12585](https://github.com/NuGet/Home/issues/12585)
-- GitHub PR https://github.com/NuGet/NuGet.Client/pull/5302
+- GitHub PR https://github.com/NuGet/NuGet.Client/pull/5335
 
 ## Summary
 
-Currently, when listing transitive packages using `dotnet list package --include-transitive`, both project and packages dependencies are reported. The goal of this proposal is to provide a way to filter the projects out of the report.
+Currently, when listing transitive packages using `dotnet list package --include-transitive`, both project and packages dependencies are reported. The goal of this proposal is to remove project dependencies from this command related to packages.
 
 ## Motivation 
 
-While packages and projects are very close - packages being packed projects -, packages differ from project because they can be published to a package repository. This package repository allows metadata not included in the package initially, to be added as a decoration - for deprecation or vulnerabilities for example -. In turn, these additional metadata can be consumed to take decisions.
+While packages and projects are very close - packages being packed projects -, packages differ from project because they can be published to a package repository. This package repository enables the addition of metadata that wasn't included in the initial package, which can serve purposes like indicating deprecation or vulnerabilities. In turn, these additional metadata can be consumed to take decisions.
 
 The `list package` command already supports filtering the results to retrieve only deprecated (`--deprecated`), vulnerable (`--vulnerable`), or not up-to-date (`--outdated`) packages. These commands only return actual packages, which is understandable as the underlying information used to choose what to report is managed by the _package_ manager, aka nuget.
 
@@ -19,13 +19,13 @@ When `list package` is used without any of these flags,
 * using `--include-transitive` lists `direct` project dependencies as transitive.
 * not using `--include-transitive` does not list project dependencies at all.
 
-Allowing to remove projects from the output would allow users to get an accurate view of their package dependencies. This would ensure that the output of the command can be processed in an uniform way by either a user, or a piece of software - through the machine readable output - to support any report, or process associated with packages, even those with no issues related to deprecation, vulnerabilities, or up-to-dateness.
+Removing projects from the output would allow users to get an accurate view of their package dependencies. This would ensure that the output of the command can be processed in an uniform way by either a user, or a piece of software - through the machine readable output - to support any report, or process associated with packages, even those with no issues related to deprecation, vulnerabilities, or up-to-dateness.
 
 ## Explanation
 
 ### Functional explanation
 
-A new `--exclude-project` option will be added to the `list` command. This option will ensure that no project will be reported in the output when used with `--include-transitive`.
+The `list package` default behavior will be changed to only return packages in the output.
 
 Given a solution setup like the one below,
 ```
@@ -59,7 +59,7 @@ Project 'projectB' has the following package references
    > projectA               1.0.0
 ```
 
-Adding `--exclude-project` to the command would make `dotnet list solution.sln package --include-transitive --exclude-project` produce the following output:
+After the fix, the same command would produce the following output:
 ```
 Project 'projectA' has the following package references
    [net7.0]:
@@ -80,18 +80,6 @@ Project 'projectB' has the following package references
 
 Machine-readable output will also reflect the change by not including the project in the output.
 
-Adding the `--exclude-project` option to a command already using a `--deprecated`, `--vulnerable`, or `--outdated` option will result in a warning.
-Running `dotnet list solution.sln package --include-transitive --vulnerable --exclude-project` will result in the following output:
-```
-warn : The command option '--exclude-project' is ignored by this command.
-
-The following sources were used:
-   https://api.nuget.org/v3/index.json
-
-The given project `projectA` has no vulnerable packages given the current sources.
-The given project `projectB` has no vulnerable packages given the current sources.
-```
-
 ### Technical explanation
 
 Currently, the implementation determines a [ReportType](https://github.com/NuGet/NuGet.Client/blob/d9d5a38c6e0c3ccc36b1b21cb8fa468474690080/src/NuGet.Core/NuGet.CommandLine.XPlat/Commands/PackageReferenceCommands/ListPackage/ReportType.cs#L6) based on the presence of options:
@@ -104,19 +92,20 @@ Currently, the implementation determines a [ReportType](https://github.com/NuGet
 
 MSBuild version resolver is then called with the `includeProject` parameter set to `false` for all values except `Default`, where it is set to `true`.
 
-The implementation would consist or changing the value to `false` when the `exclude-project` option is set.
+As the current implementation incorrectly includes direct project dependencies as transitive, the parameter responsible for this behavior will be removed from the non-public method.
+The code consuming the parameter will be update to behave as if the parameter would have been set to `false`
 
 ## Drawbacks
 
-It adds a new option to a command, which could result in it being more difficult to use.
+It might introduce a breaking change for a small number of use cases. However, the presence of a `list reference` command, working on projects, mitigates this risk
 
 ## Rationale and alternatives
 
-This design is retro compatible with the previous behavior of the command. It also limits the output of the command to the expected results.
+The proposal considers the current behavior a bug, as determined by the project members review.
 
 Other approaches could have been taken:
-* Considering that including projects into the output is a bug, and fixint it.
-* Considering that projects are part of the output, and ensuring that direct (resp. transitive) project references are reported as direct (resp. transitive). In this case, adding a flag to be able to retrieve only package is probably worth it, like mentioned below.
+* Adding an `--exclude-project` option, to remove projects from the output. A proposal has been made, which has been closed as another solution has been chosen: https://github.com/NuGet/NuGet.Client/pull/5302
+* Taking into account that projects are part of the output, and ensuring that direct (or transitive) project references are appropriately reported. In this case, adding a flag to be able to retrieve only package is probably worth it, like mentioned below.
 * Adding a `--include-project` option and modifying the default behavior of the list command: this would have made the whole command consistent, whether a `--deprecated`, `--vulnerable`, or `--outdated` option is passed or not. However, this would create a breaking change with previous behavior
 * Adding the type of dependency to the output: this would have made the output filterable afterwards, without adding flags. However, this could break console output parsing - which could be acceptable -, and could force an `output-version` increment as the machine-readable format would change. It would also require an active filtering process after the command is run. Whether this proposal is implemented, this could be an interesting option if consequences are accepted.
 
@@ -128,7 +117,7 @@ If we do not implement this option, then users of the command will have to be ab
 
 ## Unresolved Questions
 
-* Should the nature of the dependency (project or package) be included in the command output (or at least in the machine-readable one) ?
+* Should the nature of the dependency (project or package) be included in the command output (or at least in the machine-readable one)?
 
 ## Future Possibilities
 
