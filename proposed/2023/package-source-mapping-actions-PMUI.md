@@ -161,10 +161,10 @@ None
 
 ## Future Possibilities 
 
+1. If a package is found in the Global Packages Folder (GPF), the PM UI could look at the source in the `nupkg.metadata` file. A new mapping could either be created for this source auotmatically, or it could be presented to the customer in the Preview Window or another affordance.
+
 1. Support non-`PackageReference` projects as an applicable scenario. Which project types to support needs to be determined.
 
 1. Support `All` package source as an applicable scenario. Whether mappings will be created for all added packages to all enabled sources needs to be determined.
 
 1. Currently, if an `Install`/`Update` cannot find transitive packages on the mapped source being mapped, the restore will fail. Reaching out to other configured sources and allowing the customer to select a different source for these packages may resolve this issue. However, care must be taken to avoid unintentionally leaking requested package IDs to these secondary sources when the customer hasn't agreed to such a query.
-
-1. If a package is found in the Global Packages Folder (GPF), the PM UI could look at the source in the `nupkg.metadata` file. A new mapping could either be created for this source auotmatically, or it could be presented to the customer in the Preview Window or another affordance.
