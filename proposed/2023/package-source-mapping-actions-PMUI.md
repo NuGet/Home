@@ -121,7 +121,24 @@ If the customer has enabled the Preview Window, then they must consent to the pr
 
 Once preview restore determines the added packages, those package IDs will be checked against existing mappings to calculate deltas. The deltas will be written to disk in the applicable `NuGet.Config` after a successful preview restore, and immediately before executing Restore. 
 
-If Restore ultimately fails despite a successful Preview Restore, the written package source mappings will remain on disk.
+The Global Packages Folder (GPF) will not be checked for whether these packages already exist nor from which package source they were retrieved.
+
+#### Table: How package source configuration affects automatic Package Source Mappings
+
+| Dependency Type | Existing Mapping | Selected Source | Package on Source(s) | New Mapping Source |
+|--|--|--|--|--|
+Top-Level|Not Mapped|N/A|None|Error|
+Top-Level|Not Mapped|SourceA|SourceB|Error|
+Top-Level|Not Mapped|SourceA|SourceA|SourceA|
+Top-Level|Mapped SourceA|SourceA|N/A|None|
+Top-Level|Mapped SourceA|SourceB|N/A|SourceB|
+Transitive|Not Mapped|N/A|None|Error|
+Transitive|Not Mapped|SourceA|SourceB|Error|
+Transitive|Not Mapped|SourceA|SourceA|SourceA|
+Transitive|Mapped SourceA|SourceA|N/A|None|
+Transitive|Mapped SourceA|SourceB|N/A|None|
+
+If Restore ultimately fails despite a successful Preview Restore, any packages that got downloaded to the GPF due to the action will remain on disk.
 
 ## Drawbacks
 
