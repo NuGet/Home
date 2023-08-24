@@ -119,26 +119,52 @@ Package Management action logic will pass down a new mapping package ID and sour
 
 If the customer has enabled the Preview Window, then they must consent to the preview result. It's not required to enable the Preview Window in order for mappings to be automatically created, but if it's shown and cancelled, then no mappings will be written.
 
-Once preview restore determines the added packages, those package IDs will be checked against existing mappings to calculate deltas. The deltas will be written to disk in the applicable `NuGet.Config` after a successful preview restore, and immediately before executing Restore. 
+Once preview restore determines the added packages, those package IDs will be checked against existing mappings to calculate deltas.
+The deltas (see tables below) will be written to disk in the applicable `NuGet.Config` after a successful preview restore, and immediately before executing Restore.
 
-The Global Packages Folder (GPF) will not be checked for whether these packages already exist nor from which package source they were retrieved.
-
-#### Table: How package source configuration affects automatic Package Source Mappings
-
-| Dependency Type | Existing Mapping | Selected Source | Package on Source(s) | New Mapping Source |
-|--|--|--|--|--|
-Top-Level|Not Mapped|N/A|None|Error|
-Top-Level|Not Mapped|SourceA|SourceB|Error|
-Top-Level|Not Mapped|SourceA|SourceA|SourceA|
-Top-Level|Mapped SourceA|SourceA|N/A|None|
-Top-Level|Mapped SourceA|SourceB|N/A|SourceB|
-Transitive|Not Mapped|N/A|None|Error|
-Transitive|Not Mapped|SourceA|SourceB|Error|
-Transitive|Not Mapped|SourceA|SourceA|SourceA|
-Transitive|Mapped SourceA|SourceA|N/A|None|
-Transitive|Mapped SourceA|SourceB|N/A|None|
+The Global Packages Folder (GPF) will not be checked for the Top-Level package, and will be checked for Transitive Packages to determine if it's already been downloaded and from which package source.
+If GPF indicates a package source that's enabled, a new mapping for that source indicated in GPF will be created.
+If it's missing from GPF or it's from a package source not enabled for this solution, the installation will fail.
 
 If Restore ultimately fails despite a successful Preview Restore, any packages that got downloaded to the GPF due to the action will remain on disk.
+
+
+### Table: Behavior for Packages not Installed to the GPF
+
+_Selected Source: A_
+
+_Enabled Sources: A, B_
+
+_Package is not already mapped_
+
+Type|Package found on Source|Automatic Mapping Source|
+|--|--|--|
+Direct|A|A|
+Transitive|A|A|
+Transitive|B|Error*|
+
+(*) Error responses:
+- The existing error for NU1101 will be shown.
+
+### Table: Behavior for Packages Installed to the GPF
+
+_Selected Source: A_
+
+_Enabled Sources: A, B_
+
+_Package is not already mapped_
+
+Type|GPF Source|Automatic Mapping Source|
+|--|--|--|
+Direct|A|A|
+Direct|B|A|
+Direct|C|A|
+Transitive|A|A|
+Transitive|B|B|
+Transitive|C|Error*|
+
+(*) Error responses:
+- The package is available in the GPF, but the source it came from is not one of your configured sources.
 
 ## Drawbacks
 
