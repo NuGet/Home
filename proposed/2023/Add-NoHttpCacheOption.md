@@ -24,8 +24,8 @@ To make things clearer, a new CLI option has been introduced: `--no-http-cache`.
 
 Here's a simple restore example:
 
-Old way (still works): `nuget.exe restore --no-cache`
-New way (clearer): `nuget.exe restore --no-http-cache`
+Old way (still works): `dotnet restore --no-cache`
+New way (clearer): `dotnet restore --no-http-cache`
 ### Technical explanation
 
 <!-- Explain the proposal in sufficient detail with implementation details, interaction models, and clarification of corner cases. -->
