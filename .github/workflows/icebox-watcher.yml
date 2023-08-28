@@ -1,4 +1,4 @@
-name: IceBox Upvote Watcher
+https://github.com/dependabot/dependabot-core#architecturename: IceBox Upvote Watcher
 on:
   # Run before 9am Seattle time, so discussion needed labels are added before the working day.
   # Run at non-zero minute so we're not running at the same time as everyone else who runs at the zero minute
