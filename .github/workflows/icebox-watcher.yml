@@ -1,0 +1,27 @@
+name: IceBox Upvote Watcher
+on:
+  # Run before 9am Seattle time, so discussion needed labels are added before the working day.
+  # Run at non-zero minute so we're not running at the same time as everyone else who runs at the zero minute
+  schedule:
+    - cron: '34 13 * * *'
+  # Allow manual triggering, so testing changes is easier
+  workflow_dispatch:
+
+permissions:
+  packages: read
+  issues: write
+
+jobs:
+  Run-IceBox-Watcher:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up NuGet authentication
+        run: dotnet nuget add source --username github-actions --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/nuget/index.json"
+        
+      - name: Install GitHubIssueTagger
+        run: dotnet tool install --global NuGet.Internal.GitHubIssueTagger
+
+      - name: Run IceBox Watcher
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: GithubIssueTagger IceBox --add "Triage:NeedsTriageDiscussion"
