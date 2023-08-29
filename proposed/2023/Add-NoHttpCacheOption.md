@@ -20,7 +20,7 @@ The motivation behind introducing the new `--no-http-cache`  option is to enhanc
 <!-- Introduce new concepts, functional designs with real life examples, and low-fidelity mockups or  pseudocode to show how this proposal would look. -->
 Imagine you're working on a .NET project and you're using various CLI tools like dotnet.exe, nuget.exe, and msbuild.exe. You've been using the `-NoCache`, `--no-cache`, or `RestoreNoCache` options to disable caching, but you're a bit confused because it doesn't seem to affect the global packages folder. Well, that's because these options were designed to disable only the HTTP cache, not the global packages folder.
 
-To make things clearer, a new CLI option has been introduced: `--no-http-cache`. When you use this flag, it explicitly disables only the HTTP cache, leaving the global packages folder untouched. The previous options are still there; And they will have warnings to help move people towards the better named options.
+To make things clearer, a new CLI option has been introduced: `--no-http-cache`. When you use this flag, it explicitly disables only the HTTP cache, leaving the global packages folder untouched. The previous options are still there; And they will have warnings to help move people towards the better named options. In addition, we will be hiding the existing `--no-cache` option from the CLI help output. The `--no-htt-cache` option will be shown in the CLI help output. This will help guide users to the new option.
 
 Here's a simple restore example:
 
