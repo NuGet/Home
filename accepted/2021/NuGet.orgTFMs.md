@@ -4,6 +4,7 @@
 - Start Date (2021-02-16)
 - GitHub Issue (https://github.com/NuGet/NuGetGallery/issues/4843)
 - GitHub PR ()
+- Status: Accepted
 
 ## Summary
 
