@@ -11,7 +11,7 @@ This specification will discuss three key improvements to the NuGet package sear
 ## Motivation 
 
 <!-- Why are we doing this? What pain points does this solve? What is the expected outcome? -->
-Improving the nuget search functionality across all platforms is highly requested by customers. As shown in this [issue](https://github.com/NuGet/Home/issues/5138), customers would like to have `-ExactMatch` option added to the search command. In this other [issue](https://github.com/NuGet/Home/issues/6060), we can see that it has been repeatedly requested by customers for the Dotnet CLI to adopt a search functionality. Lastly, as discussed in this [issue](https://github.com/NuGet/Home/issues/7912) the `nuget list` command is redundant with `nuget search` as both commands basically display a list of packages from a source. The only difference between the two is that the search command allows for filters. In addition, the `nuget list` command can be confusing as there is a `nuget list` command in the Dotnet CLI with a different functionality: lists configured sources and client certificates. Addressing these issues will provide users with a not confusing search functionality on both the Dotnet CLI and nuget.exe.
+Improving the nuget search functionality across all platforms is highly requested by customers. As shown in this [issue](https://github.com/NuGet/Home/issues/5138), customers would like to have `-ExactMatch` option added to the search command. In this other [issue](https://github.com/NuGet/Home/issues/6060), we can see that it has been repeatedly requested by customers for the Dotnet CLI to adopt a search functionality. Lastly, as discussed in this [issue](https://github.com/NuGet/Home/issues/7912) the `nuget list` command is redundant with `nuget search` as both commands basically display a list of packages from a source. The only difference between the two is that the search command allows for filters. In addition, the `nuget list` command can be confusing as there is a `nuget list` command in the Dotnet CLI with a different functionality: lists configured sources and client certificates. Addressing these issues will provide users with a more straight-forward search functionality on both the Dotnet CLI and nuget.exe.
 ## Explanation
 
 ### Functional explanation
@@ -22,20 +22,22 @@ Improving the nuget search functionality across all platforms is highly requeste
 A new flag, `-ExactMatch`, will be added to the `search` command. When this flag is used, it will only return packages whose names exactly match the query.
 - **Version not specified** : In this case, the latest version of the package specified is listed .\
 *Nuget.exe Usage* : `nuget search <PackageName> -ExactMatch` \
-*Dotnet Usage* : `dotnet nuget search <PackageName> -ExactMatch`
+*Dotnet Usage* : `dotnet nuget search <PackageName> --exact-match`
 - **Version specified** : In this case, the package with the specific version number is listed.\
 *Nuget.exe Usage* : `nuget search <PackageName> -ExactMatch -Version 1.2.3.4` \
-*Dotnet Usage* : `dotnet nuget search <PackageName> -ExactMatch -Version 1.2.3.4`
+*Dotnet Usage* : `dotnet nuget search <PackageName> --exact-match --version 1.2.3.4`
 - **All Versions** : In this case, all versions of the package with the exact match are listed.\
 *Nuget.exe Usage* : `nuget search <PackageName> -ExactMatch -AllVersions` \
-*Dotnet Usage* : `dotnet nuget search <PackageName> -ExactMatch -AllVersions`
+*Dotnet Usage* : `dotnet nuget search <PackageName> --exact-match --all-versions`
+
+If no exact match is found, display an error: `Error: An exact match for package <PackageName> is not found.`
 #### 2. Deprecating list Command: 
 The list command is planned to be deprecated, given its functionalities can be covered by the search command. A warning message will be displayed to inform users of this change. `Warning: The 'list' command is deprecated. Use 'search' instead.` \
 The functionalities of the `list` command can be replicated as follows
 * In nuget.exe `nuget list` will be `nuget search`.
 * In Dotnet, `dotnet nuget search` will be added and it will be the same as `nuget search`.
 #### 3. Introducing nuget search to Dotnet:
-A new command dotnet nuget search will be introduced to bring package search functionality to the Dotnet CLI. This will help in resolving the highly requested `dotnet nuget list` functionality.
+A new command `dotnet nuget search` will be introduced to bring package search functionality to the Dotnet CLI. This will help in resolving the highly requested `dotnet nuget list` functionality.
 ### Technical explanation
 
 <!-- Explain the proposal in sufficient detail with implementation details, interaction models, and clarification of corner cases. -->
