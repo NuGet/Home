@@ -2,7 +2,7 @@
 <!-- Replace `Title` with an appropriate title for your design -->
 
 - Author Name Artak Mkrtchyan ([mkArtakMSFT](https://github.com/mkArtakMSFT))
-- GitHub Issue <!-- GitHub Issue link -->
+- GitHub Issue <https://github.com/NuGet/NuGetGallery/issues/3931>
 
 ## Summary
 
