@@ -6,7 +6,9 @@
 
 ## Summary
 
-This proposal introduces a concept of a logical grouping for packages published to NuGet. This will allow one to easily identify all the packages released as part of a single product version release as well as request bulk-processing for a set of packages which belong to the same release. For example, all packages published as part of .NET 8 Preview 5 release will be staged together and then also can be deprecated together by a single call to NuGet APIs.
+This proposal introduces a concept of a logical grouping for packages published to NuGet.
+This will allow one to easily identify all the packages released as part of a single product version release as well as request bulk-processing for a set of packages which belong to the same release.
+For example, all packages published as part of .NET 8 Preview 5 release will be staged together and then also can be deprecated together by a single call to NuGet APIs.
 
 ## Motivation 
 
