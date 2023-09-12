@@ -59,6 +59,8 @@ Below is a list of functional questions that must be addressed during the implem
 5. What will we do in cases where there's a README.txt file for an installed package? Will we display that as well in the details pane or is this experience only for README if it's in markdown format?
 6. What will we show in the details pane if there is no README for the selected package?
 
+Additionally, we must determine a way to measure success for this feature. How will we determine if this experience of showing the README in the details pane has had the desired effect and meets the goal outlined in the section above?
+
 
 ## Future Possibilities 
 
