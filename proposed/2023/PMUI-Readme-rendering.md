@@ -51,6 +51,14 @@ Additionally, since we do not know the users preference to seeing the Readme inf
 
 We do not know the current preference of people wanting to see a README or package information. Alternatives to address this question are presented in the section above. 
 
+Below is a list of functional questions that must be addressed during the implementation of this feature: 
+1. Will README files only be rendered for packages in the Browse tab?
+2. Will we show a README for installed packages in the Installed tab? If so, it would be worth calling out where we will be getting this README from. I would imagine we'd be pulling it in from disk rather than from the remote package source.
+3. Will we show README for packages in the Updates tab?
+4. Will we show README markdown for the Solution-level package manager or just Project-level package manager?
+5. What will we do in cases where there's a README.txt file for an installed package? Will we display that as well in the details pane or is this experience only for README if it's in markdown format?
+6. What will we show in the details pane if there is no README for the selected package?
+
 
 ## Future Possibilities 
 
