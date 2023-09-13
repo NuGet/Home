@@ -31,10 +31,10 @@ For example, on nuget.org, User1 and User2 can both use a `release` named `V1.0.
 When a package is being built, that field in the metadata is set to the same value for all the related packages, that are built together.
 
 Now, with this information in place, new set of NuGet APIs / extensions allow the user to run the following actions:
-- **Search / Query for packages based on a release** for a given publisher
-- **Deprecate a relase** for current publisher
 - **Stage** a package for later publishing
 - **Publish an earlier staged release**
+- **Deprecate a relase** for current publisher
+- **Discard a staged release** for a given publisher
 
 ### Technical explanation
 
