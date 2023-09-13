@@ -24,7 +24,9 @@ Many products (Apps / Tools / Frameworks / Utilities / etc. ...) consist of mult
 
 <!-- Explain the proposal as if it were already implemented and you're teaching it to another person. -->
 <!-- Introduce new concepts, functional designs with real life examples, and low-fidelity mockups or  pseudocode to show how this proposal would look. -->
-There is a new field in the package metadata, which indicates the unique release of the product the package belongs to. This field is called `release` and the value is scoped to the publisher of the package.
+There is a new field in the package metadata named `release`, which indicates the unique release of the product the package belongs to.
+Server implementations are expected to treat each `release` as scoped to an account or similar concept, depending on the server's implementation details.
+For example, on nuget.org, User1 and User2 can both use a `release` named `V1.0.0`, but when User1 operates on their `V1.0.0` release, it does not affect User2's release with the same name.
 
 When a package is being built, that field in the metadata is set to the same value for all the related packages, that are built together.
 
