@@ -50,6 +50,7 @@ The `package search [search terms] [options]` command will have the following op
     - **Detailed** :
 
                 <Package Name> | <Latest Package Version> | <Amount of Downloads>
+                Deprecated : YES/NO | Vulnerable : YES/NO
                 <Description of the Package(Readme file)>
                 Versions : <List of all package versions>
                 License URL : <URL>
