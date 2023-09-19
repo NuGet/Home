@@ -7,7 +7,7 @@
 ## Summary
 
 <!-- One-paragraph description of the proposal. -->
-The specification seeks to add `nuget list` functionality to dotnet. The functionality will be added to dotnet as a search command with no filters: `nuget package search`. This command could in the future be extended to a fully functioning search command. 
+The specification seeks to add `nuget list` functionality to dotnet. The functionality will be added to dotnet as a search command: `nuget package search`.  
 ## Motivation 
 
 <!-- Why are we doing this? What pain points does this solve? What is the expected outcome? -->
@@ -29,12 +29,31 @@ The `package search [search terms] [options]` command will have the following op
 | `-Source` | A list of packages to search |
 | `-Verbose` | Displays a detailed ist of information for each package |
 | `-Prerelease` | Allow prerelease packages to be shown. |
-| `-IncludeDeliste`d | Allow unlisted packages to be shown |
+| `-IncludeDelisted` | Allow unlisted packages to be shown |
+| `-NonInteractive` | Do not prompt for user input or confirmations.|
 | `-Help` | Show command help and usage information |
 | `-Verbosity` | Display the amount of details in the output: normal, quiet, detailed. |
-| `-NonInteractive` | Do not prompt for user input or confirmations. |
 | `-ConfigFile` | The NuGet configuration file. If not specified, the hierarchy of configuration files from the current directory will be used. |
 |||
+#### **Algorithm**
+1. Read and parse arguments from user
+2. Use the nuget.exe Search API to look for the specific term in the provided source. The search filter will be composed of the `-Source`, `Search term`, `-Prerelease`, `-IncludeDelisted` values.
+3. Based on `-Verbosity` value, provide with a list of packages with various verbosity
+* Verbosity
+    - **Quiet** : Each line would look as follows : 
+    
+            <Package Name> <Latest Package Version>
+    - **Normal** :
+
+                <Package Name> | <Latest Package Version> | <Amount of Downloads>
+                <Description of the Package(short form)>
+    - **Detailed** :
+
+                <Package Name> | <Latest Package Version> | <Amount of Downloads>
+                <Description of the Package(Readme file)>
+                Versions : <List of all package versions>
+                License URL : <URL>
+
 
 ## Drawbacks
 
@@ -45,7 +64,7 @@ The `package search [search terms] [options]` command will have the following op
 <!-- Why is this the best design compared to other designs? -->
 <!-- What other designs have been considered and why weren't they chosen? -->
 <!-- What is the impact of not doing this? -->
-In nuget.exe there is `nuget list` command which does the same thing
+In nuget.exe there is `nuget list` command which does the same thing. However, customers would like this functionality to be available in dotnet.
 
 ## Prior Art
 
