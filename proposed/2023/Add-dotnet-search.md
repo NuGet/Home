@@ -27,6 +27,7 @@ The `package search [search terms] [options]` command will have the following op
 | Option | Function |
 |---------|:----------|
 | `-Source` | A list of packages to search |
+| `-ExactMatch` | Return exact matches only as a search result |
 | `-Verbose` | Displays a detailed ist of information for each package |
 | `-Prerelease` | Allow prerelease packages to be shown. |
 | `-IncludeDelisted` | Allow unlisted packages to be shown |
@@ -54,7 +55,21 @@ The `package search [search terms] [options]` command will have the following op
                 <Description of the Package(Readme file)>
                 License URL : <URL>
 
+#### **New Option `ExactMatch`**
+* This new option will allow for users to be able to search and have only exact matches as an output. 
+* For example if a user uses `dotnet package search NuGet.CommandLine -Verbosity Quiet`
 
+        NuGet.CommandLine | 6.7.0
+        NuGet.CommandLine.XPlat | 6.7.0
+        NuGet.Commands | 6.7.0
+        NuGet.exe | 3.4.3
+        NuGet.Bootstrapper | 2.6.0
+        CommandLineParser20 | 2.0.0
+        NuGet.VerifyMicrosoftPackage | 1.0.0
+        NuGet.for.MSBuild | 2.1.0 ...
+* Using ``dotnet package search NuGet.CommandLine -ExactMatch -Verbosity Quiet`` on the other side will have the following output
+
+         NuGet.CommandLine | 6.7.0
 ## Drawbacks
 
 <!-- Why should we not do this? -->
