@@ -33,7 +33,6 @@ The `package search [search terms] [options]` command will have the following op
 | `--exact-match` | Return exact matches only as a search result |
 | `--verbose` | Displays a detailed ist of information for each package |
 | `--prerelease` | Allow prerelease packages to be shown. |
-| `--include-delisted` | Allow unlisted packages to be shown |
 | `--non-interactive` | Do not prompt for user input or confirmations.|
 | `--help` | Show command help and usage information |
 | `--verbosity` | Display the amount of details in the output: normal, quiet, detailed. |
@@ -43,7 +42,7 @@ The `package search [search terms] [options]` command will have the following op
 #### **Algorithm**
 
 1. Read and parse arguments from user
-2. Use the nuget.exe Search API to look for the specific term in the provided source. The search filter will be composed of the `--source`, `[Search term]`, `--prerelease`, `--include-delisted` values.
+2. Use the nuget.exe Search API to look for the specific term in the provided source. The search filter will be composed of the `--source`, `[Search term]`, `--prerelease` values.
 3. Based on `--verbosity` value, provide with a list of packages with various verbosity
 
 - Verbosity
