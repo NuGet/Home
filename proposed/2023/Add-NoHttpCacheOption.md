@@ -53,7 +53,7 @@ This design is the best because it introduces explicitness without breaking exis
 <!-- What parts of the proposal do you expect to resolve before this gets accepted? -->
 <!-- What parts of the proposal need to be resolved before the proposal is stabilized? -->
 <!-- What related issues would you consider out of scope for this proposal but can be addressed in the future? -->
-To ensure a smooth transition, the current `-NoCache` options will be preserved. However, we would also like our users to know this option will only stop Http caching and that there is a new option `-NoHttpCache` which is clearer and does the same thing. As a result, printing a waring when users use the `-NoCache` option is ideal. I am not sure if the following is a sufficient message \
+To ensure a smooth transition, the current `-NoCache` options will be preserved. However, we would also like our users to know this option will only stop Http caching and that there is a new option `-NoHttpCache` which is clearer and does the same thing. As a result, printing a log message that warns users when they use the `-NoCache` option is ideal. I am not sure if the following is a sufficient message \
 &ensp; `"NoCache is deprecated in favor of the appropriately named NoHttpCache."` 
 
 ## Future Possibilities
