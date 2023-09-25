@@ -1923,6 +1923,422 @@
           }
         ]
       }
+    },
+    {
+      "taskType": "trigger",
+      "capabilityId": "IssueResponder",
+      "subCapability": "PullRequestResponder",
+      "version": "1.0",
+      "config": {
+        "conditions": {
+          "operator": "and",
+          "operands": [
+            {
+              "operator": "or",
+              "operands": [
+                {
+                  "name": "isAction",
+                  "parameters": {
+                    "action": "opened"
+                  }
+                },
+                {
+                  "name": "isAction",
+                  "parameters": {
+                    "action": "reopened"
+                  }
+                }
+              ]
+            },
+            {
+              "name": "activitySenderHasPermissions",
+              "parameters": {
+                "permissions": "read"
+              }
+            },
+            {
+              "operator": "not",
+              "operands": [
+                {
+                  "name": "isActivitySender",
+                  "parameters": {
+                    "user": "nuget-client "
+                  }
+                }
+              ]
+            },
+            {
+              "operator": "not",
+              "operands": [
+                {
+                  "name": "hasLabel",
+                  "parameters": {
+                    "label": "Community"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "eventType": "pull_request",
+        "eventNames": [
+          "pull_request",
+          "issues",
+          "project_card"
+        ],
+        "taskName": "[Label community PRs] [1-1] Label the community PRs",
+        "actions": [
+          {
+            "name": "addLabel",
+            "parameters": {
+              "label": "Community"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "taskType": "scheduled",
+      "capabilityId": "ScheduledSearch",
+      "subCapability": "ScheduledSearch",
+      "version": "1.1",
+      "config": {
+        "frequency": [
+          {
+            "weekDay": 0,
+            "hours": [
+              9,
+              21
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 1,
+            "hours": [
+              9,
+              21
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 2,
+            "hours": [
+              9,
+              21
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 3,
+            "hours": [
+              9,
+              21
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 4,
+            "hours": [
+              9,
+              21
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 5,
+            "hours": [
+              9,
+              21
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 6,
+            "hours": [
+              9,
+              21
+            ],
+            "timezoneOffset": -7
+          }
+        ],
+        "searchTerms": [
+          {
+            "name": "hasLabel",
+            "parameters": {
+              "label": "Community"
+            }
+          },
+          {
+            "name": "noActivitySince",
+            "parameters": {
+              "days": 30
+            }
+          },
+          {
+            "name": "isPr",
+            "parameters": {}
+          },
+          {
+            "name": "isOpen",
+            "parameters": {}
+          },
+          {
+            "name": "noLabel",
+            "parameters": {
+              "label": "Status:No recent activity"
+            }
+          }
+        ],
+        "taskName": "[stale community PR] [5-1] Search for community PRs with no activity over 30 days and warn.",
+        "actions": [
+          {
+            "name": "addLabel",
+            "parameters": {
+              "label": "Status:No recent activity"
+            }
+          },
+          {
+            "name": "addReply",
+            "parameters": {
+              "comment": "This PR has been automatically marked as stale because it has no activity for **30 days**. It will be closed if no further activity occurs **within another 330 days** of this comment. If it is closed, you may reopen it anytime when you're ready again, as long as you don't delete the branch."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "taskType": "trigger",
+      "capabilityId": "IssueResponder",
+      "subCapability": "PullRequestResponder",
+      "version": "1.0",
+      "config": {
+        "conditions": {
+          "operator": "and",
+          "operands": [
+            {
+              "operator": "not",
+              "operands": [
+                {
+                  "name": "isAction",
+                  "parameters": {
+                    "action": "closed"
+                  }
+                }
+              ]
+            },
+            {
+              "name": "hasLabel",
+              "parameters": {
+                "label": "Status:No recent activity"
+              }
+            },
+            {
+              "name": "hasLabel",
+              "parameters": {
+                "label": "Community"
+              }
+            }
+          ]
+        },
+        "eventType": "pull_request",
+        "eventNames": [
+          "pull_request",
+          "issues",
+          "project_card"
+        ],
+        "taskName": "[stale community PR] [5-2] Remove \"Status:No recent activity\" if there is any activity.",
+        "actions": [
+          {
+            "name": "removeLabel",
+            "parameters": {
+              "label": "Status:No recent activity"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "taskType": "trigger",
+      "capabilityId": "IssueResponder",
+      "subCapability": "PullRequestCommentResponder",
+      "version": "1.0",
+      "config": {
+        "conditions": {
+          "operator": "and",
+          "operands": [
+            {
+              "name": "hasLabel",
+              "parameters": {
+                "label": "Status:No recent activity"
+              }
+            },
+            {
+              "name": "hasLabel",
+              "parameters": {
+                "label": "Community"
+              }
+            }
+          ]
+        },
+        "eventType": "pull_request",
+        "eventNames": [
+          "issue_comment"
+        ],
+        "taskName": "[stale community PR] [5-3] Remove \"Status:No recent activity\" if there is any comment.",
+        "actions": [
+          {
+            "name": "removeLabel",
+            "parameters": {
+              "label": "Status:No recent activity"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "taskType": "trigger",
+      "capabilityId": "IssueResponder",
+      "subCapability": "PullRequestReviewResponder",
+      "version": "1.0",
+      "config": {
+        "conditions": {
+          "operator": "and",
+          "operands": [
+            {
+              "name": "hasLabel",
+              "parameters": {
+                "label": "Status:No recent activity"
+              }
+            },
+            {
+              "name": "hasLabel",
+              "parameters": {
+                "label": "Community"
+              }
+            }
+          ]
+        },
+        "eventType": "pull_request",
+        "eventNames": [
+          "pull_request_review"
+        ],
+        "taskName": "[stale community PR] [5-4] Remove \"Status:No recent activity\" if there are any reviews.",
+        "actions": [
+          {
+            "name": "removeLabel",
+            "parameters": {
+              "label": "Status:No recent activity"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "taskType": "scheduled",
+      "capabilityId": "ScheduledSearch",
+      "subCapability": "ScheduledSearch",
+      "version": "1.1",
+      "config": {
+        "frequency": [
+          {
+            "weekDay": 0,
+            "hours": [
+              7,
+              19
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 1,
+            "hours": [
+              7,
+              19
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 2,
+            "hours": [
+              7,
+              19
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 3,
+            "hours": [
+              7,
+              19
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 4,
+            "hours": [
+              7,
+              19
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 5,
+            "hours": [
+              7,
+              19
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 6,
+            "hours": [
+              7,
+              19
+            ],
+            "timezoneOffset": -7
+          }
+        ],
+        "searchTerms": [
+          {
+            "name": "isPr",
+            "parameters": {}
+          },
+          {
+            "name": "isOpen",
+            "parameters": {}
+          },
+          {
+            "name": "hasLabel",
+            "parameters": {
+              "label": "Status:No recent activity"
+            }
+          },
+          {
+            "name": "hasLabel",
+            "parameters": {
+              "label": "Community"
+            }
+          },
+          {
+            "name": "noActivitySince",
+            "parameters": {
+              "days": 330
+            }
+          },
+          {
+            "name": "noLabel",
+            "parameters": {
+              "label": "Status:Do not auto close"
+            }
+          }
+        ],
+        "taskName": "[stale community PR] [5-5] Close PRs with no activity over 330 days after warn.",
+        "actions": [
+          {
+            "name": "closeIssue",
+            "parameters": {}
+          }
+        ]
+      }
     }
   ],
   "userGroups": []
