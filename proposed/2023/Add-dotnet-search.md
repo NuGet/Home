@@ -1,4 +1,4 @@
-# ***Add `nuget list` Functionality to DotNet***
+# ***Add `nuget search` Functionality to DotNet***
 <!-- Replace `Title` with an appropriate title for your design -->
 
 - [Nigusu](https://github.com/Nigusu-Allehu) <!-- GitHub username link -->
@@ -7,7 +7,7 @@
 ## Summary
 
 <!-- One-paragraph description of the proposal. -->
-The specification seeks to add `nuget list` functionality to dotnet. The functionality will be added to dotnet as a search command: `dotnet package search`.  
+The specification seeks to add `nuget search` functionality to dotnet. The functionality will be added to dotnet as a search command: `dotnet package search`.  
 
 ## Motivation
 
