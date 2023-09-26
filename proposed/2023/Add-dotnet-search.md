@@ -12,7 +12,7 @@ The specification seeks to add `nuget list` functionality to dotnet. The functio
 ## Motivation
 
 <!-- Why are we doing this? What pain points does this solve? What is the expected outcome? -->
-This is a customer requested functionality as discussed in this issue: https://github.com/NuGet/Home/issues/6060. Adding the functionality will aid our customers to be able to use the command when writing scripts.
+As outlined in the customer request on this GitHub [issue](https://github.com/NuGet/Home/issues/6060), there is a call for the incorporation of `nuget list` functionality into dotnet. The customers are requesting for this feature, but the `search` command can replicate the same functionality, with the only difference being the quantity of package results it outputs. The search command mitigates unnecessary server use by limiting the number of results through the `--take` option. By integrating this search functionality, we aim to accommodate our customers' needs, especially for scripting purposes.
 
 ## Explanation
 
@@ -31,12 +31,11 @@ The `package search [search terms] [options]` command will have the following op
 |---------|:----------|
 | `--source` | A list of packages to search |
 | `--exact-match` | Return exact matches only as a search result |
-| `--verbose` | Displays a detailed ist of information for each package |
 | `--prerelease` | Allow prerelease packages to be shown. |
 | `--non-interactive` | Do not prompt for user input or confirmations.|
+| `--take` | The number of results to return. The default value is 20.|
 | `--help` | Show command help and usage information |
 | `--verbosity` | Display the amount of details in the output: normal, quiet, detailed. |
-| `--config-file` | The NuGet configuration file. If not specified, the hierarchy of configuration files from the current directory will be used. |
 |||
 
 #### **Algorithm**
@@ -87,7 +86,7 @@ The `package search [search terms] [options]` command will have the following op
 <!-- Why is this the best design compared to other designs? -->
 <!-- What other designs have been considered and why weren't they chosen? -->
 <!-- What is the impact of not doing this? -->
-In nuget.exe there is `nuget list` command which does the same thing. However, customers would like this functionality to be available in dotnet.
+In nuget.exe there is `nuget search` command which does the same thing. However, customers would like this functionality to be available in dotnet.
 
 ## Prior Art
 
