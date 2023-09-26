@@ -20,12 +20,12 @@ As outlined in the customer request on this GitHub [issue](https://github.com/Nu
 
 <!-- Explain the proposal as if it were already implemented and you're teaching it to another person. -->
 <!-- Introduce new concepts, functional designs with real life examples, and low-fidelity mockups or  pseudocode to show how this proposal would look. -->
-Imagine you have your dotnet CLI open. You would like to get the list of all packages from a source `<MySource>`. No worries, you can just use the following command : `dotnet package search --source <MySource>`. It will provide you with the list of all the packages in the source `<MySource>`.
+Imagine you have your dotnet CLI open. You would like to look up a NuGet package named `MyPackage` from a source `<MySource>`. No worries, you can just use the following command : `dotnet package search MyPackage --source <MySource>`. It will provide you with the list of the packages in the source `<MySource>` that match with the search criteria.
 
 ### Technical explanation
 
 <!-- Explain the proposal in sufficient detail with implementation details, interaction models, and clarification of corner cases. -->
-The `package search [search terms] [options]` command will have the following options 
+The `package search [search terms] [options]` command will have the following options
 
 | Option | Function |
 |---------|:----------|
@@ -47,35 +47,35 @@ The `package search [search terms] [options]` command will have the following op
 - Verbosity
   - **Quiet** : Each line would look as follows :
 
-            <Package Name> <Latest Package Version>
+            >[Package Name] | [Latest Package Version]
   - **Normal** :
 
-                <Package Name> | <Latest Package Version> | <Amount of Downloads>
+                >[Package Name] | [Latest Package Version] | [Amount of Downloads]
                 <Description of the Package(short form)>
   - **Detailed** :
 
-                <Package Name> | <Latest Package Version> | <Amount of Downloads>
-                Deprecated : YES/NO | Vulnerable : YES/NO
+                >[Package Name] | [Latest Package Version] | [Amount of Downloads]
+                Deprecated : True/False | Vulnerable : True/False
                 <Description of the Package(Readme file)>
-                License URL : <URL>
+                License URL : [URL]
 
 #### **New Option `-exact-match`**
 
 - This new option will allow for users to be able to search and have only exact matches as an output.
 - For example if a user uses `dotnet package search NuGet.CommandLine --verbosity Quiet`
 
-        NuGet.CommandLine | 6.7.0
-        NuGet.CommandLine.XPlat | 6.7.0
-        NuGet.Commands | 6.7.0
-        NuGet.exe | 3.4.3
-        NuGet.Bootstrapper | 2.6.0
-        CommandLineParser20 | 2.0.0
-        NuGet.VerifyMicrosoftPackage | 1.0.0
-        NuGet.for.MSBuild | 2.1.0 ...
+        >NuGet.CommandLine | 6.7.0
+        >NuGet.CommandLine.XPlat | 6.7.0
+        >NuGet.Commands | 6.7.0
+        >NuGet.exe | 3.4.3
+        >NuGet.Bootstrapper | 2.6.0
+        >CommandLineParser20 | 2.0.0
+        >NuGet.VerifyMicrosoftPackage | 1.0.0
+        >NuGet.for.MSBuild | 2.1.0 ...
 
 - Using ``dotnet package search NuGet.CommandLine --exact-match --verbosity Quiet`` on the other side will have the following output
 
-         NuGet.CommandLine | 6.7.0
+         >NuGet.CommandLine | 6.7.0
 
 ## Drawbacks
 
