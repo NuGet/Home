@@ -35,48 +35,29 @@ The `package search [search terms] [options]` command will have the following op
 | `--interactive` | Allows the command to stop and wait for user input or action (for example to complete authentication).|
 | `--take` | The number of results to return. The default value is 20.|
 | `--help` | Show command help and usage information |
-| `--verbosity` | Display the amount of details in the output: normal, quiet, detailed. |
 |||
 
 #### **Option `--source`**
 
 This option will specify which source to search from. If the source is not specified using this option, the sources in the `nuget.config` file will be used.
 
-#### **Option `--verbosity`**
-
-Based on `--verbosity` value, the output will provide with a list of packages with various verbosity
-
-- Quiet : Each line would look as follows :
-
-            >[Package Name] | [Latest Package Version]
-- Normal :
-
-                >[Package Name] | [Latest Package Version] | [Amount of Downloads]
-                <Description of the Package(short form)>
-- Detailed :
-
-                >[Package Name] | [Latest Package Version] | [Amount of Downloads]
-                Deprecated : True/False | Vulnerable : True/False
-                <Description of the Package(Readme file)>
-                License URL : [URL]
-
 #### **Option `-exact-match`**
 
 - This option will allow for users to be able to search and have only exact matches as an output.
-- For example if a user uses `dotnet package search NuGet.CommandLine --verbosity Quiet`
+- For example if a user uses `dotnet package search NuGet.CommandLine`
 
-        >NuGet.CommandLine | 6.7.0
-        >NuGet.CommandLine.XPlat | 6.7.0
-        >NuGet.Commands | 6.7.0
-        >NuGet.exe | 3.4.3
-        >NuGet.Bootstrapper | 2.6.0
-        >CommandLineParser20 | 2.0.0
-        >NuGet.VerifyMicrosoftPackage | 1.0.0
+        >NuGet.CommandLine | 6.7.0 | Downloads: N/A
+        >NuGet.CommandLine.XPlat | 6.7.0 | Downloads: N/A
+        >NuGet.Commands | 6.7.0 | Downloads: N/A
+        >NuGet.exe | 3.4.3 | Downloads: N/A
+        >NuGet.Bootstrapper | 2.6.0 | Downloads: N/A
+        >CommandLineParser20 | 2.0.0 | Downloads: N/A
+        >NuGet.VerifyMicrosoftPackage | 1.0.0 | Downloads: N/A
         >NuGet.for.MSBuild | 2.1.0 ...
 
-- Using ``dotnet package search NuGet.CommandLine --exact-match --verbosity Quiet`` on the other side will have the following output
+- Using ``dotnet package search NuGet.CommandLine --exact-match`` on the other side will have the following output
 
-         >NuGet.CommandLine | 6.7.0
+         >NuGet.CommandLine | 6.7.0 | Downloads: N/A
 
 ## Drawbacks
 
