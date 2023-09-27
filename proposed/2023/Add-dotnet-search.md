@@ -7,12 +7,12 @@
 ## Summary
 
 <!-- One-paragraph description of the proposal. -->
-The specification seeks to add `nuget search` functionality to dotnet. The functionality will be added to dotnet as a search command: `dotnet package search`.  
+The specification seeks to add search functionality to dotnet. The functionality will be added to dotnet as a search command: `dotnet package search`.  
 
 ## Motivation
 
 <!-- Why are we doing this? What pain points does this solve? What is the expected outcome? -->
-As outlined in the customer request on this GitHub [issue](https://github.com/NuGet/Home/issues/6060), there is a call for the incorporation of `nuget list` functionality into dotnet. The customers are requesting for this feature, but the `search` command can replicate the same functionality, with the only difference being the quantity of package results it outputs. The search command mitigates unnecessary server use by limiting the number of results through the `--take` option. By integrating this search functionality, we aim to accommodate our customers' needs, especially for scripting purposes.
+As outlined in the customer request on this GitHub [issue](https://github.com/NuGet/Home/issues/6060), there is a call for the incorporation of `nuget.exe list` functionality into dotnet. The customers are requesting for this feature, but a `search` command can replicate the same functionality, with the only difference being the quantity of package results it outputs. A search command mitigates unnecessary server use by limiting the number of results through the `--take` option. By integrating this search functionality, we aim to accommodate our customers' needs, especially for scripting purposes.
 
 ## Explanation
 
