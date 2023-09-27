@@ -32,36 +32,37 @@ The `package search [search terms] [options]` command will have the following op
 | `--source` | A source to search |
 | `--exact-match` | Return exact matches only as a search result |
 | `--prerelease` | Allow prerelease packages to be shown. |
-| `--non-interactive` | Do not prompt for user input or confirmations.|
+| `--interactive` | Allows the command to stop and wait for user input or action (for example to complete authentication).|
 | `--take` | The number of results to return. The default value is 20.|
 | `--help` | Show command help and usage information |
 | `--verbosity` | Display the amount of details in the output: normal, quiet, detailed. |
 |||
 
-#### **Algorithm**
+#### **Option `--source`**
 
-1. Read and parse arguments from user
-2. Use the nuget.exe Search API to look for the specific term in the provided source. The search filter will be composed of the `--source`, `[Search term]`, `--prerelease` values.
-3. Based on `--verbosity` value, provide with a list of packages with various verbosity
+This option will specify which source to search from. If the source is not specified using this option, the sources in the `nuget.config` file will be used.
 
-- Verbosity
-  - **Quiet** : Each line would look as follows :
+#### **Option `--verbosity`**
+
+Based on `--verbosity` value, the output will provide with a list of packages with various verbosity
+
+- Quiet : Each line would look as follows :
 
             >[Package Name] | [Latest Package Version]
-  - **Normal** :
+- Normal :
 
                 >[Package Name] | [Latest Package Version] | [Amount of Downloads]
                 <Description of the Package(short form)>
-  - **Detailed** :
+- Detailed :
 
                 >[Package Name] | [Latest Package Version] | [Amount of Downloads]
                 Deprecated : True/False | Vulnerable : True/False
                 <Description of the Package(Readme file)>
                 License URL : [URL]
 
-#### **New Option `-exact-match`**
+#### **Option `-exact-match`**
 
-- This new option will allow for users to be able to search and have only exact matches as an output.
+- This option will allow for users to be able to search and have only exact matches as an output.
 - For example if a user uses `dotnet package search NuGet.CommandLine --verbosity Quiet`
 
         >NuGet.CommandLine | 6.7.0
@@ -104,4 +105,3 @@ In nuget.exe there is `nuget search` command which does the same thing. However,
 ## Future Possibilities
 
 <!-- What future possibilities can you think of that this proposal would help with? -->
-Make the search command bigger and vast
