@@ -29,7 +29,7 @@ The `package search [search terms] [options]` command will have the following op
 
 | Option | Function |
 |---------|:----------|
-| `--source` | A list of packages to search |
+| `--source` | A source to search |
 | `--exact-match` | Return exact matches only as a search result |
 | `--prerelease` | Allow prerelease packages to be shown. |
 | `--non-interactive` | Do not prompt for user input or confirmations.|
