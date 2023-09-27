@@ -39,7 +39,7 @@ The `package search [search terms] [options]` command will have the following op
 
 #### **Option `--source`**
 
-This option will specify which source to search from. If the source is not specified using this option, the sources in the `nuget.config` file will be used.
+This option will specify a list of sources to search from. If a source is not specified using this option, the sources in the `nuget.config` file will be used.
 
 #### **Option `-exact-match`**
 
