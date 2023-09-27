@@ -22,9 +22,6 @@ As outlined in the customer request on this GitHub [issue](https://github.com/Nu
 <!-- Introduce new concepts, functional designs with real life examples, and low-fidelity mockups or  pseudocode to show how this proposal would look. -->
 Imagine you have your dotnet CLI open. You would like to look up a NuGet package named `MyPackage` from a source `<MySource>`. No worries, you can just use the following command : `dotnet package search MyPackage --source <MySource>`. It will provide you with the list of the packages in the source `<MySource>` that match with the search criteria.
 
-### Technical explanation
-
-<!-- Explain the proposal in sufficient detail with implementation details, interaction models, and clarification of corner cases. -->
 The `package search [search terms] [options]` command will have the following options
 
 | Option | Function |
@@ -59,6 +56,11 @@ This option will specify a list of sources to search from. If a source is not sp
 
          >NuGet.CommandLine | 6.7.0 | Downloads: N/A
 
+### Technical explanation
+
+<!-- Explain the proposal in sufficient detail with implementation details, interaction models, and clarification of corner cases. -->
+This command will prepare a search parameter using the inputs of  `Search Term`, `--take`, and `--prerelease`. This parameter is then used prepare an API query to the specified source. In the dotnet/sdk repo, there is already a command, `dotnet tool search`, which does a similar thing. However, it specifies the package type to be only `dotnettool`. Instead of adding a new set of classes and methods, I will modify the methods and classes used by `dotnet tool search` to do a general search when needed. This will allow both `dotnet package search` and `dotnet tool search` to use the same API request class. The result of the query is then parsed to provide output to users.
+
 ## Drawbacks
 
 <!-- Why should we not do this? -->
@@ -82,6 +84,7 @@ In nuget.exe there is `nuget search` command which does the same thing. However,
 <!-- What parts of the proposal do you expect to resolve before this gets accepted? -->
 <!-- What parts of the proposal need to be resolved before the proposal is stabilized? -->
 <!-- What related issues would you consider out of scope for this proposal but can be addressed in the future? -->
+I believe `dotnet tool search` is a subset to `dotnet package search`, as a result we could deprecate it. If it is necessary we could add an option in `dotnet package search` to allow users to specify that they want to only search dotnet tool.
 
 ## Future Possibilities
 
