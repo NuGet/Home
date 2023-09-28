@@ -65,7 +65,13 @@ This option will specify a list of sources to search from. If a source is not sp
 ### Technical explanation
 
 <!-- Explain the proposal in sufficient detail with implementation details, interaction models, and clarification of corner cases. -->
-This command will prepare a search parameter using the inputs of  `Search Term`, `--take`, and `--prerelease`. This parameter is then used prepare an API query to the specified source. In the dotnet/sdk repo, there is already a command, `dotnet tool search`, which does a similar thing. However, it specifies the package type to be only `dotnettool`. Instead of adding a new set of classes and methods, I will modify the methods and classes used by `dotnet tool search` to do a general search when needed. This will allow both `dotnet package search` and `dotnet tool search` to use the same API request class. The result of the query is then parsed to provide output to users.
+This command will prepare a search parameter using the inputs of  `Search Term`, `--take`, and `--prerelease`.
+This parameter is then used prepare an API query to the specified source.
+In the dotnet/sdk repo, there is already a command, `dotnet tool search`, which does a similar thing.
+However, it specifies the package type to be only `dotnettool`.
+Instead of adding a new set of classes and methods, I will modify the methods and classes used by `dotnet tool search` to do a general search when needed.
+This will allow both `dotnet package search` and `dotnet tool search` to use the same API request class.
+The result of the query is then parsed to provide output to users.
 
 ## Drawbacks
 
