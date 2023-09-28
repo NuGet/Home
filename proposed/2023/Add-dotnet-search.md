@@ -12,7 +12,12 @@ The specification seeks to add search functionality to dotnet. The functionality
 ## Motivation
 
 <!-- Why are we doing this? What pain points does this solve? What is the expected outcome? -->
-As outlined in the customer request on this GitHub [issue](https://github.com/NuGet/Home/issues/6060), there is a call for the incorporation of `nuget.exe list` functionality into dotnet. The customers are requesting for this feature, but a `search` command can replicate the same functionality, with the only difference being the quantity of package results it outputs. A search command mitigates unnecessary server use by limiting the number of results through the `--take` option. By integrating this search functionality, we aim to accommodate our customers' needs, especially for scripting purposes.
+The `dotnet` CLI is missing a way for customers to search for packages from the command line, as is possible with `nuget.exe search`.
+This brings NuGet experiences in the `dotnet` CLI one step closer towards feature parity.
+
+While [NuGet/Home#6060](https://github.com/NuGet/Home/issues/6060) (the linked issue) also discusses the `nuget.exe list` command, the issue was created before `nuget.exe search` was added.
+The [NuGet Server API Search Resource specification requires all packages to be returned when no `q` parameter is provided](https://learn.microsoft.com/en-us/nuget/api/search-query-service-resource#request-parameters).
+Therefore, this proposal does not add a `list` equivalent to the `dotnet` CLI, as it is effectively redundant.
 
 ## Explanation
 
