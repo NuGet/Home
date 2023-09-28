@@ -31,6 +31,7 @@ The `package search [search terms] [options]` command will have the following op
 | `--prerelease` | Allow prerelease packages to be shown. |
 | `--interactive` | Allows the command to stop and wait for user input or action (for example to complete authentication).|
 | `--take` | The number of results to return. The default value is 20.|
+| `--skip` | The number of results to skip, for pagination |
 | `--help` | Show command help and usage information |
 |||
 
