@@ -1,4 +1,4 @@
-# ***Add `nuget search` Functionality to DotNet***
+# ***Add `search` Functionality to DotNet***
 <!-- Replace `Title` with an appropriate title for your design -->
 
 - [Nigusu](https://github.com/Nigusu-Allehu) <!-- GitHub username link -->
@@ -82,7 +82,7 @@ The result of the query is then parsed to provide output to users.
 <!-- Why is this the best design compared to other designs? -->
 <!-- What other designs have been considered and why weren't they chosen? -->
 <!-- What is the impact of not doing this? -->
-In nuget.exe there is `nuget search` command which does the same thing. However, customers would like this functionality to be available in dotnet.
+In nuget.exe there is `nuget.exe search` command which does the same thing. However, customers would like this functionality to be available in dotnet.
 
 ## Prior Art
 
