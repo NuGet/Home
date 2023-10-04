@@ -55,9 +55,11 @@ However, the server will only need to implement the [`VulnerabilityInfo` resourc
 <!-- Explain the proposal in sufficient detail with implementation details, interaction models, and clarification of corner cases. -->
 
 Restore is NuGet's most performance critical code path, so performance should be designed into any implementation.
-Therefore, if a source is defined more than once, or if a URL for a vulnerability source matches the URL for a package source, it should be deduplicated to avoid unnecessary work.
-Restore already has a pattern using classes it calls `Provider`s which are used to ensure that when multiple projects use the same resource, it is created no more than once per restore, and re-used across all projects.
+
+Therefore, (package and vulnerability) sources should be de-duplicated to avoid loading or checking the same VDB more than once.
 NuGetAudit's first implementation created a `VulnerabilityInformationProvider`` that caches the VDB from each source, so this should be used with any new vulnerability source.
+
+Additionally, don't move where NuGetAudit runs, so that it doesn't impact no-op restore.
 
 ## Drawbacks
 
