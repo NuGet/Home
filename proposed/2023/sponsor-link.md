@@ -101,7 +101,7 @@ To list all the packages that are looking for sponsors, one can run `dotnet list
 Project 'Umbraco.Core' has the following package references looking for sponsors
    [net7.0]: 
    Top-level Package                                              Requested            Resolved      
-   > Moq                                      					  4.18.2               4.18.2
+   > Moq                                                          4.18.2               4.18.2
    > Serilog                                                 	  2.12.0               2.12.0
    
 The given project `Umbraco.Web.UI` has no packages looking for sponsors given the current sources.
@@ -123,12 +123,18 @@ Details will be provided once the functional proposal is accepted by the .NET OS
 <!-- Why should we not do this? -->
 There may be arguments that it isn't the package registry's responsibility to bring awareness to sponsorship needs as it should focus purely as a means to index packages and deliver them reliably to consumers.
 
+It is likely that this functionality will not "move the needle" on OSS sustainability. It is just as likely that there will be negative perception of the excess noise added to individual's development environments where users may go to immediately opt-out of any sponsorship experience. 
+
+On the opposite end, there may be a positive perception of awareness to a largely ignored problem. That individuals can bring more awareness to sponsorship needs and even build tooling on-top of this functionality to empower the .NET OSS community further.
+
 ## Rationale and alternatives
 
 <!-- Why is this the best design compared to other designs? -->
 <!-- What other designs have been considered and why weren't they chosen? -->
 <!-- What is the impact of not doing this? -->
 This isn't the greatest proposal in the world, it is just a tribute to all the other prior arts who provide this functionality. The impact of not doing this work is more systemic and can discourage OSS package authors from wanting to contribute to the NuGet/.NET/C# ecosystem.
+
+An alternative approach to this proposal would be to create a new concept and home for "important links" where a package author can highlight any important information they would like consumers to be informed about regarding the package. This is not necessarily related to documentation or project website information, but rather any important social links that the package author may support such as bringing awareness to their funding goals, directing people towards a common charitable cause, or even drawing attention to worldly issues. Any social link content included in one's NuGet package must abide by the [NuGet Terms of Use](https://www.nuget.org/policies/Terms).
 
 ## Prior Art
 
@@ -141,16 +147,18 @@ This isn't the greatest proposal in the world, it is just a tribute to all the o
 - [composer funding metadata](https://getcomposer.org/doc/04-schema.md?ref=blog.packagist.com#funding)
 - [rubygems funding_uri](https://guides.rubygems.org/specification-reference/)
 - [GitHub Sponsors](https://github.com/sponsors)
+- [Visual Studio Code Sponsor](https://code.visualstudio.com/updates/v1_68#_sponsoring-extensions)
 
 ## Unresolved Questions
 
 <!-- What parts of the proposal do you expect to resolve before this gets accepted? -->
 <!-- What parts of the proposal need to be resolved before the proposal is stabilized? -->
 <!-- What related issues would you consider out of scope for this proposal but can be addressed in the future? -->
+- The name `Sponsor` today is mostly inspired by GitHub Sponsors and the Visual Studio Code extension Sponsor button. Many other package registry's use the term `funding`, which may be a better name for this functionality. We can do pulse surveys to find the right name.
 
 ## Future Possibilities
 
 <!-- What future possibilities can you think of that this proposal would help with? -->
 - Until the signal to noise ratio is figured out, this will be an opt-in experience for those passionate of becoming more aware of packages that need sponsorship.
   - In the future, it can be an opt-out experience to bring awareness to .NET OSS sustainability.
-- The name `Sponsor` today is mostly inspired by GitHub Sponsors. Many other package registry's use the term `funding`, which may be a better name for this functionality. We will do pulse surveys to find the right name.
+
