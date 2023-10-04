@@ -123,6 +123,32 @@ Rust's cargo audit command has [configuration for the advisory DB URL](https://d
 <!-- What parts of the proposal need to be resolved before the proposal is stabilized? -->
 <!-- What related issues would you consider out of scope for this proposal but can be addressed in the future? -->
 
+1. default value?
+
+   Should we add nuget.org as a default value, so that customers who remove nuget.org as a package source are more easily able to use NuGetAudit?
+   Would using nuget.org as a default vulnerability source cause undue concern from customers who don't want to use nuget.org as a package source, and the new tooling version starts making network requests to nuget.org?
+
+   If so, how?
+   NuGet has tried before to use a tracking file to automatically add nuget's v3 URL as a package source to user-profile nuget.config files that don't have any package sources.
+   However, this caused a security issue when customers wanted to remove nuget.org as a default package source, and this code incorrectly re-added it once (the customer could successfully remove nuget.org a second time).
+   When we removed this auto-update to mitigate the security concern, it exposed a bug where multiple other apps created user-profile nuget.config files without any package sources, and many customers assumed it was a bug with NuGet.
+
+   Should we hard-code nuget.org's default URL in NuGet.Configuration, and require customers to use `<clear/>` if they don't want any vulnerability source?
+
+   Should we just add it as a default in new user-profile nuget.config files, and just accept that existing developers won't get it by default?
+
+2. Stop using package source as vulnerability source?
+
+   On one hand, using package sources as a defacto vulnerability source makes it easier for customers to use the feature.
+   On the other hand, if there are package sources which the customer knows don't provide vulnerability info, then having restore check those sources every restore (that isn't a no-op) harms performance.
+
+   Another challenge is that if we want to change the behavior it' will be a breaking change, which is typically discouraged.
+
+3. Tooling
+
+  How important is it to add CLI commands to manage vulnerability sources?
+  How important is it to add a GUI in Visual Studio to manage vulnerability sources?
+
 ## Future Possibilities
 
 <!-- What future possibilities can you think of that this proposal would help with? -->
