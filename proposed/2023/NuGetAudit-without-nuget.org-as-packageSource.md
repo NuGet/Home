@@ -31,6 +31,7 @@ However, some developers might consider this an unacceptable risk and prefer ano
 <!-- Explain the proposal as if it were already implemented and you're teaching it to another person. -->
 <!-- Introduce new concepts, functional designs with real life examples, and low-fidelity mockups or  pseudocode to show how this proposal would look. -->
 *NuGet.Config* files have a new section `<auditSources>` where the URL(s) of any additional sources can be specified, which will be used only to download a VDB, and will not be used for downloading packages.
+When there is at least one source in `auditSources`, NuGet should no longer use `packageSources` to get a VDB.
 
 For example, consider a developer at Contoso using a company-internal source as a single package source, and using nuget.org as an audit source:
 
@@ -48,18 +49,16 @@ For example, consider a developer at Contoso using a company-internal source as 
 ```
 
 Any URL specified in the `auditSources` section must implement the [NuGet Server API V3 protocol](https://learn.microsoft.com/nuget/api/overview).
-However, the server will only need to implement the [`VulnerabilityInfo` resource](https://learn.microsoft.com/en-us/nuget/api/vulnerability-info), and can avoid implementing all the other resources that are required to be used as a package source.
+However, the server will only need to implement the [`VulnerabilityInfo` resource](https://learn.microsoft.com/en-us/nuget/api/vulnerability-info) (and service index), and can avoid implementing all the other resources that are required to be used as a package source.
 
 ### Technical explanation
 
 <!-- Explain the proposal in sufficient detail with implementation details, interaction models, and clarification of corner cases. -->
 
-Restore is NuGet's most performance critical code path, so performance should be designed into any implementation.
-
-Therefore, (package and vulnerability) sources should be de-duplicated to avoid loading or checking the same VDB more than once.
-NuGetAudit's first implementation created a `VulnerabilityInformationProvider`` that caches the VDB from each source, so this should be used with any new vulnerability source.
-
-Additionally, don't move where NuGetAudit runs, so that it doesn't impact no-op restore.
+Not using `packageSources` for VDB when there's at least one source in `auditSources` is a performance optimization.
+Since we expect customers to use `auditSources` when their `packageSources` don't already provide a VDB, having restore spend time making HTTP requests to the package sources is unlikely to provide any benefit.
+While downloading the VDB from audit sources is likely to take more time than verifying that package sources don't have a vulnerability resource, if any package source is slow, downloading the VDB from the audit source might complete first.
+Additionally, in the case where NuGet doesn't otherwise need to communicate with any package source, checking the package sources for a VDB might trigger a credential provider.
 
 ## Drawbacks
 
@@ -96,7 +95,7 @@ But in such a restrictive environment, I expect it's even less likely that their
 
 The NuGet team already has a [NuGet server implementation](https://github.com/NuGet/NuGet.Server) that can be self hosted.
 But the V3 NuGet Server API wasn't implemented.
-While I find the idea of a reference implementation of NuGet's server API interesting (imagine ASP.NET Core middleware where customers implement a backend interface, and getting new NuGet features is as simple as upgrading the middleware package version), we should consider NuGet.Server's lack of modernization as a signal that it's likely an unreasonable cost.
+While I find the idea of a reference implementation of NuGet's server API interesting (imagine ASP.NET Core middleware where customers implement a backend interface, and getting new NuGet features is as simple as upgrading the middleware package version), we should consider [NuGet.Server](https://github.com/NuGet/NuGet.Server)'s lack of modernization as a signal that it's likely an unreasonable cost.
 
 ### Read vulnerability database from local files
 
@@ -104,7 +103,7 @@ In order to enable customers working in offline environments (or just nuget.org 
 In these disconnected (from nuget.org) environments, it will be up to the customer to find an approved way with their security compliance to get nuget.org's VDB onto their computer.
 In non-disconnected scenarios, we could provide a tool, such as `dotnet tool install -g NuGet.VulnerabilityTool ; NuGet.VulnerabilityTool download -o path/to/destination/`.
 
-However, this doesn't provide any benefit over this spec's proposed *NuGet.Config* `<auditSource>`, coupled with the future possibility's [implement VulnerabilityInfo resource for local file feeds](#implement-vulnerabilityinfo-resource-for-local-file-feeds) idea.
+However, this doesn't provide any benefit over this spec's proposed *NuGet.Config* `<auditSource>`, coupled with the future possibility's [auditSources with local files](#allow-auditsources-to-point-to-a-filesystem-directory) idea.
 It would be worse because for customers who do not have nuget.org blocked at the firewall, it would require a manual action to update the VDB, whereas an audit source would allow NuGet to automatically download and cache the VDB.
 
 ## Prior Art
@@ -130,7 +129,7 @@ Rust's cargo audit command has [configuration for the advisory DB URL](https://d
    Should we add nuget.org as a default value, so that customers who remove nuget.org as a package source are more easily able to use NuGetAudit?
    Would using nuget.org as a default audit source cause undue concern from customers who don't want to use nuget.org as a package source, and the new tooling version starts making network requests to nuget.org?
 
-   If so, how?
+   If we want to make nuget.org a default/automatic audit source, how?
    NuGet has tried before to use a tracking file to automatically add nuget's v3 URL as a package source to user-profile nuget.config files that don't have any package sources.
    However, this caused a security issue when customers wanted to remove nuget.org as a default package source, and this code incorrectly re-added it once (the customer could successfully remove nuget.org a second time).
    When we removed this auto-update to mitigate the security concern, it exposed a bug where multiple other apps created user-profile nuget.config files without any package sources, and many customers assumed it was a bug with NuGet.
@@ -141,23 +140,29 @@ Rust's cargo audit command has [configuration for the advisory DB URL](https://d
 
 2. Stop using package source as audit source?
 
-   On one hand, using package sources as a defacto audit source makes it easier for customers to use the feature.
-   On the other hand, if there are package sources which the customer knows don't provide vulnerability info, then having restore check those sources every restore (that isn't a no-op) harms performance.
+   On one hand, using package sources as a defacto audit source makes it easier for customers to use the feature when they knowingly or unknowingly use a package source with a VDB.
+   On the other hand, overloading `<packageSources>` with multiple meanings is confusing and customers probably won't understand why sometimes they get vulnerable package information and sometimes they don't.
+   If we add nuget.org as a default audit source, and don't use packageSources when auditSources has a value, then using packageSources to get a VDB when auditSources is empty will be particularly confusing/unintuitive to customers.
 
    Another challenge is that if we want to change the behavior it' will be a breaking change, which is typically discouraged.
+   However, given that nuget.org is the only know source with a VDB, if we make nuget.org a default audit source, then it will effectively be a non-breaking change.
 
 3. Tooling
 
-  How important is it to add CLI commands to manage audit sources?
-  How important is it to add a GUI in Visual Studio to manage audit sources?
+   How important is it to add CLI commands to manage audit sources?
+   How important is it to add a GUI in Visual Studio to manage audit sources?
+
+4. Restore summary
+
+   When you restore at normal verbosity, NuGet outputs a list of package sources that were used for restore. Should we add audit sources as well?
+   If so, presumably we should only output it if at least 1 project in the restore has NuGetAudit enabled, as outputting audit sources when NuGetAudit is disabled for all projects might confuse customers.
 
 ## Future Possibilities
 
 <!-- What future possibilities can you think of that this proposal would help with? -->
 
-### Implement VulnerabilityInfo resource for local file feeds
+### Allow auditSources to point to a filesystem directory
 
-The assembly that implements NuGet's protocol handling, NuGet.Protocol, already abstracts away HTTP vs local feeds, providing a single API to work with both.
-Currently, local feeds report that they don't support the vulnerability resource.
-But this can be changed to look for the VDB using some naming convention, and when the files are found, to provide the VDB.
-This will provide customers in a disconnected network a way to use *NuGetAudit*, although it will remain their responsibility to get a VDB in a way that complies with their security requirements.
+In order to provide customers who are disconnected from nuget.org (and possibly the internet more widely), we could load the VDB from files on disk.
+It would be up to customers to determine how to copy the VDB to their disconnected network/machine.
+We could consider a .NET tool, for example `nuget-audit-download` which knows how to communicate with nuget.org's V3 protocol, and merge results into a single file, so that it's easy for customers to obtain the file that needs to be copied.
