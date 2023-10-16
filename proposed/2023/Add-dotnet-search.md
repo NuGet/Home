@@ -44,6 +44,7 @@ This option will specify a list of sources to search from. If a source is not sp
 - This option will allow for users to be able to search and have only exact matches as an output.
 - For example if a user uses `dotnet package search Newtonsoft.Json`
 
+Source: nuget.org
 | Package ID                                  | Latest Version | Authors | Downloads       |
 |---------------------------------------------|----------------|---------|-----------------|
 | Newtonsoft.Json                             | 13.0.3         |         | 3,829,822,911   |
@@ -54,6 +55,7 @@ This option will specify a list of sources to search from. If a source is not sp
 
 - Using ``dotnet package search NuGet.CommandLine --exact-match`` on the other side will have the following output
 
+Source: nuget.org
 | Package ID                                  | Latest Version | Authors | Downloads       |
 |---------------------------------------------|----------------|---------|-----------------|
 | Newtonsoft.Json                             | 13.0.3         |         | 3,829,822,911   |
