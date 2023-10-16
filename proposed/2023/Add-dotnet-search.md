@@ -66,7 +66,7 @@ This option will specify a list of sources to search from. If a source is not sp
 
 <!-- Explain the proposal in sufficient detail with implementation details, interaction models, and clarification of corner cases. -->
 This command will prepare a search parameter using the inputs of  `Search Term`, `--take`, and `--prerelease`.
-This parameter is then used prepare an API query to the specified source. Nuget.Protocol will be used to do this query. Then the result is printed accordingly. If `--exact-match` is specified, assuming the search API returns a sorted search result, the first result of the search will be compared with the search term and printed out accordingly.
+This parameter is then used prepare an API query to the specified source. Nuget.Protocol will be used to do this query. Then the result is printed accordingly. If `--exact-match` is specified, the get metadata API is used to load the metadata for the specific package.
 
 ## Drawbacks
 
@@ -91,8 +91,9 @@ In nuget.exe there is `nuget.exe search` command which does the same thing. Howe
 <!-- What parts of the proposal do you expect to resolve before this gets accepted? -->
 <!-- What parts of the proposal need to be resolved before the proposal is stabilized? -->
 <!-- What related issues would you consider out of scope for this proposal but can be addressed in the future? -->
-I believe `dotnet tool search` is a subset to `dotnet package search`, as a result we could deprecate it. If it is necessary we could add an option in `dotnet package search` to allow users to specify that they want to only search dotnet tool.
+- should exact match output the latest package only?
 
 ## Future Possibilities
 
 <!-- What future possibilities can you think of that this proposal would help with? -->
+- In the next iteration, a formatting option will be added for the output.
