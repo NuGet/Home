@@ -52,7 +52,7 @@ This option will specify a list of sources to search from. If a source is not sp
 | Microsoft.AspNetCore.Mvc.NewtonsoftJson     | 7.0.12         |         | 317,067,823     |
 ...
 
-- Using ``dotnet package search NuGet.CommandLine --exact-match`` on the other side will have the following output
+- Using ``dotnet package search Newtonsoft.Json --exact-match`` on the other side will have the following output
 
 | Package ID                                  | Latest Version | Authors | Downloads       |
 |---------------------------------------------|----------------|---------|-----------------|
