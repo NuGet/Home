@@ -33,7 +33,6 @@ The `package search [search terms] [options]` command will have the following op
 | `--take` | The number of results to return. The default value is 20.|
 | `--skip` | The number of results to skip, for pagination. The default value is 0. |
 | `--help` | Show command help and usage information |
-|||
 
 #### **Option `--source`**
 
