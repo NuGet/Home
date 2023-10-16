@@ -53,7 +53,7 @@ Source: nuget.org
 | Microsoft.AspNetCore.Mvc.NewtonsoftJson     | 7.0.12         |         | 317,067,823     |
 ...
 
-- Using ``dotnet package search NuGet.CommandLine --exact-match`` on the other side will have the following output
+- Using ``dotnet package search Newtonsoft.Json --exact-match`` on the other side will have the following output
 
 Source: nuget.org
 | Package ID                                  | Latest Version | Authors | Downloads       |
