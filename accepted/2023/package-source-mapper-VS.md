@@ -2,12 +2,12 @@
 <!-- Replace `Title` with an appropriate title for your design -->
 
 - Donnie Goodson ([donnie-msft](https://github.com/donnie-msft))
-- GitHub Issue <!-- GitHub Issue link -->
+- GitHub Issue [#12834](https://github.com/NuGet/Home/issues/12834)
 
 ## Summary
 
 <!-- One-paragraph description of the proposal. -->
-Package source mapping is a relatively new feature in the .NET ecosystem, and Visual Studio (VS) doesn't currently have an onboarding experience for existing solutions. Let's bring the `PackageSourceMapper` tool's functionality into Visual Studio by introducing a button to launch the tool via the `NuGet Package Manager` VS Options. The existing `Package Source Mappings` options page can be automatically populated by the tool, and then update the solution's `NuGet.Config` with all package's mapped to the appropriate source.
+Package source mapping is a relatively new feature in the .NET ecosystem, and Visual Studio (VS) doesn't currently have an onboarding experience for existing solutions. Let's bring the [PackageSourceMapper](https://github.com/NuGet/PackageSourceMapper/tree/dev/PackageSourceMapper) tool's functionality into Visual Studio by introducing a button to launch the tool via the `NuGet Package Manager` VS Options. The existing `Package Source Mappings` options page can be automatically populated by the tool, and then update the solution's `NuGet.Config` with all package's mapped to the appropriate source.
 
 ## Motivation 
 
@@ -25,7 +25,6 @@ Open a solution which has not onboarded to Package Source Mapping. Navigate to t
 If a solution is already onboarded, there will be at least 1 mapping already, and therefore, the link to onboard a solution will not be available.
 
 Press the link, and a cancellable dialog window will appear indicating the following progress:
-1. Loading the `PackageSourceMapper` tool as an external process.
 1. The tool is reading the solution's package graph.
 1. The tool is calculating the source mappings to create.
 1. Results are shown in the dialog, and the Cancel button changes to an OK button.
@@ -38,12 +37,9 @@ Press the link, and a cancellable dialog window will appear indicating the follo
 ### Technical explanation
 
 <!-- Explain the proposal in sufficient detail with implementation details, interaction models, and clarification of corner cases. -->
-- `PackageSourceMapper` installation to VS
-    - Optional component? Workload?
-    - NuGet.Tools.vsix? Separate vsix?
-- External process initiated from VS
-- VS Option pages already use WPF dialogs which will be the UI to communicate this tool's state.
-- Populating the list gives the customer the ability to "consent" to the generated mappings prior to writing creating them. The heavy lifting is behind-the-scenes, but the impact is visible to the customer.
+- Import the relevant source code into VS from the [PackageSourceMapper](https://github.com/NuGet/PackageSourceMapper/tree/dev/PackageSourceMapper) repository.
+- VS Options dialog have pages that already use WPF dialogs, which will be the UI to communicate status from the tool.
+- Populating the list gives the customer the ability to "consent" to the generated mappings prior to writing them to disk. The heavy lifting is behind-the-scenes, but the impact is visible to the customer.
 - Writing to the `NuGet.Config` is functionality that's already available from NuGet's VS Option pages.
 
 ## Drawbacks
