@@ -6,17 +6,27 @@
 
 ## Summary
 
-This proposal introduces a concept of a logical grouping for packages published to NuGet.
-This will allow one to easily identify all the packages released as part of a single product version release as well as request bulk-processing for a set of packages which belong to the same release.
-For example, all packages published as part of .NET 8 Preview 5 release will be staged together and then also can be deprecated together by a single call to NuGet APIs.
+This proposal introduces a concept for grouping packages that are published to NuGet.
+This will allow one to easily identify all the packages released as part of a single group as well as request bulk-processing
+ for all packages which belong to the same group. For example, all packages published as part of .NET 8 release will be staged
+ together and then also can be deprecated together by a single call to NuGet APIs.
 
-## Motivation 
+## Motivation
 
 <!-- Why are we doing this? What pain points does this solve? What is the expected outcome? -->
-Many products (Apps / Tools / Frameworks / Utilities / etc. ...) consist of multiple interdependent packages which should be published together as a single set. Currently, NuGet provides no functionality for definding / grouping packages into such sets. This results in package owners having to keep track of these package sets on their own. There are three specific sets of scenarios which this feature will simplify dramatically:
-1. When preparing a release, product owners would like to have a mechanism to pre-stage their product packages, so that the release will consist only of a single action of marking the set of packages as `published`, which would result all the packages in the set to be marked as published at the same time.
-2. Sometimes developers have to take a dependency on several related packages in their projects, which are part of the same "release". Without having a concept of the `release` developers have to guess which versions of those packages are compatible. As a result, most of the time developers would simply pick the latest version of all these packages, which sometimes can lead to incompatibility issues down the road.
-3. Keeping a package healthy on NuGet also means keeping the list of packages aligned with it support policy. Hence, package owners try to deprecate packages which are out of support. Without ability to group packages, package owners end up keeping track of all the packages which belong to the same release and run the deprecation over a discrete set of packages when necessary. Being able to group packages together would enable deprecating a whole release at once, knowing that all the packages which belong to that release will get deprecated.
+Many products (Apps / Tools / Frameworks / Utilities / etc. ...) consist of multiple interdependent packages which should be published together as a single set.
+ Currently, NuGet provides no functionality for definding / grouping packages into such sets.
+ This results in package owners having to keep track of these package sets on their own.
+ There are three specific sets of scenarios which this feature will simplify dramatically:
+1. When preparing a release, product owners would like to have a mechanism to pre-stage their product packages,
+ so that the release will consist only of a single action of marking the set of packages as `published`,
+ which would result all the packages in the set to be marked as published at the same time.
+2. Sometimes developers have to take a dependency on several related packages in their projects, which are part of the same "release".
+ Without having a concept of the `release` developers have to guess which versions of those packages are compatible.
+ As a result, most of the time developers would simply pick the latest version of all these packages, which sometimes can lead to incompatibility issues down the road.
+3. Keeping a package healthy on NuGet also means keeping the list of packages aligned with it support policy.
+Hence, package owners try to deprecate packages which are out of support. Without ability to group packages,
+ package owners end up keeping track of all the packages which belong to the same release and run the deprecation over a discrete set of packages when necessary. Being able to group packages together would enable deprecating a whole release at once, knowing that all the packages which belong to that release will get deprecated.
 
 ## Explanation
 
@@ -24,17 +34,86 @@ Many products (Apps / Tools / Frameworks / Utilities / etc. ...) consist of mult
 
 <!-- Explain the proposal as if it were already implemented and you're teaching it to another person. -->
 <!-- Introduce new concepts, functional designs with real life examples, and low-fidelity mockups or  pseudocode to show how this proposal would look. -->
-There is a new field in the package metadata named `release`, which indicates the unique release of the product the package belongs to.
-Server implementations are expected to treat each `release` as scoped to an account or similar concept, depending on the server's implementation details.
-For example, on nuget.org, User1 and User2 can both use a `release` named `V1.0.0`, but when User1 operates on their `V1.0.0` release, it does not affect User2's release with the same name.
+A new NuGet CLI command `stage` will be added, which will allow a user to stage a package to nuget, specifying a `group` parameter.
+ Staged packages will be uploaded to NuGet and will be validated during the staging process, so that the staging fails
+ if validation fails for a package in a group. After uploading multiple packages, the user user can then call `nuget publish [group]`
+ command to request all the packages from the earlier group to become availble on the server as `published`.
+Note, that the `group` information will only be stored on the server and has nothing to do with how a package was built.
 
-When a package is being built, that field in the metadata is set to the same value for all the related packages, that are built together.
+Groups are scoped to an owner. So a package published by `Owner 1` into `Group 1` has nothing to do with another package published
+ to `Group 1` by `Owner 2`, as these should be treated as two separate groups.
 
-Now, with this information in place, new set of NuGet APIs / extensions allow the user to run the following actions:
+Groups can expand over time, by publishing new packages to the same group in the future. There is no concept of a "deprecated group"
+ as group by itself is stateless. It's just a collection of packages. A package can belong only to a single group.
+ This group expansion functionality will be handy for the error situation described above, where during staging a package staging fails.
+ This will result in only some packages being staged. The user will need to address the issues related to the failed package
+ and stage the remaining packages using the same command. Note, that if a package is stages, the operation should be idempotent,
+ and a request to stage the same package again should only result in a warning message (package is already staged) and the package shouldn't be uploaded again.
+
+Groups can later be used in the future when it's time to deprecate a set of packages. The package author can request to
+ deprecate a `group` by calling a single command on the nuget CLI and all the packages that belong to that group will be marked as `deprecated`.
+
+With this information in place, new set of NuGet APIs / extensions will be needed to allow a user to run the following actions:
 - **Stage** a package for later publishing
 - **Publish an earlier staged release**
-- **Deprecate a relase** for current publisher
-- **Discard a staged release** for a given publisher
+- **Deprecate a group** using the group id 
+- **Discard a staged release** using the group id
+
+Note, that the user is required to be the owner / co-owner of the packages which are in the group,
+otherwise the request to make any modification to a non-owned package will fail.
+
+#### Group Ownership
+There are few interesting scenarios related to package ownership:
+1. The user has staged a package to a group for later publishing, but the ownership has changed, and the user is no longer
+ an owner for a package in a group. At this point, publishing request should fail with a message that the group has been modified
+ from its original set, and the outcome of the request may be different from what the user was expecting, indicating the package
+ that was moved out of the group. If the user is aware of the problem and still wants to move forward with the change,
+ they will have to pass an additional `--force` parameter to the publish command: `nuget publish <group-id> --force`.
+2. The group to be published no longer has any packages in it. In this case the command should fail detailing the reason for the failure.
+3. This will be the same but for deprecation. Essentially, any bulk operation using groups, where the set of the packages in the group
+ have changed after staging, should result in an error with details about the change. The `--force` flag should again be used
+ to ignore the change and move forward with execution of the requst (either publishing or deprecation). To summarize,
+ the fundamental principle is that a user cannot deprecate a package they don't own.
+
+#### Lifespan of a staged group
+If users keep staging packages but do nothing with them, NuGet will become an ever-growing package graveyard,
+ incurring higher and higher costs over time simply for storing these packages. To avoid this problem, staging should be time-limited.
+ That is, there should be a maximum lifespan for a staged package, that is not published. NuGet should then unstage / remove
+ any package that was staged but never published within the specified / pre-configured time period. As a maximum timeslot
+ a default one month period can be considered. However, to reduce the cost of maintaining these packages,
+ the `nuget stage` command can also accept an optional `--lifespan [number of days]` parameter,
+ which can indicate a shorter time period, thus giving NuGet ability to remove those packages earlier than the maximum period.
+
+Note, that this opens up a new scenario, where a group has been created with a package 29 days ago, and then a new package is staged to the same group.
+In two days from that time, the package author tries to publish the staged group. At this point, the publish command will fail,
+indicating that the group has been modified, and showing the package that has been deleted by NuGet out of the staging due to the expiration.
+The user can still continue publishing using the `--force` option, which will result in the non-expired/ removed staged packages to be published.
+Alternatively, the user can restage the expired package and call the publish command again.
+
+#### Expanding groups
+It should be possible for a group to expand over time. This is currently a real scenario, where .NET GA SDK ships a set of packages,
+ and then follow-up SDK updates ship updated packages which still belong to the same .NET 8 package group.
+ Here how this will play out with the tooling support described above:
+1. During GA release, the release team will stage the set of RTM packages for the release. (nuget stage --group-id "net8.0" --package-id <package-id>)
+2. Then on the day of the release, all the staged packages will be published using `nuget publish --group-id "net8.0"` command.
+   At this point, the stage for the `net8.0` group will be empty.
+3. Later, as new builds are being prepared for a patch release, a new set of packages will be staged, to be later published to the same group.
+As there can be multiple candidate builds for a release, there is a need for functionality to discard a stage for a given group `nuget stage --discard --group-id "net8.0"`.
+This will remove all the staged but not published packages from the net8.0 group.
+4. A new set of packages will be staged for the 8.0 group, untile the final build is known. At this point, there is only one unified set of related packages is staged.
+5. On the release date, the release team will call `nuget publish --group-id "net8.0"` again, and only the staged packages will be published, resulting in an expanded set of published packages in the net8.0 group.
+6. Some time in the future, when the release is already out of support, somebody from the .NET team will call
+ `nuget deprecate --group-id "net8.0"` and all the packages which have ever been published to that group will be deprecated.
+ Those packages, which has already been deprecated because of whatever reason, will not be altered.
+
+#### Asynchronous behavior
+
+As both publishing and deprecation commands can take some time, these will run asynchronously.
+ So the CLI command for both operations will return immediately, giving the user some token which can later be used to
+ track the current state of the request.
+There are no critical scenarios for deprecation to happen within specific time period, however, publishing is somewhat
+ critical and is being orchestrated in many cases. Hence, NuGet should provide some guarantees for how much time the operation
+ can take in the worst case. As of right now, having 10 minutes deadline for the publishing request should be reasonable.
 
 ### Technical explanation
 
@@ -51,9 +130,12 @@ Now, with this information in place, new set of NuGet APIs / extensions allow th
 <!-- What is the impact of not doing this? -->
 
 ### Alternatives considrered
-Utilizing **package tags** was considered as an alternative to solve this problem. Unfortunately, this has issues and can't be used for this purpose. Below are some of them:
+Utilizing **package tags** was considered as an alternative to solve the grouping problem.
+ Unfortunately, this has issues and can't be used for this purpose. Below are some of them:
 - There are currently no restrictions on tags usage, so anyone can use the same tag for a random package and "interfere" with a set
-- tags were introduced mostly for description and discovery purposes and are expected to be hints on their own, so customers can utilise them in their searches. If a package author decides to use a tag to identify a release, they may end up using a GUID as a tag, and that will introduce some user-friendliness related issues on NuGet.
+- tags were introduced mostly for description and discovery purposes and are expected to be
+ hints on their own, so customers can utilise them in their searches. If a package author decides to use a tag to identify a release,
+ they may end up using a GUID as a tag, and that will introduce some user-friendliness related issues on NuGet.
 
 ## Prior Art
 
@@ -67,10 +149,21 @@ Below are two problems from Microsoft, where due to lack of this feature teams a
 ### .NET Release publishing
 
 The .NET team has a monthly release cadance for their products. As part of each release we publish hundreds of packages to NuGet.
-This is generally a very time-sensitive effort, especially when it comes to security releases. Many teams within Microsoft wait for our releases before they can move forward with publishing their patches immediately after, because with security releases we will also document the security fixes the release contains. Unfortunately, what happens sometimes, is that during publishing NuGet sometimes blocks certain packages due to some new validation rules or some other reason, which wasn't something the team could have foreseen earlier. As a result, the the releases get delayed and partner teams delay their releases awaiting a green light from the .NET team, which results in a tense / stressfull effort of patching the impacting packages on the last minute to address the faced issues.
-Besides the security releases, there are also GA releases, which have a similar risk characteristics. Many times there are confrerences schedueld the same day when a release is planned. And during such a conference the presenter expectes the release to be published (a few hours earlier) so that they can demo some new feature(s). And it happened in the past that the releases didn't succeed in time and impacted the presentations in a negative way.
+This is generally a very time-sensitive effort, especially when it comes to security releases. Many teams within Microsoft
+ wait for our releases before they can move forward with publishing their patches immediately after, because with security releases
+ we will also document the security fixes the release contains. Unfortunately, what happens sometimes, is that
+ during publishing NuGet sometimes blocks certain packages due to some new validation rules or some other reason, which
+ wasn't something the team could have foreseen earlier. As a result, the the releases get delayed and partner teams delay
+ their releases awaiting a green light from the .NET team, which results in a tense / stressfull effort of patching the impacting
+ packages on the last minute to address the faced issues.
+Besides the security releases, there are also GA releases, which have a similar risk characteristics.
+ Many times there are confrerences schedueld the same day when a release is planned. And during such a conference the presenter
+ expectes the release to be published (a few hours earlier) so that they can demo some new feature(s).
+ And it happened in the past that the releases didn't succeed in time and impacted the presentations in a negative way.
 
-Having a mechanism to stage / pre-publish packages ahead of time and then only to `notify` NuGet to make a release available would reduce such risks dramatically, as issues would have been caught earlier during package staging, which can happen days before the actual scheduled release.
+Having a mechanism to stage / pre-publish packages ahead of time and then only to `notify` NuGet to make a release available
+ would reduce such risks dramatically, as issues would have been caught earlier during package staging,
+ which can happen days before the actual scheduled release.
 
 ### .NET release deprecation
 As part of the .NET product support policy, releases go out of support after a certain period of time. When that happens, the team has some automation to "find out" what were all the packages that were released as part of the release and then utilizes a custom built solution / tool to deprecate all these packages by calling multiple NuGet APIs per each package to do so. This is also a stressful process, such, that we had to introduce some artificial delays in the code to avoid stressing the servers.
