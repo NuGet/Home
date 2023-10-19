@@ -18,8 +18,11 @@ While nuget.org provides a VDB, there are several reasons why customers may not 
 This is especially true following the 2021 blog post titled "Dependency confusion" which significantly increased knowledge of multi-source package substitution supply chain risks.
 
 While the design of NuGetAudit attempts to make it easy for upstreaming package sources to also upstream the `VulnerabilityInfo` resource, the NuGet team and customers are reliant of the feed implementor to implement the change.
+An upstreaming package source is one that either aggregates multiple package sources or caches packages from another package source.
+Upstreaming isn't a concept that exists in NuGet, so servers have to present to clients as if all data (packages, search results, vulnerability information) originates from itself.
+
 However, there are also cases where customers are not using upstreaming feeds, but instead curate approved 3rd party packages and manually upload them to an internal feed.
-What upstreaming means is a feed that is not solely a repository for packages that were pushed to the feed, but can also automatically obtain packages from other feeds.
+There are also other scenarios where customers do not use nuget.org (directly) as a package source.
 
 It's possible for customers to use [Package Source Mapping](https://learn.microsoft.com/nuget/consume-packages/package-source-mapping) to add nuget.org as a package source, but configured in a way that NuGet will never restore packages from this package source.
 However, some developers might consider this an unacceptable risk and prefer another way to get a VDB that cannot accidentally be used to get packages.
@@ -30,7 +33,8 @@ However, some developers might consider this an unacceptable risk and prefer ano
 
 <!-- Explain the proposal as if it were already implemented and you're teaching it to another person. -->
 <!-- Introduce new concepts, functional designs with real life examples, and low-fidelity mockups or  pseudocode to show how this proposal would look. -->
-*NuGet.Config* files have a new section `<auditSources>` where the URL(s) of any additional sources can be specified, which will be used only to download a VDB, and will not be used for downloading packages.
+*NuGet.Config* files have a new section `<auditSources>` where the URL(s) of any audit sources can be specified, which will be used only to download a VDB, and will not be used for downloading packages.
+Like `<packageSources>`, `<auditSources>` can contain zero, one, or more sources, and supports `<clear />`.
 When there is at least one source in `auditSources`, NuGet should no longer use `packageSources` to get a VDB.
 
 For example, consider a developer at Contoso using a company-internal source as a single package source, and using nuget.org as an audit source:
@@ -99,7 +103,7 @@ While I find the idea of a reference implementation of NuGet's server API intere
 
 ### Read vulnerability database from local files
 
-In order to enable customers working in offline environments (or just nuget.org is blocked), the most realistic option is likely to allow NuGet to read the VDB from a file on disk.
+In order to enable customers working in offline environments (or just nuget.org is blocked), the most realistic option is likely to allow NuGet to read the VDB from a file on disk (including a network share).
 In these disconnected (from nuget.org) environments, it will be up to the customer to find an approved way with their security compliance to get nuget.org's VDB onto their computer.
 In non-disconnected scenarios, we could provide a tool, such as `dotnet tool install -g NuGet.VulnerabilityTool ; NuGet.VulnerabilityTool download -o path/to/destination/`.
 
@@ -166,3 +170,9 @@ Rust's cargo audit command has [configuration for the advisory DB URL](https://d
 In order to provide customers who are disconnected from nuget.org (and possibly the internet more widely), we could load the VDB from files on disk.
 It would be up to customers to determine how to copy the VDB to their disconnected network/machine.
 We could consider a .NET tool, for example `nuget-audit-download` which knows how to communicate with nuget.org's V3 protocol, and merge results into a single file, so that it's easy for customers to obtain the file that needs to be copied.
+
+### Add support for common file formats
+
+https://osv.dev is a free vulnerability database, with per-ecosystem downloads available as a zip download.
+For NuGet, the URL is https://osv-vulnerabilities.storage.googleapis.com/NuGet/all.zip.
+It could be interesting to be able to use this URL as an audit source, especially for customers who block access to nuget.org.
