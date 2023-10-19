@@ -110,6 +110,18 @@ In non-disconnected scenarios, we could provide a tool, such as `dotnet tool ins
 However, this doesn't provide any benefit over this spec's proposed *NuGet.Config* `<auditSource>`, coupled with the future possibility's [auditSources with local files](#allow-auditsources-to-point-to-a-filesystem-directory) idea.
 It would be worse because for customers who do not have nuget.org blocked at the firewall, it would require a manual action to update the VDB, whereas an audit source would allow NuGet to automatically download and cache the VDB.
 
+### Specify audit sources via MSBuild
+
+Some customers are MSBuild enthusiasts and wish to be able to control everything via MSBuild.
+In theory, this could allow customers to avoid having a *nuget.config* file in their repo.
+However, there are multiple features in NuGet that only work via *nuget.config*, such as package source credentials, and package source mapping.
+Therefore, in order to avoid implementation delays, we'll limit the scope 
+
+Additionally, the biggest benefit to MSBuild is that different projects can use different values.
+However, it's not clear what customer benefit would result in being able to use different audit sources in different projects in the same solution or repo.
+My best guess is that the most likely scenario is customers using different settings when working in the office compared to working from home.
+However, we have not received much feedback that this is desirable for package sources, so it's unlikely that it's important for audit sources.
+
 ## Prior Art
 
 <!-- What prior art, both good and bad are related to this proposal? -->
