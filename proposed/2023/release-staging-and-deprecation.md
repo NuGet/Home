@@ -62,6 +62,14 @@ With this information in place, new set of NuGet APIs / extensions will be neede
 Note, that the user is required to be the owner / co-owner of the packages which are in the group,
 otherwise the request to make any modification to a non-owned package will fail.
 
+#### Package staging
+When a package is staged, the id of the package is reserved at that point, and no other user can introduce a package with the same name.
+
+Also, to avoid abuse, only a limited number of packages can be staged within a single group. While this can potentially be defined as a configurable value per organization / owner, there is no such requirement at the moment. Hence, this can be set to 1000 packages for now or not defined at all. Will leave this for potentially future consideration.
+
+When staged, packages will not be visible / accessible to anyone but the owner (including coowners). They will be able to see the current staged list for a given group using `nuget stage --list --group-id [group-id]` command. 
+
+
 #### Group Ownership
 There are few interesting scenarios related to package ownership:
 1. The user has staged a package to a group for later publishing, but the ownership has changed, and the user is no longer
@@ -114,6 +122,14 @@ As both publishing and deprecation commands can take some time, these will run a
 There are no critical scenarios for deprecation to happen within specific time period, however, publishing is somewhat
  critical and is being orchestrated in many cases. Hence, NuGet should provide some guarantees for how much time the operation
  can take in the worst case. As of right now, having 10 minutes deadline for the publishing request should be reasonable.
+
+This requirement brings a need for a new NuGet command for querying the status of an asynchronous operation.
+Let's assume that the group publishing and deprecation commands will return some "operation id" for later state inquriry by the client.
+`nuget status --operation-id` command can be used to track the progress of an asynchronous operation.
+This can return the fullowing results:
+- `success` : when successful, the operation should also return the time when the operation was completed.
+- `failed` : operation failed
+When failed, the result of the command shuold also produce detailed information about what went wrong.
 
 ### Technical explanation
 
