@@ -92,7 +92,7 @@ This option will allow the specification of the output format. The option will t
 
         [
             {
-                "source": "source1",
+                "source": "source Name1",
                 "packagesList": [
                     {
                         "author": "",
@@ -113,7 +113,7 @@ This option will allow the specification of the output format. The option will t
                 ]
             },
             {
-                "source": "source2",...
+                "source": "source Name2",...
             }
         ]
 
