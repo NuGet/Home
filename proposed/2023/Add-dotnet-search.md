@@ -28,6 +28,7 @@ The `package search [search terms] [options]` command will have the following op
 |---------|:----------|
 | `--source` | A source to search |
 | `--exact-match` | Return exact matches only as a search result |
+| `--format` | Format the output accordingly. |
 | `--prerelease` | Allow prerelease packages to be shown. |
 | `--interactive` | Allows the command to stop and wait for user input or action (for example to complete authentication).|
 | `--take` | The number of results to return. The default value is 20.|
@@ -43,21 +44,78 @@ This option will specify a list of sources to search from. If a source is not sp
 - This option will allow for users to be able to search and have only exact matches as an output.
 - For example if a user uses `dotnet package search Newtonsoft.Json`
 
-Source: nuget.org
-| Package ID                                  | Latest Version | Authors | Downloads       |
-|---------------------------------------------|----------------|---------|-----------------|
-| Newtonsoft.Json                             | 13.0.3         |         | 3,829,822,911   |
-| Newtonsoft.Json.Bson                        | 1.0.2          |         | 554,641,545     |
-| Newtonsoft.Json.Schema                      | 3.0.15         |         | 39,648,430      |
-| Microsoft.AspNetCore.Mvc.NewtonsoftJson     | 7.0.12         |         | 317,067,823     |
-...
+        Source: nuget.org
+        | Package ID                                  | Latest Version | Authors | Downloads       |
+        |---------------------------------------------|----------------|---------|-----------------|
+        | Newtonsoft.Json                             | 13.0.3         |         | 3,829,822,911   |
+        | Newtonsoft.Json.Bson                        | 1.0.2          |         | 554,641,545     |
+        | Newtonsoft.Json.Schema                      | 3.0.15         |         | 39,648,430      |
+        | Microsoft.AspNetCore.Mvc.NewtonsoftJson     | 7.0.12         |         | 317,067,823     |
+        ...
 
 - Using ``dotnet package search Newtonsoft.Json --exact-match`` on the other side will have the following output
 
-Source: nuget.org
-| Package ID                                  | Latest Version | Authors | Downloads       |
-|---------------------------------------------|----------------|---------|-----------------|
-| Newtonsoft.Json                             | 13.0.3         |         | 3,829,822,911   |
+        Source: nuget.org
+        | Package ID                                  | Latest Version | Authors | Downloads       |
+        |---------------------------------------------|----------------|---------|-----------------|
+        | Newtonsoft.Json                             | 13.0.3         |         | 3,829,822,911   |
+
+#### **Option `--format`**
+
+This option will allow the specification of the output format. The option will take one of these three arguments: Table, List, or Json.
+
+- `--format Table` the output will be in a tabular form as shown below
+
+        Source: nuget.org
+        | Package ID                                  | Latest Version | Authors | Downloads       |
+        |---------------------------------------------|----------------|---------|-----------------|
+        | Newtonsoft.Json                             | 13.0.3         |         | 3,829,822,911   |
+- `--format List` : each package will be listed line by line
+
+        >NuGet.CommandLine | 6.7.0 | Downloads: N/A
+        >NuGet.CommandLine.XPlat | 6.7.0 | Downloads: N/A
+        >NuGet.Commands | 6.7.0 | Downloads: N/A
+        >NuGet.exe | 3.4.3 | Downloads: N/A
+
+- `--format Json` : A json output will be outputted. It will contain the following metdata.
+  - Source
+  - Author
+  - Package ID
+  - LatestVersion
+  - Downloads
+  - Description
+  - Vulnerabilities
+  - Deprecation
+  - Project URL
+
+  The output will take the following format
+
+        [
+            {
+                "source": "source1",
+                "packagesList": [
+                    {
+                        "author": "",
+                        "deprecation": "",
+                        "description": "",
+                        "downloads": "",
+                        "latestVersion": "",
+                        "packageId": "",
+                        "projectUrl": "",
+                        "source": "",
+                        "vulnerabilities": [
+                            {
+                                "advisoryUrl": "",
+                                "severity": ""
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "source": "source2",...
+            }
+        ]
 
 ### Technical explanation
 
