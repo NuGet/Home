@@ -15,7 +15,8 @@ This proposal adds a new `<auditSource>` to *NuGet.Config* files, allowing *NuGe
 [NuGetAudit](https://learn.microsoft.com/nuget/concepts/auditing-packages) is a feature where NuGet will report during restore which packages with known vulnerabilities are being used by projects, [proposed in late 2022](../2022/vulnerabilities-in-restore.md), and finally released with .NET 8 in 2023.
 The first version of NuGetAudit used package sources as the data source for known vulnerabilities, which will be referred to as a Vulnerability Database (VDB) for the remainder of this document.
 While nuget.org provides a VDB, there are several reasons why customers may not be using nuget.org as a package source.
-This is especially true following the 2021 blog post titled "Dependency confusion" which significantly increased knowledge of multi-source package substitution supply chain risks.
+This is especially true following the 2021 [blog post titled "Dependency confusion"](https://medium.com/@alex.birsan/dependency-confusion-4a5d60fec610) which significantly increased knowledge of multi-source package substitution supply chain risks.
+Someone at Microsoft published [a whitepaper titled "3 ways to mitigate risk when using private package feeds"](https://azure.microsoft.com/mediahandler/files/resourcefiles/3-ways-to-mitigate-risk-using-private-package-feeds/3%20Ways%20to%20Mitigate%20Risk%20When%20Using%20Private%20Package%20Feeds%20-%20v1.0.pdf), so from customers points of view, it appears that Microsoft's official advice is to not use nuget.org directly, but instead use a single package source that uses nuget.org as an upstream source.
 
 While the design of NuGetAudit attempts to make it easy for upstreaming package sources to also upstream the `VulnerabilityInfo` resource, the NuGet team and customers are reliant of the feed implementor to implement the change.
 An upstreaming package source is one that either aggregates multiple package sources or caches packages from another package source.
@@ -33,6 +34,9 @@ However, some developers might consider this an unacceptable risk and prefer ano
 
 <!-- Explain the proposal as if it were already implemented and you're teaching it to another person. -->
 <!-- Introduce new concepts, functional designs with real life examples, and low-fidelity mockups or  pseudocode to show how this proposal would look. -->
+
+#### auditSources in nuget.config
+
 *NuGet.Config* files have a new section `<auditSources>` where the URL(s) of any audit sources can be specified, which will be used only to download a VDB, and will not be used for downloading packages.
 Like `<packageSources>`, `<auditSources>` can contain zero, one, or more sources, and supports `<clear />`.
 When there is at least one source in `auditSources`, NuGet should no longer use `packageSources` to get a VDB.
@@ -54,6 +58,32 @@ For example, consider a developer at Contoso using a company-internal source as 
 
 Any URL specified in the `auditSources` section must implement the [NuGet Server API V3 protocol](https://learn.microsoft.com/nuget/api/overview).
 However, the server will only need to implement the [`VulnerabilityInfo` resource](https://learn.microsoft.com/en-us/nuget/api/vulnerability-info) (and service index), and can avoid implementing all the other resources that are required to be used as a package source.
+
+NuGet will use same semantics for `auditSources` as it already has with `packageSources`.
+This means that `auditSources` are accumulated from other nuget.config files, and `<clear />` can be used to remove them.
+`auditSources` will also follow `packageSources` with regards to insecure http warnings, errors, and `allowInsecureConnections` configurations.
+Sources that need credentials will use `packageSourceCredentials`, using the `key` as the lookup, just as `packageSources` does.
+This means that credentials can be re-used by using the same key for a source that is defined in both `packageSources` and `auditSources`.
+
+#### Restore summary
+
+When restore is run at normal or detailed verbosity, NuGet outputs detected nuget.config files and package sources (feeds) used.
+Audit sources should be added.
+
+```diff
+ NuGet Config files used:
+     C:\Users\zivkan\AppData\Roaming\NuGet\NuGet.Config
+
+ Feeds used:
+     https://api.nuget.org/v3/index.json
++
++Audit sources used:
++    https://api.nuget.org/v3/index.json
+```
+
+When `auditSources` do not have any configured sources, replay all of the package sources again under the audit sources used section, to make it explicit to customers that these sources are being used.
+
+If `NuGetAudit` is disabled for all projects in the solution, the audit sources used section of the summary should be omitted.
 
 ### Technical explanation
 
@@ -85,6 +115,18 @@ An example is developers working in highly regulated industries where packages n
 The reasons customers may do this do not preclude them from using nuget.org as an audit source, so allowing these customers an easy way to use *NuGetAudit* benefits them.
 
 Therefore, in order to provide customers with the ability to use NuGetAudit most easily, it's more effective to implement a new feature that does not depend on other teams to implement features.
+
+### Provide a sample "static feed" with no packages, and use nuget.org's VulnerabilityInfo resource
+
+We could provide a sample of a few json files to put on a static web server that would appear to be a NuGet feed that doesn't have any packages, and its `VulnerabilityInfo` resource would use nuget.org's URL.
+
+The [Sleet](https://github.com/emgarten/Sleet) static feed generator already demonstrates that static feeds are technically feasible.
+The only issue is that search doesn't behave nicely, although for an audit source, there wouldn't be any packages, so an empty search result would be correct.
+
+This would give customers confidence that this "package source" really does not provide packages.
+However, the difficulty for development teams getting approval to host a server, and the compliance required in doing so, will still be infeasible in many companies.
+
+While the cost of doing this would be very low, once `auditSources` is implemented, there will be no benefit in providing the documentation/samples.
 
 ### NuGet Team supplied upsourcing server
 
@@ -134,44 +176,24 @@ Pypi's `pip` has [an audit command](https://pypi.org/project/pip-audit/), and `-
 
 Rust's cargo audit command has [configuration for the advisory DB URL](https://docs.rs/cargo-audit/latest/cargo_audit/config/struct.DatabaseConfig.html)
 
+Note that for these other package ecosystems, they do not appear to need any explicit configuration file in order to specify default sources (either package source, or audit source).
+Instead, defaults appear hard-coded into the app, and it requires explicit configuration to remove.
+
+Contrast this to NuGet's design where NuGet creates a default configuration file at first use, and then requires sources to be explicitly defined.
+However, NuGet settings that fall under the `<config>` section of the *nuget.config* file do have hard-coded defaults that do not need to be explicitly defined in any config file.
+
+Both choices have advantages and disadvantages.
+Needing explicit config files, as NuGet's package sources do, means it might be easier for customers to discover why a source is being used.
+Also, customers are less likely to have unexpected changes if the app changes defaults.
+On the other hand, when customers are happy to change with changing defaults, having an explicit config file makes it much more difficult for customers to learn about changed defaults, and from the package manager team's point of view, much more difficult to have customers adopt new defaults.
+
 ## Unresolved Questions
 
 <!-- What parts of the proposal do you expect to resolve before this gets accepted? -->
 <!-- What parts of the proposal need to be resolved before the proposal is stabilized? -->
 <!-- What related issues would you consider out of scope for this proposal but can be addressed in the future? -->
 
-1. default value?
-
-   Should we add nuget.org as a default value, so that customers who remove nuget.org as a package source are more easily able to use NuGetAudit?
-   Would using nuget.org as a default audit source cause undue concern from customers who don't want to use nuget.org as a package source, and the new tooling version starts making network requests to nuget.org?
-
-   If we want to make nuget.org a default/automatic audit source, how?
-   NuGet has tried before to use a tracking file to automatically add nuget's v3 URL as a package source to user-profile nuget.config files that don't have any package sources.
-   However, this caused a security issue when customers wanted to remove nuget.org as a default package source, and this code incorrectly re-added it once (the customer could successfully remove nuget.org a second time).
-   When we removed this auto-update to mitigate the security concern, it exposed a bug where multiple other apps created user-profile nuget.config files without any package sources, and many customers assumed it was a bug with NuGet.
-
-   Should we hard-code nuget.org's default URL in NuGet.Configuration, and require customers to use `<clear/>` if they don't want any audit source?
-
-   Should we just add it as a default in new user-profile nuget.config files, and just accept that existing developers won't get it by default?
-
-2. Stop using package source as audit source?
-
-   On one hand, using package sources as a defacto audit source makes it easier for customers to use the feature when they knowingly or unknowingly use a package source with a VDB.
-   On the other hand, overloading `<packageSources>` with multiple meanings is confusing and customers probably won't understand why sometimes they get vulnerable package information and sometimes they don't.
-   If we add nuget.org as a default audit source, and don't use packageSources when auditSources has a value, then using packageSources to get a VDB when auditSources is empty will be particularly confusing/unintuitive to customers.
-
-   Another challenge is that if we want to change the behavior it' will be a breaking change, which is typically discouraged.
-   However, given that nuget.org is the only know source with a VDB, if we make nuget.org a default audit source, then it will effectively be a non-breaking change.
-
-3. Tooling
-
-   How important is it to add CLI commands to manage audit sources?
-   How important is it to add a GUI in Visual Studio to manage audit sources?
-
-4. Restore summary
-
-   When you restore at normal verbosity, NuGet outputs a list of package sources that were used for restore. Should we add audit sources as well?
-   If so, presumably we should only output it if at least 1 project in the restore has NuGetAudit enabled, as outputting audit sources when NuGetAudit is disabled for all projects might confuse customers.
+All resolved during the spec review process.
 
 ## Future Possibilities
 
@@ -188,3 +210,8 @@ We could consider a .NET tool, for example `nuget-audit-download` which knows ho
 https://osv.dev is a free vulnerability database, with per-ecosystem downloads available as a zip download.
 For NuGet, the URL is https://osv-vulnerabilities.storage.googleapis.com/NuGet/all.zip.
 It could be interesting to be able to use this URL as an audit source, especially for customers who block access to nuget.org.
+
+### Tooling support
+
+Visual Studio has a GUI to manage package sources, and the `dotnet` CLI has commands such as `dotnet nuget add source`.
+The first version of `auditSources` will not include equivalent experiences in order to avoid slowing down the implementation of the first version.
