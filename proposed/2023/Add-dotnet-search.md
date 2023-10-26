@@ -28,7 +28,7 @@ The `package search [search terms] [options]` command will have the following op
 |---------|:----------|
 | `--source` | A source to search |
 | `--exact-match` | Return exact matches only as a search result |
-| `--format` | Format the output accordingly. |
+| `--format` | Format the output accordingly. Either Table, List, or Json. The default value is Table.|
 | `--prerelease` | Allow prerelease packages to be shown. |
 | `--interactive` | Allows the command to stop and wait for user input or action (for example to complete authentication).|
 | `--take` | The number of results to return. The default value is 20.|
