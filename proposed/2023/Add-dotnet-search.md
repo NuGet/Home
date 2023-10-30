@@ -24,16 +24,17 @@ Imagine you have your dotnet CLI open. You would like to look up a NuGet package
 
 The `package search [search terms] [options]` command will have the following options
 
-| Option | Function |
-|---------|:----------|
-| `--source` | A source to search |
-| `--exact-match` | Return exact matches only as a search result |
-| `--format` | Format the output accordingly. Either Table, List, or Json. The default value is Table.|
-| `--prerelease` | Allow prerelease packages to be shown. |
-| `--interactive` | Allows the command to stop and wait for user input or action (for example to complete authentication).|
-| `--take` | The number of results to return. The default value is 20.|
-| `--skip` | The number of results to skip, for pagination. The default value is 0. |
-| `--help` | Show command help and usage information |
+| Option           | Function |
+|------------------|--------------|
+| `--exact-match`  | Return exact matches only as a search result. |
+| `--format`       | Format the output accordingly. Either Table, List, or Json. The default value is Table. |
+| `--help`         | Show command help and usage information. |
+| `--interactive`  | Allows the command to stop and wait for user input or action (for example to complete authentication).|
+| `--prerelease`   | Allow prerelease packages to be shown. |
+| `--skip`         | The number of results to skip, for pagination. The default value is 0. |
+| `--source`       | A source to search. |
+| `--take`         | The number of results to return. The default value is 20.|
+| `--verbosity`    | Display this amount of details in the output: normal, quiet, detailed. The default is normal. |
 
 #### **Option `--source`**
 
@@ -62,7 +63,7 @@ This option will specify a list of sources to search from. If a source is not sp
 
 #### **Option `--format`**
 
-This option will allow the specification of the output format. The option will take one of these three arguments: Table, List, or Json.
+This option will allow the specification of the output format. The option will take one of these three arguments: Table, List, or Json. The outputs will depend on verbosity. The following examples are for normal verbosity.
 
 - `--format Table` the output will be in a tabular form as shown below
 
@@ -72,21 +73,15 @@ This option will allow the specification of the output format. The option will t
         | Newtonsoft.Json                             | 13.0.3         |         | 3,829,822,911   |
 - `--format List` : each package will be listed line by line
 
-        >NuGet.CommandLine | 6.7.0 | Downloads: N/A
-        >NuGet.CommandLine.XPlat | 6.7.0 | Downloads: N/A
-        >NuGet.Commands | 6.7.0 | Downloads: N/A
-        >NuGet.exe | 3.4.3 | Downloads: N/A
+        >Newtonsoft.Json | 13.0.3 | Authors: N/A | Downloads: 3,829,822,911
+        >Microsoft.IdentityModel.JsonWebTokens | 7.0.3 Authors: N/A | Downloads: N/A
 
-- `--format Json` : A json output will be outputted. It will contain the following metdata.
+- `--format Json` : A json output will be outputted. It will contain the following metadata.
   - Source
-  - Author
   - Package ID
   - LatestVersion
+  - Authors
   - Downloads
-  - Description
-  - Vulnerabilities
-  - Deprecation
-  - Project URL
 
   The output will take the following format
 
@@ -96,19 +91,9 @@ This option will allow the specification of the output format. The option will t
                 "packagesList": [
                     {
                         "author": "",
-                        "deprecation": "",
-                        "description": "",
                         "downloads": "",
                         "latestVersion": "",
-                        "packageId": "",
-                        "projectUrl": "",
-                        "source": "",
-                        "vulnerabilities": [
-                            {
-                                "advisoryUrl": "",
-                                "severity": ""
-                            }
-                        ]
+                        "packageId": ""
                     }
                 ]
             },
@@ -116,6 +101,32 @@ This option will allow the specification of the output format. The option will t
                 "source": "source Name2",...
             }
         ]
+
+#### Option `--verbosity`
+
+  controls the amount of information included in the output of a command. This allows you to tailor the output to your needs, providing either a concise summary or a detailed breakdown of the information returned by the command. 
+
+Here are the details of each verbosity level:
+
+- **`--verbosity quiet`** : The output will contain minimal information. For each package, it will display only the following metadata:
+  - Package ID
+  - Latest Version
+  
+- **`--verbosity normal`** : The output will provide a moderate amount of information. For each package, it will display the following metadata:
+  - Package ID
+  - Latest Version
+  - Authors
+  - Downloads
+  
+- **`--verbosity detailed`** : The output will be highly detailed. For each package, it will display the following metadata:
+  - Package ID
+  - Latest Version
+  - Authors
+  - Downloads
+  - Description
+  - Deprecation
+  - Project URL
+  - Vulnerable
 
 ### Technical explanation
 
@@ -150,4 +161,3 @@ In nuget.exe there is `nuget.exe search` command which does the same thing. Howe
 ## Future Possibilities
 
 <!-- What future possibilities can you think of that this proposal would help with? -->
-- In the next iteration, a formatting option will be added for the output.
