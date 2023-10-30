@@ -16,7 +16,6 @@ This proposal adds a new `<auditSource>` to *NuGet.Config* files, allowing *NuGe
 The first version of NuGetAudit used package sources as the data source for known vulnerabilities, which will be referred to as a Vulnerability Database (VDB) for the remainder of this document.
 While nuget.org provides a VDB, there are several reasons why customers may not be using nuget.org as a package source.
 This is especially true following the 2021 [blog post titled "Dependency confusion"](https://medium.com/@alex.birsan/dependency-confusion-4a5d60fec610) which significantly increased knowledge of multi-source package substitution supply chain risks.
-Someone at Microsoft published [a whitepaper titled "3 ways to mitigate risk when using private package feeds"](https://azure.microsoft.com/mediahandler/files/resourcefiles/3-ways-to-mitigate-risk-using-private-package-feeds/3%20Ways%20to%20Mitigate%20Risk%20When%20Using%20Private%20Package%20Feeds%20-%20v1.0.pdf), so from customers points of view, it appears that Microsoft's official advice is to not use nuget.org directly, but instead use a single package source that uses nuget.org as an upstream source.
 
 While the design of NuGetAudit attempts to make it easy for upstreaming package sources to also upstream the `VulnerabilityInfo` resource, the NuGet team and customers are reliant of the feed implementor to implement the change.
 An upstreaming package source is one that either aggregates multiple package sources or caches packages from another package source.
@@ -38,18 +37,21 @@ However, some developers might consider this an unacceptable risk and prefer ano
 #### auditSources in nuget.config
 
 *NuGet.Config* files have a new section `<auditSources>` where the URL(s) of any audit sources can be specified, which will be used only to download a VDB, and will not be used for downloading packages.
-Like `<packageSources>`, `<auditSources>` can contain zero, one, or more sources, and supports `<clear />`.
+Like `<packageSources>`, `<auditSources>` can contain zero, one, or more sources, and supports `<clear />` to remove any `auditSources` inherited from parent *nuget.config* files.
 When there is at least one source in `auditSources`, NuGet should no longer use `packageSources` to get a VDB.
+Omitting `<clear />` will not use `packageSources` in addition to `auditSources`.
 
 For example, consider a developer at Contoso using a company-internal source as a single package source, and using nuget.org as an audit source:
 
 ```xml
 <configuration>
   <packageSources>
+    <!-- Clear to ensure package sources not inherited from other config files -->
     <clear />
     <add key="contoso" value="https://internal.corp.contoso.com/packages/nuget/index.json" >
   </packageSources>
   <auditSources>
+    <!-- Clear to ensure audit sources not inherited from other config files -->
     <clear />
     <add key="nuget.org" value="https://api.nuget.org/v3/index.json" >
   </auditSources>
@@ -75,13 +77,15 @@ Audit sources should be added.
      C:\Users\zivkan\AppData\Roaming\NuGet\NuGet.Config
 
  Feeds used:
-     https://api.nuget.org/v3/index.json
+     https://internal.corp.contoso.com/packages/nuget/index.json
 +
 +Audit sources used:
 +    https://api.nuget.org/v3/index.json
 ```
 
-When `auditSources` do not have any configured sources, replay all of the package sources again under the audit sources used section, to make it explicit to customers that these sources are being used.
+The "Audit sources used" section should ideally list sources where a VDB was successfully obtained.
+This depends on the feasibility of implementation.
+For example, if two package sources are defined, and no audit sources are defined by the *nuget.config* file, but only one of the two sources has a VDB, then the restore summary will only list the one source with a VDB under "Audit sources used".
 
 If `NuGetAudit` is disabled for all projects in the solution, the audit sources used section of the summary should be omitted.
 
