@@ -28,14 +28,14 @@ The `package search [search terms] [options]` command will have the following op
 |------------------|--------------|
 | `--configFile`   | The path to the NuGet config file to use. |
 | `--exact-match`  | Return exact matches only as a search result. |
-| `--format`       | Format the output accordingly. Either Table, List, or Json. The default value is Table. |
+| `--format`       | Format the output accordingly. Either `table`, or `json`. The default value is `table`. |
 | `--help`         | Show command help and usage information. |
 | `--interactive`  | Allows the command to stop and wait for user input or action (for example to complete authentication).|
 | `--prerelease`   | Allow prerelease packages to be shown. |
 | `--skip`         | The number of results to skip, for pagination. The default value is 0. |
 | `--source`       | A source to search. |
 | `--take`         | The number of results to return. The default value is 20.|
-| `--verbosity`    | Display this amount of details in the output: normal, quiet, detailed. The default is normal. |
+| `--verbosity`    | Display this amount of details in the output: `normal`, `minimal`, `detailed`. The default is `normal`. |
 
 #### **Option `--source`**
 
@@ -65,20 +65,16 @@ This option will specify a list of sources to search from. If a source is not sp
 
 #### **Option `--format`**
 
-This option will allow the specification of the output format. The option will take one of these three arguments: Table, List, or Json. The outputs will depend on verbosity. The following examples are for normal verbosity.
+This option will allow the specification of the output format. The option will take one of these three arguments: `table`, or `json`. The outputs will depend on verbosity. The following examples are for normal verbosity.
 
-- `--format Table` the output will be in a tabular form as shown below
+- `--format table` the output will be in a tabular form as shown below
 
         Source: nuget.org
         | Package ID                                  | Latest Version | Authors | Downloads       |
         |---------------------------------------------|----------------|---------|-----------------|
         | Newtonsoft.Json                             | 13.0.3         |         | 3,829,822,911   |
-- `--format List` : each package will be listed line by line
 
-        >Newtonsoft.Json | 13.0.3 | Authors: N/A | Downloads: 3,829,822,911
-        >Microsoft.IdentityModel.JsonWebTokens | 7.0.3 Authors: N/A | Downloads: N/A
-
-- `--format Json` : A json output will be outputted. It will contain the following metadata.
+- `--format json` : A json output will be outputted. It will contain the following metadata.
   - Source
   - Package ID
   - LatestVersion
@@ -106,11 +102,11 @@ This option will allow the specification of the output format. The option will t
 
 #### Option `--verbosity`
 
-  controls the amount of information included in the output of a command. This allows you to tailor the output to your needs, providing either a concise summary or a detailed breakdown of the information returned by the command. 
+  controls the amount of information included in the output of a command. This allows you to tailor the output to your needs, providing either a concise summary or a detailed breakdown of the information returned by the command.
 
 Here are the details of each verbosity level:
 
-- **`--verbosity quiet`** : The output will contain minimal information. For each package, it will display only the following metadata:
+- **`--verbosity minimal`** : The output will contain minimal information. For each package, it will display only the following metadata:
   - Package ID
   - Latest Version
   
