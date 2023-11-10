@@ -36,7 +36,7 @@ Hence, package owners try to deprecate packages which are out of support. Withou
 <!-- Introduce new concepts, functional designs with real life examples, and low-fidelity mockups or  pseudocode to show how this proposal would look. -->
 A new NuGet CLI command `stage` will be added, which will allow a user to stage a package to nuget, specifying a `group` parameter.
  Staged packages will be uploaded to NuGet and will be validated during the staging process, so that the staging fails
- if validation fails for a package in a group. After uploading multiple packages, the user user can then call `nuget publish [group]`
+ if validation fails for a package in a group. After uploading multiple packages, the user user can then call `nuget push --group [group]`
  command to request all the packages from the earlier group to become availble on the server as `published`.
 Note, that the `group` information will only be stored on the server and has nothing to do with how a package was built.
 
