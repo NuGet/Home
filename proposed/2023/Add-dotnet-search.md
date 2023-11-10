@@ -124,7 +124,7 @@ Here are the details of each verbosity level:
   - Description
   - Deprecation
   - Project URL
-  - Vulnerable
+  - Vulnerabilities
 
 ### Technical explanation
 
