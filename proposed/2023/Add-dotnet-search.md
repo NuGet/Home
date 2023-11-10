@@ -44,7 +44,7 @@ This option will specify a list of sources to search from. If a source is not sp
 #### **Option `-exact-match`**
 
 - This option will allow for users to be able to search and have only exact matches as an output.
-- The outputted list will contain all versions of the matching package ID
+- The results will contain all versions of the matching package ID
 - For example if a user uses `dotnet package search Newtonsoft.Json`
 
         Source: nuget.org
