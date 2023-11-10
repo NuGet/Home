@@ -48,7 +48,7 @@ This option will specify a list of sources to search from. If a source is not sp
 - For example if a user uses `dotnet package search Newtonsoft.Json`
 
         Source: nuget.org
-        | Package ID                                  | Latest Version | Authors | Downloads       |
+        | Package ID                                  | Latest Version | Authors | Total Downloads |
         |---------------------------------------------|----------------|---------|-----------------|
         | Newtonsoft.Json                             | 13.0.3         |         | 3,829,822,911   |
         | Newtonsoft.Json.Bson                        | 1.0.2          |         | 554,641,545     |
@@ -59,18 +59,18 @@ This option will specify a list of sources to search from. If a source is not sp
 - Using ``dotnet package search Newtonsoft.Json --exact-match`` on the other side will have the following output
 
         Source: nuget.org
-        | Package ID                                  | Latest Version | Authors | Downloads       |
+        | Package ID                                  | Latest Version | Authors | Total Downloads |
         |---------------------------------------------|----------------|---------|-----------------|
         | Newtonsoft.Json                             | 13.0.3         |         | 3,829,822,911   |
 
 #### **Option `--format`**
 
-This option will allow the specification of the output format. The option will take one of these three arguments: `table`, or `json`. The outputs will depend on verbosity. The following examples are for normal verbosity.
+This option will allow the specification of the output format. The option will take one of these two arguments: `table`, or `json`. The outputs will depend on verbosity. The following examples are for normal verbosity.
 
 - `--format table` the output will be in a tabular form as shown below
 
         Source: nuget.org
-        | Package ID                                  | Latest Version | Authors | Downloads       |
+        | Package ID                                  | Latest Version | Authors | Total Downloads |
         |---------------------------------------------|----------------|---------|-----------------|
         | Newtonsoft.Json                             | 13.0.3         |         | 3,829,822,911   |
 
@@ -79,17 +79,17 @@ This option will allow the specification of the output format. The option will t
   - Package ID
   - LatestVersion
   - Authors
-  - Downloads
+  - TotalDownloads
 
   The output will take the following format
 
         [
             {
                 "source": "source Name1",
-                "packagesList": [
+                "packages": [
                     {
-                        "author": "",
-                        "downloads": "",
+                        "authors": "",
+                        "totalDownloads": "",
                         "latestVersion": "",
                         "packageId": ""
                     }
@@ -114,13 +114,13 @@ Here are the details of each verbosity level:
   - Package ID
   - Latest Version
   - Authors
-  - Downloads
+  - Total Downloads
   
 - **`--verbosity detailed`** : The output will be highly detailed. For each package, it will display the following metadata:
   - Package ID
   - Latest Version
   - Authors
-  - Downloads
+  - Total Downloads
   - Description
   - Deprecation
   - Project URL
