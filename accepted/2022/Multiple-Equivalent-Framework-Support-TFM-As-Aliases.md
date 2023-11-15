@@ -7,7 +7,7 @@
 
 .NET SDK projects are capable of multi targeting based on a target framework where you can have different dependencies for each framework.
 In some cases, it is convenient to multi target based on different pivots such as target application version or maybe the specific runtime, as packages can contain runtime assets.
-This proposals covers the steps that need to be taken to enable that capability.
+This proposal covers the steps that need to be taken to enable that capability.
 
 ## Motivation
 
@@ -18,9 +18,14 @@ It would also allow scenarios such as different builds for VSIXes targeting diff
 
 ### Functional explanation
 
-#### TargetFramework values are aliases today
+#### TargetFramework values are already aliases
 
-NuGet currently treats `TargetFramework` as aliases. For example, the following is a valid project.
+NuGet, and the .NET SDK more generally, uses `TargetFrameworkMoniker` and `TargetPlatformMoniker` for project and package compatibility.
+Each of the two `*Moniker` properties are composed of `*Identifier` and `*Version` properties, which NuGet doesn't use, but might be used by other components, so should also be set correctly.
+If these properties do not have values, the .NET SDK will infer the values by parsing the `TargetFramework` property, which is what we typically see defined in project files.
+However, if the `TargetFrameworkMoniker` property is defined explicitly (`TargetPlatformMoniker` is allowed be be undefined), NuGet (and several other components, like the .NET SDK and Visual Studio's dotnet/project-system) will already treat these values as aliases.
+
+For example, the following is a valid project that works before this spec is implemented.
 
 ```xml
 <Project Sdk="Microsoft.NET.Sdk">
@@ -63,13 +68,15 @@ MSBuild version 17.3.0+92e077650 for .NET
   Aliases -> C:\Code\Temp\Aliases\bin\Debug\banana\publish\
 ```
 
-The missing part is allowing the same framework to be targeting among these aliases.
+However, what doesn't currently work is when multiple TargetFramework values resolve to the same `*Moniker` property value.
 
-The following hypothetical scenarios would be enabled.
-Note that these examples are not being proposed as syntax that will be implemented.
-Rather, they're intended to demonstrate a scenario that is not possible today.
+#### The proposal
 
-Firstly, a single project that creates multiple packages for different platforms, but the same TFM:
+The changes proposed in this document will enable the following hypothetical scenarios.
+Note that projects and SDKs are responsible for setting the `TargetFramework*` and `TargetPlatform*` properties, which NuGet uses as the canonical framework to use for compatibility checks.
+Therefore, the exact `TargetFrameworks` value is not important to NuGet, as it is either the SDK author, or the project owner, to set any value that is reasonable to them.
+
+Firstly, a single project that creates multiple platform specific assemblies, all targeting the same .NET version.
 
 ```xml
 <Project Sdk="Microsoft.NET.Sdk">
@@ -84,14 +91,14 @@ Firstly, a single project that creates multiple packages for different platforms
     <TargetFrameworkMoniker>.NETCoreApp,Version=v6.0</TargetFrameworkMoniker>
 
     <DefineConstants>$(DefineConstants);$(TargetFramework)</>
-    <PackageId>$(AssemblyName).$(TargetFramework)</PackageId>
+    <AssemblyName>$(MSBuildThisFileName).$(TargetFramework)</AssemblyName>
   </PropertyGroup>
 
 </Project>
 ```
 
 Secondly, a Visual Studio Extension project targeting multiple versions of VS could look similar to the following.
-In this example, the Visual Studio Extensibility SDK would be responsible for setting `TargetFrameworkIdentifier`, `TargetFrameworkVersion` and `TargetFrameworkMoniker`.
+In this example, the Visual Studio Extensibility SDK would be responsible for setting `TargetFrameworkIdentifier`, `TargetFrameworkVersion` and `TargetFrameworkMoniker` properties.
 
 ```xml
 <Project Sdk="Microsoft.VisualStudio.Extensibility.Sdk">
@@ -103,85 +110,163 @@ In this example, the Visual Studio Extensibility SDK would be responsible for se
 </Project>
 ```
 
-### Technical explanation
+#### Compatibility
 
-Implementing this feature will require several large and in some cases, breaking changes.
-The breaking changes are not necessarily in the completely new NuGet and .NET SDK version, but for some scenarios where different versions of the tooling are combined.
+Customers that both restore and build their projects with the `dotnet` CLI or MSBuild should not encounter any issues.
 
-Fortunately, attempting any of the to be enabled scenarios with current versions of the tooling will lead to an obvious issue.
+However, many customers have old pipelines that use NuGet.exe to restore, or create new pipelines that continue to use NuGet.exe because we've been unable to spread knowledge to use more modern tooling.
+Typically customers do not update the version of NuGet.exe used as frequently as using newer versions of the .NET SDK or MSBuild.
+When newer versions of NuGet don't change the restore output (files written to the `obj/` directory), then using older versions of NuGet will not cause pipeline failures.
+However, the changed proposed by this document require changes to the assets file, and as a result using an older NuGet.exe with a newer .NET SDK or MSBuild will cause build failures similar to the following.
 
 ```console
 C:\Program Files\Microsoft Visual Studio\2022\Preview\Common7\IDE\CommonExtensions\Microsoft\NuGet\NuGet.targets(132,5)
-: error : Invalid restore input. Duplicate frameworks found: 'net472, net472'. Input files: C:\Code\Temp\Aliases\Aliase
-s.csproj. [C:\Code\Temp\Aliases\Aliases.csproj]
+: error : Invalid restore input. Duplicate frameworks found: 'net472, net472'. Input files: C:\Code\Temp\Aliases\Aliases.csproj. [C:\Code\Temp\Aliases\Aliases.csproj]
 ```
 
-While this scenario does have a number of interesting uses, there are many commands that would be affected by NuGet supporting this.
+Unfortunately this error does not contain a NU code, which would make it easier for customers to find a documentation page explaining the issue and probable fixes.
+Instead, customers who are not aware of this tooling version issue will likely need to search the error message and we have to hope that search engines will direct them to a page that informs them to upgrade to a newer version of NuGet.exe, or ideally switch to `MSBuild -t:restore` or `dotnet restore`.
 
-| Scenario | Affected Commands | Cost | Notes |
-|----------|-------------------|------|-------|
-| Build Challenges | restore (NuGet side), and build (SDK side) | 2L | This requires changes in both NuGet & SDK |
-| Restore challenges | restore | 2L | |
-| Pack challenges | restore | L | The answer here is likely that first class support won't be available, but having an experience that's intuitive should be the priority.|
-| dotnet.exe challenges | Non-NuGet dotnet.exe commands |  ? | Seems like most of the commands at hand do treat `TargetFramework` as a simple string, but this would need to confirmed. |
-| dotnet list package | dotnet list package | L | The work here would likely follow the work from the the restore side |
-| Visual Studio challenges | Multi targeting, displaying (transitive) dependencies | L(+) | |
+This problem is not technically unique to this design change, but since assets file changes are uncommon, this feature is significantly more likely to expose this issue than other features.
 
-### Assets file changes
+### Technical explanation
 
-In PackageReference, NuGet has a contract with the .NET SDK, where NuGet writes the assets file and the .NET SDK consumes it.
-Therefore, the assets file schema that NuGet writes must match what's expected by the .NET SDK.
-In most scenarios, people use `dotnet restore` and `dotnet build --no-restore` and there are no issues.
-It is not uncommon that people use `nuget.exe restore` due to the fact that they have non-SDK projects in their solution and they have not modernized their CI build to use MSBuild restore.
-Given that NuGet.exe and .NET SDK do not ship together, it is very common that the assets file was generated by a different version of NuGet.exe than what the .NET SDK can contains.
-Normally, this works.
-However, when NuGet makes a breaking change to the assets file, a significant number of customers will experience issues.
-We should design the feature to avoid incorrect results, and also make error messages as easy as possible to understand and resolve.
+There are many changes required to implement this feature.
 
-#### Assets file version
+1. [Restore output (assets file) changes](#restore-output-assets-file-changes)
+1. [Components iterating target frameworks](#components-iterating-target-frameworks)
+1. [Lock file changes](#lock-file-changes)
+1. [ProjectReference changes](#project-to-project-references)
+1. [Pack changes](#pack-changes)
+1. [Visual Studio Challenges](#visual-studio-challenges)
 
-A breaking change in the assets file will be very difficult to implement unless we allow a period where NuGet supports multiple versions of the assets file in the same release.
-Additionally, the [.NET SDK assets file reader](https://github.com/dotnet/sdk/blob/main/src/Tasks/Microsoft.NET.Build.Tasks/ResolvePackageAssets.cs) and [non-SDK style projects assets file reader](https://github.com/dotnet/NuGet.BuildTasks) have different implementations, across different repos.
-Therefore, unless Nuget supports multiple multiple asset file versions in a single binary, it would be necessary to insert the change simultaneously across NuGet, the .NET SDK, NuGet.BuildTools, VS, and possibly MSBuild.
-This is so infeasible it's effectively impossible.
+The changes listed are largely what NuGet needs to implement in code we own, but there will be impacts to other components as well.
+In particular the .NET SDK will need some (hopefully small) changes to be able to use the assets file correctly.
+However, it's likely that other tools, like various Visual Studio components, might have assumptions about TFM uniqueness in the project, which this feature changes.
+Therefore, while the NuGet team works very closely with the .NET SDK team and we will ensure that building projects work, there will increased risk of other features and tools breaking, which would normally not be affected by NuGet changes.
 
-Therefore, the proposal is that the .NET SDK will define an MSBuild property `ProjectAssetsFileVersion`, with allowed values `3` or `4`.
-When the property is not defined, it will assume `3`, in order to maintain backwards compatibility with the existing build tools.
-The .NET SDK already defines property `PropertyAssetsFile`, which is the location it reads the assets file from, hence the proposal of `ProjectAssetsFileVersion`.
-It may be that the non-SDK style project assets file reader (NuGet.BuildTools) may never migrate to v4 assets file, so supporting both assets file schemas could be a permanent cost, rather than a temporary situation.
+### Restore output (assets file) changes
 
-Reading the assets file will need a new data structure, and therefore will need new APIs to read.
-The goal is to enable the new data structure to be compatible with both v3 and v4 assets files, so that consumers of the assets file don't need multiple code paths to handle both assets file versions.
-This is not only relevant for the .NET SDK, but NuGet's own Visual Studio integration.
+In PackageReference, NuGet has a contract with the .NET SDK where NuGet writes the assets file and the .NET SDK consumes it.
 
-The assets file already contains a `version` property, always written out as the first property on the root object.
-This enables our assets file reader to use polymorphic deserialization to handle.
-Although if this turns out to be difficult to implement, we can provide separate V3 and V4 read methods (but both using the new data structures), and callers will need to check the `ProjectAssetsFileVersion` MSBuild property to determine which one to use.
-However, I'm reasonably confident that polymorphic deserialization should be feasible to implement.
+This feature will require the following changes to the asset file:
 
-#### Inner build pivot
+1. [Increment Version Number](#assets-file-version)
+1. [Target Framework Pivots](#target-framework-pivots)
+1. [Add List Lengths](#add-list-lengths)
 
-There are multiple places in the assets fie where the "NuGet Framework" (before .NET 5 it was just the `TargetFrameworkMoniker` MSBuild property, but since .NET 5 it can include the TargetPlatformMoniker as well, although in a simplified format) is used as a JSON property key.
-Sometimes with an additional Runtime Identifier (RID).
-Since the goal of this spec is to allow multiple `TargetFramework`s to resolve to the same "NuGet Framework", this means these parts of the assets file have to change.
+However, PackageReference is also supported by non-SDK style projects, which use [dotnet/NuGet.BuildTools](https://github.com/NuGet.BuildTools) which, despite the name, is owned by the non-SDK project system team, not NuGet.
+Their implementation parses the JSON file directly, rather than using NuGet.ProjectModel.
+Therefore, if we can implement the assets file changes without breaking changes to the NuGet.ProjectModel APIs, the .NET SDK may "just work" when the newer version of NuGet is inserted into the .NET SDK.
+However, the non-SDK project system will fail.
+This means that we either need to implement NuGet to support reading and writing two different assets file schemas, or we need to synchronize 3 different components (NuGet, .NET SDK, and NuGet.BuildTools) to implement support in the same VS insertion.
+The multi-rep synchronization insertion would have a lot of risk and difficulty, so allowing NuGet.ProjectModel to support multiple versions of the assets file schema seems the better choice.
 
-Here is a short extract from an assets file:
+There are still two ideas for how this can be implemented.
 
-```json
-  "targets": {
-    ".NETFramework,Version=v4.8": {},
-    ".NETFramework,Version=v4.8/win7-x64": {},
-    "net8.0": {},
-    "net8.0/win7-x64": {},
-    "net8.0-windows7.0": {},
-    "net8.0-windows7.0/win7-x64": {},
-  },
+1. Assets file version as a restore input
+
+   NuGet could require read a `RestoreAssetsFileVersion` property on each project, defaulting to 3 when not specified.
+   This allows project systems that have not yet adapted to the new assets file schema to keep working as before.
+
+1. Use the newer assets file automatically when a project multi-targets
+
+  Non-SDK style project can only single target, so those project types won't see a change.
+  Single targeting SDK style projects will also continue to use the V3 assets file.
+  However, multi-targeting SDK style projects will use the V4 assets file.
+
+The automatic version selection based on single or multi targeting projects will make NuGet.exe not backwards compatible with older versions of the .NET SDK.
+There are some customers who explicitly run `nuget.exe update -self`, or download NuGet.exe from the `latest` directory, or use build tools which do the equivalent.
+If we choose automatic version selection based on single- or multi-targeting, then these customers will experience build failures on release of NuGet.exe with this feature, until they also update to a newer version of the .NET SDK.
+If we choose asset file version via MSBuild property, then newer NuGet.exe versions will remain backwards compatible with older .NET SDK versions.
+
+#### Assets File Version
+
+The assets file contains a `version` property since it was first created, and is always the first property in the file.
+The current assets file version is 3, and this feature will increment the version to 4.
+
+```diff
+-"version": 3
++"version": 4
 ```
 
-Currently the `targets` section of the assets file is loaded into a `Dictionary<string, NotRelevant>`, and therefore the `targets` node cannot contain two identical TFMs when two Target Frameworks resolve to the same TFM. The proposal is to change this, and all other examples in the assets file, to use the `TargetFramework` as a string literal instead.
+#### Target Framework Pivots
 
-Todo: figure out best choice for proposed data model & schema.
-Will there be a problem if customer uses `TargetFramework` with a `/` character?
+There are multiple places in the assets file where the "NuGet Framework" is used as a JSON object property key.
+
+Imagine a project using `<TargetFramework>production</TargetFramework>`, `<TargetFrameworkMoniker>.NETCoreApp,Version=v8.0</TargetFrameworkMoniker>`, and `<RuntimeIdentifiers>linux-x64</RuntimeIdentifiers>`.
+The following changes will be made to the assets file.
+
+1. `$/targets`
+
+    ```diff
+      "targets": {
+    -    "net8.0": {},
+    -    "net8.0/linux-x64": {},
+    +    "production": {},
+    +    "production/linux-x64": {},
+      },
+    ```
+
+1. `$/projectFileDependencyGroups`
+
+    ```diff
+      "projectFileDependencyGroups": {
+    -    "net8.0": [],
+    +    "production": [],
+      },
+    ```
+
+1. `$/project/restore/frameworks`
+
+    ```diff
+      "originalTargetFrameworks": [
+    -    "net8.0"
+    +    "production"
+      ],
+    ```
+
+1. `$/project/frameworks`
+
+    ```diff
+    "frameworks": {
+    -  "net8.0": {
+    -    "targetAlias": "production",
+    +  "production": {
+    +    "targetFramework": "net8.0",
+      }
+    }
+    ```
+
+    Additionally, NuGet was previously using the canonical `TargetFrameworkMoniker` value in the assets file for all target frameworks that are not .NET 5 or later.
+    For example, `.NETFramework,Version=v4.8`.
+    I propose that as part of this schema change we standardize on the "short name" (`net48`) instead.
+    However, implementing this might be non-trivial, in which case it's not worth the effort, even if it's not difficult.
+
+#### Add List Lengths
+
+This is not required for this feature, but taking advantage of a breaking change in the JSON schema, we may be able to improve performance.
+When deserialized, many parts of the assets file become some kind of collection, such as a `List<T>` or a `Dictionary<Tkey, Tvalue>`.
+During deserialization, if the collection size is not known, then .NET will create a backing array with a default size, and every time the collection exceeds the current capacity, it will need to double the backing array size and copy the old array data into the new array.
+This is a known cause of performance degradation.
+This is particularly important in large collections, where the resize will happen multiple times, which includes `$/targets/*` and `$/libraries` in the assets file.
+
+I will not enumerate every location that could benefit from a count, I consider that an implementation detail that will absolutely be hidden by the Nuget.ProjectModel APIs.
+But as for some examples, I propose `$/librariesCount` to specify the number of property keys under `$/libraries`.
+`$/targets/tfm1/@count` could be the first property in `$/target/tfm1`, since `@` is an invalid character for a package ID.
+
+### Components iterating target frameworks
+
+There are some components that either read the assets file directly, or interact with project `TargetFrameworks` in another way.
+Some examples are:
+
+- The .NET SDK, as part of build, as previously discussed.
+- Any `dotnet` CLI command with a `--frameworks` or `-f` argument, such as `dotnet build`, `dotnet publish`, `dotnet test`.
+- `dotnet list package`.
+- Numerous features in Visual Studio.
+  - Test Explorer.
+  - Text editor (left-most dropdown, for TFM specific Intellisense).
+  - Solution Explorer's Dependencies node.
 
 ### Lock file changes
 
@@ -190,9 +275,7 @@ The restore has a lock file has a similar schema to the assets file, so that sch
 Fortunately when Central Package Management and its transitive pinning was introduced we introduced the concept of a PackagesLockFile version successfully.
 We'd just add a version 3.
 
-NuGet would:
-
-- Add version 3 of the packages lock file.
+NuGet would add version 4 of the packages lock file, which will [pivot on the target framework alias, just as assets files will](#target-framework-pivots).
 
 NuGet's intra restore caching is based on the existing of a single framework.
 It is difficult to predict the amount of work that'd be required to implement this correctly, but it'll certainly involve public API changes to NuGet libraries.
@@ -203,22 +286,7 @@ It is difficult to predict the amount of work that'd be required to implement th
 For the first version of this feature, projects that have more than one `TargetFramework` (inner-build) resolve to the same "NuGet Framework" will result in a pack error, therefore preventing these projects from being packed.
 See [Extending Pack, under Future Possibilities](#extending-pack) for more information.
 
-### dotnet.exe challenges
-
-Today, some values in dotnet.exe work with an aliased `TargetFramework`, such as `build` and `publish`, using the `--framework` or `-f` argument.
-The expectation is that all the commands support this, but this would require a deeper investigation.
-
-#### dotnet list package
-
-`dotnet list package` has an output that pivots on the effective target framework.
-This would need to be changed to use the aliased value.
-
-NuGet would need to:
-
-- Display the output with an aliased pivot.
-- Update the machine readable output to handle the new schema, <https://github.com/NuGet/Home/issues/11449>.
-
-#### Visual Studio challenges
+### Visual Studio challenges
 
 Currently the PM UI does not have any support for multi targeting.
 This isn't anything new, but it can affect the experience of customers moving to SDK projects for the first time.
@@ -227,15 +295,15 @@ Especially for customers who are not comfortable hand editing XML or MSBuild fil
 Another concern are all the APIs for displaying the dependencies, transitive dependencies and Get Installed Packages APIs in NuGet.VisualStudio.Contracts.
 All of these APIs may require an incremental addition.
 
-#### Project to Project references
+### Project to Project references
 
 MSBuild has a [`ProjectReference` protocol](https://github.com/dotnet/msbuild/blob/25fdeb3c8c2608f248faec3d6d37733ae144bbbb/documentation/ProjectReference-Protocol.md), which explains how `ProjectReferences` work.
-This will need changes to support scenarios where a project where more than one `TargetFramework` resolves to the same "NuGet Framework".
+MSBuild calls the `GetReferenceNearestTargetFrameworkTask`, which NuGet implements, in order to obtain best TFM matching.
 
-Additionally, NuGet's `PackageReference` requires a project's entire dependency graph to be resolved, which includes projects, in order to calculate transitive packages.
-Therefore, NuGet has the same, or at least very similar, problems as MSBuild with regards to `ProjectReference`s.
-
-This needs further discussion between the MSBuild and NuGet teams.
+Currently `GetReferenceNearestTargetFrameworkTask` is implemented by running NuGet's "nearest match" algorithm.
+This feature would extend it to first try nearest match, and if there is more than one matching `TargetFramework`, then look for a `TargetFramework` that has an exact name match in both projects.
+If there are more than one "nearest" framework, but no exact name match, then for the first version of this feature, NuGet will report an error.
+Depending on customer feedback, build customization can be added in the future.
 
 ## Drawbacks
 
@@ -259,24 +327,60 @@ Therefore, this feature is a binary decision to either support or not support th
 <!-- What parts of the proposal need to be resolved before the proposal is stabilized? -->
 <!-- What related issues would you consider out of scope for this proposal but can be addressed in the future? -->
 
-### Exact assets file schema changes
+### TargetFramework alias to block `/` character
 
-Should we "simply" replace the TFM in property keys with the Target Framework alias?
-For example, change ".NETFramework,Version=4.7.2/win-x64" with "vs17.7/win-x64"?
-But there will be parsing problems when a `TargetFramework` contains a `/` character.
-While "something/another thing/win-x64" can determine that "win-x64" is a RID, when we get the RID-less "something/another thing" string, it's not clear that what follows the `/` is a RID, unless the assets file parser starts knowing the entire RID graph.
+As previously shown in [the assets file pivots changes](#target-framework-pivots), NuGet uses `tfm/rid` as the property name in the `$/targets` object.
+Therefore, a `TargetFramework` that includes a `/` will cause significant parsing challenges.
 
-### How ProjectReferences will work
+However, an alternative to this specific challenge is that the assets file could have more substantial schema change:
 
-Currently ProjectReferences (P2P) do a compatibility check, both by MSBuild and NuGet (although I'm sure MSBuild delegates to NuGet APIs).
-When a project has multiple `TargetFramework`s that map to a single "NuGet Framework", which one should MSBuild and NuGet use?
-MSBuild needs to choose in order to know which dll to pass to the compiler (in case different aliases have different APIs), and so test projects actualy test the desired product binary.
-NuGet needs to know for the package dependency graph.
+```diff
+  "targets": {
+-    "net8.0": {},
+-    "net8.0/linux-x64": {},
++    "production": {
++      "any": {},
++      "linux-x64": {}
++    }
+  },
+```
 
-A simple option is to match the alias string.
-But do we want to support different projects using different aliases?
-If so, then a way to "set the desired alias in the target project" will be needed.
-That may be usable as a way to [override selection of "nearest" framework](https://github.com/NuGet/Home/issues/7416), which may or may not be considered a good thing, depending on your view if overriding asset selection is good or not.
+This assumes that the "rid-less" TFM is equivalent to the `any` RID, and that `<RuntimeIdentifier>any</RuntimeIdentifier>` is not meaningful currently.
+
+### Other TargetFramework alias naming restrictions
+
+Should we block characters that need to be encoded in JSON files, like `"`, or non-ASCII characters?
+
+Since the `TargetFramework` value is used by the .NET SDK as the directory name for build output, should we block invalid characters on Windows file systems? (Linux doesn't prevent any characters, with the possible exception of `/`, since that's used as the directory separator).
+
+### More significant assets file schema changes?
+
+Should we consider more significant schema changes in the assets file?
+
+Under `$/libraries`, each package lists every file in the package.
+However, the performance penalty of needing to parse that list every time the assets file is read may be worse than any benefit it provides from avoiding enumerating the filesystem when it is needed.
+The assets file primary purpose is to tell the .NET SDK and dotnet/NuGet.BuildTools what package assets are used by the project, and they don't need or use the `$/libraries` section at all.
+While reading the assets file might be a small percentage of the overall build process, if we consider reading the assets file in isolation, there could be a fairly significant performance increase by removing this entire section of the assets file.
+
+`$/projectFileDependencyGroups` appears to be a duplication of the information available in `$/project/frameworks`.
+
+`$/project/originalTargetFrameworks` duplicates information already available in `$/project/restore/frameworks`
+
+Since the .NET SDK has to read the assets file after NuGet writes it, time and memory allocations spent on parts of the assets file not relevant to asset selection reduces performance.
+Additionally, MSBuild binlogs embed the assets file, which bloats the binlog size.
+
+Removing the duplicated data should be non-controversial.
+But the `$/libraries` section is useful for diagnosing customer complaints.
+Whether impacting the performance of every build is worth occasional benefit in helping debug customer issues is subjective.
+An alternative is we add a `<RestoreVerboseAssetsFile>` property to include it, but otherwise have it off by default for performance reasons.
+Although the .NET SDK already have a cache, so they should only read the assets file when the assets file changes.
+
+### More significant lock file schema changes
+
+I don't want to make the scope of this feature so large that it takes an unreasonably long time to implement.
+However, breaking changes are rarely made in NuGet, so if we have to make a breaking change to enable a feature, it's tempting to take advantage and propose other changes at the same time.
+
+Since the lock file contains the package's content hash, and the package's `nuspec` is included in that content hash, this means that the dependencies in the the lock file are a redundant duplication of information available elsewhere.
 
 ## Future Possibilities
 
@@ -287,3 +391,7 @@ That may be usable as a way to [override selection of "nearest" framework](https
 It seems feasible that if a single project can target multiple versions of Visual Studio, through a new Visual Studio Extensibility SDK, that someone will also want to create a package that supports multiple versions of Visual Studio.
 
 Designing how this could work is out of scope for this spec, and can be introduced in a different spec.
+
+### Customizing ProjectReference TargetFramework selection
+
+As [previously mentioned](#project-to-project-references), the first version of this feature proposes only doing exact name matches, when more than one `TargetFramework` is a "best match" for a project reference.
