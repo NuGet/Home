@@ -38,8 +38,7 @@ However, some developers might consider this an unacceptable risk and prefer ano
 
 *NuGet.Config* files have a new section `<auditSources>` where the URL(s) of any audit sources can be specified, which will be used only to download a VDB, and will not be used for downloading packages.
 Like `<packageSources>`, `<auditSources>` can contain zero, one, or more sources, and supports `<clear />` to remove any `auditSources` inherited from parent *nuget.config* files.
-When there is at least one source in `auditSources`, NuGet should no longer use `packageSources` to get a VDB.
-Omitting `<clear />` will not use `packageSources` in addition to `auditSources`.
+NuGetAudit will use attempt to download a VDB from both package sources and audit sources.
 
 For example, consider a developer at Contoso using a company-internal source as a single package source, and using nuget.org as an audit source:
 
@@ -93,11 +92,6 @@ If `NuGetAudit` is disabled for all projects in the solution, the audit sources 
 
 <!-- Explain the proposal in sufficient detail with implementation details, interaction models, and clarification of corner cases. -->
 
-Not using `packageSources` for VDB when there's at least one source in `auditSources` is a performance optimization.
-Since we expect customers to use `auditSources` when their `packageSources` don't already provide a VDB, having restore spend time making HTTP requests to the package sources is unlikely to provide any benefit.
-While downloading the VDB from audit sources is likely to take more time than verifying that package sources don't have a vulnerability resource, if any package source is slow, downloading the VDB from the audit source might complete first.
-Additionally, in the case where NuGet doesn't otherwise need to communicate with any package source, checking the package sources for a VDB might trigger a credential provider.
-
 ## Drawbacks
 
 <!-- Why should we not do this? -->
@@ -108,6 +102,20 @@ Customers who appear functionally network isolated from nuget.org (for example, 
 <!-- Why is this the best design compared to other designs? -->
 <!-- What other designs have been considered and why weren't they chosen? -->
 <!-- What is the impact of not doing this? -->
+
+### Only use audit sources, not package sources
+
+The first implementation of NuGet Audit used package sources as the only source for a VDB.
+So, it would be a breaking change to stop doing so, and to use audit sources as the only source for VDBs.
+
+It is convenient to use package sources as an audit source, as it increases the feature usage when customers have a package source that provides a VDB, such as nuget.org.
+Additionally, it eliminates the need to duplicate the URL in two sections of *NuGet.config* files.
+
+However, overloading a single configuration for multiple reasons can be confusing, and adds a little complexity in documentation and might make it more difficult to clearly explain in a GUI for configuring NuGet's configuration.
+It also makes it impossible for customers to configure NuGet to avoid using a package source during audit, which may be desirable when the customer knows the source doesn't provide a VDB and the source needs credentials (especially when the source doesn't have a credential provider).
+
+Originally this spec proposed to use package sources for NuGet Audit only when `auditSources` was empty.
+However during review nobody appeared to agree.
 
 ### Wait for other servers to implement the VulnerabilityInfo resource
 
