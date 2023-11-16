@@ -26,7 +26,7 @@ The `package search [search terms] [options]` command will have the following op
 
 | Option           | Function |
 |------------------|--------------|
-| `--configFile`   | The path to the NuGet config file to use. |
+| `--configfile`   | The path to the NuGet config file to use. |
 | `--exact-match`  | Return exact matches only as a search result. |
 | `--format`       | Format the output accordingly. Either `table`, or `json`. The default value is `table`. |
 | `--help`         | Show command help and usage information. |
@@ -124,7 +124,7 @@ Here are the details of each verbosity level:
   - Description
   - Deprecation
   - Project URL
-  - Vulnerabilities
+  - Vulnerable
 
 ### Technical explanation
 
