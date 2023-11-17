@@ -80,9 +80,8 @@ A developer may not want to check in an insecure configuration file and may want
 ### Technical explanation
 
 <!-- Explain the proposal in sufficient detail with implementation details, interaction models, and clarification of corner cases. -->
-This section will be filled out by the respective person picking up this work in more detail if more needs to be explained. 
 
-`HttpClient` and `HttpClientHandler` should be able to support this functionality easily such as a custom `ServerCertificateCustomValidationCallback` which always returns `true` meaning that any certificate presented by the server will be considered valid for the `disableTLSCertificateValidation` functionality.
+This proposal introduces a feature to manage the `HttpClientHandler` for conditionally disabling TLS certificate validation. By setting a boolean flag, `disableTLSCertificateValidation`, to true, the HttpClientHandler is configured to bypass the standard certificate checks via a custom `ServerCertificateCustomValidationCallback` that unconditionally returns `true`. This means that any SSL/TLS certificate, regardless of its source, expiration status, or domain name mismatch, will be accepted as valid, effectively disabling the usual security checks performed for HTTPS connections.
 
 As for `allowInsecureConnections`, this functionality should be fairly easy to revert the initial warning/error messages to take into account this new flag. Simply put, if there's no code flow to this property, a user will continue to see HTTPS warnings/errors encouraging best practice. 
 
