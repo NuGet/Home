@@ -3,7 +3,7 @@
 ## How do I create a proposal?
 
 - Fork or clone https://github.com/NuGet/Home
-- Copy `meta/template.md` into `proposed/<year>/your-proposal-name.md`
+- Copy `meta/template.md` into `accepted/<year>/your-proposal-name.md`
 - Fill in the template with your proposal.
 - Submit a PR to the `NuGet/Home` repo
 - (Optional) Create a new discussion to talk about it https://github.com/NuGet/Home/discussions/new
@@ -16,19 +16,18 @@ All discussions surrounding a proposal are covered by the [.NET Foundation code 
 
 ## What happens to a proposal?
 
-When there is consensus among the NuGet contributors and .NET community of the direction of the proposal, and at least one NuGet contributor has signed off on the proposal, it will be merged into the `Proposed` folder.
+When there is consensus among the NuGet contributors and .NET community of the direction of the proposal, and at least one NuGet contributor has signed off on the proposal, it will be merged into the `Accepted` folder (eg, `accepted/<year>/your-proposal-name.md`).
 Otherwise, the proposal will be withdrawn by closing the PR with the reasoning mentioned in the PR.
 
 ## What happens when a proposal is accepted?
-A PR will be opened to move the proposal from `Proposed` to `Accepted` (eg, `accepted/<year>/your-proposal-name.md`). The PR can contain any edits to the original proposal can be made based on the acceptance criteria.
 
 Once accepted, it will be scheduled by the NuGet contributors to be implemented or put up for grabs for anyone to implement by making a PR in the appropriate repository.
 
 ## What happens when a proposal is implemented?
 
-When the changes described in the accepted proposal have been implemented and merged into the relevant repository and due for release the corresponding proposal will remain in the `accepted` folder. The linked GitHub issue will be closed upon merging to the relevant branch. 
+When the changes described in the accepted proposal have been implemented and merged into the relevant repository and due for release the corresponding proposal will be moved to the `implemented` folder. The linked GitHub issue will be closed upon merging to the relevant branch.
 
-If you'd like to implement an `accepted` proposal, please make a PR in the appropriate repository and mention the proposal in the PR and Issue. 
+If you'd like to implement an `accepted` proposal, please make a PR in the appropriate repository and mention the proposal in the PR and Issue.
 
 ## What happens when a proposal is withdrawn?
 
