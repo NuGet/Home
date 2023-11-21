@@ -60,6 +60,11 @@ For example, consider a developer at Contoso using a company-internal source as 
 Any URL specified in the `auditSources` section must implement the [NuGet Server API V3 protocol](https://learn.microsoft.com/nuget/api/overview).
 However, the server will only need to implement the [`VulnerabilityInfo` resource](https://learn.microsoft.com/en-us/nuget/api/vulnerability-info) (and service index), and can avoid implementing all the other resources that are required to be used as a package source.
 
+NuGet should report a warning to customers if a source listed under `<auditSources>` does not provide a VDB.
+However, NuGet should not warn about any `<packageSources>` that do not provide a VDB.
+If a customer lists the same URL under both `<auditSources>` and `<packageSources>`, then the warning should be emit.
+The exact warning code will depend on which codes are unused at the time of implementation, but NU1905 is a good candidate.
+
 NuGet will use same semantics for `auditSources` as it already has with `packageSources`.
 This means that `auditSources` are accumulated from other nuget.config files, and `<clear />` can be used to remove them.
 `auditSources` will also follow `packageSources` with regards to insecure http warnings, errors, and `allowInsecureConnections` configurations.
@@ -92,10 +97,17 @@ If `NuGetAudit` is disabled for all projects in the solution, the audit sources 
 
 <!-- Explain the proposal in sufficient detail with implementation details, interaction models, and clarification of corner cases. -->
 
+NuGet currently uses the `VulnerabilityInfo` V3 server API in two scenarios: restore, and VS's Package Manager UI.
+Both of these scenarios will need to use `auditSources`, in addition to `packageSources`.
+
+`dotnet list package --vulnerable` also shows customers vulnerability information.
+However, at the time this document is being written it does not use the server's `VulnerabilityInfo`, it uses package metadata (registration) instead.
+Therefore, this is being considered out of scope for this feature's V1, but [it is something that can be done in the future](#dotnet-list-package---vulnerable)
+
 ## Drawbacks
 
 <!-- Why should we not do this? -->
-Customers who appear functionally network isolated from nuget.org (for example, by blocking nuget.org at the firewall) will still not be able to use this feature.
+Customers who appear functionally network isolated from nuget.org (for example, by blocking nuget.org at the firewall) will still need another source that implements the `VulnerabilityInfo` resource, which they could then list either as a `packageSource` or `auditSource`.
 
 ## Rationale and alternatives
 
@@ -219,11 +231,16 @@ We could consider a .NET tool, for example `nuget-audit-download` which knows ho
 
 ### Add support for common file formats
 
-https://osv.dev is a free vulnerability database, with per-ecosystem downloads available as a zip download.
-For NuGet, the URL is https://osv-vulnerabilities.storage.googleapis.com/NuGet/all.zip.
+<https://osv.dev> is a free vulnerability database, with per-ecosystem downloads available as a zip download.
+For NuGet, the URL is <https://osv-vulnerabilities.storage.googleapis.com/NuGet/all.zip>.
 It could be interesting to be able to use this URL as an audit source, especially for customers who block access to nuget.org.
 
 ### Tooling support
 
 Visual Studio has a GUI to manage package sources, and the `dotnet` CLI has commands such as `dotnet nuget add source`.
 The first version of `auditSources` will not include equivalent experiences in order to avoid slowing down the implementation of the first version.
+
+### `dotnet list package --vulnerable`
+
+As mentioned in the [technical explanation](#technical-explanation), `dotnet list package --vulnerable` doesn't currently use servers `VulnerabilityInfo` resource.
+A tracking issue to use both `VulnerabilityInfo` and `auditSources` has been created: <https://github.com/NuGet/Home/issues/13026>
