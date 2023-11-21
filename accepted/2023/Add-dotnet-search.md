@@ -59,9 +59,9 @@ This option will specify a list of sources to search from. If a source is not sp
 - Using ``dotnet package search Newtonsoft.Json --exact-match`` on the other side will have the following output
 
         Source: nuget.org
-        | Package ID                                  | Latest Version | Authors | Total Downloads |
-        |---------------------------------------------|----------------|---------|-----------------|
-        | Newtonsoft.Json                             | 13.0.3         |         | 3,829,822,911   |
+        | Package ID                                  |  Version | Authors | Total Downloads |
+        |---------------------------------------------|----------|---------|-----------------|
+        | Newtonsoft.Json                             | 13.0.3   |         | 3,829,822,911   |
 
 #### **Option `--format`**
 
