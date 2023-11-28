@@ -1,0 +1,2345 @@
+{
+  "version": "1.0",
+  "tasks": [
+    {
+      "taskType": "trigger",
+      "capabilityId": "IssueResponder",
+      "subCapability": "IssuesOnlyResponder",
+      "version": "1.0",
+      "config": {
+        "conditions": {
+          "operator": "and",
+          "operands": [
+            {
+              "name": "isAction",
+              "parameters": {
+                "action": "opened"
+              }
+            },
+            {
+              "operator": "or",
+              "operands": [
+                {
+                  "name": "isActivitySender",
+                  "parameters": {
+                    "user": "vsfeedback"
+                  }
+                },
+                {
+                  "name": "bodyContains",
+                  "parameters": {
+                    "bodyPattern": "Copied from original issue"
+                  }
+                },
+                {
+                  "name": "bodyContains",
+                  "parameters": {
+                    "bodyPattern": "Issue moved from"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "eventType": "issue",
+        "eventNames": [
+          "issues",
+          "project_card"
+        ],
+        "taskName": "[Manage \"WaitingFor\" labels] [4-1] Tag \"Transferred issue\" if it's transferred from vsfeedback or other github repo.",
+        "actions": [
+          {
+            "name": "addLabel",
+            "parameters": {
+              "label": "Transferred issue"
+            }
+          },
+          {
+            "name": "addLabel",
+            "parameters": {
+              "label": "Triage:Untriaged"
+            }
+          }
+        ]
+      },
+      "disabled": false
+    },
+    {
+      "taskType": "trigger",
+      "capabilityId": "IssueResponder",
+      "subCapability": "IssueCommentResponder",
+      "version": "1.0",
+      "config": {
+        "conditions": {
+          "operator": "and",
+          "operands": [
+            {
+              "name": "isAction",
+              "parameters": {
+                "action": "created"
+              }
+            },
+            {
+              "name": "hasLabel",
+              "parameters": {
+                "label": "WaitingForCustomer"
+              }
+            },
+            {
+              "name": "isOpen",
+              "parameters": {}
+            },
+            {
+              "operator": "or",
+              "operands": [
+                {
+                  "operator": "and",
+                  "operands": [
+                    {
+                      "name": "hasLabel",
+                      "parameters": {
+                        "label": "Transferred issue"
+                      }
+                    },
+                    {
+                      "operator": "not",
+                      "operands": [
+                        {
+                          "name": "activitySenderHasPermissions",
+                          "parameters": {
+                            "permissions": "write"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "isActivitySender",
+                  "parameters": {
+                    "user": {
+                      "type": "author"
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "eventType": "issue",
+        "eventNames": [
+          "issue_comment"
+        ],
+        "taskName": "[Manage \"WaitingFor\" labels] [4-2] Replace tag \"WaitingForCustomer\" with \"WaitingForClientTeam\" when the author comments on an issue. Also remove `Status:No recent activity` if it's been set.",
+        "actions": [
+          {
+            "name": "removeLabel",
+            "parameters": {
+              "label": "WaitingForCustomer"
+            }
+          },
+          {
+            "name": "addLabel",
+            "parameters": {
+              "label": "WaitingForClientTeam"
+            }
+          },
+          {
+            "name": "removeLabel",
+            "parameters": {
+              "label": "Status:No recent activity"
+            }
+          }
+        ]
+      },
+      "disabled": false
+    },
+    {
+      "taskType": "trigger",
+      "capabilityId": "IssueResponder",
+      "subCapability": "IssuesOnlyResponder",
+      "version": "1.0",
+      "config": {
+        "conditions": {
+          "operator": "and",
+          "operands": [
+            {
+              "name": "isAction",
+              "parameters": {
+                "action": "closed"
+              }
+            },
+            {
+              "operator": "or",
+              "operands": [
+                {
+                  "name": "hasLabel",
+                  "parameters": {
+                    "label": "WaitingForClientTeam"
+                  }
+                },
+                {
+                  "name": "hasLabel",
+                  "parameters": {
+                    "label": "WaitingForCustomer"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "eventType": "issue",
+        "eventNames": [
+          "issues",
+          "project_card"
+        ],
+        "taskName": "[Manage \"WaitingFor\" labels] [4-3] Remove any \"WaitingFor\" label when the issue is closed",
+        "actions": [
+          {
+            "name": "removeLabel",
+            "parameters": {
+              "label": "WaitingForClientTeam"
+            }
+          },
+          {
+            "name": "removeLabel",
+            "parameters": {
+              "label": "WaitingForCustomer"
+            }
+          }
+        ]
+      },
+      "disabled": false
+    },
+    {
+      "taskType": "trigger",
+      "capabilityId": "IssueResponder",
+      "subCapability": "IssueCommentResponder",
+      "version": "1.0",
+      "config": {
+        "conditions": {
+          "operator": "and",
+          "operands": [
+            {
+              "name": "isAction",
+              "parameters": {
+                "action": "created"
+              }
+            },
+            {
+              "name": "hasLabel",
+              "parameters": {
+                "label": "WaitingForClientTeam"
+              }
+            },
+            {
+              "name": "isOpen",
+              "parameters": {}
+            },
+            {
+              "operator": "or",
+              "operands": [
+                {
+                  "name": "activitySenderHasPermissions",
+                  "parameters": {
+                    "permissions": "write"
+                  }
+                },
+                {
+                  "name": "activitySenderHasPermissions",
+                  "parameters": {
+                    "permissions": "admin"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "eventType": "issue",
+        "eventNames": [
+          "issue_comment"
+        ],
+        "taskName": "[Manage \"WaitingFor\" labels] [4-4] Replace tag \"WaitingForClientTeam\" with \"WaitingForCustomer\" when client team comments on an issue.",
+        "actions": [
+          {
+            "name": "removeLabel",
+            "parameters": {
+              "label": "WaitingForClientTeam"
+            }
+          },
+          {
+            "name": "addLabel",
+            "parameters": {
+              "label": "WaitingForCustomer"
+            }
+          }
+        ]
+      },
+      "disabled": false
+    },
+    {
+      "taskType": "scheduled",
+      "capabilityId": "ScheduledSearch",
+      "subCapability": "ScheduledSearch",
+      "version": "1.1",
+      "config": {
+        "frequency": [
+          {
+            "weekDay": 0,
+            "hours": [
+              0,
+              3,
+              6,
+              9,
+              12,
+              15,
+              18,
+              21
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 1,
+            "hours": [
+              0,
+              3,
+              6,
+              9,
+              12,
+              15,
+              18,
+              21
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 2,
+            "hours": [
+              0,
+              3,
+              6,
+              9,
+              12,
+              15,
+              18,
+              21
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 3,
+            "hours": [
+              0,
+              3,
+              6,
+              9,
+              12,
+              15,
+              18,
+              21
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 4,
+            "hours": [
+              0,
+              3,
+              6,
+              9,
+              12,
+              15,
+              18,
+              21
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 5,
+            "hours": [
+              0,
+              3,
+              6,
+              9,
+              12,
+              15,
+              18,
+              21
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 6,
+            "hours": [
+              0,
+              3,
+              6,
+              9,
+              12,
+              15,
+              18,
+              21
+            ],
+            "timezoneOffset": -7
+          }
+        ],
+        "searchTerms": [
+          {
+            "name": "hasLabel",
+            "parameters": {
+              "label": "Community"
+            }
+          },
+          {
+            "name": "noActivitySince",
+            "parameters": {
+              "days": 30
+            }
+          },
+          {
+            "name": "isPr",
+            "parameters": {}
+          },
+          {
+            "name": "isOpen",
+            "parameters": {}
+          },
+          {
+            "name": "isDraftPr",
+            "parameters": {
+              "value": "false"
+            }
+          },
+          {
+            "name": "noLabel",
+            "parameters": {
+              "label": "Status:No recent activity"
+            }
+          },
+          {
+            "name": "noLabel",
+            "parameters": {
+              "label": "Community"
+            }
+          }
+        ],
+        "taskName": "[stale PR] [5-1] Search for PRs with no activity over 30 days and warn. (except draft PRs and Community PRs)",
+        "actions": [
+          {
+            "name": "addLabel",
+            "parameters": {
+              "label": "Status:No recent activity"
+            }
+          },
+          {
+            "name": "addReply",
+            "parameters": {
+              "comment": "This PR has been automatically marked as stale because it has no activity for **30 days**. It will be closed if no further activity occurs **within another 15 days** of this comment, unless it has a \"Status:Do not auto close\" label. If it is closed, you may reopen it anytime when you're ready again, as long as you don't delete the branch."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "taskType": "trigger",
+      "capabilityId": "IssueResponder",
+      "subCapability": "PullRequestResponder",
+      "version": "1.0",
+      "config": {
+        "conditions": {
+          "operator": "and",
+          "operands": [
+            {
+              "operator": "not",
+              "operands": [
+                {
+                  "name": "isAction",
+                  "parameters": {
+                    "action": "closed"
+                  }
+                }
+              ]
+            },
+            {
+              "name": "hasLabel",
+              "parameters": {
+                "label": "Status:No recent activity"
+              }
+            }
+          ]
+        },
+        "eventType": "pull_request",
+        "eventNames": [
+          "pull_request",
+          "issues",
+          "project_card"
+        ],
+        "taskName": "[stale PR] [5-2] Remove \"Status:No recent activity\" if there is any activity.",
+        "actions": [
+          {
+            "name": "removeLabel",
+            "parameters": {
+              "label": "Status:No recent activity"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "taskType": "trigger",
+      "capabilityId": "IssueResponder",
+      "subCapability": "PullRequestCommentResponder",
+      "version": "1.0",
+      "config": {
+        "conditions": {
+          "operator": "and",
+          "operands": [
+            {
+              "name": "hasLabel",
+              "parameters": {
+                "label": "Status:No recent activity"
+              }
+            }
+          ]
+        },
+        "eventType": "pull_request",
+        "eventNames": [
+          "issue_comment"
+        ],
+        "taskName": "[stale PR] [5-3] Remove \"Status:No recent activity\" if there is any comment.",
+        "actions": [
+          {
+            "name": "removeLabel",
+            "parameters": {
+              "label": "Status:No recent activity"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "taskType": "trigger",
+      "capabilityId": "IssueResponder",
+      "subCapability": "PullRequestReviewResponder",
+      "version": "1.0",
+      "config": {
+        "conditions": {
+          "operator": "and",
+          "operands": [
+            {
+              "name": "hasLabel",
+              "parameters": {
+                "label": "Status:No recent activity"
+              }
+            },
+            {
+              "name": "hasLabel",
+              "parameters": {
+                "label": "Community"
+              }
+            }
+          ]
+        },
+        "eventType": "pull_request",
+        "eventNames": [
+          "pull_request_review"
+        ],
+        "taskName": "[stale PR] [5-4] Remove \"Status:No recent activity\" if there are any reviews.",
+        "actions": [
+          {
+            "name": "removeLabel",
+            "parameters": {
+              "label": "Status:No recent activity"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "taskType": "scheduled",
+      "capabilityId": "ScheduledSearch",
+      "subCapability": "ScheduledSearch",
+      "version": "1.1",
+      "config": {
+        "frequency": [
+          {
+            "weekDay": 0,
+            "hours": [
+              2,
+              5,
+              8,
+              11,
+              14,
+              17,
+              20,
+              23
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 1,
+            "hours": [
+              2,
+              5,
+              8,
+              11,
+              14,
+              17,
+              20,
+              23
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 2,
+            "hours": [
+              2,
+              5,
+              8,
+              11,
+              14,
+              17,
+              20,
+              23
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 3,
+            "hours": [
+              2,
+              5,
+              8,
+              11,
+              14,
+              17,
+              20,
+              23
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 4,
+            "hours": [
+              2,
+              5,
+              8,
+              11,
+              14,
+              17,
+              20,
+              23
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 5,
+            "hours": [
+              2,
+              5,
+              8,
+              11,
+              14,
+              17,
+              20,
+              23
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 6,
+            "hours": [
+              2,
+              5,
+              8,
+              11,
+              14,
+              17,
+              20,
+              23
+            ],
+            "timezoneOffset": -7
+          }
+        ],
+        "searchTerms": [
+          {
+            "name": "isPr",
+            "parameters": {}
+          },
+          {
+            "name": "isOpen",
+            "parameters": {}
+          },
+          {
+            "name": "hasLabel",
+            "parameters": {
+              "label": "Status:No recent activity"
+            }
+          },
+          {
+            "name": "noLabel",
+            "parameters": {
+              "label": "Community"
+            }
+          },
+          {
+            "name": "noActivitySince",
+            "parameters": {
+              "days": 15
+            }
+          },
+          {
+            "name": "noLabel",
+            "parameters": {
+              "label": "Status:Do not auto close"
+            }
+          }
+        ],
+        "taskName": "[stale PR] [5-5] Close PRs with no activity over 15 days after warn (except Community PRs)",
+        "actions": [
+          {
+            "name": "closeIssue",
+            "parameters": {}
+          }
+        ]
+      }
+    },
+    {
+      "taskType": "scheduled",
+      "capabilityId": "ScheduledSearch",
+      "subCapability": "ScheduledSearch",
+      "version": "1.0",
+      "config": {
+        "frequency": [
+          {
+            "weekDay": 0,
+            "hours": [
+              6
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 1,
+            "hours": [
+              6
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 2,
+            "hours": [
+              6
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 3,
+            "hours": [
+              6
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 4,
+            "hours": [
+              6
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 5,
+            "hours": [
+              6
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 6,
+            "hours": [
+              6
+            ],
+            "timezoneOffset": -7
+          }
+        ],
+        "searchTerms": [
+          {
+            "name": "hasLabel",
+            "parameters": {
+              "label": "WaitingForCustomer"
+            }
+          },
+          {
+            "name": "noActivitySince",
+            "parameters": {
+              "days": 14
+            }
+          },
+          {
+            "name": "isIssue",
+            "parameters": {}
+          },
+          {
+            "name": "isOpen",
+            "parameters": {}
+          },
+          {
+            "name": "noLabel",
+            "parameters": {
+              "label": "Status:No recent activity"
+            }
+          }
+        ],
+        "taskName": "[Manage stale WaitingForCustomer issues] Search for WaitingForCustomer issues with no activity over 14 days and warn.",
+        "actions": [
+          {
+            "name": "addLabel",
+            "parameters": {
+              "label": "Status:No recent activity"
+            }
+          },
+          {
+            "name": "addReply",
+            "parameters": {
+              "comment": "This issue has been automatically marked as stale because we have not received a response in 14 days. It will be closed if no further activity occurs within another 14 days of this comment."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "taskType": "scheduled",
+      "capabilityId": "ScheduledSearch",
+      "subCapability": "ScheduledSearch",
+      "version": "1.0",
+      "config": {
+        "frequency": [
+          {
+            "weekDay": 0,
+            "hours": [
+              6
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 1,
+            "hours": [
+              6
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 2,
+            "hours": [
+              6
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 3,
+            "hours": [
+              6
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 4,
+            "hours": [
+              6
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 5,
+            "hours": [
+              6
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 6,
+            "hours": [
+              6
+            ],
+            "timezoneOffset": -7
+          }
+        ],
+        "searchTerms": [
+          {
+            "name": "hasLabel",
+            "parameters": {
+              "label": "Status:No recent activity"
+            }
+          },
+          {
+            "name": "noActivitySince",
+            "parameters": {
+              "days": 14
+            }
+          },
+          {
+            "name": "isIssue",
+            "parameters": {}
+          },
+          {
+            "name": "isOpen",
+            "parameters": {}
+          }
+        ],
+        "taskName": "[Close stale WaitingForCustomer issues] Search for stale WaitingForCustomer issues with no activity over 14 days and warn.",
+        "actions": [
+          {
+            "name": "closeIssue",
+            "parameters": {}
+          },
+          {
+            "name": "removeLabel",
+            "parameters": {
+              "label": "Status:No recent activity"
+            }
+          },
+          {
+            "name": "addLabel",
+            "parameters": {
+              "label": "Resolution:NeedMoreInfo"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "taskType": "scheduled",
+      "capabilityId": "ScheduledSearch",
+      "subCapability": "ScheduledSearch",
+      "version": "1.1",
+      "config": {
+        "frequency": [
+          {
+            "weekDay": 0,
+            "hours": [
+              12
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 1,
+            "hours": [
+              12
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 2,
+            "hours": [
+              12
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 3,
+            "hours": [
+              12
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 4,
+            "hours": [
+              12
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 5,
+            "hours": [
+              12
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 6,
+            "hours": [
+              12
+            ],
+            "timezoneOffset": -7
+          }
+        ],
+        "searchTerms": [
+          {
+            "name": "isOpen",
+            "parameters": {}
+          },
+          {
+            "name": "isIssue",
+            "parameters": {}
+          },
+          {
+            "name": "noLabel",
+            "parameters": {
+              "label": "Type:Spec"
+            }
+          },
+          {
+            "name": "noLabel",
+            "parameters": {
+              "label": "Type:Test"
+            }
+          },
+          {
+            "name": "noLabel",
+            "parameters": {
+              "label": "Type:Feature"
+            }
+          },
+          {
+            "name": "noLabel",
+            "parameters": {
+              "label": "Type:Docs"
+            }
+          },
+          {
+            "name": "noLabel",
+            "parameters": {
+              "label": "Type:DCR"
+            }
+          },
+          {
+            "name": "noLabel",
+            "parameters": {
+              "label": "Type:Bug"
+            }
+          },
+          {
+            "name": "noLabel",
+            "parameters": {
+              "label": "Type:DeveloperDocs"
+            }
+          },
+          {
+            "name": "noLabel",
+            "parameters": {
+              "label": "Type:DataAnalysis"
+            }
+          },
+          {
+            "name": "noLabel",
+            "parameters": {
+              "label": "Type:Learning"
+            }
+          },
+          {
+            "name": "noLabel",
+            "parameters": {
+              "label": "Type:Tracking"
+            }
+          },
+          {
+            "name": "noLabel",
+            "parameters": {
+              "label": "Type:Engineering"
+            }
+          },
+          {
+            "name": "noLabel",
+            "parameters": {
+              "label": "Type:BreakingChange"
+            }
+          },
+          {
+            "name": "noLabel",
+            "parameters": {
+              "label": "missing-required-type"
+            }
+          },
+          {
+            "name": "noLabel",
+            "parameters": {
+              "label": "Pipeline:Icebox"
+            }
+          },
+          {
+            "name": "noLabel",
+            "parameters": {
+              "label": "Epic"
+            }
+          }
+        ],
+        "taskName": "[Type Label Reminder][4-1] Remind HotSeat to Add Type Label ",
+        "actions": [
+          {
+            "name": "addReply",
+            "parameters": {
+              "comment": "Issue is missing Type label, remember to add a [Type label](https://github.com/NuGet/Client.Engineering/blob/main/designs/nuget-issues-approach.md#issue-type)"
+            }
+          },
+          {
+            "name": "addLabel",
+            "parameters": {
+              "label": "missing-required-type"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "taskType": "trigger",
+      "capabilityId": "IssueResponder",
+      "subCapability": "IssuesOnlyResponder",
+      "version": "1.0",
+      "config": {
+        "conditions": {
+          "operator": "and",
+          "operands": [
+            {
+              "name": "isAction",
+              "parameters": {
+                "action": "labeled"
+              }
+            },
+            {
+              "name": "hasLabel",
+              "parameters": {
+                "label": "missing-required-type"
+              }
+            },
+            {
+              "operator": "or",
+              "operands": [
+                {
+                  "name": "hasLabel",
+                  "parameters": {
+                    "label": "Type:Spec"
+                  }
+                },
+                {
+                  "name": "hasLabel",
+                  "parameters": {
+                    "label": "Type:Test"
+                  }
+                },
+                {
+                  "name": "hasLabel",
+                  "parameters": {
+                    "label": "Type:Feature"
+                  }
+                },
+                {
+                  "name": "hasLabel",
+                  "parameters": {
+                    "label": "Type:Docs"
+                  }
+                },
+                {
+                  "name": "hasLabel",
+                  "parameters": {
+                    "label": "Type:DCR"
+                  }
+                },
+                {
+                  "name": "hasLabel",
+                  "parameters": {
+                    "label": "Type:Bug"
+                  }
+                },
+                {
+                  "name": "hasLabel",
+                  "parameters": {
+                    "label": "Type:DeveloperDocs"
+                  }
+                },
+                {
+                  "name": "hasLabel",
+                  "parameters": {
+                    "label": "Type:DataAnalysis"
+                  }
+                },
+                {
+                  "name": "hasLabel",
+                  "parameters": {
+                    "label": "Type:Learning"
+                  }
+                },
+                {
+                  "name": "hasLabel",
+                  "parameters": {
+                    "label": "Type:Tracking"
+                  }
+                },
+                {
+                  "name": "hasLabel",
+                  "parameters": {
+                    "label": "Type:Engineering"
+                  }
+                },
+                {
+                  "name": "hasLabel",
+                  "parameters": {
+                    "label": "Type:BreakingChange"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "eventType": "issue",
+        "eventNames": [
+          "issues",
+          "project_card"
+        ],
+        "actions": [
+          {
+            "name": "removeLabel",
+            "parameters": {
+              "label": "missing-required-type"
+            }
+          }
+        ],
+        "taskName": "[Type Label Reminder][4-2] Remove \"missing-required-type\" if it is has Type label"
+      }
+    },
+    {
+      "taskType": "trigger",
+      "capabilityId": "IssueResponder",
+      "subCapability": "IssuesOnlyResponder",
+      "version": "1.0",
+      "config": {
+        "conditions": {
+          "operator": "and",
+          "operands": [
+            {
+              "operator": "not",
+              "operands": [
+                {
+                  "name": "hasLabel",
+                  "parameters": {
+                    "label": "Type:Spec"
+                  }
+                }
+              ]
+            },
+            {
+              "operator": "not",
+              "operands": [
+                {
+                  "name": "hasLabel",
+                  "parameters": {
+                    "label": "Type:Test"
+                  }
+                }
+              ]
+            },
+            {
+              "operator": "not",
+              "operands": [
+                {
+                  "name": "hasLabel",
+                  "parameters": {
+                    "label": "Type:Feature"
+                  }
+                }
+              ]
+            },
+            {
+              "operator": "not",
+              "operands": [
+                {
+                  "name": "hasLabel",
+                  "parameters": {
+                    "label": "Type:Docs"
+                  }
+                }
+              ]
+            },
+            {
+              "operator": "not",
+              "operands": [
+                {
+                  "name": "hasLabel",
+                  "parameters": {
+                    "label": "Type:DCR"
+                  }
+                }
+              ]
+            },
+            {
+              "operator": "not",
+              "operands": [
+                {
+                  "name": "hasLabel",
+                  "parameters": {
+                    "label": "Type:Bug"
+                  }
+                }
+              ]
+            },
+            {
+              "operator": "not",
+              "operands": [
+                {
+                  "name": "hasLabel",
+                  "parameters": {
+                    "label": "Type:DeveloperDocs"
+                  }
+                }
+              ]
+            },
+            {
+              "operator": "not",
+              "operands": [
+                {
+                  "name": "hasLabel",
+                  "parameters": {
+                    "label": "Type:DataAnalysis"
+                  }
+                }
+              ]
+            },
+            {
+              "operator": "not",
+              "operands": [
+                {
+                  "name": "hasLabel",
+                  "parameters": {
+                    "label": "Type:Learning"
+                  }
+                }
+              ]
+            },
+            {
+              "operator": "not",
+              "operands": [
+                {
+                  "name": "hasLabel",
+                  "parameters": {
+                    "label": "Type:Tracking"
+                  }
+                }
+              ]
+            },
+            {
+              "operator": "not",
+              "operands": [
+                {
+                  "name": "hasLabel",
+                  "parameters": {
+                    "label": "Type:Engineering"
+                  }
+                }
+              ]
+            },
+            {
+              "operator": "not",
+              "operands": [
+                {
+                  "name": "hasLabel",
+                  "parameters": {
+                    "label": "Type:BreakingChange"
+                  }
+                }
+              ]
+            },
+            {
+              "operator": "and",
+              "operands": [
+                {
+                  "name": "isAction",
+                  "parameters": {
+                    "action": "opened"
+                  }
+                },
+                {
+                  "name": "activitySenderHasPermissions",
+                  "parameters": {
+                    "permissions": "write"
+                  }
+                }
+              ]
+            },
+            {
+              "operator": "not",
+              "operands": [
+                {
+                  "name": "hasLabel",
+                  "parameters": {
+                    "label": "Epic"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "eventType": "issue",
+        "eventNames": [
+          "issues",
+          "project_card"
+        ],
+        "taskName": "[Type Label Reminder][4-3] Remember NuGet Client member(issue author) to add Type label",
+        "actions": [
+          {
+            "name": "addReply",
+            "parameters": {
+              "comment": "@${issueAuthor} Issue is missing Type label, remember to add a [Type label](https://github.com/NuGet/Client.Engineering/blob/main/designs/nuget-issues-approach.md#issue-type)"
+            }
+          },
+          {
+            "name": "addLabel",
+            "parameters": {
+              "label": "missing-required-type"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "taskType": "trigger",
+      "capabilityId": "IssueResponder",
+      "subCapability": "IssuesOnlyResponder",
+      "version": "1.0",
+      "config": {
+        "conditions": {
+          "operator": "and",
+          "operands": [
+            {
+              "operator": "and",
+              "operands": [
+                {
+                  "operator": "not",
+                  "operands": [
+                    {
+                      "name": "hasLabel",
+                      "parameters": {
+                        "label": "Type:Spec"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "operator": "not",
+                  "operands": [
+                    {
+                      "name": "hasLabel",
+                      "parameters": {
+                        "label": "Type:Test"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "operator": "not",
+                  "operands": [
+                    {
+                      "name": "hasLabel",
+                      "parameters": {
+                        "label": "Type:Feature"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "operator": "not",
+                  "operands": [
+                    {
+                      "name": "hasLabel",
+                      "parameters": {
+                        "label": "Type:Docs"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "operator": "not",
+                  "operands": [
+                    {
+                      "name": "hasLabel",
+                      "parameters": {
+                        "label": "Type:DCR"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "operator": "not",
+                  "operands": [
+                    {
+                      "name": "hasLabel",
+                      "parameters": {
+                        "label": "Type:Bug"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "operator": "not",
+                  "operands": [
+                    {
+                      "name": "hasLabel",
+                      "parameters": {
+                        "label": "Type:DeveloperDocs"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "operator": "not",
+                  "operands": [
+                    {
+                      "name": "hasLabel",
+                      "parameters": {
+                        "label": "Type:DataAnalysis"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "operator": "not",
+                  "operands": [
+                    {
+                      "name": "hasLabel",
+                      "parameters": {
+                        "label": "Type:Learning"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "operator": "not",
+                  "operands": [
+                    {
+                      "name": "hasLabel",
+                      "parameters": {
+                        "label": "Type:Tracking"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "operator": "not",
+                  "operands": [
+                    {
+                      "name": "hasLabel",
+                      "parameters": {
+                        "label": "Type:Engineering"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "operator": "not",
+                  "operands": [
+                    {
+                      "name": "hasLabel",
+                      "parameters": {
+                        "label": "Type:BreakingChange"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "operator": "or",
+                  "operands": [
+                    {
+                      "name": "isAction",
+                      "parameters": {
+                        "action": "reopened"
+                      }
+                    },
+                    {
+                      "name": "isAction",
+                      "parameters": {
+                        "action": "assigned"
+                      }
+                    },
+                    {
+                      "name": "isAction",
+                      "parameters": {
+                        "action": "closed"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "operator": "not",
+              "operands": [
+                {
+                  "name": "hasLabel",
+                  "parameters": {
+                    "label": "Epic"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "eventType": "issue",
+        "eventNames": [
+          "issues",
+          "project_card"
+        ],
+        "taskName": "[Type Label Reminder][4-4] Remember NuGet Client member(issue assignee) to add Type label",
+        "actions": [
+          {
+            "name": "addReply",
+            "parameters": {
+              "comment": "${assignees} Issue is missing Type label, remember to add a [Type label](https://github.com/NuGet/Client.Engineering/blob/main/designs/nuget-issues-approach.md#issue-type)"
+            }
+          },
+          {
+            "name": "addLabel",
+            "parameters": {
+              "label": "missing-required-type"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "taskType": "scheduled",
+      "capabilityId": "ScheduledSearch",
+      "subCapability": "ScheduledSearch",
+      "version": "1.1",
+      "config": {
+        "frequency": [
+          {
+            "weekDay": 0,
+            "hours": [
+              3,
+              7,
+              11,
+              15,
+              19,
+              23
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 1,
+            "hours": [
+              3,
+              7,
+              11,
+              15,
+              19,
+              23
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 2,
+            "hours": [
+              3,
+              7,
+              11,
+              15,
+              19,
+              23
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 3,
+            "hours": [
+              3,
+              7,
+              11,
+              15,
+              19,
+              23
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 4,
+            "hours": [
+              3,
+              7,
+              11,
+              15,
+              19,
+              23
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 5,
+            "hours": [
+              3,
+              7,
+              11,
+              15,
+              19,
+              23
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 6,
+            "hours": [
+              3,
+              7,
+              11,
+              15,
+              19,
+              23
+            ],
+            "timezoneOffset": -7
+          }
+        ],
+        "searchTerms": [
+          {
+            "name": "isOpen",
+            "parameters": {}
+          },
+          {
+            "name": "isIssue",
+            "parameters": {}
+          },
+          {
+            "name": "hasLabel",
+            "parameters": {
+              "label": "Status:Inactive"
+            }
+          },
+          {
+            "name": "noLabel",
+            "parameters": {
+              "label": "Status:Excluded from icebox cleanup"
+            }
+          },
+          {
+            "name": "noLabel",
+            "parameters": {
+              "label": "Triage:NeedsTriageDiscussion"
+            }
+          },
+          {
+            "name": "noLabel",
+            "parameters": {
+              "label": "Icebox cleanup candidate"
+            }
+          }
+        ],
+        "actions": [
+          {
+            "name": "addLabel",
+            "parameters": {
+              "label": "Icebox cleanup candidate"
+            }
+          },
+          {
+            "name": "addReply",
+            "parameters": {
+              "comment": "Due to lack of recent activity, this issue has been marked as a candidate for icebox cleanup. It will be closed if no further activity occurs within 14 more days. Any new comment (by anyone, not necessarily the author) will add a `Triage:NeedsTriageDiscussion` label and lead to a triaging process.\nThis process is part of the experimental [Stale icebox issues cleanup](https://github.com/NuGet/Home/issues/12113) we are currently trialing. Please share any feedback you might have in the linked issue.\n"
+            }
+          }
+        ],
+        "taskName": "[Close stale icebox][3-1] Search \"Status:Inactive\" but without \"Status:Excluded from icebox cleanup\" and \"Triage:NeedsTriageDiscussion\", add \"Icebox cleanup candidate\" and show a warning."
+      }
+    },
+    {
+      "taskType": "scheduled",
+      "capabilityId": "ScheduledSearch",
+      "subCapability": "ScheduledSearch",
+      "version": "1.1",
+      "config": {
+        "frequency": [
+          {
+            "weekDay": 0,
+            "hours": [
+              2,
+              6,
+              10,
+              14,
+              18,
+              22
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 1,
+            "hours": [
+              2,
+              6,
+              10,
+              14,
+              18,
+              22
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 2,
+            "hours": [
+              2,
+              6,
+              10,
+              14,
+              18,
+              22
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 3,
+            "hours": [
+              2,
+              6,
+              10,
+              14,
+              18,
+              22
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 4,
+            "hours": [
+              2,
+              6,
+              10,
+              14,
+              18,
+              22
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 5,
+            "hours": [
+              2,
+              6,
+              10,
+              14,
+              18,
+              22
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 6,
+            "hours": [
+              2,
+              6,
+              10,
+              14,
+              18,
+              22
+            ],
+            "timezoneOffset": -7
+          }
+        ],
+        "searchTerms": [
+          {
+            "name": "isOpen",
+            "parameters": {}
+          },
+          {
+            "name": "isIssue",
+            "parameters": {}
+          },
+          {
+            "name": "hasLabel",
+            "parameters": {
+              "label": "Icebox cleanup candidate"
+            }
+          },
+          {
+            "name": "noLabel",
+            "parameters": {
+              "label": "Triage:NeedsTriageDiscussion"
+            }
+          },
+          {
+            "name": "noActivitySince",
+            "parameters": {
+              "days": 14
+            }
+          }
+        ],
+        "taskName": "[Close stale icebox][3-2] Close \"Icebox cleanup candidate\" if no activity within 14 days.",
+        "actions": [
+          {
+            "name": "addReply",
+            "parameters": {
+              "comment": "This issue will now be closed since it had been marked Icebox cleanup candidate, but received no further activity in the past 14 days. "
+            }
+          },
+          {
+            "name": "closeIssue",
+            "parameters": {}
+          }
+        ]
+      }
+    },
+    {
+      "taskType": "trigger",
+      "capabilityId": "IssueResponder",
+      "subCapability": "IssueCommentResponder",
+      "version": "1.0",
+      "config": {
+        "conditions": {
+          "operator": "and",
+          "operands": [
+            {
+              "name": "isOpen",
+              "parameters": {}
+            },
+            {
+              "name": "isAction",
+              "parameters": {
+                "action": "created"
+              }
+            },
+            {
+              "name": "hasLabel",
+              "parameters": {
+                "label": "Icebox cleanup candidate"
+              }
+            },
+            {
+              "operator": "not",
+              "operands": [
+                {
+                  "name": "hasLabel",
+                  "parameters": {
+                    "label": "Triage:NeedsTriageDiscussion"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "eventType": "issue",
+        "eventNames": [
+          "issue_comment"
+        ],
+        "taskName": "[Close stale icebox][3-3] For \"Icebox cleanup candidate\" issues, if there is any comments, add \"Triage:NeedsTriageDiscussion\" label",
+        "actions": [
+          {
+            "name": "addLabel",
+            "parameters": {
+              "label": "Triage:NeedsTriageDiscussion"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "taskType": "trigger",
+      "capabilityId": "IssueResponder",
+      "subCapability": "PullRequestResponder",
+      "version": "1.0",
+      "config": {
+        "conditions": {
+          "operator": "and",
+          "operands": [
+            {
+              "operator": "or",
+              "operands": [
+                {
+                  "name": "isAction",
+                  "parameters": {
+                    "action": "opened"
+                  }
+                },
+                {
+                  "name": "isAction",
+                  "parameters": {
+                    "action": "reopened"
+                  }
+                }
+              ]
+            },
+            {
+              "name": "activitySenderHasPermissions",
+              "parameters": {
+                "permissions": "read"
+              }
+            },
+            {
+              "operator": "not",
+              "operands": [
+                {
+                  "name": "isActivitySender",
+                  "parameters": {
+                    "user": "nuget-client "
+                  }
+                }
+              ]
+            },
+            {
+              "operator": "not",
+              "operands": [
+                {
+                  "name": "hasLabel",
+                  "parameters": {
+                    "label": "Community"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "eventType": "pull_request",
+        "eventNames": [
+          "pull_request",
+          "issues",
+          "project_card"
+        ],
+        "taskName": "[Label community PRs] [1-1] Label the community PRs",
+        "actions": [
+          {
+            "name": "addLabel",
+            "parameters": {
+              "label": "Community"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "taskType": "scheduled",
+      "capabilityId": "ScheduledSearch",
+      "subCapability": "ScheduledSearch",
+      "version": "1.1",
+      "config": {
+        "frequency": [
+          {
+            "weekDay": 0,
+            "hours": [
+              9,
+              21
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 1,
+            "hours": [
+              9,
+              21
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 2,
+            "hours": [
+              9,
+              21
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 3,
+            "hours": [
+              9,
+              21
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 4,
+            "hours": [
+              9,
+              21
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 5,
+            "hours": [
+              9,
+              21
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 6,
+            "hours": [
+              9,
+              21
+            ],
+            "timezoneOffset": -7
+          }
+        ],
+        "searchTerms": [
+          {
+            "name": "hasLabel",
+            "parameters": {
+              "label": "Community"
+            }
+          },
+          {
+            "name": "noActivitySince",
+            "parameters": {
+              "days": 30
+            }
+          },
+          {
+            "name": "isPr",
+            "parameters": {}
+          },
+          {
+            "name": "isOpen",
+            "parameters": {}
+          },
+          {
+            "name": "noLabel",
+            "parameters": {
+              "label": "Status:No recent activity"
+            }
+          }
+        ],
+        "taskName": "[stale community PR] [5-1] Search for community PRs with no activity over 30 days and warn.",
+        "actions": [
+          {
+            "name": "addLabel",
+            "parameters": {
+              "label": "Status:No recent activity"
+            }
+          },
+          {
+            "name": "addReply",
+            "parameters": {
+              "comment": "This PR has been automatically marked as stale because it has no activity for **30 days**. It will be closed if no further activity occurs **within another 330 days** of this comment. If it is closed, you may reopen it anytime when you're ready again, as long as you don't delete the branch."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "taskType": "trigger",
+      "capabilityId": "IssueResponder",
+      "subCapability": "PullRequestResponder",
+      "version": "1.0",
+      "config": {
+        "conditions": {
+          "operator": "and",
+          "operands": [
+            {
+              "operator": "not",
+              "operands": [
+                {
+                  "name": "isAction",
+                  "parameters": {
+                    "action": "closed"
+                  }
+                }
+              ]
+            },
+            {
+              "name": "hasLabel",
+              "parameters": {
+                "label": "Status:No recent activity"
+              }
+            },
+            {
+              "name": "hasLabel",
+              "parameters": {
+                "label": "Community"
+              }
+            }
+          ]
+        },
+        "eventType": "pull_request",
+        "eventNames": [
+          "pull_request",
+          "issues",
+          "project_card"
+        ],
+        "taskName": "[stale community PR] [5-2] Remove \"Status:No recent activity\" if there is any activity.",
+        "actions": [
+          {
+            "name": "removeLabel",
+            "parameters": {
+              "label": "Status:No recent activity"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "taskType": "trigger",
+      "capabilityId": "IssueResponder",
+      "subCapability": "PullRequestCommentResponder",
+      "version": "1.0",
+      "config": {
+        "conditions": {
+          "operator": "and",
+          "operands": [
+            {
+              "name": "hasLabel",
+              "parameters": {
+                "label": "Status:No recent activity"
+              }
+            },
+            {
+              "name": "hasLabel",
+              "parameters": {
+                "label": "Community"
+              }
+            }
+          ]
+        },
+        "eventType": "pull_request",
+        "eventNames": [
+          "issue_comment"
+        ],
+        "taskName": "[stale community PR] [5-3] Remove \"Status:No recent activity\" if there is any comment.",
+        "actions": [
+          {
+            "name": "removeLabel",
+            "parameters": {
+              "label": "Status:No recent activity"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "taskType": "trigger",
+      "capabilityId": "IssueResponder",
+      "subCapability": "PullRequestReviewResponder",
+      "version": "1.0",
+      "config": {
+        "conditions": {
+          "operator": "and",
+          "operands": [
+            {
+              "name": "hasLabel",
+              "parameters": {
+                "label": "Status:No recent activity"
+              }
+            },
+            {
+              "name": "hasLabel",
+              "parameters": {
+                "label": "Community"
+              }
+            }
+          ]
+        },
+        "eventType": "pull_request",
+        "eventNames": [
+          "pull_request_review"
+        ],
+        "taskName": "[stale community PR] [5-4] Remove \"Status:No recent activity\" if there are any reviews.",
+        "actions": [
+          {
+            "name": "removeLabel",
+            "parameters": {
+              "label": "Status:No recent activity"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "taskType": "scheduled",
+      "capabilityId": "ScheduledSearch",
+      "subCapability": "ScheduledSearch",
+      "version": "1.1",
+      "config": {
+        "frequency": [
+          {
+            "weekDay": 0,
+            "hours": [
+              7,
+              19
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 1,
+            "hours": [
+              7,
+              19
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 2,
+            "hours": [
+              7,
+              19
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 3,
+            "hours": [
+              7,
+              19
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 4,
+            "hours": [
+              7,
+              19
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 5,
+            "hours": [
+              7,
+              19
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 6,
+            "hours": [
+              7,
+              19
+            ],
+            "timezoneOffset": -7
+          }
+        ],
+        "searchTerms": [
+          {
+            "name": "isPr",
+            "parameters": {}
+          },
+          {
+            "name": "isOpen",
+            "parameters": {}
+          },
+          {
+            "name": "hasLabel",
+            "parameters": {
+              "label": "Status:No recent activity"
+            }
+          },
+          {
+            "name": "hasLabel",
+            "parameters": {
+              "label": "Community"
+            }
+          },
+          {
+            "name": "noActivitySince",
+            "parameters": {
+              "days": 330
+            }
+          },
+          {
+            "name": "noLabel",
+            "parameters": {
+              "label": "Status:Do not auto close"
+            }
+          }
+        ],
+        "taskName": "[stale community PR] [5-5] Close PRs with no activity over 330 days after warn.",
+        "actions": [
+          {
+            "name": "closeIssue",
+            "parameters": {}
+          }
+        ]
+      }
+    }
+  ],
+  "userGroups": []
+}
