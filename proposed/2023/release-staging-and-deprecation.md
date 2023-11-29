@@ -15,7 +15,7 @@ This will allow one to easily identify all the packages released as part of a si
 
 <!-- Why are we doing this? What pain points does this solve? What is the expected outcome? -->
 Many products (Apps / Tools / Frameworks / Utilities / etc. ...) consist of multiple interdependent packages which should be published together as a single set.
- Currently, NuGet provides no functionality for definding / grouping packages into such sets.
+ Currently, NuGet provides no functionality for defining / grouping packages into such sets.
  This results in package owners having to keep track of these package sets on their own.
  There are three specific sets of scenarios which this feature will simplify dramatically:
 1. When preparing a release, product owners would like to have a mechanism to pre-stage their product packages,
