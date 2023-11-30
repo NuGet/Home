@@ -35,7 +35,6 @@ The `package search [search terms] [options]` command will have the following op
 | `--skip`         | The number of results to skip, for pagination. The default value is 0. |
 | `--source`       | A source to search. |
 | `--take`         | The number of results to return. The default value is 20.|
-| `--verbosity`    | Display this amount of details in the output: `normal`, `minimal`, `detailed`. The default is `normal`. |
 
 #### **Option `--source`**
 
@@ -91,7 +90,7 @@ This option will allow the specification of the output format. The option will t
                         "Owners": "",
                         "totalDownloads": "",
                         "latestVersion": "",
-                        "packageId": ""
+                        "id": ""
                     }
                 ]
             },
@@ -124,7 +123,6 @@ Here are the details of each verbosity level:
   - Description
   - Deprecation
   - Project URL
-  - Vulnerable
 
 ### Technical explanation
 
@@ -158,4 +156,3 @@ In nuget.exe there is `nuget.exe search` command which does the same thing. Howe
 
 ## Future Possibilities
 
-<!-- What future possibilities can you think of that this proposal would help with? -->
