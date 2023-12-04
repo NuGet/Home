@@ -108,7 +108,7 @@ It should be possible for a group to expand over time. This is currently a real 
 3. Later, as new builds are being prepared for a patch release, a new set of packages will be staged, to be later published to the same group.
 As there can be multiple candidate builds for a release, there is a need for functionality to discard a stage for a given group `nuget stage --discard --group-id "net8.0"`.
 This will remove all the staged but not published packages from the net8.0 group.
-4. A new set of packages will be staged for the 8.0 group, untile the final build is known. At this point, there is only one unified set of related packages is staged.
+4. A new set of packages will be staged for the 8.0 group, until the final build is known. At this point, there is only one unified set of related packages is staged.
 5. On the release date, the release team will call `nuget publish --group-id "net8.0"` again, and only the staged packages will be published, resulting in an expanded set of published packages in the net8.0 group.
 6. Some time in the future, when the release is already out of support, somebody from the .NET team will call
  `nuget deprecate --group-id "net8.0"` and all the packages which have ever been published to that group will be deprecated.
