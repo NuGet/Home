@@ -80,7 +80,7 @@ There are few interesting scenarios related to package ownership:
 2. The group to be published no longer has any packages in it. In this case the command should fail detailing the reason for the failure.
 3. This will be the same but for deprecation. Essentially, any bulk operation using groups, where the set of the packages in the group
  have changed after staging, should result in an error with details about the change. The `--force` flag should again be used
- to ignore the change and move forward with execution of the requst (either publishing or deprecation). To summarize,
+ to ignore the change and move forward with execution of the request (either publishing or deprecation). To summarize,
  the fundamental principle is that a user cannot deprecate a package they don't own.
 
 #### Lifespan of a staged group
