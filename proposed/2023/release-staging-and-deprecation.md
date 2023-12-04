@@ -67,7 +67,7 @@ When a package is staged, the id of the package is reserved at that point, and n
 
 Also, to avoid abuse, only a limited number of packages can be staged within a single group. While this can potentially be defined as a configurable value per organization / owner, there is no such requirement at the moment. Hence, this can be set to 1000 packages for now or not defined at all. Will leave this for potentially future consideration.
 
-When staged, packages will not be visible / accessible to anyone but the owner (including coowners). They will be able to see the current staged list for a given group using `nuget stage --list --group-id [group-id]` command. 
+When staged, packages will not be visible / accessible to anyone but the co-owners. They will be able to see the current staged list for a given group using `nuget stage --list --group-id [group-id]` command. 
 
 
 #### Group Ownership
