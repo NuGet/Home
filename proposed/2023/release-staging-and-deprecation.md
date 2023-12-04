@@ -102,7 +102,7 @@ Alternatively, the user can restage the expired package and call the publish com
 It should be possible for a group to expand over time. This is currently a real scenario, where .NET GA SDK ships a set of packages,
  and then follow-up SDK updates ship updated packages which still belong to the same .NET 8 package group.
  Here how this will play out with the tooling support described above:
-1. During GA release, the release team will stage the set of RTM packages for the release. (nuget stage --group-id "net8.0" --package-id <package-id>)
+1. During GA release, the release team will stage the set of RTM packages for the release. (nuget stage --group-id "net8.0" --package-id <package-file-path>)
 2. Then on the day of the release, all the staged packages will be published using `nuget publish --group-id "net8.0"` command.
    At this point, the stage for the `net8.0` group will be empty.
 3. Later, as new builds are being prepared for a patch release, a new set of packages will be staged, to be later published to the same group.
