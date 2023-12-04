@@ -47,7 +47,7 @@ Groups can expand over time, by publishing new packages to the same group in the
  as group by itself is stateless. It's just a collection of packages. A package can belong only to a single group.
  This group expansion functionality will be handy for the error situation described above, where during staging a package staging fails.
  This will result in only some packages being staged. The user will need to address the issues related to the failed package
- and stage the remaining packages using the same command. Note, that if a package is stages, the operation should be idempotent,
+ and stage the remaining packages using the same command. Note, that if a package is staged, the operation should be idempotent,
  and a request to stage the same package again should only result in a warning message (package is already staged) and the package shouldn't be uploaded again.
 
 Groups can later be used in the future when it's time to deprecate a set of packages. The package author can request to
