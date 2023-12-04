@@ -126,7 +126,7 @@ There are no critical scenarios for deprecation to happen within specific time p
 This requirement brings a need for a new NuGet command for querying the status of an asynchronous operation.
 Let's assume that the group publishing and deprecation commands will return some "operation id" for later state inquriry by the client.
 `nuget status --operation-id` command can be used to track the progress of an asynchronous operation.
-This can return the fullowing results:
+This can return the following results:
 - `success` : when successful, the operation should also return the time when the operation was completed.
 - `failed` : operation failed
 When failed, the result of the command shuold also produce detailed information about what went wrong.
