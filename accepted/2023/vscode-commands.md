@@ -9,7 +9,7 @@
 <!-- One-paragraph description of the proposal. -->
 This proposal introduces a command palette experience including quickpick flows for NuGet package management. It covers browsing for a package and installing it, managing packages(removing, updating, etc) in existing projects & solutions, clearing caches/package folders, packaging a library, pushing it to a source, managing package sources, and opening the package manager.
 
-## Motivation 
+## Motivation
 
 <!-- Why are we doing this? What pain points does this solve? What is the expected outcome? -->
 Visual Studio Code now supports "C# Dev Kit" which is an extension that allows a .NET/C# developer to use familiar Visual Studio tooling for their purposes. This proposal brings integrated Visual Studio Code-like experiences directly into the extension to make it easier for .NET/C# developers to manage their packages and package-related tasks.
@@ -25,21 +25,88 @@ Requests for NuGet functionality are at an all time high since the general avail
 
 #### Browse and Install a Package
 
-A new command is listed named `NuGet: Add a package...``. When a developer selects this command, it will prompt them in a search box to provide a search term for a respective package to be found on their package sources. The results box will provide them a selectable list that also shows what package sources the package can be found on. It also includes a brief snippet of the description, an icon, and the latest version available.
+##### Option 1: Navigating to add package directly in command palette
+
+A new command is listed named `NuGet: Add a package...``. 
+
+![Screenshot showing the Visual Studio Code command palette with 'NuGet: Add package...' command at the top of the list and highlighted](../../meta/resources/vscode-commands/addpackage-commandpalette1.png)
+
+When a developer selects this command, it will prompt them in a search box to provide a search term for a respective package to be found on their package sources.
+
+The results box will provide them a selectable list that also shows what package sources the package can be found on. It also includes a brief snippet of the description, an icon, and the latest version available.
+
+--Screenshot of example search results --
+TODO: Define experience of what the list will look like for the first iteration
+
+Once a package is selected from the list, the user will then be prompted to select the version number that they would like to install.
+
+TODO: define what the version selection page will look like and what information we want to include (ex: latest, prerelease, date, keyboard shortcuts for latest, etc)
+
+Once the user selects their desired version number, the package will be installed. Once installation has either succeeded or failed, the developer will recieve a toast notification notifying them of the status of the installation operation. If the installation has succeeded, the notification will read " Package X was successfully installed". If the installation has failed then the notification will read "An error occured when trying to install package X. Click here for more details". The words "Click here" will be a link that when clicked, will direct the developer to the output window where they can see why the installation failed.
+
+TODO: Define notification experience and provide screenshots
+
+##### Option 2: Navigating to 'NuGet: Add Package' command through C# DevKit Solution Explorer
+
+A developer will also be able to access the same add package command through a right click experience built directly into the soltion explorer offered through C# DevKit. In the solution explorer, there is a "Dependencies" node, which contains a list of all of the packages directly installed into the solutuion in question. When the user right clicks on this "Dependency" folder, they will see a menu of options...
+
+TODO: Add screenshot and define right click experience
+
+When the use selects the "Add dependency" menu list item, the command palette will open and it will prompt them in a search box to provide a search term for a respective package to be found on their package sources. They will then go through the same flow described in option 1 above.
 
 #### Removing a Package
 
+##### Option 1: Naviagting to remove package directly in command palette
+A new command is listed named `NuGet: Remove a package...``.
+
+TODO: Add a screenshot of the command palette option for remove package
+
+When a developer selects this command, it will prompt them in a search box to provide a search term for a respective package to be found within the packages they have installed in their current solution. Beneath the search bar, a list of all of these packages installed in the solution will appear, and the developer will have the option to enter a search term to narrow down the list, or just select directly from the list provided.
+
+TODO: show screenshot of what the experience described above will look like (search bar with list of all installed packages below it)
+Question: do we want to provide check boxes and allow multiple packages to be selected at once? or could this be a possible addition for a future iteration
+
+##### Option 2: Navigating to 'NuGet: Remove package' command through C# DevKit soltion explorer
+
+A developer will also be able to access the same remove package command through a right click experience built directly into the soltion explorer offered through C# DevKit. In the dependency node, if the developer right clicks on a specific package in the folder, they will see a menu of options for operations to perform on this specific package. One of these options will be: "Remove package".
+
+TODO: Define the remove package experience ... I assume we want to prompt the user to confirm this action and not just delete right away.
+
 #### Updating a Package
+
+##### Option 1: Navigating to update package directly in command palette
+A new command is listed named `NuGet: Update a package...``.
+
+TODO: add a screenshot of the command palette option for updating a package
+
+
+##### Option 2: Navigating to 'NuGet: Update Package' command through C# DevKit soltion explorer
+
+A developer will also be able to access the same update package command through a right click experience built directly into the soltion explorer offered through C# DevKit. In the dependency node, if the developer right clicks on a specific package in the folder, they will see a menu of options for operations to perform on this specific package. One of these options will be: "Update package".
+
+TODO: Define update package experience
 
 #### Clearing package caches/folders
 
+TBD 
+
 #### Packaging a Library
+TBD
 
 #### Pushing a package to a source
+TBD
 
 #### Managing package sources
+TBD
 
 #### Opening a Package Manager
+TBD
+
+#### Navigating back in operation flow
+
+At any point during a specific package operation using the command palette, the user will have the option to navigate back, and undo their most resent previous selection. They can do this by...
+
+TODO: define how the navigating back experience will look
 
 ### Technical explanation
 
