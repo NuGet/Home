@@ -96,9 +96,8 @@ If Owner is not available, the metadata will be shown with an indication that th
 
 #### Resource: `'OwnerDetailsUriTemplate'`
 
-Introduce a template to the NuGet Server API for building URLs for details about an owner.
-
-`OwnerDetailsUriTemplate`, Similar to [Package details URL template](https://learn.microsoft.com/en-us/nuget/api/package-details-template-resource), the template will allow clients to link to details (eg, a profile page) on the package source.
+Introduce a template, `OwnerDetailsUriTemplate`, to the NuGet Server API for building URLs for details about an owner.
+Similar to [Package details URL template](https://learn.microsoft.com/en-us/nuget/api/package-details-template-resource), the template will allow clients to link to details (eg, a profile page) on the package source.
 
 #### NuGet Client SDK
 
