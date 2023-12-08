@@ -1,5 +1,5 @@
 # NuGet Package Management - Command Palette & Quick Picks in Visual Studio Code
-<!-- Replace `Title` with an appropriate title for your design -->
+
 
 - Jon Douglas, Allie Barry, Jean-Pierre
 - GitHub Issue <!-- GitHub Issue link -->
@@ -49,17 +49,28 @@ Once a package is selected from the list, the user will then be prompted to sele
 
 ![Screenshot showing a selectable list of version numbers for 'Microsoft.CSharp' package.](../../meta/resources/vscode-commands/addpackage-searchresults.png)
 
-Once the user selects their desired version number, the package will be installed. Once installation has either succeeded or failed, the developer will recieve a toast notification notifying them of the status of the installation operation. If the installation has succeeded, the notification will read " Package X was successfully installed". If the installation has failed then the notification will read "An error occured when trying to install package X. Click here for more details". The words "Click here" will be a link that when clicked, will direct the developer to the output window where they can see why the installation failed.
+Once the user selects their desired version number, the package will be installed. Once installation has either succeeded or failed, the developer will recieve a toast notification notifying them of the status of the installation operation. If the installation has succeeded, the notification will read " Package X was successfully installed". If the installation has failed then the notification will read "Package X failed to install due to an error.". This toast will also include a blue button that says "More Information", which when clicked, will direct the developer to the output window where they can see why the installation failed.
 
-TODO: Define notification experience and provide screenshots
+![Screenshot showing failed package install notification](../../meta/resources/vscode-commands/addpackage-failurenotification.png)
+
+![Screenshot showing sucessful package install notification](../../meta/resources/vscode-commands/addpackage-successnotification.png)
 
 ##### Option 2: Navigating to 'NuGet: Add Package' command through C# DevKit Solution Explorer
 
-A developer will also be able to access the same add package command through a right click experience built directly into the soltion explorer offered through C# DevKit. In the solution explorer, there is a "Dependencies" node, which contains a list of all of the packages directly installed into the solutuion in question. When the user right clicks on this "Dependency" folder, they will see a menu of options...
+A developer will also be able to access the same add package command through a right click experience built directly into the soltion explorer offered through C# DevKit. We want to provide an experience that aligns closely with the experience that is currently offered in, and future plans for, C# Dev Kit. When interacting with the solution explorer for C# projects that is offered through DevKit, many of the elements that exist today can be interacted with through a similar right-click experience, as well as icons that appear on hover of these elements that allow for quick selection of common functions. We want to incorporate this functionality into the NuGet VS Code experience to allow for a seamless and well-rounded experience for C# Developers. 
 
-TODO: Add screenshot and define right click experience
+In the solution explorer, there is a "Dependencies" node, and within that node, there is a "Packages" node, which contains a list of all of the NuGet packages directly installed into the solution in question. When a user hovers over this "Packages" folder, they will see a small plus sign icon appear in line on the far right.
 
-When the use selects the "Add dependency" menu list item, the command palette will open and it will prompt them in a search box to provide a search term for a respective package to be found on their package sources. They will then go through the same flow described in option 1 above.
+![A screenshot showing the plus sign icon that will appear next to the "packages" folder when a user hovers over it](../../meta/resources/vscode-commands/addpackage-plussign.png)
+
+Additionally, when the user right clicks on this Packages folder, they will see a menu show up, providing them with options to manage their NuGet packages. Specifically, they will see an option to "Add package...".
+
+![Screenshot showing the menu that will appear when a user right clicks on the "packages folder" in C# DevKit. The menu contains an option to add a nuget package](../../meta/resources/vscode-commands/addpackage-rightclickmenu.png)
+
+When the user selects the "Add package" menu list item, or when they select the 'plus sign' icon that appears on hover next to the
+'Packages' folder, the command palette will open and they will be guided through the same pacage install process described in option 1, starting with the empty serch box to search for a specific package. 
+
+![Screenshot shwoing the quick picks search box prompting the user to enter a search term to search for a NuGet package.](../../meta/resources/vscode-commands/addpackage-searchbox.png)
 
 #### Removing a Package
 
