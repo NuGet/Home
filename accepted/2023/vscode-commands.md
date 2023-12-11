@@ -1,5 +1,4 @@
-# NuGet Package Management - Command Palette & Quick Picks in Visual Studio Code
-
+# NuGet Package Management: Command Palette & Quick Picks in Visual Studio Code/C# Dev Kit - MVP
 
 - Jon Douglas, Allie Barry, Jean-Pierre
 - GitHub Issue <!-- GitHub Issue link -->
@@ -7,11 +6,27 @@
 ## Summary
 
 <!-- One-paragraph description of the proposal. -->
-This proposal introduces a command palette experience including quickpick flows for NuGet package management. It covers browsing for a package and installing it, managing packages(removing, updating, etc) in existing projects & solutions, clearing caches/package folders, packaging a library, pushing it to a source, managing package sources, and opening the package manager.
+This proposal introduces a command palette experience including 'quickpick' flows and integration with C# DevKit for NuGet package management. It covers the initial experiences for adding, removing, and updating a NuGet package. This document covers the minimum viable product (MVP) for a NuGet command palette experience, and leaves room for growth and expansion on these initial concepts, both in enhancing these 3 features, or in the addition of more NuGet command palette features.
 
-Elaborate on the summary -- quick run down of each of the features and flow to help people understand what they are about to read 
+For each feature, there are two "entry points" presented for 
 
-table of contents with links to specific parts of the doc?
+## Table of Contents
+
+1. [Motivation](#motivation)
+2. [Functional Explanation](#functional-explanation)
+    - [Browse and Install a Package - Command Palette](#option-1-navigating-to-add-package-directly-in-command-palette)
+    - [Browse and Install a Package - C# Dev Kit](#option-2-navigating-to-nuget-add-package-command-through-c-devkit-solution-explorer)
+    - [Removing a Package - Command Palette](#option-1-navigating-to-remove-package-directly-in-command-palette)
+    - [Removing a Package - C# Dev Kit](#option-2-navigating-to-nuget-remove-package-command-through-c-devkit-solution-explorer)
+    - [Updating a Package - Command Palette](#option-1-navigating-to-update-package-directly-in-command-palette)
+    - [Updating a Package - C# Dev Kit](#option-2-navigating-to-nuget-update-package-command-through-c-devkit-soltion-explorer)
+    - [Navigating back in operation flow](#navigating-back-in-operation-flow)
+3. [Technical Explanation](#technical-explanation)
+4. [Drawbacks](#drawbacks)
+5. [Rationale and Alternatives](#rationale-and-alternatives)
+6. [Prior Art](#prior-art)
+7. [Unresolved Questions](#unresolved-questions)
+8. [Future](#future-possibilities)
 
 ## Motivation
 
@@ -19,6 +34,10 @@ table of contents with links to specific parts of the doc?
 Visual Studio Code now supports "C# Dev Kit" which is an extension that allows a .NET/C# developer to use familiar Visual Studio tooling for their purposes. This proposal brings integrated Visual Studio Code-like experiences directly into the extension to make it easier for .NET/C# developers to manage their packages and package-related tasks.
 
 Requests for NuGet functionality are at an all time high since the general availability of C# Dev Kit. NuGet feature requests remain in the top 3 of GitHub issues on the C# Dev Kit repository. It was a popular ask at MVP Summit, Microsoft Build, and dotnetConf.
+
+In a recent Visual Studio for Mac/C# Dev Kit survey, when asked about "features or experiences missing from the VS Code experience that are critical to their workflow", 20 out of 157 respondents mentioned NuGet package manager functionality. They specifically called out "being able to look up available NuGet packages to solve specific problems", "updating to the latest version of NuGet packages", and wanting a "visual experience".
+
+Given the high demand for this functionality, we first plan to integrate NuGet package management into C# Dev Kit and the VS Code command palette to get a solution for managing NuGet packages into the hands of users as soon as possible. From there, we plan to explore and build a visual UI to compliment and enhance this experience.
 
 ## Explanation
 
@@ -49,7 +68,7 @@ Once a package is selected from the list, the user will then be prompted to sele
 
 ![Screenshot showing a selectable list of version numbers for 'Microsoft.CSharp' package.](../../meta/resources/vscode-commands/addpackage-searchresults.png)
 
-Once the user selects their desired version number, the package will be installed. Once installation has either succeeded or failed, the developer will recieve a toast notification notifying them of the status of the installation operation. If the installation has succeeded, the notification will read " Package X was successfully installed". If the installation has failed then the notification will read "Package X failed to install due to an error.". This toast will also include a blue button that says "More Information", which when clicked, will direct the developer to the output window where they can see why the installation failed.
+Once the user selects their desired version number, the package will be installed. Once installation has either succeeded or failed, the developer will receive a toast notification notifying them of the status of the installation operation. If the installation has succeeded, the notification will read " Package X was successfully installed". If the installation has failed then the notification will read "Package X failed to install due to an error.". This toast will also include a blue button that says "More Information", which when clicked, will direct the developer to the output window where they can see why the installation failed.
 
 ![Screenshot showing failed package install notification](../../meta/resources/vscode-commands/addpackage-failurenotification.png)
 
@@ -83,7 +102,6 @@ TODO: Add a screenshot of the command palette option for remove package
 When a developer selects this command, it will prompt them in a search box to provide a search term for a respective package to be found within the packages they have installed in their current solution. Beneath the search bar, a list of all of these packages installed in the solution will appear, and the developer will have the option to enter a search term to narrow down the list, or just select directly from the list provided.
 
 TODO: show screenshot of what the experience described above will look like (search bar with list of all installed packages below it)
-Question: do we want to provide check boxes and allow multiple packages to be selected at once? or could this be a possible addition for a future iteration
 
 ##### Option 2: Navigating to 'NuGet: Remove package' command through C# DevKit solution explorer
 
@@ -106,26 +124,6 @@ TODO: add a screenshot of the command palette option for updating a package
 A developer will also be able to access the same update package command through a right click experience built directly into the soltion explorer offered through C# DevKit. In the dependency node, if the developer right clicks on a specific package in the folder, they will see a menu of options for operations to perform on this specific package. One of these options will be: "Update package".
 
 TODO: Define update package experience
-
-#### Clearing package caches/folders
-
-TBD
-
-#### Packaging a Library
-
-TBD
-
-#### Pushing a package to a source
-
-TBD
-
-#### Managing package sources
-
-TBD
-
-#### Opening a Package Manager
-
-TBD
 
 #### Navigating back in operation flow
 
@@ -165,4 +163,6 @@ Ask Wendy about if this is something they do/enable currently
 
 <!-- What future possibilities can you think of that this proposal would help with? -->
 
-expand on possibilities for future iterations ( more package details in the quick picks list, etc.)
+expand on possibilities for future iterations ( more package details in the quick picks list, multi select for package uninstall and updates, etc.)
+
+clearing package caches/folders, packaging a library, pushing a package to a source, managing package sources, opening a package manager
