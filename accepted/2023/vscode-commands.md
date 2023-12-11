@@ -31,15 +31,15 @@ Requests for NuGet functionality are at an all time high since the general avail
 
 ##### Option 1: Navigating to add package directly in command palette
 
-A new command is listed named `NuGet: Add a package...``. 
+A new command is listed named `NuGet: Add a package...``.
 
 ![Screenshot showing the Visual Studio Code command palette with 'NuGet: Add package...' command at the top of the list and highlighted](../../meta/resources/vscode-commands/addpackage-commandpalette1.png)
 
 When a developer selects this command, it will prompt them in a search box to provide a search term for a respective package to be found on their package sources.
 
-![Screenshot shwoing the quick picks search box prompting the user to enter a search term to search for a NuGet package.](../../meta/resources/vscode-commands/addpackage-searchbox.png)
+![Screenshot showing the quick picks search box prompting the user to enter a search term to search for a NuGet package.](../../meta/resources/vscode-commands/addpackage-searchbox.png)
 
-The developer can then enter a search term to search for a NuGet package, and press enter. At this point, if they would like to cancel the operation, they can press the 'Escape' key on the keyboard. There will be a line of text underneath the searchbox that alterts the user of the functions of both the 'Enter' and 'Escape' keys here.
+The developer can then enter a search term to search for a NuGet package, and press enter. At this point, if they would like to cancel the operation, they can press the 'Escape' key on the keyboard. There will be a line of text underneath the searchbox that alerts the user of the functions of both the 'Enter' and 'Escape' keys here.
 
 When the developer presses enter, the results box will appear and provide them a selectable list of packages that match their search term. For the first iteration of this experience, only the package ID will be shown in the search results. There are a few other possible options for what the search results could look like in the "Future Possibilities" section later in this document.
 
@@ -53,11 +53,11 @@ Once the user selects their desired version number, the package will be installe
 
 ![Screenshot showing failed package install notification](../../meta/resources/vscode-commands/addpackage-failurenotification.png)
 
-![Screenshot showing sucessful package install notification](../../meta/resources/vscode-commands/addpackage-successnotification.png)
+![Screenshot showing successful package install notification](../../meta/resources/vscode-commands/addpackage-successnotification.png)
 
 ##### Option 2: Navigating to 'NuGet: Add Package' command through C# DevKit Solution Explorer
 
-A developer will also be able to access the same add package command through a right click experience built directly into the soltion explorer offered through C# DevKit. We want to provide an experience that aligns closely with the experience that is currently offered in, and future plans for, C# Dev Kit. When interacting with the solution explorer for C# projects that is offered through DevKit, many of the elements that exist today can be interacted with through a similar right-click experience, as well as icons that appear on hover of these elements that allow for quick selection of common functions. We want to incorporate this functionality into the NuGet VS Code experience to allow for a seamless and well-rounded experience for C# Developers. 
+A developer will also be able to access the same add package command through a right click experience built directly into the solution explorer offered through C# DevKit. We want to provide an experience that aligns closely with the experience that is currently offered in, and future plans for, C# Dev Kit. When interacting with the solution explorer for C# projects that is offered through DevKit, many of the elements that exist today can be interacted with through a similar right-click experience, as well as icons that appear on hover of these elements that allow for quick selection of common functions. We want to incorporate this functionality into the NuGet VS Code experience to allow for a seamless and well-rounded experience for C# Developers.
 
 In the solution explorer, there is a "Dependencies" node, and within that node, there is a "Packages" node, which contains a list of all of the NuGet packages directly installed into the solution in question. When a user hovers over this "Packages" folder, they will see a small plus sign icon appear in line on the far right.
 
@@ -68,13 +68,13 @@ Additionally, when the user right clicks on this Packages folder, they will see 
 ![Screenshot showing the menu that will appear when a user right clicks on the "packages folder" in C# DevKit. The menu contains an option to add a nuget package](../../meta/resources/vscode-commands/addpackage-rightclickmenu.png)
 
 When the user selects the "Add package" menu list item, or when they select the 'plus sign' icon that appears on hover next to the
-'Packages' folder, the command palette will open and they will be guided through the same pacage install process described in option 1, starting with the empty serch box to search for a specific package. 
+'Packages' folder, the command palette will open and they will be guided through the same package install process described in option 1, starting with the empty search box to search for a specific package. 
 
-![Screenshot shwoing the quick picks search box prompting the user to enter a search term to search for a NuGet package.](../../meta/resources/vscode-commands/addpackage-searchbox.png)
+![Screenshot showing the quick picks search box prompting the user to enter a search term to search for a NuGet package.](../../meta/resources/vscode-commands/addpackage-searchbox.png)
 
 #### Removing a Package
 
-##### Option 1: Naviagting to remove package directly in command palette
+##### Option 1: Navigating to remove package directly in command palette
 
 A new command is listed named `NuGet: Remove a package...``.
 
@@ -85,9 +85,9 @@ When a developer selects this command, it will prompt them in a search box to pr
 TODO: show screenshot of what the experience described above will look like (search bar with list of all installed packages below it)
 Question: do we want to provide check boxes and allow multiple packages to be selected at once? or could this be a possible addition for a future iteration
 
-##### Option 2: Navigating to 'NuGet: Remove package' command through C# DevKit soltion explorer
+##### Option 2: Navigating to 'NuGet: Remove package' command through C# DevKit solution explorer
 
-A developer will also be able to access the same remove package command through a right click experience built directly into the soltion explorer offered through C# DevKit. In the dependency node, if the developer right clicks on a specific package in the folder, they will see a menu of options for operations to perform on this specific package. One of these options will be: "Remove package".
+A developer will also be able to access the same remove package command through a right click experience built directly into the solution explorer offered through C# DevKit. In the dependency node, if the developer right clicks on a specific package in the folder, they will see a menu of options for operations to perform on this specific package. One of these options will be: "Remove package".
 
 Option to use the existing delete command & key binding?
 
