@@ -35,7 +35,7 @@ A new command is listed named `NuGet: Add a package...``.
 
 ![Screenshot showing the Visual Studio Code command palette with 'NuGet: Add package...' command at the top of the list and highlighted](../../meta/resources/vscode-commands/addpackage-commandpalette1.png)
 
-When a developer selects this command, it will prompt them in a search box to provide a search term for a respective package to be found on their package sources.
+When a developer selects this command, it will prompt them in a search box to provide a search term for a respective package to be found on their package sources. If the user wants to search specifically by a package attribute, they can do so by following the convention 'owner:Microsoft'. Otherwise, the search will search across all package attributes. (This search convention will work for the following attributes: owner, tag, and packageid.)
 
 ![Screenshot showing the quick picks search box prompting the user to enter a search term to search for a NuGet package.](../../meta/resources/vscode-commands/addpackage-searchbox.png)
 
