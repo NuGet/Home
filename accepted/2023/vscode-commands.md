@@ -47,11 +47,15 @@ Given the high demand for this functionality, we first plan to integrate NuGet p
 
 #### Option 1: Navigating to add package directly in command palette
 
-A new command is listed named `NuGet: Add a package...``.
+A new command is listed named `NuGet: Add package...``.
 
 ![Screenshot showing the Visual Studio Code command palette with 'NuGet: Add package...' command at the top of the list and highlighted](../../meta/resources/vscode-commands/addpackage-commandpalette1.png)
 
-When a developer selects this command, it will prompt them in a search box to provide a search term for a respective package to be found on their package sources. If the user wants to search specifically by a package attribute, they can do so by following the convention 'owner:Microsoft'. Otherwise, the search will search across all package attributes. (To see more information about what is supported with the syntax, see here: ![Fins and evaluate NuGet packages | Microsoft Learn](https://learn.microsoft.com/en-us/nuget/consume-packages/finding-and-choosing-packages#search-syntax).)
+When a developer selects this command, they might first have to set the context for where they would like this package to be installed, at the project level or at the solution level for projects with multiple solutions. If, in a certain use case this distinction needs to be made, the user will first have to specify the context in the first quickpick option. There are a few other options for how we could allow the user to set the context for operations detailed in the 'Unanswered questions' section of this document.
+
+![Screenshot showing quickpicks option asking the user to select if they want the package to be installed at the project level or the solution level.](../../meta/resources/vscode-commands/addpackage-context.png)
+
+The rest of the flow will be the same for both project and solution level installations. Next, they will see a search box to provide a search term for a respective package to be found on their package sources. If the user wants to search specifically by a package attribute, they can do so by following the convention 'owner:Microsoft'. Otherwise, the search will search across all package attributes. (To see more information about what is supported with the syntax, see here: ![Fins and evaluate NuGet packages | Microsoft Learn](https://learn.microsoft.com/en-us/nuget/consume-packages/finding-and-choosing-packages#search-syntax).)
 
 ![Screenshot showing the quick picks search box prompting the user to enter a search term to search for a NuGet package.](../../meta/resources/vscode-commands/addpackage-searchbox.png)
 
@@ -84,7 +88,7 @@ Additionally, when the user right clicks on this Packages folder, they will see 
 ![Screenshot showing the menu that will appear when a user right clicks on the "packages folder" in C# DevKit. The menu contains an option to add a nuget package](../../meta/resources/vscode-commands/addpackage-rightclickmenu.png)
 
 When the user selects the "Add package" menu list item, or when they select the 'plus sign' icon that appears on hover next to the
-'Packages' folder, the command palette will open and they will be guided through the same package install process described in option 1, starting with the empty search box to search for a specific package. 
+'Packages' folder, the command palette will open and they will be guided through the same package install process described in option 1, starting with the empty search box to search for a specific package.
 
 ![Screenshot showing the quick picks search box prompting the user to enter a search term to search for a NuGet package.](../../meta/resources/vscode-commands/addpackage-searchbox.png)
 
@@ -102,17 +106,27 @@ When a developer selects this command, it will prompt them in a search box to pr
 
 ![Screenshot showing the search bar for removing a package, with a search term entered and the list of potential packages listed below is now narrowed down to only packages installed in the solution AND that match the search term](../../meta/resources/vscode-commands/removepackage-searchresults2.png)
 
-When the user selects the package they would like to remove, they will be prompted to confirm their choice with a pop-up bar. If the user confirms this by clicking 'Remove', the package will be removed from their solution. They will also have the option to cancel the operation at this point.
+When the user selects the package they would like to remove, if it is a project with multiple solutions, and the package is installed at the project level, the user will need to choose if they would like the package to be removed at the solution level or the project level.
+
+![Alt text](../../meta/resources/vscode-commands/removepackage-context.png)
+
+Once they make this choice, if necessary, they will be prompted to confirm their choice with a pop-up bar. If the user confirms this by clicking 'Remove', the package will be removed from their solution. They will also have the option to cancel the operation at this point.
 
 ![Screenshot showing the pop-up notification asking the user to confirm the removal of a package from their solution](../../meta/resources/vscode-commands/removepackage-confirmation.png)
 
 #### Option 2: Navigating to 'NuGet: Remove package' command through C# DevKit solution explorer
 
-A developer will also be able to access the same remove package command through a right click experience built directly into the solution explorer offered through C# DevKit. In the 'Packages' folder within the 'Dependencies' node, if the developer right clicks on a specific package in the folder, they will see a menu of options for operations to perform on this specific package. One of these options will be: "Remove package...".
+A developer will also be able to access the same remove package command through an experience built directly into the solution explorer offered through C# DevKit.
+
+When a user hovers over a package that they have installed in their solution explorer, they will see two small icons appear, one of which being a 'minus sign'.
+
+![Alt text](../../meta/resources/vscode-commands/updateremove-hover.png)
+
+Additionally, if the developer right clicks on a specific package in the folder, they will see a menu of options for operations to perform on this specific package. One of these options will be: "Remove package...".
 
 ![Screenshot showing the C# dev kit solution explorer. The user has right clicked on a package in the 'Packages' folder, and a pop up menu is shown with the options 'Remove package...' and 'Update package...'](../../meta/resources/vscode-commands/rightclick-removeandupdate.png)
 
-When the user selects the package they would like to remove, they will be prompted to confirm their choice with a pop-up bar. When the user selects the 'Remove package...' option, the package will be removed from their solution, and it will disappear from their Dev Kit solution explorer. They will also have the option to cancel the operation at this point.
+When the user either clicks the minus sign in the solution explorer or clicks the 'Remove package...' menu item, they will be prompted to confirm their choice with a pop-up bar. When the user selects the 'Remove package...' option, the package will be removed from their solution, and it will disappear from their Dev Kit solution explorer. They will also have the option to cancel the operation at this point.
 
 ![Screenshot showing the pop-up notification asking the user to confirm the removal of a package from their solution](../../meta/resources/vscode-commands/removepackage-confirmation.png)
 
@@ -134,15 +148,25 @@ When the user selects the package they would like to update, they will then see 
 
 ![Screenshot showing the command palette view to select which version of a package that you would like to update to](../../meta/resources/vscode-commands/updatepackage-versionselection.png)
 
-Once the user selects a version they would like to update to, the package version number will be updated in the solution.
+When the user selects the package they would like to update, if it is a project with multiple solutions, and the package is installed at the project level, the user will need to choose if they would like the package to be updated at the solution level or the project level.
+
+![Alt text](../../meta/resources/vscode-commands/updatepackage-context.png)
+
+Once the user makes this selection if necessary, the package version number will be updated in the solution.
 
 #### Option 2: Navigating to 'NuGet: Update Package' command through C# DevKit solution explorer
 
-A developer will also be able to access the same update package command through a right click experience built directly into the solution explorer offered through C# DevKit. In the dependency node, if the developer right clicks on a specific package in the folder, they will see a menu of options for operations to perform on this specific package. One of these options will be: "Update package...".
+A developer will also be able to access the same update package command through an experience built directly into the solution explorer offered through C# DevKit.
+
+When a user hovers over a package that they have installed in their solution explorer, they will see two small icons appear, one of which being a 'up arrow'.
+
+![Alt text](../../meta/resources/vscode-commands/updateremove-hover.png)
+
+Additionally, if the developer right clicks on a specific package in the folder, they will see a menu of options for operations to perform on this specific package. One of these options will be: "Update package...".
 
 ![Screenshot showing the C# dev kit solution explorer. The user has right clicked on a package in the 'Packages' folder, and a pop up menu is shown with the options 'Remove package...' and 'Update package...'](../../meta/resources/vscode-commands/rightclick-removeandupdate.png)
 
-When the user selects the 'Update package option, they will be guided through the same command palette flow described in option 1, starting from the version selection page.
+When the user selects the 'Update package' option or clicks the up arrow icon in the solution explorer, they will be guided through the same command palette flow described in option 1, starting from the version selection page.
 
 ![Screenshot showing the command palette view to select which version of a package that you would like to update to](../../meta/resources/vscode-commands/updatepackage-versionselection.png)
 
@@ -190,7 +214,12 @@ We also took inspiration from the already existing Maven extension in VS Code to
 - Will we include keyboard shortcuts for any commands?
 - For removing a package, can we utilize the existing delete command & key binding?
 - For removing a package, will we require users to confirm their choice before the package is removed? or for updating? adding?
+- Is it possible to ask the user to confirm their choice with a pop-up notification?
 - Can we allow users to backflow through commands, or undo their last selection and return to the last page in the command flow?
+- How do we want to allow the user to set the context (solution vs project level) for different package operations?
+    1. two separate add package commands for project / solution (Add package in project... Add package in solution...)
+    2. one add package command where the first quickpick asks for the context (project or solution level)
+    3. use any existing selected context and back-propagate to the closest .csproj or directory.packages.props file.
 
 ## Future Possibilities
 
