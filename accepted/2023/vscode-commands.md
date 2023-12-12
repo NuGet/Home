@@ -17,7 +17,7 @@ This proposal introduces a command palette experience including 'quickpick' flow
     - [Removing a Package - Command Palette](#option-1-navigating-to-remove-package-directly-in-command-palette)
     - [Removing a Package - C# Dev Kit](#option-2-navigating-to-nuget-remove-package-command-through-c-devkit-solution-explorer)
     - [Updating a Package - Command Palette](#option-1-navigating-to-update-package-directly-in-command-palette)
-    - [Updating a Package - C# Dev Kit](#option-2-navigating-to-nuget-update-package-command-through-c-devkit-soltion-explorer)
+    - [Updating a Package - C# Dev Kit](#option-2-navigating-to-nuget-update-package-command-through-c-devkit-solution-explorer)
 3. [Technical Explanation](#technical-explanation)
 4. [Drawbacks](#drawbacks)
 5. [Rationale and Alternatives](#rationale-and-alternatives)
