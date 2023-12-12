@@ -51,7 +51,7 @@ A new command is listed named `NuGet: Add a package...``.
 
 ![Screenshot showing the Visual Studio Code command palette with 'NuGet: Add package...' command at the top of the list and highlighted](../../meta/resources/vscode-commands/addpackage-commandpalette1.png)
 
-When a developer selects this command, it will prompt them in a search box to provide a search term for a respective package to be found on their package sources. If the user wants to search specifically by a package attribute, they can do so by following the convention 'owner:Microsoft'. Otherwise, the search will search across all package attributes. (This search convention will work for the following attributes: owner, tag, and packageid.)
+When a developer selects this command, it will prompt them in a search box to provide a search term for a respective package to be found on their package sources. If the user wants to search specifically by a package attribute, they can do so by following the convention 'owner:Microsoft'. Otherwise, the search will search across all package attributes. (To see more information about what is supported with the syntax, see here: ![Fins and evaluate NuGet packages | Microsoft Learn](https://learn.microsoft.com/en-us/nuget/consume-packages/finding-and-choosing-packages#search-syntax).)
 
 ![Screenshot showing the quick picks search box prompting the user to enter a search term to search for a NuGet package.](../../meta/resources/vscode-commands/addpackage-searchbox.png)
 
@@ -207,3 +207,7 @@ To enhance the add/remove/update experiences, we could add more package details/
 We could also allow for operations like updates, installs and uninstalls to be performed on multiple packages at a time by enabling multi-select in a future iteration to enhance these experiences.
 
 Some ideas for features to add in future iterations are: clearing package caches/folders, packaging a library, pushing a package to a source, managing package sources, NuGet restore, central package management, package source mapping, opening a package manager UI.
+
+Another potential future possibility would be to add icons next to packages in the solution explorer to signal at a glance things such as if an update is available, if there is a known vulnerability in the package, if the package has been deprecated, or other package statuses. For more information on this concept, ![linked here](https://github.com/NuGet/Home/pull/11838) is a proposal for this feature in the Visual Studio NuGet UI. An example of what this could look like is shown below:
+
+![Alt text](../../meta/resources/vscode-commands/solutionexplorer-packageicons.png)
