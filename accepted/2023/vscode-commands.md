@@ -8,7 +8,6 @@
 <!-- One-paragraph description of the proposal. -->
 This proposal introduces a command palette experience including 'quickpick' flows and integration with C# DevKit for NuGet package management. It covers the initial experiences for adding, removing, and updating a NuGet package. This document covers the minimum viable product (MVP) for a NuGet command palette experience, and leaves room for growth and expansion on these initial concepts, both in enhancing these 3 features, or in the addition of more NuGet command palette features.
 
-
 ## Table of Contents
 
 1. [Motivation](#motivation)
@@ -39,16 +38,14 @@ For each feature, there are two "entry points" presented for how users can reach
 
 Given the high demand for this functionality, we first plan to integrate NuGet package management into C# Dev Kit and the VS Code command palette to get a solution for managing NuGet packages into the hands of users as soon as possible. From there, we plan to explore and build a visual UI to compliment and enhance this experience.
 
-## Explanation
-
-### Functional explanation
+## Functional Explanation
 
 <!-- Explain the proposal as if it were already implemented and you're teaching it to another person. -->
 <!-- Introduce new concepts, functional designs with real life examples, and low-fidelity mockups or pseudocode to show how this proposal would look. -->
 
-#### Browse and Install a Package
+### Browse and Install a Package
 
-##### Option 1: Navigating to add package directly in command palette
+#### Option 1: Navigating to add package directly in command palette
 
 A new command is listed named `NuGet: Add a package...``.
 
@@ -74,7 +71,7 @@ Once the user selects their desired version number, the package will be installe
 
 ![Screenshot showing successful package install notification](../../meta/resources/vscode-commands/addpackage-successnotification.png)
 
-##### Option 2: Navigating to 'NuGet: Add Package' command through C# DevKit Solution Explorer
+#### Option 2: Navigating to 'NuGet: Add Package' command through C# DevKit Solution Explorer
 
 A developer will also be able to access the same add package command through a right click experience built directly into the solution explorer offered through C# DevKit. We want to provide an experience that aligns closely with the experience that is currently offered in, and future plans for, C# Dev Kit. When interacting with the solution explorer for C# projects that is offered through DevKit, many of the elements that exist today can be interacted with through a similar right-click experience, as well as icons that appear on hover of these elements that allow for quick selection of common functions. We want to incorporate this functionality into the NuGet VS Code experience to allow for a seamless and well-rounded experience for C# Developers.
 
@@ -91,9 +88,9 @@ When the user selects the "Add package" menu list item, or when they select the 
 
 ![Screenshot showing the quick picks search box prompting the user to enter a search term to search for a NuGet package.](../../meta/resources/vscode-commands/addpackage-searchbox.png)
 
-#### Removing a Package
+### Removing a Package
 
-##### Option 1: Navigating to remove package directly in command palette
+#### Option 1: Navigating to remove package directly in command palette
 
 A new command is listed named `NuGet: Remove a package...``.
 
@@ -109,7 +106,7 @@ When the user selects the package they would like to remove, they will be prompt
 
 ![Screenshot showing the pop-up notification asking the user to confirm the removal of a package from their solution](../../meta/resources/vscode-commands/removepackage-confirmation.png)
 
-##### Option 2: Navigating to 'NuGet: Remove package' command through C# DevKit solution explorer
+#### Option 2: Navigating to 'NuGet: Remove package' command through C# DevKit solution explorer
 
 A developer will also be able to access the same remove package command through a right click experience built directly into the solution explorer offered through C# DevKit. In the 'Packages' folder within the 'Dependencies' node, if the developer right clicks on a specific package in the folder, they will see a menu of options for operations to perform on this specific package. One of these options will be: "Remove package...".
 
@@ -119,9 +116,9 @@ When the user selects the package they would like to remove, they will be prompt
 
 ![Screenshot showing the pop-up notification asking the user to confirm the removal of a package from their solution](../../meta/resources/vscode-commands/removepackage-confirmation.png)
 
-#### Updating a Package
+### Updating a Package
 
-##### Option 1: Navigating to update package directly in command palette
+#### Option 1: Navigating to update package directly in command palette
 
 A new command is listed named `NuGet: Update a package...``.
 
@@ -139,7 +136,7 @@ When the user selects the package they would like to update, they will then see 
 
 Once the user selects a version they would like to update to, the package version number will be updated in the solution.
 
-##### Option 2: Navigating to 'NuGet: Update Package' command through C# DevKit solution explorer
+#### Option 2: Navigating to 'NuGet: Update Package' command through C# DevKit solution explorer
 
 A developer will also be able to access the same update package command through a right click experience built directly into the solution explorer offered through C# DevKit. In the dependency node, if the developer right clicks on a specific package in the folder, they will see a menu of options for operations to perform on this specific package. One of these options will be: "Update package...".
 
@@ -149,19 +146,27 @@ When the user selects the 'Update package option, they will be guided through th
 
 ![Screenshot showing the command palette view to select which version of a package that you would like to update to](../../meta/resources/vscode-commands/updatepackage-versionselection.png)
 
-### Technical explanation
+## Technical Explanation
 
 <!-- Explain the proposal in sufficient detail with implementation details, interaction models, and clarification of corner cases. -->
+
+TBD
 
 ## Drawbacks
 
 <!-- Why should we not do this? -->
+
+A potential drawback to this solution is that many user have specifically requested a "package management UI" or a more visual experience. Additionally, we received signal from users who are familiar with using NuGet in Visual Studio that they expect and desire similar UI experience to what is provided there. While this solution does provide a more visual experience than what is currently available (i.e. performing NuGet operations through the CLI), it might not fully meet the expectations of users who desire a UI. We plan to address this in future iterations of NuGet in VS code with a UI.
 
 ## Rationale and alternatives
 
 <!-- Why is this the best design compared to other designs? -->
 <!-- What other designs have been considered and why weren't they chosen? -->
 <!-- What is the impact of not doing this? -->
+
+This design provides a starting point for a buildable and iterable experience for NuGet package management within VS Code and C# Dev Kit. It includes all of the basic features and functionality that users would require and expect for basic package management functions in VS Code. Additionally, it provides new value to users by including a visual experience and searching capabilities that were not previously available for VS Code developers. This design also provides a lot of room for additional information/details and functions to be added into this base experience. We plan to utilize customer feedback to help us understand what information about packages that users would expect to see at each step of these commands, as well as what commands and features should be added next.
+
+It also utilizes familiar functionality for users who are already familiar with both the VS Code command palette and C# dev kit. We worked with the Dev Kit team and closely analyzed current VS Code functionality, as well as how developers prefer to use this functionality, to help inform this experience.
 
 ## Prior Art
 
@@ -170,16 +175,22 @@ When the user selects the 'Update package option, they will be guided through th
 <!-- What lessons from other communities can we learn from? -->
 <!-- Are there any resources that are relevant to this proposal? -->
 
+Prior art that we took inspiration from, most importantly includes what exists currently in VS Code and C# Dev Kit. We wanted to provide an experience that is closely integrated into what exists in and how users interact with these platforms, so we relied on this heavily when making design choices.
+
+Additionally, there is a relatively popular NuGet extension that already exists for VS Code. Since its popular (over 1 million downloads), we looked at this to inform what users might want from a NuGet experience in VS Code. We also wanted to understand how we could provide additional and differentiated value from this solution and expanded on the functionality that it provides.
+
+We also took inspiration from the already existing Maven extension in VS Code to understand how other package managers currently operate in VS Code.
+
 ## Unresolved Questions
 
 <!-- What parts of the proposal do you expect to resolve before this gets accepted? -->
 <!-- What parts of the proposal need to be resolved before the proposal is stabilized? -->
 <!-- What related issues would you consider out of scope for this proposal but can be addressed in the future? -->
 
-Will we include keyboard shortcuts for any commands?
-For removing a package, can we utilize the existing delete command & key binding?
-For removing a package, will we require users to confirm their choice before the package is removed? or for updating? adding?
-Can we allow users to backflow through commands, or undo their last selection and return to the last page in the command flow?
+- Will we include keyboard shortcuts for any commands?
+- For removing a package, can we utilize the existing delete command & key binding?
+- For removing a package, will we require users to confirm their choice before the package is removed? or for updating? adding?
+- Can we allow users to backflow through commands, or undo their last selection and return to the last page in the command flow?
 
 ## Future Possibilities
 
@@ -187,4 +198,12 @@ Can we allow users to backflow through commands, or undo their last selection an
 
 expand on possibilities for future iterations ( more package details in the quick picks list, multi select for package uninstall and updates, etc.)
 
-clearing package caches/folders, packaging a library, pushing a package to a source, managing package sources, opening a package manager
+Some future possibilities for this proposal fall into two categories: adding information/package details to enhance the feature experiences proposed here, and adding additional features to enhance the overall package management experience in VS Code.
+
+To enhance the add/remove/update experiences, we could add more package details/information in the quickpicks results list for each of these operations. Due to the limited real estate space in the search results for each package, it is important that we ensure that we are displaying the most relevant information that would help users to make the most informed decision about a package. For example, we could include package owners, version number, a snippet of the description, icons, tags, or other information. Different package operations might require different information to be showed, so we plant o do customer development to understand what would make the most sense to display at different stages in the package management process. An example of what this might look like for an example scenario is displayed below.
+
+![Screenshot showing package search results with multiple different pieces of package details in addition to package ID](../../meta/resources/vscode-commands/detailedsearch.png)
+
+We could also allow for operations like updates, installs and uninstalls to be performed on multiple packages at a time by enabling multi-select in a future iteration to enhance these experiences.
+
+Some ideas for features to add in future iterations are: clearing package caches/folders, packaging a library, pushing a package to a source, managing package sources, NuGet restore, central package management, package source mapping, opening a package manager UI.
