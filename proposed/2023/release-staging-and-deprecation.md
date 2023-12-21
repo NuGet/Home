@@ -123,7 +123,7 @@ There are no critical scenarios for deprecation to happen within specific time p
  critical and is being orchestrated in many cases. Hence, NuGet should provide some guarantees for how much time the operation
  can take in the worst case. As of right now, having 10 minutes deadline for the publishing request should be reasonable.
 
-This requirement brings a need for a new NuGet command for querying the status of an asynchronous operation.
+This requirement brings a need for a new NuGet command for querying the status of an asynchronous operation. This particular requirement should be treated as a stretch goal, and it can be implemented in a later release.
 Let's assume that the group publishing and deprecation commands will return some "operation id" for later state inquriry by the client.
 `nuget status --operation-id` command can be used to track the progress of an asynchronous operation.
 This can return the following results:
