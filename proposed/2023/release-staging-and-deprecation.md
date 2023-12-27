@@ -34,7 +34,7 @@ Hence, package owners try to deprecate packages which are out of support. Withou
 
 <!-- Explain the proposal as if it were already implemented and you're teaching it to another person. -->
 <!-- Introduce new concepts, functional designs with real life examples, and low-fidelity mockups or  pseudocode to show how this proposal would look. -->
-A new NuGet CLI command `stage` will be added, which will allow a user to stage a package to nuget, specifying a `group` parameter.
+A new NuGet CLI command option `stage` will be added to the `stage` command, which will allow a user to stage a package to nuget, specifying a group parameter. (dotnet nuget push --stage [group-id])
  Staged packages will be uploaded to NuGet and will be validated during the staging process, so that the staging fails
  if validation fails for a package in a group. After uploading multiple packages, the user user can then call `nuget push --group [group]`
  command to request all the packages from the earlier group to become available on the server as `published`.
@@ -67,7 +67,7 @@ When a package is staged, the id of the package is reserved at that point, and n
 
 Also, to avoid abuse, only a limited number of packages can be staged within a single group. While this can potentially be defined as a configurable value per organization / owner, there is no such requirement at the moment. Hence, this can be set to 1000 packages for now or not defined at all. Will leave this for potentially future consideration.
 
-When staged, packages will not be visible / accessible to anyone but the co-owners. They will be able to see the current staged list for a given group using `nuget stage --list --group-id [group-id]` command. 
+When staged, packages will not be visible / accessible to anyone but the co-owners. The co-owners will be able to see the current staged list for a given group using `nuget list --stage [group-id]` command. 
 
 
 #### Group Ownership
@@ -76,7 +76,7 @@ There are few interesting scenarios related to package ownership:
  an owner for a package in a group. At this point, publishing request should fail with a message that the group has been modified
  from its original set, and the outcome of the request may be different from what the user was expecting, indicating the package
  that was moved out of the group. If the user is aware of the problem and still wants to move forward with the change,
- they will have to pass an additional `--force` parameter to the publish command: `nuget publish <group-id> --force`.
+ they will have to pass an additional `--force` parameter to the publish command: `nuget push --stage <group-id> --force`.
 2. The group to be published no longer has any packages in it. In this case the command should fail detailing the reason for the failure.
 3. This will be the same but for deprecation. Essentially, any bulk operation using groups, where the set of the packages in the group
  have changed after staging, should result in an error with details about the change. The `--force` flag should again be used
@@ -85,33 +85,23 @@ There are few interesting scenarios related to package ownership:
 
 #### Lifespan of a staged group
 If users keep staging packages but do nothing with them, NuGet will become an ever-growing package graveyard,
- incurring higher and higher costs over time simply for storing these packages. To avoid this problem, staging should be time-limited.
- That is, there should be a maximum lifespan for a staged package, that is not published. NuGet should then unstage / remove
- any package that was staged but never published within the specified / pre-configured time period. As a maximum timeslot
- a default one month period can be considered. However, to reduce the cost of maintaining these packages,
- the `nuget stage` command can also accept an optional `--lifespan [number of days]` parameter,
- which can indicate a shorter time period, thus giving NuGet ability to remove those packages earlier than the maximum period.
-
-Note, that this opens up a new scenario, where a group has been created with a package 29 days ago, and then a new package is staged to the same group.
-In two days from that time, the package author tries to publish the staged group. At this point, the publish command will fail,
-indicating that the group has been modified, and showing the package that has been deleted by NuGet out of the staging due to the expiration.
-The user can still continue publishing using the `--force` option, which will result in the non-expired/ removed staged packages to be published.
-Alternatively, the user can restage the expired package and call the publish command again.
+ incurring higher and higher costs over time simply for storing these packages. To avoid this problem, stages should be time-limited.
+ That is, there should be a maximum lifespan for a stage. Any updates to the stage will reset its TTL date to some amount (let's say 30 days). If within the next 30 days no changes are made to the stage, NuGet should then remove the stage (all its packages basically).
 
 #### Expanding groups
 It should be possible for a group to expand over time. This is currently a real scenario, where .NET GA SDK ships a set of packages,
  and then follow-up SDK updates ship updated packages which still belong to the same .NET 8 package group.
  Here how this will play out with the tooling support described above:
 1. During GA release, the release team will stage the set of RTM packages for the release. (nuget stage --group-id "net8.0" --package-id <package-file-path>)
-2. Then on the day of the release, all the staged packages will be published using `nuget publish --group-id "net8.0"` command.
+2. Then on the day of the release, all the staged packages will be published using `nuget push --stage "net8.0"` command.
    At this point, the stage for the `net8.0` group will be empty.
 3. Later, as new builds are being prepared for a patch release, a new set of packages will be staged, to be later published to the same group.
-As there can be multiple candidate builds for a release, there is a need for functionality to discard a stage for a given group `nuget stage --discard --group-id "net8.0"`.
+As there can be multiple candidate builds for a release, there is a need for functionality to discard a stage for a given group `nuget delete --stage "net8.0"`.
 This will remove all the staged but not published packages from the net8.0 group.
 4. A new set of packages will be staged for the 8.0 group, until the final build is known. At this point, there is only one unified set of related packages is staged.
-5. On the release date, the release team will call `nuget publish --group-id "net8.0"` again, and only the staged packages will be published, resulting in an expanded set of published packages in the net8.0 group.
+5. On the release date, the release team will call `nuget publish --stage "net8.0"` again, and only the staged packages will be published, resulting in an expanded set of published packages in the net8.0 group.
 6. Some time in the future, when the release is already out of support, somebody from the .NET team will call
- `nuget deprecate --group-id "net8.0"` and all the packages which have ever been published to that group will be deprecated.
+ `nuget deprecate --stage "net8.0"` and all the packages which have ever been published to that group will be deprecated.
  Those packages, which has already been deprecated because of whatever reason, will not be altered.
 
 #### Asynchronous behavior
@@ -125,6 +115,8 @@ There are no critical scenarios for deprecation to happen within specific time p
 
 This requirement brings a need for a new NuGet command for querying the status of an asynchronous operation. This particular requirement should be treated as a stretch goal, and it can be implemented in a later release.
 Let's assume that the group publishing and deprecation commands will return some "operation id" for later state inquriry by the client.
+
+The below command for tracking progress should be treated as a P2 ask, and can be implemented later.
 `nuget status --operation-id` command can be used to track the progress of an asynchronous operation.
 This can return the following results:
 - `success` : when successful, the operation should also return the time when the operation was completed.
