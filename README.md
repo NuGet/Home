@@ -42,7 +42,7 @@ If you are interested in fixing issues and contributing directly to the code bas
 * The development workflow, including debugging and running tests
 * Coding guidelines
 * Submitting pull requests
-* [Finding an issue to work on](https://github.com/NuGet/Home/issues?q=is%3Aopen+is%3Aissue+label%3A%22Up+for+Grabs%22)
+* [Finding an issue to work on](https://github.com/NuGet/Home/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22)
 * And much more!
 
 **Note:** Not all of our repositories are open for contribution yet. Ping us if unsure.

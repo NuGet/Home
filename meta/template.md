@@ -1,9 +1,8 @@
-# Title
+# ***Untitled***
+<!-- Replace `Title` with an appropriate title for your design -->
 
-- Author Name (GitHub username link)
-- Start Date (YYYY-MM-DD)
-- GitHub Issue (GitHub Issue link)
-- GitHub PR (GitHub PR link)
+- Author Name <!-- GitHub username link -->
+- GitHub Issue <!-- GitHub Issue link -->
 
 ## Summary
 
@@ -39,7 +38,7 @@
 <!-- What prior art, both good and bad are related to this proposal? -->
 <!-- Do other features exist in other ecosystems and what experience have their community had? -->
 <!-- What lessons from other communities can we learn from? -->
-<!-- Are there any resources that are relevent to this proposal? -->
+<!-- Are there any resources that are relevant to this proposal? -->
 
 ## Unresolved Questions
 
