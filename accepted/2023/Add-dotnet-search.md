@@ -24,15 +24,17 @@ Imagine you have your dotnet CLI open. You would like to look up a NuGet package
 
 The `package search [search terms] [options]` command will have the following options
 
-| Option | Function |
-|---------|:----------|
-| `--source` | A source to search |
-| `--exact-match` | Return exact matches only as a search result |
-| `--prerelease` | Allow prerelease packages to be shown. |
-| `--interactive` | Allows the command to stop and wait for user input or action (for example to complete authentication).|
-| `--take` | The number of results to return. The default value is 20.|
-| `--skip` | The number of results to skip, for pagination. The default value is 0. |
-| `--help` | Show command help and usage information |
+| Option           | Function |
+|------------------|--------------|
+| `--configfile`   | The path to the NuGet config file to use. |
+| `--exact-match`  | Return exact matches only as a search result. |
+| `--format`       | Format the output accordingly. Either `table`, or `json`. The default value is `table`. |
+| `--help`         | Show command help and usage information. |
+| `--interactive`  | Allows the command to stop and wait for user input or action (for example to complete authentication).|
+| `--prerelease`   | Allow prerelease packages to be shown. |
+| `--skip`         | The number of results to skip, for pagination. The default value is 0. |
+| `--source`       | A source to search. |
+| `--take`         | The number of results to return. The default value is 20.|
 
 #### **Option `--source`**
 
@@ -41,23 +43,86 @@ This option will specify a list of sources to search from. If a source is not sp
 #### **Option `-exact-match`**
 
 - This option will allow for users to be able to search and have only exact matches as an output.
+- The results will contain all versions of the matching package ID
 - For example if a user uses `dotnet package search Newtonsoft.Json`
 
-Source: nuget.org
-| Package ID                                  | Latest Version | Authors | Downloads       |
-|---------------------------------------------|----------------|---------|-----------------|
-| Newtonsoft.Json                             | 13.0.3         |         | 3,829,822,911   |
-| Newtonsoft.Json.Bson                        | 1.0.2          |         | 554,641,545     |
-| Newtonsoft.Json.Schema                      | 3.0.15         |         | 39,648,430      |
-| Microsoft.AspNetCore.Mvc.NewtonsoftJson     | 7.0.12         |         | 317,067,823     |
-...
+        Source: nuget.org
+        | Package ID                                  | Latest Version | Owners | Total Downloads |
+        |---------------------------------------------|----------------|---------|-----------------|
+        | Newtonsoft.Json                             | 13.0.3         |         | 3,829,822,911   |
+        | Newtonsoft.Json.Bson                        | 1.0.2          |         | 554,641,545     |
+        | Newtonsoft.Json.Schema                      | 3.0.15         |         | 39,648,430      |
+        | Microsoft.AspNetCore.Mvc.NewtonsoftJson     | 7.0.12         |         | 317,067,823     |
+        ...
 
 - Using ``dotnet package search Newtonsoft.Json --exact-match`` on the other side will have the following output
 
-Source: nuget.org
-| Package ID                                  | Latest Version | Authors | Downloads       |
-|---------------------------------------------|----------------|---------|-----------------|
-| Newtonsoft.Json                             | 13.0.3         |         | 3,829,822,911   |
+        Source: nuget.org
+        | Package ID                                  |  Version | Owners | Total Downloads |
+        |---------------------------------------------|----------|---------|-----------------|
+        | Newtonsoft.Json                             | 13.0.3   |         | 3,829,822,911   |
+
+#### **Option `--format`**
+
+This option will allow the specification of the output format. The option will take one of these two arguments: `table`, or `json`. The outputs will depend on verbosity. The following examples are for normal verbosity.
+
+- `--format table` the output will be in a tabular form as shown below
+
+        Source: nuget.org
+        | Package ID                                  | Latest Version | Owners | Total Downloads |
+        |---------------------------------------------|----------------|---------|-----------------|
+        | Newtonsoft.Json                             | 13.0.3         |         | 3,829,822,911   |
+
+- `--format json` : A json output will be outputted. It will contain the following metadata.
+  - Source
+  - Package ID
+  - LatestVersion
+  - Owners
+  - TotalDownloads
+
+  The output will take the following format
+
+        [
+            {
+                "source": "source Name1",
+                "packages": [
+                    {
+                        "Owners": "",
+                        "totalDownloads": "",
+                        "latestVersion": "",
+                        "id": ""
+                    }
+                ]
+            },
+            {
+                "source": "source Name2",...
+            }
+        ]
+
+#### Option `--verbosity`
+
+  controls the amount of information included in the output of a command. This allows you to tailor the output to your needs, providing either a concise summary or a detailed breakdown of the information returned by the command.
+
+Here are the details of each verbosity level:
+
+- **`--verbosity minimal`** : The output will contain minimal information. For each package, it will display only the following metadata:
+  - Package ID
+  - Latest Version
+  
+- **`--verbosity normal`** : The output will provide a moderate amount of information. For each package, it will display the following metadata:
+  - Package ID
+  - Latest Version
+  - Owners
+  - Total Downloads
+  
+- **`--verbosity detailed`** : The output will be highly detailed. For each package, it will display the following metadata:
+  - Package ID
+  - Latest Version
+  - Owners
+  - Total Downloads
+  - Description
+  - Deprecation
+  - Project URL
 
 ### Technical explanation
 
@@ -91,5 +156,3 @@ In nuget.exe there is `nuget.exe search` command which does the same thing. Howe
 
 ## Future Possibilities
 
-<!-- What future possibilities can you think of that this proposal would help with? -->
-- In the next iteration, a formatting option will be added for the output.
