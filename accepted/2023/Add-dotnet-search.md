@@ -80,11 +80,12 @@ This option will allow the specification of the output format. The option will t
   - Owners
   - TotalDownloads
 
-  The output will take the following format
+  The output will take the following format. Any problems with the source will be reported in the `errors` value.
 
         [
             {
                 "source": "source Name1",
+                "errors": [],
                 "packages": [
                     {
                         "Owners": "",
