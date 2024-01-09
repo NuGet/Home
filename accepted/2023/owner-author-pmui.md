@@ -11,7 +11,7 @@ A Trusted Owner is defined as a package owner that's indicated by a package sour
 Introduce a UI affordance to emphasize which package owners shown in the Packages Manager UI (PM UI) are trusted by the package source.
 In the case of the `nuget.org` package source, each owner will render with a hyperlink typically to the owner's profile page (eg, `'https://www.nuget.org/profiles/<owner name>'`).
 
-Only show `author` when no Trusted Owner is available from the selected package sources in PM UI.
+Only show `by <author>` when Trusted Owners are not provided by the selected package sources in PM UI.
 
 ## Motivation
 
@@ -30,24 +30,27 @@ Customers will be able to identify Trusted Owners of packages on the Browse Tab 
 <!-- Explain the proposal as if it were already implemented and you're teaching it to another person. -->
 <!-- Introduce new concepts, functional designs with real life examples, and low-fidelity mockups or  pseudocode to show how this proposal would look. -->
 
-Instead of showing only `author` as the PM UI does today, the packages list will now show Owners when available from a package source, and only fallback to author when Owners are not available.
+Instead of showing only `author` as the PM UI does today, the packages list will now show Trusted Owners beside each package ID when available from the selected package source.
+Author will be shown only when the selected package source does not implement Trusted Owners.
 For this iteration, a single package source must be selected (ie, not `All`) and the `Browse` tab must be selected.
 
-The Details Pane will show both Owner and Author for a selected package.
+The Details Pane will be capable of showing both Trusted Owner (when available) and Author for the selected package.
 
-The Owners in both of these panes will be shown as a hyperlink.
+The Trusted Owner in both of these panes will be shown as a hyperlink.
 
 #### Packages List UI for Owner/Author
 
-The PM UI Packages list will show Trusted Owners beside each package ID as a hyperlink.
+When Trusted Owners are available on a package source, the PM UI Packages list will show:
 
-Multiple Owners will use a comma-delimited list of hyperlinks, similar to how authors are rendered today as a comma-delmited list of plain-text.
+- Each Trusted Owner beside each package ID as a hyperlink.
+- Multiple Owners will be separated by a comma-delimiter.
+- The ToolTip on the  package list item will show all Trusted Owners as a comma-delimited list of plain-text (the way authors are shown, today).
+- Blank space will be shown for packages missing a Trusted Owner, with nothing beside the package ID.
 
-The tooltip will show the owners as a comma-delimited list (the way authors are shown, today).
-
+Example of HyperLinks and a package list item's ToolTip:
 ![The PM UI Packages list showing a page of Owners from NuGet.org beside each package ID as a hyperlink. An example of a tooltip showing the package name, owners, and package description.](../../meta/resources/OwnerAuthor/ownerNuGetOrgLinksNoIcon.png)
 
-|Has Trusted Owner|Shown in Packages List|Example
+|Package Source supports Trusted Owners|Shown in Packages List|Example
 |--|--|--|
 |No| Author | "by James Newton-King"
 |Yes| Owner only| "by [jamesnk](https://www.nuget.org/profiles/jamesnk), [newtonsoft](https://www.nuget.org/profiles/newtonsoft), [dotnetfoundation](https://www.nuget.org/profiles/dotnetfoundation)"
@@ -71,22 +74,19 @@ A complete list of owners will be shown in the tooltip for the package.
 
 #### Packages without a Trusted Owner
 
-Packages without Trusted Owners will fallback to the author.
+Blank space will be shown for packages missing a Trusted Owner, with nothing beside the package ID.
+
 For example, using package source `nuget.org`, the package `Mvc3CodeTemplatesCSharp` has no owners.
 
-- Both today, and with this proposal, the PM UI will render the `author`, which will be `"by Microsoft"`.
+- A blank is shown where author ("by Microsoft") would have been shown prior to this proposal.
 
-    ![A package item for `Mvc3CodeTemplatesCSharp` in the PM UI packages list showing "by Microsoft". ](../../meta/resources/OwnerAuthor/Mvc3CodeTemplatesCSharp_byAuthor.png)
-
-- When this proposal is implemented, `Mvc3CodeTemplatesCSharp` will continue showing "by Microsoft" as the `author` fallback, while other packages may show their Trusted Owner hyperlinks.
-
-    ![Annotation pointing out package `Mvc3CodeTemplatesCSharp` being shown "by Microsoft" while other packages show owner hyperlinks as they have Trusted Owners.](../../meta/resources/OwnerAuthor/Mvc3CodeTemplatesCSharp_noLinkAuthor.png)
+    ![A package item for `Mvc3CodeTemplatesCSharp` in the PM UI packages list showing "Mvc3CodeTemplatesCSharp" with 31.2K downloads and no owner nor author. ](../../meta/resources/OwnerAuthor/Mvc3CodeTemplatesCSharp_byBlank.png)
 
 #### Details Pane UI for Owner/Author
 
-The Details Pane will show both the Owner and Author.
-Owner is not currently shown at all.
-If Owner is not available, the metadata will be shown with an indication that the data is not available.
+The Details Pane will show both the Trusted Owner and the Author.
+Historically, Owner has not been shown in the details pane at all.
+If Owner is not available, the Owner field will be shown with an indication that the metadata is not specified.
 
 ![The PM UI Details Pane showing too many owner hyperlinks to fit in the width of the PM UI, and a tooltip which shows the complete list of owners.](../../meta/resources/OwnerAuthor/detailsPaneOwnerAuthor.png)
 
@@ -103,7 +103,7 @@ Similar to [Package details URL template](https://learn.microsoft.com/en-us/nuge
 
 Currently, `Owners` JSON parsed from the Search API is immediately converted into a comma-delimited string of owners.
 To avoid breaking any clients depending on this, `Owners` will continue being a pre-processed string with comma-delimited owners.
-A new property, `OwnersEnumerable` (naming TBD) will be added to [IPackageSearchMetadata](https://github.com/NuGet/NuGet.Client/blob/dc2fadacd311646754ce6b062489b403338972aa/src/NuGet.Core/NuGet.Protocol/Model/IPackageSearchMetadata.cs) and [PackageSearchMetadataContextInfo](https://github.com/NuGet/NuGet.Client/blob/dc2fadacd311646754ce6b062489b403338972aa/src/NuGet.Clients/NuGet.VisualStudio.Internal.Contracts/ContextInfos/PackageSearchMetadataContextInfo.cs).
+A new property, `OwnersEnumerable` will be added to [IPackageSearchMetadata](https://github.com/NuGet/NuGet.Client/blob/dc2fadacd311646754ce6b062489b403338972aa/src/NuGet.Core/NuGet.Protocol/Model/IPackageSearchMetadata.cs) and [PackageSearchMetadataContextInfo](https://github.com/NuGet/NuGet.Client/blob/dc2fadacd311646754ce6b062489b403338972aa/src/NuGet.Clients/NuGet.VisualStudio.Internal.Contracts/ContextInfos/PackageSearchMetadataContextInfo.cs).
 The enumerable owners will allow displaying custom UI for each owner.
 
 #### Tabs other than Browse Tab
