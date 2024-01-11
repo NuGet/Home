@@ -6,7 +6,7 @@
 
 ## Summary
 
-A Known Owner is defined as a package owner that's indicated by a package source's [Search API](https://learn.microsoft.com/nuget/api/search-query-service-resource#search-result), as opposed to the free-form field in the `.nuspec`.
+A Known Owner is defined as a package owner that's indicated by a package source's [Search API](https://learn.microsoft.com/nuget/api/search-query-service-resource#search-result), as opposed to the free-form field in the `.nuspec`. A package source may change the owner for any given package over time.
 
 Introduce a UI affordance to emphasize which package owners shown in the Packages Manager UI (PM UI) are known by the package source.
 In the case of the `nuget.org` package source, each owner will render with a hyperlink typically to the owner's profile page (eg, `'https://www.nuget.org/profiles/<owner name>'`).
