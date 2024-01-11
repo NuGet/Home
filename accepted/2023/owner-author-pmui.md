@@ -1,4 +1,4 @@
-# Display Trusted Owners on the PM UI Browse Tab
+# Display Known Owners on the PM UI Browse Tab
 <!-- Replace `Title` with an appropriate title for your design -->
 
 - Donnie Goodson ([donnie-msft](https://github.com/donnie-msft))
@@ -6,22 +6,22 @@
 
 ## Summary
 
-A Trusted Owner is defined as a package owner that's indicated by a package source's [Search API](https://learn.microsoft.com/nuget/api/search-query-service-resource#search-result), as opposed to the free-form field in the `.nuspec`.
+A Known Owner is defined as a package owner that's indicated by a package source's [Search API](https://learn.microsoft.com/nuget/api/search-query-service-resource#search-result), as opposed to the free-form field in the `.nuspec`.
 
-Introduce a UI affordance to emphasize which package owners shown in the Packages Manager UI (PM UI) are trusted by the package source.
+Introduce a UI affordance to emphasize which package owners shown in the Packages Manager UI (PM UI) are known by the package source.
 In the case of the `nuget.org` package source, each owner will render with a hyperlink typically to the owner's profile page (eg, `'https://www.nuget.org/profiles/<owner name>'`).
 
-Only show `by <author>` when Trusted Owners are not provided by the selected package sources in PM UI.
+Only show `by <author>` when Known Owners are not provided by the selected package sources in PM UI.
 
 ## Motivation
 
 <!-- Why are we doing this? What pain points does this solve? What is the expected outcome? -->
 
-Customers need a clear understanding of who created a NuGet package in order to trust that package.
+Customers need a clear understanding of who created a NuGet package to be more confident the package they've found is correct.
 The term "owner" has become overloaded as NuGet has evolved, which has caused confusion.
 The "author" metadata is also misleading as it's a free-form text field which doesn't imply any verified credentials.
 
-Customers will be able to identify Trusted Owners of packages on the Browse Tab in the package list search results and in the package details pane of PM UI.
+Customers will be able to identify Known Owners of packages on the Browse Tab in the package list search results and in the package details pane of PM UI.
 
 ## Explanation
 
@@ -30,32 +30,32 @@ Customers will be able to identify Trusted Owners of packages on the Browse Tab 
 <!-- Explain the proposal as if it were already implemented and you're teaching it to another person. -->
 <!-- Introduce new concepts, functional designs with real life examples, and low-fidelity mockups or  pseudocode to show how this proposal would look. -->
 
-Instead of showing only `author` as the PM UI does today, the packages list will now show Trusted Owners beside each package ID when available from the selected package source.
-Author will be shown only when the selected package source does not implement Trusted Owners.
+Instead of showing only `author` as the PM UI does today, the packages list will now show Known Owners beside each package ID when available from the selected package source.
+Author will be shown only when the selected package source does not implement Known Owners.
 For this iteration, a single package source must be selected (ie, not `All`) and the `Browse` tab must be selected.
 
-The Details Pane will be capable of showing both Trusted Owner (when available) and Author for the selected package.
+The Details Pane will be capable of showing both Known Owner (when available) and Author for the selected package.
 
-The Trusted Owner in both of these panes will be shown as a hyperlink.
+The Known Owner in both of these panes will be shown as a hyperlink.
 
 #### Packages List UI for Owner/Author
 
-When Trusted Owners are available on a package source, the PM UI Packages list will show:
+When Known Owners are available on a package source, the PM UI Packages list will show:
 
-- Each Trusted Owner beside each package ID as a hyperlink.
+- Each Known Owner beside each package ID as a hyperlink.
 - Multiple Owners will be separated by a comma-delimiter.
-- The ToolTip on the  package list item will show all Trusted Owners as a comma-delimited list of plain-text (the way authors are shown, today).
-- Blank space will be shown for packages missing a Trusted Owner, with nothing beside the package ID.
+- The ToolTip on the  package list item will show all Known Owners as a comma-delimited list of plain-text (the way authors are shown, today).
+- Blank space will be shown for packages missing a Known Owner, with nothing beside the package ID.
 
 Example of HyperLinks and a package list item's ToolTip:
 ![The PM UI Packages list showing a page of Owners from NuGet.org beside each package ID as a hyperlink. An example of a tooltip showing the package name, owners, and package description.](../../meta/resources/OwnerAuthor/ownerNuGetOrgLinksNoIcon.png)
 
-|Package Source supports Trusted Owners|Shown in Packages List|Example
+|Package Source supports Known Owners|Shown in Packages List|Example
 |--|--|--|
 |No| Author | "by James Newton-King"
 |Yes| Owner only| "by [jamesnk](https://www.nuget.org/profiles/jamesnk), [newtonsoft](https://www.nuget.org/profiles/newtonsoft), [dotnetfoundation](https://www.nuget.org/profiles/dotnetfoundation)"
 
-Hyperlink URL values for each Trusted Owner will depend on which resource the package source supports.
+Hyperlink URL values for each Known Owner will depend on which resource the package source supports.
 The URL's value will be shown as a tooltip on each hyperlink.
 
 _The following is the order of precedence, starting from highest to lowest precedence:_
@@ -72,9 +72,9 @@ Long lists of owners will be truncated, just as author can become truncated, tod
 A complete list of owners will be shown in the tooltip for the package.
 ![A package is shown with a long list of owner hyperlinks that becomes truncated, while the tooltip shows the complete list of owners. ](../../meta/resources/OwnerAuthor/ownerLongTruncated.png)
 
-#### Packages without a Trusted Owner
+#### Packages without a Known Owner
 
-Blank space will be shown for packages missing a Trusted Owner, with nothing beside the package ID.
+Blank space will be shown for packages missing a Known Owner, with nothing beside the package ID.
 
 For example, using package source `nuget.org`, the package `Mvc3CodeTemplatesCSharp` has no owners.
 
@@ -84,7 +84,7 @@ For example, using package source `nuget.org`, the package `Mvc3CodeTemplatesCSh
 
 #### Details Pane UI for Owner/Author
 
-The Details Pane will show both the Trusted Owner and the Author.
+The Details Pane will show both the Known Owner and the Author.
 Historically, Owner has not been shown in the details pane at all.
 If Owner is not available, the Owner field will be shown with an indication that the metadata is not specified.
 
@@ -154,9 +154,9 @@ N/A
 <!-- What parts of the proposal need to be resolved before the proposal is stabilized? -->
 <!-- What related issues would you consider out of scope for this proposal but can be addressed in the future? -->
 
-1. Edge case: The package source responds with a Trusted Owner, but doesn't provide URL templates for **Owner Details** nor **Package Details**.
+1. Edge case: The package source responds with a Known Owner, but doesn't provide URL templates for **Owner Details** nor **Package Details**.
 
-    What URL should the Trusted Owner hyperlink point to in this case?
+    What URL should the Known Owner hyperlink point to in this case?
 
     UX Board suggests that a real URL be used with all hyperlinks.
     I had considered a hyperlink that only opens the tooltip when no destination URL is available.
@@ -168,7 +168,7 @@ N/A
         However, it may be any URL and nuget.org does not validate it.
 
         _Example of an author with a GitHub repository Project URL_
-        ![Annotation showing the Project URL for `https://github.com/redth/AndroidSdk.Tools` which could serve as the URL for "Redth" if they were a Trusted Owner](../../meta/resources/OwnerAuthor/ownerFallbackProjectURL.png)
+        ![Annotation showing the Project URL for `https://github.com/redth/AndroidSdk.Tools` which could serve as the URL for "Redth" if they were a Known Owner](../../meta/resources/OwnerAuthor/ownerFallbackProjectURL.png)
 
     1. The Registration JSON or Service index JSON file URLs.
 
@@ -185,24 +185,24 @@ N/A
     To demonstrate, on a private feed, here I used Fiddler to inject my name into an `owner` response from the Search endpoint.
     When selecting that feed, my name appears as the owner.
 
-    ![Example of a Trusted Owner that is different from another source](../../meta/resources/OwnerAuthor/fakeOwnerResponse.png)
+    ![Example of a Known Owner that is different from another source](../../meta/resources/OwnerAuthor/fakeOwnerResponse.png)
 
     However, when switching to `nuget.org`, the owners are now different:
 
-    ![Example of a Trusted Owner that is different from the previous source for the same package](../../meta/resources/OwnerAuthor/realOwnerResponse.png)
+    ![Example of a Known Owner that is different from the previous source for the same package](../../meta/resources/OwnerAuthor/realOwnerResponse.png)
 
 1. Support tabs beyond the Browse tab.
     Consider querying for metadata on the Installed tab so that information like Owners and Download Count can be shown.
 
-1. Apply any configured [Package Source Mappings](https://learn.microsoft.com/en-us/nuget/consume-packages/package-source-mapping) when evaluating multiple package sources for Trusted Owners.
-When a package is mapped, do not read Trusted Owner from any other unmapped package sources.
+1. Apply any configured [Package Source Mappings](https://learn.microsoft.com/en-us/nuget/consume-packages/package-source-mapping) when evaluating multiple package sources for Known Owners.
+When a package is mapped, do not read Known Owner from any other unmapped package sources.
 
 1. Show Owners for Recommended Packages.
-As the issue [#10714](https://github.com/NuGet/Home/issues/10714) indicates, the recommender feed does not look up metadata for packages, and therefore will not have Trusted Owner metadata.
+As the issue [#10714](https://github.com/NuGet/Home/issues/10714) indicates, the recommender feed does not look up metadata for packages, and therefore will not have Known Owner metadata.
 
-1. Stop falling back to `author` when a package source supports Trusted Owners.
+1. Stop falling back to `author` when a package source supports Known Owners.
 
-    Package sources could advertise whether they support strict Trusted Owner so that Clients can choose to hide `author` for packages where Trusted Owner is missing from the returned metadata.
+    Package sources could advertise whether they support strict Known Owner so that Clients can choose to hide `author` for packages where Known Owner is missing from the returned metadata.
     Package sources which do not make the strict declaration would continue falling back to `author`.
 
     For example, for package source `nuget.org`, the package `Mvc3CodeTemplatesCSharp` has no owners.
