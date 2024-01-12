@@ -80,24 +80,61 @@ This option will allow the specification of the output format. The option will t
   - Owners
   - TotalDownloads
 
-  The output will take the following format
+  The output will take the following format.
 
-        [
-            {
-                "source": "source Name1",
-                "packages": [
-                    {
-                        "Owners": "",
-                        "totalDownloads": "",
-                        "latestVersion": "",
-                        "id": ""
-                    }
-                ]
-            },
-            {
-                "source": "source Name2",...
-            }
+      {
+        "version": 1,
+        "problems": [
+          {
+            "level": "error",
+            "text": "An error occurred!"
+          }
+        ],
+        "searchResult": [
+          {
+            "source": "source Name1",
+            "problems": [
+              {
+                "level": "error",
+                "text": "An error occurred!"
+              }
+            ],
+            "packages": [
+              {
+                "Owners": "",
+                "totalDownloads": "",
+                "latestVersion": "",
+                "id": ""
+              }
+            ]
+          },
+          {
+            "source": "source Name2",
+            "problems": [
+              {
+                "level": "error",
+                "text": "An error occurred!"
+              }
+            ],
+            "packages": [
+              {
+                "Owners": "",
+                "totalDownloads": "",
+                "latestVersion": "",
+                "id": ""
+              }
+            ]
+          },...
         ]
+      }
+
+##### Error Handling
+
+The `problems` section captures and reports issues, and it appears in two contexts: globally for the command and individually for each source. `problems` has two sections: `level` and `text`. Whether a problem is an error or a warning is presented in `level`. And the message describing the problem is presented in `text`.
+
+- **Global Problems**: Here, `problems` detail issues that prevent the command from proceeding. These are critical errors that affect the entire operation.
+- **Source-Specific Problems**: Within each source, `problems` identify issues related only to that source. These might include source errors, or other source-specific issues."
+
 
 #### Option `--verbosity`
 
