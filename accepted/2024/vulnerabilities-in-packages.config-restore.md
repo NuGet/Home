@@ -82,6 +82,7 @@ When we run restore for packages.config, the following metrics will be considere
 
 - Should the NuGet.config configuration *affect* the PackageReference defaults as well?
 - Should vulnerability checks be performed at every packages.config restore?
+- Should we add the vulnerability metrics in the vs/nuget/restoreinformation event or a dedicated one?
 
 <!-- What parts of the proposal do you expect to resolve before this gets accepted? -->
 <!-- What parts of the proposal need to be resolved before the proposal is stabilized? -->
