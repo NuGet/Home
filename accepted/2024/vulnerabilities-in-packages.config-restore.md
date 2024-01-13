@@ -51,6 +51,9 @@ For performance considerations, vulnerability checks are only going to be perfor
 
 When we run restore for packages.config, the following metrics will be considered:
 
+- Was Audit enabled
+- Was Audit Run
+- Reason why audit was not run. (No package downloads for example)
 - Sev0Matches
 - Sev1Matches
 - Sev2Matches
@@ -60,6 +63,7 @@ When we run restore for packages.config, the following metrics will be considere
 - Severity
 - DownloadDurationSeconds
 - CheckPackagesDurationSeconds
+- SourcesWithVulnerabilityData
 
 ## Drawbacks
 
