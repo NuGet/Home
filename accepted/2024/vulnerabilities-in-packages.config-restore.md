@@ -42,8 +42,6 @@ Note that warnings as errors and no warn are not support in packages.config proj
 
 > Package 'Contoso.Service.APIs' 1.0.3 has a known critical severity vulnerability, https://github.com/advisories/GHSA-1234-5678-9012.
 
-For performance considerations, vulnerability checks are only going to be performed when the packages.config restore downloads a package.
-
 ### Technical explanation
 
 An [AuditUtility](https://github.com/NuGet/NuGet.Client/blob/dev/src/NuGet.Core/NuGet.PackageManagement/AuditUtility.cs) already exists for packages.config projects, written along similar lines as the AuditUtility for PackageReference.
@@ -72,7 +70,6 @@ When we run restore for packages.config, the following metrics will be considere
 ## Rationale and alternatives
 
 - Enable vulnerability checking on demand.
-- Enable vulnerability checking at installation time only.
 
 ## Prior Art
 
