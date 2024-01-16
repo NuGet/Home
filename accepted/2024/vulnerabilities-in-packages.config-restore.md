@@ -23,7 +23,7 @@ In particular, there will be 2 new configuration keys:
 | Key | Acceptable values | Description | Default |
 |-----|-------------------|-------------|---------|
 | auditForPackagesConfig | enable, disable | Enables or disables NuGet Audit for packages config projects | If not specified, the default will be `enable` |
-| auditLevelForPackagesConfig | Critical, high, moderate, low | Configurations the default audit level for NuGet audit for packages config projects |  If not specified, the default will be `disable` |
+| auditLevelForPackagesConfig | Critical, high, moderate, low | Configures the default audit level for NuGet audit for packages config projects |  If not specified, the default will be `low` |
 
 The audit functionality for packages.config restore will be enabled by default.
 To disable it, one can specify a property in the config section of the configuration file.
