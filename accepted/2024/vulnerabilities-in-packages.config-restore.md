@@ -78,6 +78,7 @@ All of these metrics are going to the added to the root vs/nuget/restoreinformat
 
 ## Unresolved Questions
 
+- Should we use MSBuild properties instead?
 - Should the NuGet.config configuration *affect* the PackageReference defaults as well?
 - What should the vulnerability check frequency be? Every time might lead to a lot of overhead on packages.config restores, since no-ops are currently very fast.
   - A possible alternative is to run on the first restore within a process and everytime a new package is downloaded.
