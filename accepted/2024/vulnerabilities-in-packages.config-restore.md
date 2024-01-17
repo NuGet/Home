@@ -23,7 +23,7 @@ In particular, there will be 2 new configuration keys:
 | Key | Acceptable values | Description | Default |
 |-----|-------------------|-------------|---------|
 | auditForPackagesConfig | enable, disable | Enables or disables NuGet Audit for packages config projects | If not specified, the default will be `enable` |
-| auditLevelForPackagesConfig | Critical, high, moderate, low | Configures the default audit level for NuGet audit for packages config projects |  If not specified, the default will be `low` |
+| auditLevelForPackagesConfig | Critical, high, moderate, low | Configurations the default audit level for NuGet audit for packages config projects |  If not specified, the default will be `disable` |
 
 The audit functionality for packages.config restore will be enabled by default.
 To disable it, one can specify a property in the config section of the configuration file.
@@ -45,7 +45,6 @@ Note that warnings as errors and no warn are not support in packages.config proj
 ### Technical explanation
 
 An [AuditUtility](https://github.com/NuGet/NuGet.Client/blob/dev/src/NuGet.Core/NuGet.PackageManagement/AuditUtility.cs) already exists for packages.config projects, written along similar lines as the AuditUtility for PackageReference.
-For performance considerations, vulnerability checks are only going to be performed when the packages.config restore downloads a package.
 
 When we run restore for packages.config, the following metrics will be considered:
 
@@ -63,6 +62,8 @@ When we run restore for packages.config, the following metrics will be considere
 - CheckPackagesDurationSeconds
 - SourcesWithVulnerabilityData
 
+All of these metrics are going to the added to the root vs/nuget/restoreinformation event.
+
 ## Drawbacks
 
 - Vulnerability checking comes with a performance hit.
@@ -78,8 +79,9 @@ When we run restore for packages.config, the following metrics will be considere
 ## Unresolved Questions
 
 - Should the NuGet.config configuration *affect* the PackageReference defaults as well?
-- Should vulnerability checks be performed at every packages.config restore?
-- Should we add the vulnerability metrics in the vs/nuget/restoreinformation event or a dedicated one?
+- What should the vulnerability check frequency be? Every time might lead to a lot of overhead on packages.config restores, since no-ops are currently very fast.
+  - A possible alternative is to run on the first restore within a process and everytime a new package is downloaded.
+    - That'd basically mean every CLI restore checks for vulnerabilities, but within VS, we only do it selectively, since on-build restores are so many and we don't want people to pay performance penalties.
 
 <!-- What parts of the proposal do you expect to resolve before this gets accepted? -->
 <!-- What parts of the proposal need to be resolved before the proposal is stabilized? -->
