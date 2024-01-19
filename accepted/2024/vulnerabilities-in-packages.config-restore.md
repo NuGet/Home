@@ -15,7 +15,8 @@ See [vulnerabilities in PackageReference restore motivation](../2022/vulnerabili
 
 ### Functional explanation
 
-Packages.config restore combines all packages regardless of project. Instead of raising warnings and errors on a per project level, at restore time, they're raised on a per package level.
+After every restore, the vulnerability warnings will be displayed for every package with vulnerabilities (see technical explanation for no-op considerations).
+Packages.config restore combines all packages regardless of project. If 10 projects have a vulnerability package, 10 equivalent warnings will be raised, one for each project. This matches the PackageReference behavior where the warnings are raised on a per project basis, and each projet may contain the same package.
 
 The configuration knobs for packages.config restore auditing functionality will be NuGet.config based.
 In particular, there will be 2 new configuration keys:
@@ -31,18 +32,30 @@ To disable it, one can specify a property in the config section of the configura
 ```xml
 <configuration>
     <config>
-        <add key="audit" value="enable" />
-        <add key="auditLevel" value="low" />
+        <add key="auditForPackagesConfig" value="enable" />
+        <add key="auditLevelForPackagesConfig" value="low" />
     </config>
 </configuration>
 ```
 
 Whenever a vulnerability for a package is discovered, a warning will be raised indicating the severity and advisory url.
-Note that warnings as errors and no warn are not support in packages.config projects, so these warnings will not fail the build.
+Note that warnings as errors and no warn are not supported in packages.config projects, so these warnings will not fail the build.
 
 > Package 'Contoso.Service.APIs' 1.0.3 has a known critical severity vulnerability, https://github.com/advisories/GHSA-1234-5678-9012.
 
 ### Technical explanation
+
+Vulnerability warnings will be displayed after every packages.config restore.
+In Visual Studio, there will be a caching layer to avoid recalculating stable data when no packages are no downloaded.
+
+To best understand that, we define a packages.config no-op restore, as a restore that does not install any packages in the packages folder.
+Given that, vulnerabilties will be raised via the following heuristic.
+
+- Refresh vulnerability warnings at every restore that does not no-op.
+- Refresh vulnerabilities during the first restore in Visual Studio.
+- Replay vulnerabilities at every no-op restore that's not the first restore in Visual Studio.
+
+This could potentially go out of date, but it's the same optimization as PackageReference restore's no-op.
 
 An [AuditUtility](https://github.com/NuGet/NuGet.Client/blob/dev/src/NuGet.Core/NuGet.PackageManagement/AuditUtility.cs) already exists for packages.config projects, written along similar lines as the AuditUtility for PackageReference.
 
@@ -70,7 +83,9 @@ All of these metrics are going to the added to the root vs/nuget/restoreinformat
 
 ## Rationale and alternatives
 
-- Enable vulnerability checking on demand.
+### MSBuild properties vs nuget.config for packages.config restore configuration
+
+
 
 ## Prior Art
 
