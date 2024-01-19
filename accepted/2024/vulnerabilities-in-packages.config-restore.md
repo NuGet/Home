@@ -137,6 +137,7 @@ Another consideration for these 2 properties is that the default are arguably go
 - Should we use MSBuild properties instead?
 - Should the NuGet.config configuration *affect* the PackageReference defaults as well?
   - The consequence would be that *when* the project properties page displays audit defaults (not yet done), it won't know about the potential impact from the nuget.config file. This is likely not a common scenario.
+  The property names would be `audit` and `auditLevel`.
 
 <!-- What parts of the proposal do you expect to resolve before this gets accepted? -->
 <!-- What parts of the proposal need to be resolved before the proposal is stabilized? -->
