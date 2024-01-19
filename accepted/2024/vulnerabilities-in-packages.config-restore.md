@@ -48,6 +48,10 @@ To disable it, one can specify a property in the config section of the configura
 </configuration>
 ```
 
+#### Enabling the feature
+
+The feature will be enabled by default in Visual Studio 17.10 as restore in packages.config does not fail the build.
+
 ### Technical explanation
 
 An [AuditUtility](https://github.com/NuGet/NuGet.Client/blob/dev/src/NuGet.Core/NuGet.PackageManagement/AuditUtility.cs) already exists for packages.config projects, written along similar lines as the AuditUtility for PackageReference.
@@ -121,6 +125,8 @@ Given all that, the pros and cons of a property centric vs a nuget.config centri
 |-|------|------|
 | NuGet.config centric approach | Matches other packages.config configuration knobs. </br> Enabling audit and audit level is a repo setting, not a project one.  | May require 2 configuration knobs for mixed projects, or potentially having a project property page that does not recognize the nuget.config value. |
 | Property centric approach | Matches the PackageReference configuration | Introduces a new concept for packages.config users. </br> Implementation cost for functionality that won't be used frequently, if at all. |
+
+Another consideration for these 2 properties is that the default are arguably good enough, and that they'd rarely be configured.
 
 ## Prior Art
 
