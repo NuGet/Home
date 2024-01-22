@@ -34,9 +34,8 @@ Hence, package owners try to deprecate packages which are out of support. Withou
 
 <!-- Explain the proposal as if it were already implemented and you're teaching it to another person. -->
 <!-- Introduce new concepts, functional designs with real life examples, and low-fidelity mockups or  pseudocode to show how this proposal would look. -->
-A new NuGet CLI command option `stage` will be added to the `stage` command, which will allow a user to stage a package to nuget, specifying a group parameter. (dotnet nuget push --stage [group-id])
- Staged packages will be uploaded to NuGet and will be validated during the staging process, so that the staging fails
- if validation fails for a package in a group. After uploading multiple packages, the user user can then call `nuget push --group [group]`
+A new NuGet CLI command option `stage` will be added to the `push` command, which will allow a user to stage a package to nuget, specifying a group identifier. (dotnet nuget push --stage [group-id])
+ Staged packages will be uploaded to NuGet and will be validated as part of the staging process, so that if a package being staged fails validation, the staging fails. After uploading multiple packages, the user can then call `nuget push --group [group-id]`
  command to request all the packages from the earlier group to become available on the server as `published`.
 Note, that the `group` information will only be stored on the server and has nothing to do with how a package was built.
 
@@ -52,10 +51,11 @@ Groups can expand over time, by publishing new packages to the same group in the
 
 Groups can later be used in the future when it's time to deprecate a set of packages. The package author can request to
  deprecate a `group` by calling a single command on the nuget CLI and all the packages that belong to that group will be marked as `deprecated`.
+ This particular functionality depends on the support of the NuGet Deprecation command, which is not yet publicly available.
 
 With this information in place, new set of NuGet APIs / extensions will be needed to allow a user to run the following actions:
 - **Stage** a package for later publishing
-- **Publish an earlier staged release**
+- **Publish an earlier staged group**
 - **Deprecate a group** using the group id 
 - **Discard a staged release** using the group id
 
@@ -93,13 +93,13 @@ It should be possible for a group to expand over time. This is currently a real 
  and then follow-up SDK updates ship updated packages which still belong to the same .NET 8 package group.
  Here how this will play out with the tooling support described above:
 1. During GA release, the release team will stage the set of RTM packages for the release. (nuget stage --group-id "net8.0" --package-id <package-file-path>)
-2. Then on the day of the release, all the staged packages will be published using `nuget push --stage "net8.0"` command.
-   At this point, the stage for the `net8.0` group will be empty.
+2. Then on the day of the release, all the staged packages will be published using `nuget push --group "net8.0"` command.
+   At this point, the group with id `net8.0` will be empty.
 3. Later, as new builds are being prepared for a patch release, a new set of packages will be staged, to be later published to the same group.
 As there can be multiple candidate builds for a release, there is a need for functionality to discard a stage for a given group `nuget delete --stage "net8.0"`.
 This will remove all the staged but not published packages from the net8.0 group.
 4. A new set of packages will be staged for the 8.0 group, until the final build is known. At this point, there is only one unified set of related packages is staged.
-5. On the release date, the release team will call `nuget publish --stage "net8.0"` again, and only the staged packages will be published, resulting in an expanded set of published packages in the net8.0 group.
+5. On the release date, the release team will call `nuget push --group "net8.0"` again, and only the staged packages will be published, resulting in an expanded set of published packages in the net8.0 group.
 6. Some time in the future, when the release is already out of support, somebody from the .NET team will call
  `nuget deprecate --stage "net8.0"` and all the packages which have ever been published to that group will be deprecated.
  Those packages, which has already been deprecated because of whatever reason, will not be altered.
