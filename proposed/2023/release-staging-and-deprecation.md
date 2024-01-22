@@ -165,7 +165,9 @@ This is generally a very time-sensitive effort, especially when it comes to secu
  their releases awaiting a green light from the .NET team, which results in a tense / stressfull effort of patching the impacting
  packages on the last minute to address the faced issues.
 Besides the security releases, there are also GA releases, which have a similar risk characteristics.
- Many times there are confrerences schedueld the same day when a release is planned. And during such a conference the presenter
+Many times there are conferences scheduled the same day when a release is planned. And during such a conference the presenter
+ expectes the release to be published (a few hours earlier) so that they can demo some new feature(s).
+ And it happened in the past that the releases didn't succeed in time and impacted the presentations in a negative way.
  expectes the release to be published (a few hours earlier) so that they can demo some new feature(s).
  And it happened in the past that the releases didn't succeed in time and impacted the presentations in a negative way.
 
