@@ -87,7 +87,7 @@ Instead, they would use `dotnet list package --format json --vulnerable` (possib
 Finally, they would need to have a script that parses the output, remove vulnerabilities they wish to suppress, then return a non-zero exit code if the result still contains any other vulnerabilities.
 
 This effort would need to be duplicated by every customer who wishes to implement such behavior.
-Even if someone in the community (or even the NuGet team ourselves) provideds a sample, it requires developers to find the location where the sample is documented, and then to adapt it to their needs.
+Even if someone in the community (or even the NuGet team ourselves) provides a sample, it requires developers to find the location where the sample is documented, and then to adapt it to their needs.
 Alternatively, if this feature is implemented, then it's much easier for customers to adopt, as it's a fairly small configuration change.
 
 ## Rationale and alternatives
@@ -105,7 +105,7 @@ This seems like an important use-case that should be enabled.
 
 ### MSBuild item vs property
 
-NuGet already uses MSBuild properties for various settings, such as additional package sources, and we can learn from experiences using it.
+The current proposal is to use an MSBuild item. NuGet already uses MSBuild properties for various settings, such as additional package sources, and we can learn from experiences using it.
 
 Firstly, adding a per-project item into an MSBuild property has worse syntax (at least in my opinion): `<NuGetAuditSuppress>$(NuGetAuditSuppress);https://sample.test/CVE</NuGetAuditSuppress>`.
 
@@ -145,6 +145,20 @@ It also means duplication when a package is direct in one project, but transitiv
 Having the suppress metadata flowed down to transitive packages, as Include/Exclude/Private Assets does is another option, because it's behavior that already exists.
 However, this makes it difficult to suppress centrally, like in a *Directory.Packages.props* file, as a transitive package will have different "entry points" in different projects in a solution.
 
+### CollectNuGetAuditSuppress target
+
+We already have `CollectPackageReferences`, `CollectPackageDownloads`, `CollectFrameworkReferences`, and `CollectCentralPackageVersions`.
+I believe the original design of these targets was specifically for `PackageDownload`, to allow the .NET SDK to determine instruct NuGet to download runtime packs and BCL reference assemblies only when they're not already available locally.
+I'm not sure why the other `Collect*` targets were added.
+This has a side-effect that it provides customers, and other MSBuild SDK authors, a way to customize their build and dynamically add or modify items as needed.
+
+We will add a `CollectNuGetAuditSuppress` target with the new `NuGetAuditSuppress` item. We will need to not only modify our own *NuGet.targets* to add it to the appropriate `DependsOnTargets`, but we also need to investigate MSBuild's static restore or .NET SDK to see if it needs to be added to the list of targets it "hardcodes" it runs.
+Additionally, we'll need to check if Visual Studio's project systems need any changes, specifically for design time builds.
+
+If NuGet's restore always ran as an MSBuild target, the customers and MSBuild SDK authors could probably just have used `BeforeTarget="Restore"`.
+However, in Visual Studio that's not the case, so it won't work.
+Could we consider a single `CollectRestoreInputs` target, which we can re-use for everything going forward, rather than adding a new target for every item type we add?
+
 ### Performance concerns
 
 Restore is NuGet's most performance critical path.
@@ -178,21 +192,6 @@ Therefore, even though using MSBuild items is theoretically the highest allocati
 <!-- What parts of the proposal need to be resolved before the proposal is stabilized? -->
 <!-- What related issues would you consider out of scope for this proposal but can be addressed in the future? -->
 
-### CollectNuGetAuditSuppress target
-
-We already have `CollectPackageReferences`, `CollectPackageDownloads`, `CollectFrameworkReferences`, and `CollectCentralPackageVersions`.
-I believe the original design of these targets was specifically for `PackageDownload`, to allow the .NET SDK to determine instruct NuGet to download runtime packs and BCL reference assemblies only when they're not already available locally.
-I'm not sure why the other `Collect*` targets were added.
-This has a side-effect that it provides customers, and other MSBuild SDK authors, a way to customize their build and dynamically add or modify items as needed.
-
-If we add a new item type, `NuGetAuditSuppress`, do we also need to add a `CollectNuGetAuditSuppress` target?
-If so, we need to not only modify our own *NuGet.targets* to add it to the appropriate `DependsOnTargets`, but we also need to investigate MSBuild's static restore or .NET SDK to see if it needs to be added to the list of targets it "hardcodes" it runs.
-Additionally, we'd need to check if Visual Studio's project systems need any changes, specifically for design time builds.
-
-If NuGet's restore always ran as an MSBuild target, the customers and MSBuild SDK authors could probably just have used `BeforeTarget="Restore"`.
-However, in Visual Studio that's not the case, so it won't work.
-Could we consider a single `CollectRestoreInputs` target, which we can re-use for everything going forward, rather than adding a new target for every item type we add?
-
 ### Per-package suppressions
 
 Most of NuGet's and .NET's security advisories affect multiple packages.
@@ -210,7 +209,7 @@ For example:
 
 Since NuGet saves restore inputs in a `dgspec.json` file, adding this as a future possibility will mean that there will be additional changes to the file's schema, and care would need to be taken to ensure that any existing dgspec doesn't crash the deserializer and cause restore errors when it's an older version without per-package support.
 If we add per-package support in the first version of `NuGetAuditSuppress`, then it reduces risk for this future change.
-Additionally, given the need to modify all of NuGet's restore entry points, it reduces effort
+Additionally, given the need to modify all of NuGet's restore entry points, it reduces effort.
 
 On the other hand, this feature has not yet been requested by any customers, so might be a form of scope creep.
 The more simple `NuGetAuditSuppress` without per-package support will be quicker to implement, and significantly easier to write automated tests for.
@@ -224,7 +223,7 @@ Taking cargo's lead, perhaps `NugetAuditIgnore`?
 
 Should we add any `dotnet` CLI commands to add/remove `NuGetAuditSuppress` items?
 
-Should we work with dotnet/project-system to display supressions in Solution Explorer? Should project properties provide a GUI to edit suppressions?
+Should we work with dotnet/project-system to display suppressions in Solution Explorer? Should project properties provide a GUI to edit suppressions?
 
 ## Future Possibilities
 
