@@ -104,24 +104,6 @@ This will remove all the staged but not published packages from the net8.0 group
  `nuget deprecate --stage "net8.0"` and all the packages which have ever been published to that group will be deprecated.
  Those packages, which has already been deprecated because of whatever reason, will not be altered.
 
-#### Asynchronous behavior
-
-As both publishing and deprecation commands can take some time, these will run asynchronously.
- So the CLI command for both operations will return immediately, giving the user some token which can later be used to
- track the current state of the request.
-There are no critical scenarios for deprecation to happen within specific time period, however, publishing is somewhat
- critical and is being orchestrated in many cases. Hence, NuGet should provide some guarantees for how much time the operation
- can take in the worst case. As of right now, having 10 minutes deadline for the publishing request should be reasonable.
-
-This requirement brings a need for a new NuGet command for querying the status of an asynchronous operation. This particular requirement should be treated as a stretch goal, and it can be implemented in a later release.
-Let's assume that the group publishing and deprecation commands will return some "operation id" for later state inquriry by the client.
-
-The below command for tracking progress should be treated as a P2 ask, and can be implemented later.
-`nuget status --operation-id` command can be used to track the progress of an asynchronous operation.
-This can return the following results:
-- `success` : when successful, the operation should also return the time when the operation was completed.
-- `failed` : operation failed
-When failed, the result of the command shuold also produce detailed information about what went wrong.
 
 ### Technical explanation
 
@@ -191,3 +173,22 @@ Obviously, this is a problem which can be solved by a stable solution, but inste
 <!-- What future possibilities can you think of that this proposal would help with? -->
 
 In addition to the above core scenarios, this will also enable NuGet tooling scenarios, where projects can have a consistent set of dependencies. That is, NuGet can warn / suggest customers to fix inconsistent dependencies may they have such in their projects.
+
+### Asynchronous behavior
+
+As both publishing and deprecation commands can take some time, these will run asynchronously.
+ So the CLI command for both operations will return immediately, giving the user some token which can later be used to
+ track the current state of the request.
+There are no critical scenarios for deprecation to happen within specific time period, however, publishing is somewhat
+ critical and is being orchestrated in many cases. Hence, NuGet should provide some guarantees for how much time the operation
+ can take in the worst case. As of right now, having 10 minutes deadline for the publishing request should be reasonable.
+
+This requirement brings a need for a new NuGet command for querying the status of an asynchronous operation. This particular requirement should be treated as a stretch goal, and it can be implemented in a later release.
+Let's assume that the group publishing and deprecation commands will return some "operation id" for later state inquriry by the client.
+
+The below command for tracking progress should be treated as a P2 ask, and can be implemented later.
+`nuget status --operation-id` command can be used to track the progress of an asynchronous operation.
+This can return the following results:
+- `success` : when successful, the operation should also return the time when the operation was completed.
+- `failed` : operation failed
+When failed, the result of the command shuold also produce detailed information about what went wrong.
