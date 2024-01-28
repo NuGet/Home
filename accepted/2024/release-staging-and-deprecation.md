@@ -34,8 +34,8 @@ Hence, package owners try to deprecate packages which are out of support. Withou
 
 <!-- Explain the proposal as if it were already implemented and you're teaching it to another person. -->
 <!-- Introduce new concepts, functional designs with real life examples, and low-fidelity mockups or  pseudocode to show how this proposal would look. -->
-A new NuGet CLI command option `stage` will be added to the `push` command, which will allow a user to stage a package to nuget, specifying a group identifier. (dotnet nuget push --stage [group-id])
- Staged packages will be uploaded to NuGet and will be validated as part of the staging process, so that if a package being staged fails validation, the staging fails. After uploading multiple packages, the user can then call `nuget push --group [group-id]`
+A new NuGet CLI command option `stage` will be added to the `push` command, which will allow a user to stage a package to a NuGet server, specifying a group identifier. (dotnet nuget push --stage [group-id])
+ Staged packages will be uploaded to NuGet server and will be validated as part of the staging process, so that if a package being staged fails validation, the staging fails. After uploading multiple packages, the user can then call `nuget push --group [group-id]`
  command to request all the packages from the earlier group to become available on the server as `published`.
 Note, that the `group` information will only be stored on the server and has nothing to do with how a package was built.
 
@@ -71,9 +71,17 @@ When staged, packages will not be visible / accessible to anyone but the co-owne
 
 
 #### Group Ownership
-There are few interesting scenarios related to package ownership:
+
+A questions arises regarding group ownership. What does group ownership mean?
+Groups should have no concept of ownership. The concept ownership is applicable only to packages and those rules are what control and guide the decisions of operations applied to groups.
+Imagine a scenario where user A and userB are co-owners of a package. Any one of them can stage that package and the other one can handle any operation with the group the package has been associated with. If userB discards the stage, then userA won't be able to find that package in the stage any more.
+
+Think about all this ownership thing from data model perspective.
+The NuGet server will associate group id with each package that's staged / published. So when asking the question which packages belong to this group depending on which packages you have access to you will be getting a subset from the whole list.
+
+Below are a few interesting scenarios that derieve from the above:
 1. The user has staged a package to a group for later publishing, but the ownership has changed, and the user is no longer
- an owner for a package in a group. At this point, publishing request should fail with a message that the group has been modified
+ an owner for that package. At this point, publishing request should fail with a message that the group has been modified
  from its original set, and the outcome of the request may be different from what the user was expecting, indicating the package
  that was moved out of the group. If the user is aware of the problem and still wants to move forward with the change,
  they will have to pass an additional `--force` parameter to the publish command: `nuget push --stage <group-id> --force`.
@@ -84,9 +92,9 @@ There are few interesting scenarios related to package ownership:
  the fundamental principle is that a user cannot deprecate a package they don't own.
 
 #### Lifespan of a staged group
-If users keep staging packages but do nothing with them, NuGet will become an ever-growing package graveyard,
+If users keep staging packages but do nothing with them, NuGet server will become an ever-growing package graveyard,
  incurring higher and higher costs over time simply for storing these packages. To avoid this problem, stages should be time-limited.
- That is, there should be a maximum lifespan for a stage. Any updates to the stage will reset its TTL date to some amount (let's say 30 days). If within the next 30 days no changes are made to the stage, NuGet should then remove the stage (all its packages basically).
+ That is, there should be a maximum lifespan for a stage. Any updates to the stage will reset its TTL date to some amount (let's say 30 days). If within the next 30 days no changes are made to the stage, the NuGet server should then remove the stage (all its packages basically).
 
 #### Expanding groups
 It should be possible for a group to expand over time. This is currently a real scenario, where .NET GA SDK ships a set of packages,
@@ -180,7 +188,7 @@ As both publishing and deprecation commands can take some time, these will run a
  So the CLI command for both operations will return immediately, giving the user some token which can later be used to
  track the current state of the request.
 There are no critical scenarios for deprecation to happen within specific time period, however, publishing is somewhat
- critical and is being orchestrated in many cases. Hence, NuGet should provide some guarantees for how much time the operation
+ critical and is being orchestrated in many cases. Hence, NuGet server should provide some guarantees for how much time the operation
  can take in the worst case. As of right now, having 10 minutes deadline for the publishing request should be reasonable.
 
 This requirement brings a need for a new NuGet command for querying the status of an asynchronous operation. This particular requirement should be treated as a stretch goal, and it can be implemented in a later release.
