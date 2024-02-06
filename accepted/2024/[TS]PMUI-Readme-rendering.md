@@ -6,7 +6,7 @@
 
 ## Summary
 
-We want to add update the PM UI to render the ReadMe.md file while browing packages. 
+We want to update the PM UI to render the ReadMe.md file while browsing packages. 
 
 ## Motivation 
 
