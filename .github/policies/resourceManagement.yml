@@ -289,6 +289,7 @@ configuration:
       description: '[stale PR] [5-2] Remove "Status:No recent activity" if there is any activity.'
     - if:
       - payloadType: Issue_Comment
+      - isPullRequest
       - hasLabel:
           label: Status:No recent activity
       then:
