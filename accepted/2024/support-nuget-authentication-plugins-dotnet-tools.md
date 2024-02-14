@@ -73,7 +73,7 @@ The setup instructions mentioned in step 2 are platform-specific, but they are s
 I proposed using a `tool path` .NET tool because, by default, .NET tools are considered [global](https://learn.microsoft.com/dotnet/core/tools/global-tools). This means they are installed in a default directory, such as `%UserProfile%/.dotnet/tools` on Windows, which is then added to the PATH environment variable.
 - Global tools can be invoked from any directory on the machine without specifying their location.
 - One version of a tool is used for all directories on the machine.
-However, NuGet cannot easily determine which tool is a cross-platform authentication or a package download plugin without invoking every single global tool installed on the machine. This could potentially lead to a performance hit for NuGet operations.
+However, NuGet cannot easily determine which tool is a NuGet plugin.
 On the other hand, the `tool path` option allows us to install .NET tools as global tools, but with the binaries located in a specified location. This makes it easier to identify and invoke the appropriate tool for NuGet operations.
 - The binaries are installed in a location that we specify while installing the tool.
 - We can invoke the tool from the installation directory by providing the directory with the command name or by adding the directory to the PATH environment variable.
