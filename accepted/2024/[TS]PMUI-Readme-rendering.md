@@ -48,6 +48,8 @@ This control is not currently using Daytona. There are plans to upgrade it, [Exp
 
 It's also currently marked as obsolete since the interface has not been finalized. So when an upgrade is made we may have to change how we use the control.
 
+Currently WebView2 controls always render ontop of other controls in the view. [Secnario 25254665](https://microsoft.visualstudio.com/Edge/_workitems/edit/25254665). PM UI needs to be updated to ensure items don't scroll off screen.
+
 ## Rationale and alternatives
 By using an existing control we maintain consistency throughout the IDE and can rely on the owner to fix any bugs with the control.
 <!-- Why is this the best design compared to other designs? -->
@@ -71,11 +73,12 @@ The IMarkdownPreview is currently being used when creating a new pull request in
     - [ ] Hide the tab from the the details pane
     - [ ] Display the tab with a message saying there is no ReadMe defined.
 1. Where do we get the ReadMe from when it's not on the disk?
-    - Does the current API return the ReadMe information when searchin for a package?
+    - Does the current API return the ReadMe information when searching for a package? 
     - If not is there an API to retrieve the ReadMe information?
 1. Where are the ReadMe files saved in a package? 
     - There are examples of them being in root folder as well as a _content folder. 
 1. What do we want the UX to be when an exception or error occurs while reading a ReadMe file? 
+1. Do we want the ReadMe to update whenever a new version is selected for the current package?
 <!-- What parts of the proposal do you expect to resolve before this gets accepted? -->
 <!-- What parts of the proposal need to be resolved before the proposal is stabilized? -->
 <!-- What related issues would you consider out of scope for this proposal but can be addressed in the future? -->
