@@ -142,7 +142,8 @@ The ideal workflow for repositories accessing private NuGet feeds, such as Azure
 [Andy Zivkovic](https://github.com/zivkan) kindly proposed an alternative design in [[Feature]: Make NuGet credential providers installable via the dotnet cli](https://github.com/NuGet/Home/issues/11325). The recommendation was developing a command like `dotnet nuget credential-provider install Microsoft.Azure.Artifacts.CredentialProvider`. Here are the advantages and disadvantages of this approach:
 
 **Advantages:**
-- As Andy suggested in the linked issue, we can utilize nuspec package types to enhance the discovery of credential providers. By introducing a new package type called `CredentialProvider`, the `dotnet nuget credential-provider list` command can filter by `packageType:CredentialProvider` on nuget.org. This will display a list of credential providers available on the feed, similar to the `dotnet list package` command. Although there are currently limited options for credential providers, customers would benefit from the ability to search by `packageType:CredentialProvider` on nuget.org.
+- Improved discoverability, as `dotnet tool search` will list packages that are not NuGet plugins.
+- Doesn't require customers to memorize or lookup the NuGet plugin directory location in order to pass it to all `dotnet tool` commands via the `--tool-path` argument, for install, uninstall, and update.
 
 **Disadvantages:**
 - The NuGet Client team would be required to maintain all the .NET Commands for installing, updating, and uninstalling the plugins. However, these tasks are already handled by the existing commands in the .NET SDK.
