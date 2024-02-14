@@ -102,7 +102,11 @@ If none of the above environment variables are set, NuGet will default to the co
 
 In the [current implementation](https://github.com/NuGet/NuGet.Client/blob/dev/src/NuGet.Core/NuGet.Protocol/Plugins/PluginDiscoveryUtility.cs#L79-L101), the NuGet code searches for plugin files in a plugin-specific subdirectory. For example, in the case of the Azure Artifacts Credential Provider, the code looks for `*.exe` or `*.dll` files under the "CredentialProvider.Microsoft" directory. However, when .NET tools are installed in the `tools` folder, executable files (like `.exe` files on Windows or files with the executable bit set on Linux & Mac) are placed directly in the `tools` directory. The remaining files are stored in a `.store` folder. This arrangement eliminates the need to search in subdirectories.
 
-The new folder structure for NuGet plugins on the Windows platform is as follows: The `tools` folder contains .NET tool plugins, while the `.store` folder houses other necessary files.
+NuGet will discover plugins in the new directory by enumerating files, without recursing into child directories.
+This is compatible with the layout that `dotnet tool install` uses, where packages are extracted to a `.store` subdirectory, and shims are put in the tool directory, one file per executable command.
+All files could be considered executables that NuGet will run.
+Alternatively, on Windows, NuGet could filter `*.exe`.
+On Mac and Linux, where apps typically don't have extensions, to do functionally equivalent filtering NuGet should check each file's permissions and ensure the execute bit is enabled (although technically we'd probably also need to check the file owner and group, to know if we should check the user, group, or other permissions).
 
 ![plugin-tools-folder-windows](./../../meta/resources/PluginsAsDotNetTools/plugin-tools-folder-windows.png)
 
