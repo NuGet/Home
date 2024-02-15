@@ -5,7 +5,7 @@
 
 ## Summary
 
-Currently, NuGet utilizes a [cross-platform plugin model](https://learn.microsoft.com/nuget/reference/extensibility/nuget-cross-platform-plugins#supported-operations) which is primarily used for [authentication against private feeds](https://learn.microsoft.com/en-us/nuget/reference/extensibility/nuget-cross-platform-authentication-plugin). It also supports the [package download](https://github.com/NuGet/Home/wiki/NuGet-Package-Download-Plugin) operation.
+Currently, NuGet utilizes a [cross-platform plugin model](https://learn.microsoft.com/nuget/reference/extensibility/nuget-cross-platform-plugins#supported-operations) which is primarily used for [authentication against private feeds](https://learn.microsoft.com/nuget/reference/extensibility/nuget-cross-platform-authentication-plugin). It also supports the [package download](https://github.com/NuGet/Home/wiki/NuGet-Package-Download-Plugin) operation.
 
 To accommodate all scenarios involving NuGet client tools, plugin authors will need to create plugins for both `.NET Framework` and `.NET Core`. The following details the combinations of client and framework for these plugins.
 
