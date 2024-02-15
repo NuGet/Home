@@ -79,7 +79,7 @@ By implementing this specification, we offer plugin authors the option to use .N
 They can install these as a `tool path` global tool. This eliminates the need to maintain separate versions for `.NET Framework` and `.NET Core`.
 It also simplifies the installation process by removing the necessity for plugin authors to create subcommands like `codeartifact-creds install/uninstall`.
 
-The ideal workflow for repositories that access private NuGet feeds, such as Azure DevOps, would be:
+The proposed workflow for repositories that access private NuGet feeds, such as Azure DevOps, would be:
 
 1. Ensure that the dotnet CLI tools are installed.
 2. Execute the command `dotnet tool install Microsoft.CredentialProviders --tool-path "%UserProfile%/.nuget/plugins/tools"` on the Windows platform.
