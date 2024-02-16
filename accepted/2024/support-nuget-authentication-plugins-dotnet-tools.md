@@ -121,7 +121,8 @@ If this environment variable is set, it overrides the convention-based discovery
 It is ignored if either of the framework-specific variables is specified.
 
 I propose the addition of a `NUGET_DOTNET_TOOLS_PLUGIN_PATHS` environment variable.
-This variable will define the plugins, installed as .NET tools, to be used by both .NET Framework and .NET Core tooling. It will take precedence over `NUGET_PLUGIN_PATHS`. 
+This variable will define the plugins, installed as .NET tools, to be used by both .NET Framework and .NET Core tooling.
+It will take precedence over `NUGET_PLUGIN_PATHS`. 
 
 The plugins specified in the `NUGET_DOTNET_TOOLS_PLUGIN_PATHS` environment variable will be used regardless of whether the `NUGET_NETFX_PLUGIN_PATHS` or `NUGET_NETCORE_PLUGIN_PATHS` environment variables are set.
 The primary reason for this is that plugins installed as .NET tools can be executed in both .NET Framework and .NET Core tooling.
