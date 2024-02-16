@@ -33,13 +33,12 @@ Upon installation, .NET tools are organized in a way that helps NuGet quickly de
 
 ## Motivation 
 
-At present, NuGet uses different methods to execute plugins for `.NET Framework` and `.NET Core`.
-For the `.NET Framework`, it looks for files ending in `*.exe`, while for `.NET Core`, it looks for files ending in `*.dll`.
-These files are usually stored in two separate folders under the base path for NuGet plugins.
-
-Before `.NET Core 2.0`, this division was necessary because `.NET Core` only supported platform-agnostic DLLs.
-However, with the latest versions of .NET, this division is no longer necessary, but the NuGet plugin architecture still requires supporting and deploying multiple versions.
-This behavior is further reinforced by the two plugin path environment variables `NUGET_NETFX_PLUGIN_PATHS` and `NUGET_NETCORE_PLUGIN_PATHS`, which need to be set for each framework version.
+Currently, the NuGet plugin architecture requires support and deployment of multiple versions.
+For `.NET Framework`, NuGet searches for files ending in `*.exe`, while for `.NET Core`, it searches for files ending in `*.dll`.
+These files are typically stored in two distinct folders such as `netfx` and `netcore` under the NuGet plugins base path.
+This design decision is due to the different entry points for `.NET Core` and `.NET Framework`, as explained in the [original design](https://github.com/NuGet/Home/wiki/NuGet-cross-plat-authentication-plugin#plugin-installation-and-discovery).
+`.NET Core` uses files with a `dll` extension, while `.NET Framework` uses files with an `exe` extension as entry points.
+This distinction is further highlighted by the two plugin path environment variables, `NUGET_NETFX_PLUGIN_PATHS` and `NUGET_NETCORE_PLUGIN_PATHS`, which must be set for each framework type.
 
 Another motivating factor for this work is the current story for installing these credential providers, which is not ideal.
 For instance, let's consider the two cross-platform authentication plugins that I am aware of while writing this specification:
