@@ -109,7 +109,7 @@ This is an important consideration for plugin customers when installing NuGet pl
 
 ### Technical explanation
 
-Plugins are discovered through a convention-based directory structure, such as the `%userprofile%/.nuget/plugins` folder on Windows.
+Currently, plugins are discovered through a convention-based directory structure, such as the `%userprofile%/.nuget/plugins` folder on Windows.
 CI/CD scenarios and power users can use environment variables to override this behavior.
 Note that only absolute paths are allowed when using these environment variables.
 
