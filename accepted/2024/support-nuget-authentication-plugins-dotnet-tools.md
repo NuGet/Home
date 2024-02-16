@@ -145,9 +145,23 @@ All files could be considered executables that NuGet will run.
 Alternatively, on Windows, NuGet could filter `*.exe`.
 On Mac and Linux, where apps typically don't have extensions, to do functionally equivalent filtering NuGet should check each file's permissions and ensure the execute bit is enabled (although technically we'd probably also need to check the file owner and group, to know if we should check the user, group, or other permissions).
 
-![plugin-tools-folder-windows](./../../meta/resources/PluginsAsDotNetTools/plugin-tools-folder-windows.png)
+The new folder structure for NuGet plugins on the Windows platform is as follows:
 
-![plugin-tools-store-windows](./../../meta/resources/PluginsAsDotNetTools/plugin-tools-store-windows.png)
+```
+├───any
+│   │   dotnetsay.exe
+│   │
+│   └───.store│
+├───netcore
+├   ├───AWS.CodeArtifact.NuGetCredentialProvider
+├   │
+│   └───CredentialProvider.Microsoft
+└───netfx
+├   ├───AWS.CodeArtifact.NuGetCredentialProvider
+├   │
+├   └───CredentialProvider.Microsoft
+└
+```
 
 The new folder structure for NuGet plugins on the Linux platforms is as follows:
 
