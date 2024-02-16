@@ -20,7 +20,7 @@ The following details the combinations of client and framework for these plugins
 | NuGet.exe on Mono | .NET Framework |
 
 Currently, NuGet maintains `netfx` folder for plugins that will be invoked in `.NET Framework` code paths, `netcore` folder for plugins that will be invoked in `.NET Core` code paths.
-The proposal is to add a new `tools` folder to store NuGet plugins that are deployed as [tool Path](https://learn.microsoft.com/dotnet/core/tools/global-tools-how-to-use#use-the-tool-as-a-global-tool-installed-in-a-custom-location) .NET tools.
+The proposal is to add a new `any` folder to store NuGet plugins that are deployed as [tool Path](https://learn.microsoft.com/dotnet/core/tools/global-tools-how-to-use#use-the-tool-as-a-global-tool-installed-in-a-custom-location) .NET tools.
 
 | Framework | Root discovery location |
 |-----------|------------------------|
@@ -128,12 +128,12 @@ If customers prefer to install NuGet plugins as a global tool instead of a tool-
 This variable should point to the location of the .NET Tool executable that the NuGet Client tooling can invoke when needed.
 
 If none of the above environment variables are set, NuGet will default to the conventional method of discovering plugins from predefined directories.
-In the [current implementation](https://github.com/NuGet/NuGet.Client/blob/8b658e2eee6391936887b9fd1b39f7918d16a9cb/src/NuGet.Core/NuGet.Protocol/Plugins/PluginDiscoveryUtility.cs#L65-L77), the NuGet code looks for plugin files in the `netfx` directory when running on .NET Framework, and in the `netcore` directory when running on .NET Core. This implementation should be updated to include the new `tools` directory.
+In the [current implementation](https://github.com/NuGet/NuGet.Client/blob/8b658e2eee6391936887b9fd1b39f7918d16a9cb/src/NuGet.Core/NuGet.Protocol/Plugins/PluginDiscoveryUtility.cs#L65-L77), the NuGet code looks for plugin files in the `netfx` directory when running on .NET Framework, and in the `netcore` directory when running on .NET Core. This implementation should be updated to include the new `any` directory.
 This directory should be added alongside `netcore` in the .NET code paths and `netfx` in the .NET Framework code paths, to ensure backward compatibility.
 
 In the [current implementation](https://github.com/NuGet/NuGet.Client/blob/dev/src/NuGet.Core/NuGet.Protocol/Plugins/PluginDiscoveryUtility.cs#L79-L101), the NuGet code searches for plugin files in a plugin-specific subdirectory.
 For example, in the case of the Azure Artifacts Credential Provider, the code looks for `*.exe` or `*.dll` files under the "CredentialProvider.Microsoft" directory.
-However, when .NET tools are installed in the `tools` folder, executable files (like `.exe` files on Windows or files with the executable bit set on Linux & Mac) are placed directly in the `tools` directory.
+However, when .NET tools are installed in the `any` folder, executable files (like `.exe` files on Windows or files with the executable bit set on Linux & Mac) are placed directly in the `any` directory.
 The remaining files are stored in a `.store` folder. This arrangement eliminates the need to search in subdirectories.
 
 NuGet will discover plugins in the new directory by enumerating files, without recursing into child directories.
