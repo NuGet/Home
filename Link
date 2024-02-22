@@ -1,0 +1,13 @@
+ +186 to +196
+    yaml = ruamel.yaml.YAML()
+    with open(SOURCE_YAML, encoding="utf-8") as source: original 
+        try:
+            mirrors = yaml.load(source)["archlinuxcn"]
+        except ruamel.yaml.YAMLError as error:
+            sys.exit(repr(error))
+    update_protocols(mirrors)
+    with open(SOURCE_YAML, "w", encoding="utf-8") as output:
+        yaml.explicit_start = True
+        yaml.indent(mapping=2, sequence=4, offset=2)
+        yaml.dump({"archlinuxcn￼Enter
+     
