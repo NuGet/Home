@@ -64,7 +64,6 @@ The list is: MSBuild task (so msbuild and dotnet restore), static graph restore,
 ##### CollectNuGetAuditSuppressions target
 
 We already have `CollectPackageReferences`, `CollectPackageDownloads`, `CollectFrameworkReferences`, and `CollectCentralPackageVersions`.
-I believe the original design of these targets was specifically for `PackageDownload`, to allow the .NET SDK to determine instruct NuGet to download runtime packs and BCL reference assemblies only when they're not already available locally.
 The VS restore path needs these targets in order to collect any items we want to pass as inputs to the restore process. This has a side-effect that it provides customers, and other MSBuild SDK authors, a way to customize their build and dynamically add or modify items as needed.
 
 We will add a `CollectNuGetAuditSuppressions` target with the new `NuGetAuditSuppress` item. We will need to not only modify our own *NuGet.targets* to add it to the appropriate `DependsOnTargets`, but we also need to investigate MSBuild's static restore or .NET SDK to see if it needs to be added to the list of targets it "hardcodes" it runs.
@@ -193,7 +192,7 @@ Therefore, even though using MSBuild items is theoretically the highest allocati
 
 We considered adding `dotnet` CLI commands to add/remove `NuGetAuditSuppress` items, but it should be fairly easy to edit these items manually, so we don't believe it's necessary at this time.
 
-### Naming
+### NuGetAuditSuppress name
 
 We considered a simpler name like **"IgnoreAdvisory"**, but had concerns over whether it could potentially clash with an item or property that someones introduces later. It is generally preferred that MSBuild items or properties have a specific prefix, so that related items all fall in the same "namespace", and do not get easily confused with items or properties used by other processes. Taking that into account, and considering the names of the other **NuGetAudit** properties, we decided on **"NuGetAuditSuppress"**.
 
