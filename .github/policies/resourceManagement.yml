@@ -1,0 +1,520 @@
+id: 
+name: GitOps.PullRequestIssueManagement
+description: GitOps.PullRequestIssueManagement primitive
+owner: 
+resource: repository
+disabled: false
+where: 
+configuration:
+  resourceManagementConfiguration:
+    scheduledSearches:
+    - description: '[stale PR] [5-1] Search for PRs with no activity over 30 days and warn. (except draft PRs and Community PRs)'
+      frequencies:
+      - hourly:
+          hour: 3
+      filters:
+      - hasLabel:
+          label: Community
+      - noActivitySince:
+          days: 30
+      - isPullRequest
+      - isOpen
+      - isNotDraftPullRequest
+      - isNotLabeledWith:
+          label: Status:No recent activity
+      - isNotLabeledWith:
+          label: Community
+      actions:
+      - addLabel:
+          label: Status:No recent activity
+      - addReply:
+          reply: This PR has been automatically marked as stale because it has no activity for **30 days**. It will be closed if no further activity occurs **within another 15 days** of this comment, unless it has a "Status:Do not auto close" label. If it is closed, you may reopen it anytime when you're ready again, as long as you don't delete the branch.
+    - description: '[stale PR] [5-5] Close PRs with no activity over 15 days after warn (except Community PRs)'
+      frequencies:
+      - hourly:
+          hour: 3
+      filters:
+      - isPullRequest
+      - isOpen
+      - hasLabel:
+          label: Status:No recent activity
+      - isNotLabeledWith:
+          label: Community
+      - noActivitySince:
+          days: 15
+      - isNotLabeledWith:
+          label: Status:Do not auto close
+      actions:
+      - closeIssue
+    - description: '[Manage stale WaitingForCustomer issues] Search for WaitingForCustomer issues with no activity over 14 days and warn.'
+      frequencies:
+      - daily:
+          time: 6:0
+      filters:
+      - hasLabel:
+          label: WaitingForCustomer
+      - noActivitySince:
+          days: 14
+      - isIssue
+      - isOpen
+      - isNotLabeledWith:
+          label: Status:No recent activity
+      actions:
+      - addLabel:
+          label: Status:No recent activity
+      - addReply:
+          reply: This issue has been automatically marked as stale because we have not received a response in 14 days. It will be closed if no further activity occurs within another 14 days of this comment.
+    - description: '[Close stale WaitingForCustomer issues] Search for stale WaitingForCustomer issues with no activity over 14 days and warn.'
+      frequencies:
+      - daily:
+          time: 6:0
+      filters:
+      - hasLabel:
+          label: Status:No recent activity
+      - noActivitySince:
+          days: 14
+      - isIssue
+      - isOpen
+      actions:
+      - closeIssue
+      - removeLabel:
+          label: Status:No recent activity
+      - addLabel:
+          label: Resolution:NeedMoreInfo
+    - description: '[Type Label Reminder][4-1] Remind HotSeat to Add Type Label '
+      frequencies:
+      - daily:
+          time: 12:0
+      filters:
+      - isOpen
+      - isIssue
+      - isNotLabeledWith:
+          label: Type:Spec
+      - isNotLabeledWith:
+          label: Type:Test
+      - isNotLabeledWith:
+          label: Type:Feature
+      - isNotLabeledWith:
+          label: Type:Docs
+      - isNotLabeledWith:
+          label: Type:DCR
+      - isNotLabeledWith:
+          label: Type:Bug
+      - isNotLabeledWith:
+          label: Type:DeveloperDocs
+      - isNotLabeledWith:
+          label: Type:DataAnalysis
+      - isNotLabeledWith:
+          label: Type:Learning
+      - isNotLabeledWith:
+          label: Type:Tracking
+      - isNotLabeledWith:
+          label: Type:Engineering
+      - isNotLabeledWith:
+          label: Type:BreakingChange
+      - isNotLabeledWith:
+          label: missing-required-type
+      - isNotLabeledWith:
+          label: Pipeline:Icebox
+      - isNotLabeledWith:
+          label: Epic
+      actions:
+      - addReply:
+          reply: Issue is missing Type label, remember to add a [Type label](https://github.com/NuGet/Client.Engineering/blob/main/designs/nuget-issues-approach.md#issue-type)
+      - addLabel:
+          label: missing-required-type
+    - description: '[Close stale icebox][3-1] Search "Status:Inactive" but without "Status:Excluded from icebox cleanup" and "Triage:NeedsTriageDiscussion", add "Icebox cleanup candidate" and show a warning.'
+      frequencies:
+      - hourly:
+          hour: 4
+      filters:
+      - isOpen
+      - isIssue
+      - hasLabel:
+          label: Status:Inactive
+      - isNotLabeledWith:
+          label: Status:Excluded from icebox cleanup
+      - isNotLabeledWith:
+          label: Triage:NeedsTriageDiscussion
+      - isNotLabeledWith:
+          label: Icebox cleanup candidate
+      actions:
+      - addLabel:
+          label: Icebox cleanup candidate
+      - addReply:
+          reply: >
+            Due to lack of recent activity, this issue has been marked as a candidate for icebox cleanup. It will be closed if no further activity occurs within 14 more days. Any new comment (by anyone, not necessarily the author) will add a `Triage:NeedsTriageDiscussion` label and lead to a triaging process.
+
+            This process is part of the experimental [Stale icebox issues cleanup](https://github.com/NuGet/Home/issues/12113) we are currently trialing. Please share any feedback you might have in the linked issue.
+    - description: '[Close stale icebox][3-2] Close "Icebox cleanup candidate" if no activity within 14 days.'
+      frequencies:
+      - hourly:
+          hour: 4
+      filters:
+      - isOpen
+      - isIssue
+      - hasLabel:
+          label: Icebox cleanup candidate
+      - isNotLabeledWith:
+          label: Triage:NeedsTriageDiscussion
+      - noActivitySince:
+          days: 14
+      actions:
+      - addReply:
+          reply: 'This issue will now be closed since it had been marked Icebox cleanup candidate, but received no further activity in the past 14 days. '
+      - closeIssue
+    - description: '[stale community PR] [5-1] Search for community PRs with no activity over 30 days and warn.'
+      frequencies:
+      - hourly:
+          hour: 12
+      filters:
+      - hasLabel:
+          label: Community
+      - noActivitySince:
+          days: 30
+      - isPullRequest
+      - isOpen
+      - isNotLabeledWith:
+          label: Status:No recent activity
+      actions:
+      - addLabel:
+          label: Status:No recent activity
+      - addReply:
+          reply: This PR has been automatically marked as stale because it has no activity for **30 days**. It will be closed if no further activity occurs **within another 330 days** of this comment. If it is closed, you may reopen it anytime when you're ready again, as long as you don't delete the branch.
+    - description: '[stale community PR] [5-5] Close PRs with no activity over 330 days after warn.'
+      frequencies:
+      - hourly:
+          hour: 12
+      filters:
+      - isPullRequest
+      - isOpen
+      - hasLabel:
+          label: Status:No recent activity
+      - hasLabel:
+          label: Community
+      - noActivitySince:
+          days: 330
+      - isNotLabeledWith:
+          label: Status:Do not auto close
+      actions:
+      - closeIssue
+    eventResponderTasks:
+    - if:
+      - payloadType: Issues
+      - isAction:
+          action: Opened
+      - or:
+        - isActivitySender:
+            user: vsfeedback
+            issueAuthor: False
+        - bodyContains:
+            pattern: Copied from original issue
+            isRegex: False
+        - bodyContains:
+            pattern: Issue moved from
+            isRegex: False
+      then:
+      - addLabel:
+          label: Transferred issue
+      - addLabel:
+          label: Triage:Untriaged
+      description: "[Manage \"WaitingFor\" labels] [4-1] Tag \"Transferred issue\" if it's transferred from vsfeedback or other github repo."
+    - if:
+      - payloadType: Issue_Comment
+      - isAction:
+          action: Created
+      - hasLabel:
+          label: WaitingForCustomer
+      - isOpen
+      - or:
+        - and:
+          - hasLabel:
+              label: Transferred issue
+          - not:
+              activitySenderHasPermission:
+                permission: Write
+        - isActivitySender:
+            issueAuthor: True
+      then:
+      - removeLabel:
+          label: WaitingForCustomer
+      - addLabel:
+          label: WaitingForClientTeam
+      - removeLabel:
+          label: Status:No recent activity
+      description: "[Manage \"WaitingFor\" labels] [4-2] Replace tag \"WaitingForCustomer\" with \"WaitingForClientTeam\" when the author comments on an issue. Also remove `Status:No recent activity` if it's been set."
+    - if:
+      - payloadType: Issues
+      - isAction:
+          action: Closed
+      - or:
+        - hasLabel:
+            label: WaitingForClientTeam
+        - hasLabel:
+            label: WaitingForCustomer
+      then:
+      - removeLabel:
+          label: WaitingForClientTeam
+      - removeLabel:
+          label: WaitingForCustomer
+      description: '[Manage "WaitingFor" labels] [4-3] Remove any "WaitingFor" label when the issue is closed'
+    - if:
+      - payloadType: Issue_Comment
+      - isAction:
+          action: Created
+      - hasLabel:
+          label: WaitingForClientTeam
+      - isOpen
+      - or:
+        - activitySenderHasPermission:
+            permission: Write
+        - activitySenderHasPermission:
+            permission: Admin
+      then:
+      - removeLabel:
+          label: WaitingForClientTeam
+      - addLabel:
+          label: WaitingForCustomer
+      description: '[Manage "WaitingFor" labels] [4-4] Replace tag "WaitingForClientTeam" with "WaitingForCustomer" when client team comments on an issue.'
+    - if:
+      - payloadType: Pull_Request
+      - not:
+          isAction:
+            action: Closed
+      - hasLabel:
+          label: Status:No recent activity
+      then:
+      - removeLabel:
+          label: Status:No recent activity
+      description: '[stale PR] [5-2] Remove "Status:No recent activity" if there is any activity.'
+    - if:
+      - payloadType: Issue_Comment
+      - isPullRequest
+      - hasLabel:
+          label: Status:No recent activity
+      then:
+      - removeLabel:
+          label: Status:No recent activity
+      description: '[stale PR] [5-3] Remove "Status:No recent activity" if there is any comment.'
+    - if:
+      - payloadType: Pull_Request_Review
+      - hasLabel:
+          label: Status:No recent activity
+      - hasLabel:
+          label: Community
+      then:
+      - removeLabel:
+          label: Status:No recent activity
+      description: '[stale PR] [5-4] Remove "Status:No recent activity" if there are any reviews.'
+    - if:
+      - payloadType: Issues
+      - isAction:
+          action: Labeled
+      - hasLabel:
+          label: missing-required-type
+      - or:
+        - hasLabel:
+            label: Type:Spec
+        - hasLabel:
+            label: Type:Test
+        - hasLabel:
+            label: Type:Feature
+        - hasLabel:
+            label: Type:Docs
+        - hasLabel:
+            label: Type:DCR
+        - hasLabel:
+            label: Type:Bug
+        - hasLabel:
+            label: Type:DeveloperDocs
+        - hasLabel:
+            label: Type:DataAnalysis
+        - hasLabel:
+            label: Type:Learning
+        - hasLabel:
+            label: Type:Tracking
+        - hasLabel:
+            label: Type:Engineering
+        - hasLabel:
+            label: Type:BreakingChange
+      then:
+      - removeLabel:
+          label: missing-required-type
+      description: '[Type Label Reminder][4-2] Remove "missing-required-type" if it is has Type label'
+    - if:
+      - payloadType: Issues
+      - not:
+          hasLabel:
+            label: Type:Spec
+      - not:
+          hasLabel:
+            label: Type:Test
+      - not:
+          hasLabel:
+            label: Type:Feature
+      - not:
+          hasLabel:
+            label: Type:Docs
+      - not:
+          hasLabel:
+            label: Type:DCR
+      - not:
+          hasLabel:
+            label: Type:Bug
+      - not:
+          hasLabel:
+            label: Type:DeveloperDocs
+      - not:
+          hasLabel:
+            label: Type:DataAnalysis
+      - not:
+          hasLabel:
+            label: Type:Learning
+      - not:
+          hasLabel:
+            label: Type:Tracking
+      - not:
+          hasLabel:
+            label: Type:Engineering
+      - not:
+          hasLabel:
+            label: Type:BreakingChange
+      - and:
+        - isAction:
+            action: Opened
+        - activitySenderHasPermission:
+            permission: Write
+      - not:
+          hasLabel:
+            label: Epic
+      then:
+      - addReply:
+          reply: '@${issueAuthor} Issue is missing Type label, remember to add a [Type label](https://github.com/NuGet/Client.Engineering/blob/main/designs/nuget-issues-approach.md#issue-type)'
+      - addLabel:
+          label: missing-required-type
+      description: '[Type Label Reminder][4-3] Remember NuGet Client member(issue author) to add Type label'
+    - if:
+      - payloadType: Issues
+      - and:
+        - not:
+            hasLabel:
+              label: Type:Spec
+        - not:
+            hasLabel:
+              label: Type:Test
+        - not:
+            hasLabel:
+              label: Type:Feature
+        - not:
+            hasLabel:
+              label: Type:Docs
+        - not:
+            hasLabel:
+              label: Type:DCR
+        - not:
+            hasLabel:
+              label: Type:Bug
+        - not:
+            hasLabel:
+              label: Type:DeveloperDocs
+        - not:
+            hasLabel:
+              label: Type:DataAnalysis
+        - not:
+            hasLabel:
+              label: Type:Learning
+        - not:
+            hasLabel:
+              label: Type:Tracking
+        - not:
+            hasLabel:
+              label: Type:Engineering
+        - not:
+            hasLabel:
+              label: Type:BreakingChange
+        - or:
+          - isAction:
+              action: Reopened
+          - isAction:
+              action: Assigned
+          - isAction:
+              action: Closed
+      - not:
+          hasLabel:
+            label: Epic
+      then:
+      - addReply:
+          reply: ${assignees} Issue is missing Type label, remember to add a [Type label](https://github.com/NuGet/Client.Engineering/blob/main/designs/nuget-issues-approach.md#issue-type)
+      - addLabel:
+          label: missing-required-type
+      description: '[Type Label Reminder][4-4] Remember NuGet Client member(issue assignee) to add Type label'
+    - if:
+      - payloadType: Issue_Comment
+      - isOpen
+      - isAction:
+          action: Created
+      - hasLabel:
+          label: Icebox cleanup candidate
+      - not:
+          hasLabel:
+            label: Triage:NeedsTriageDiscussion
+      then:
+      - addLabel:
+          label: Triage:NeedsTriageDiscussion
+      description: '[Close stale icebox][3-3] For "Icebox cleanup candidate" issues, if there is any comments, add "Triage:NeedsTriageDiscussion" label'
+    - if:
+      - payloadType: Pull_Request
+      - or:
+        - isAction:
+            action: Opened
+        - isAction:
+            action: Reopened
+      - activitySenderHasPermission:
+          permission: Read
+      - not:
+          isActivitySender:
+            user: 'nuget-client '
+            issueAuthor: False
+      - not:
+          hasLabel:
+            label: Community
+      then:
+      - addLabel:
+          label: Community
+      description: '[Label community PRs] [1-1] Label the community PRs'
+    - if:
+      - payloadType: Pull_Request
+      - not:
+          isAction:
+            action: Closed
+      - hasLabel:
+          label: Status:No recent activity
+      - hasLabel:
+          label: Community
+      then:
+      - removeLabel:
+          label: Status:No recent activity
+      description: '[stale community PR] [5-2] Remove "Status:No recent activity" if there is any activity.'
+    - if:
+      - payloadType: Issue_Comment
+      - isPullRequest
+      - hasLabel:
+          label: Status:No recent activity
+      - hasLabel:
+          label: Community
+      then:
+      - removeLabel:
+          label: Status:No recent activity
+      description: '[stale community PR] [5-3] Remove "Status:No recent activity" if there is any comment.'
+    - if:
+      - payloadType: Pull_Request_Review
+      - hasLabel:
+          label: Status:No recent activity
+      - hasLabel:
+          label: Community
+      then:
+      - removeLabel:
+          label: Status:No recent activity
+      description: '[stale community PR] [5-4] Remove "Status:No recent activity" if there are any reviews.'
+onFailure: 
+onSuccess: 
