@@ -71,7 +71,8 @@ Additionally, we'll need to check if Visual Studio's project systems need any ch
 
 If NuGet's restore always ran as an MSBuild target, the customers and MSBuild SDK authors could probably just have used `BeforeTarget="Restore"`.
 However, in Visual Studio that's not the case, so it won't work.
-Could we consider a single `CollectRestoreInputs` target, which we can re-use for everything going forward, rather than adding a new target for every item type we add?
+
+This new target needs to be added to our list of 'targets to run' in multiple places. In order to avoid adding these new targets in multiple places every time, we will also take this opportunity to unify all the 'Collect' targets (5, after we add this one) into a single `CollectRestoreInputs` target, which we can re-use for everything going forward.
 
 #### `dotnet list package --vulnerable`
 
@@ -188,10 +189,6 @@ Putting it in *nuget.config* would not only make it much easier to avoid duplica
 However, basic tests on MSBuild evaluation performance doesn't show measurable regressions when adding 100 additional items into a project, and I don't believe it's likely that customers will suppress 100 different advisories.
 Therefore, even though using MSBuild items is theoretically the highest allocation design choice, given how much other work MSBuild does, it doesn't appear to result in a measurable performance impact.
 
-### Tooling support
-
-We considered adding `dotnet` CLI commands to add/remove `NuGetAuditSuppress` items, but it should be fairly easy to edit these items manually, so we don't believe it's necessary at this time.
-
 ### NuGetAuditSuppress name
 
 We considered a simpler name like **"IgnoreAdvisory"**, but had concerns over whether it could potentially clash with an item or property that someones introduces later. It is generally preferred that MSBuild items or properties have a specific prefix, so that related items all fall in the same "namespace", and do not get easily confused with items or properties used by other processes. Taking that into account, and considering the names of the other **NuGetAudit** properties, we decided on **"NuGetAuditSuppress"**.
@@ -240,3 +237,7 @@ The more simple `NuGetAuditSuppress` without per-package support will be quicker
 ### Project properties GUI support
 
 We can consider adding a GUI to edit suppressions through project properties.
+
+### Tooling support
+
+We considered adding `dotnet` CLI commands to add/remove `NuGetAuditSuppress` items, but it should be fairly easy to edit these items manually, so we don't believe it's necessary at this time.
