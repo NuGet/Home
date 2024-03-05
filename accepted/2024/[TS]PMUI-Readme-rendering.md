@@ -74,7 +74,12 @@ The IMarkdownPreview is currently being used when creating a new pull request in
     - [ ] Display the tab with a message saying there is no ReadMe defined.
 1. Where do we get the ReadMe from when it's not on the disk?
     - Does the current API return the ReadMe information when searching for a package? 
-    - If not is there an API to retrieve the ReadMe information?
+      - Yes, but not documented
+    https://api.nuget.org/v3-flatcontainer/{PACKAGE ID}/{PACKAGE VERSION}/readme
+    
+        Example: https://api.nuget.org/v3-flatcontainer/newtonsoft.json/13.0.2/readme
+1. Are we okay with pulling ReadMe exclusively from NuGet.org?
+    - Yes
 1. Where are the ReadMe files saved in a package? 
     - There are examples of them being in root folder as well as a _content folder. 
 1. What do we want the UX to be when an exception or error occurs while reading a ReadMe file? 
