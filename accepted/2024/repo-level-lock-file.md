@@ -77,6 +77,7 @@ NodeJS has the concept of [Workspaces](https://docs.npmjs.com/cli/v7/using-npm/w
 * How would the `Directory.packages.props` dependencies be separated out from the project dependencies to generate the lock file? 
 * How does the publish command handle this as it doesn't have full context of all packages. (Could be solved by the restore always running with --locked-mode)
 * How will a project deleted from the repository get deleted from the lock file.
+* How will Lock files be generated with nested `Directoy.packages.props` files.
 
 ## Future Possibilities
 <!-- What future possibilities can you think of that this proposal would help with? -->
