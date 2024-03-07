@@ -25,6 +25,8 @@ The ReadMe file will be selected from disk if available otherwise pulled from pa
 <!-- Introduce new concepts, functional designs with real life examples, and low-fidelity mockups or  pseudocode to show how this proposal would look. -->
 
 ### Technical explanation
+
+#### Rendering Markdown
 We want to leverage the [IMarkdownPreview](https://devdiv.visualstudio.com/DevDiv/_git/VS-Platform?path=/src/Productivity/MarkdownLanguageService/Impl/Markdown.Platform/Preview/IMarkdownPreview.cs) class to render the ReadMe in the IDE. A new instance can be created using [PreviewBuilder](https://devdiv.visualstudio.com/DevDiv/_git/VS-Platform?path=/src/Productivity/MarkdownLanguageService/Impl/Markdown.Platform/Preview/PreviewBuilder.cs). 
 
 We can use the Preview builder as follows:
@@ -38,8 +40,12 @@ markdownPreview.UpdateContentAsync(markDown ?? string.Empty, ScrollHint.None)
 //IMarkdownPreview.VisualElement contains the FrameworkElement to be passed to the view
 MarkdownPreviewControl = markdownPreview.VisualElement
 ```
+#### Locating the ReadMe
+For packages that are already on the disk we will retrieve the ReadMe from the root folder of the package. 
 
-For packages that are already on the disk we will retrieve the ReadMe from the root folder of the package. We will need to confirm if the current API returns the ReadMe when fetching package details and determine which API we should use to get the data.
+For remote packages we will download the file and pull the md from the stream response using the [ZipArchive](https://learn.microsoft.com/en-us/dotnet/api/system.io.compression.ziparchive?view=net-8.0) class.
+
+If the feed we're calling allows for [HTTP range requests](https://developer.mozilla.org/en-US/docs/Web/HTTP/Range_requests) we can implement something similar to [Seekable HTTP Range Stream](https://codereview.stackexchange.com/questions/70679/seekable-http-range-stream) to reduce the amount of data we pull. 
 <!-- Explain the proposal in sufficient detail with implementation details, interaction models, and clarification of corner cases. -->
 
 ## Drawbacks
@@ -81,13 +87,16 @@ The IMarkdownPreview is currently being used when creating a new pull request in
 1. Are we okay with pulling ReadMe exclusively from NuGet.org?
     - Yes
 1. Where are the ReadMe files saved in a package? 
-    - There are examples of them being in root folder as well as a _content folder. 
+    - There are examples of them being in root folder as well as a _content folder.
+    - Can use Nuget.Packaging to get ReadMe location from nuspec. 
 1. What do we want the UX to be when an exception or error occurs while reading a ReadMe file? 
 1. Do we want the ReadMe to update whenever a new version is selected for the current package?
+    Yes.
 <!-- What parts of the proposal do you expect to resolve before this gets accepted? -->
 <!-- What parts of the proposal need to be resolved before the proposal is stabilized? -->
 <!-- What related issues would you consider out of scope for this proposal but can be addressed in the future? -->
 
 ## Future Possibilities
+Currently there is no way to access the Readme.md without downloading the nupgk. The server team has the ability to return us the MD but this isn't documented. We could make a change to the NuGet API to include RawReadmeUrl which a link to download the MarkDown.
 
 <!-- What future possibilities can you think of that this proposal would help with? -->
