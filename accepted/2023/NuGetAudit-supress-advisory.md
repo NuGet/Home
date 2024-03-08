@@ -61,7 +61,7 @@ Unfortunately, restore has many entry points, each of which read MSBuild propert
 Therefore, just like adding any other property or item, it will need modifications in all of them.
 The list is: MSBuild task (so msbuild and dotnet restore), static graph restore, nuget.exe, VS CPS projects (nominations), VS non-CPS projects (LegacyPackageReferenceProject).
 
-##### CollectNuGetAuditSuppressions target
+##### `CollectNuGetAuditSuppressions` target
 
 We already have `CollectPackageReferences`, `CollectPackageDownloads`, `CollectFrameworkReferences`, and `CollectCentralPackageVersions`.
 The VS restore path needs these targets in order to collect any items we want to pass as inputs to the restore process. This has a side-effect that it provides customers, and other MSBuild SDK authors, a way to customize their build and dynamically add or modify items as needed.
@@ -72,7 +72,11 @@ Additionally, we'll need to check if Visual Studio's project systems need any ch
 If NuGet's restore always ran as an MSBuild target, the customers and MSBuild SDK authors could probably just have used `BeforeTarget="Restore"`.
 However, in Visual Studio that's not the case, so it won't work.
 
-This new target needs to be added to our list of 'targets to run' in multiple places. In order to avoid adding these new targets in multiple places every time, we will also take this opportunity to unify all the 'Collect' targets (5, after we add this one) into a single `CollectRestoreInputs` target, which we can re-use for everything going forward.
+##### `_CollectRestoreInputs` target
+
+The new `CollectNuGetAuditSuppressions` target needs to be added to our list of 'targets to run' in multiple places. In order to avoid adding these new targets in multiple places every time, we will also take this opportunity to unify all the 'Collect' targets (5, after we add this one) into a single `_CollectRestoreInputs` target, which we can re-use for everything going forward.
+
+This target is strictly an internal implementation detail, meant to reduce the amount of work needed to add new targets in the future. This is not intended as a target for customers to hook onto.
 
 #### `dotnet list package --vulnerable`
 
