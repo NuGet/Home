@@ -184,11 +184,14 @@ drwxr-xr-x 5 {user}  4096 Feb 10 08:21 .store
 
 ## Drawbacks
 
-The ideal workflow for repositories accessing private NuGet feeds, such as Azure DevOps, is to easily search for NuGet plugins and install them without needing to know the destination location. 
+- The ideal workflow for repositories accessing private NuGet feeds, such as Azure DevOps, is to easily search for NuGet plugins and install them without needing to know the destination location. 
 However, the current proposal suggests installing the plugin as a tool-path .NET tool. 
 As mentioned in the technical explanation section, customers can opt to install NuGet plugins as a global tool instead of a tool-path tool.
 To do this, they need to set the `NUGET_DOTNET_TOOLS_PLUGIN_PATHS` environment variable.
 This variable should point to the location of the .NET Tool executable, which the NuGet Client tooling can invoke when needed.
+
+- There is some risk of the `dotnet tool` introducing breaking changes that could negatively impact NuGet. 
+If the `dotnet tool` started writing non-executable files into the directory, it would affect how NuGet discovers and runs plugins at runtime.
 
 ## Rationale and alternatives
 
