@@ -257,7 +257,9 @@ This approach allows customers to specify the dependency only once, without conf
 </configuration>
 ```
 
-However, the NuGet Client plugins functionality is a global setting. This means that the plugins are discovered based on the platform and target framework, as discussed earlier, and there is currently no way to configure the dependent plugins via NuGet settings per repository. It could be a future possibility to provide users with an option to manage their plugins per repository instead of loading all the available plugins.
+However, the NuGet Client plugins functionality is a global setting.
+This means that the plugins are discovered based on the platform and target framework, as discussed earlier, and there is currently no way to configure the dependent plugins via NuGet settings per repository.
+It could be a future possibility to provide users with an option to manage their plugins per repository instead of loading all the available plugins.
 However, given the limited number of plugin implementations currently available, this is not a problem that needs to be solved at this point in time, in my understanding.
 
 ## Prior Art
