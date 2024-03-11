@@ -43,6 +43,7 @@ MarkdownPreviewControl = markdownPreview.VisualElement
 #### Locating the ReadMe
 We will focus the MVP on loading the ReadMe only for packages which are already downloaded. 
 
+Will use ZipArchive to locate the nuspec within the Nupkg. Then se NuspecReader to locate the ReadMe within the NupKg, and extract it using ZipArchive.
 
 ## Drawbacks
 
@@ -70,20 +71,15 @@ The IMarkdownPreview is currently being used when creating a new pull request in
 1. What do we show if the package has a ReadMe.txt instead of md?
     * Current suggestion is to focus on ReadMe.md. Once that's complete see how ReadMe.txt would appear when rendered. 
     * How many packages have a ReadMe.txt vs ReadMe.md?
-1. What do we show if there is no ReadMe defined?
-    - [ ] Hide the tab from the the details pane
-    - [ ] Display the tab with a message saying there is no ReadMe defined.
-1. Where do we get the ReadMe from when it's not on the disk?
-    - Does the current API return the ReadMe information when searching for a package? 
-      - Yes, but not documented
-    https://api.nuget.org/v3-flatcontainer/{PACKAGE ID}/{PACKAGE VERSION}/readme
-    
-        Example: https://api.nuget.org/v3-flatcontainer/newtonsoft.json/13.0.2/readme
-1. Where are the ReadMe files saved in a package? 
+1. ~~What do we show if there is no ReadMe defined?~~
+    - Hide the tab from the the details pane
+1. ~~Where do we get the ReadMe from when it's not on the disk?~~
+    - There is no documented way of getting the ReadMe from the server without downloading the nupkg. 
+1. ~~Where are the ReadMe files saved in a package?~~
     - Can use Nuget.Packaging to get ReadMe location from nuspec. 
 1. What do we want the UX to be when an exception or error occurs while reading a ReadMe file? 
 1. Do we want the ReadMe to update whenever a new version is selected for the current package?
-    Yes.
+   - Yes.
 <!-- What parts of the proposal do you expect to resolve before this gets accepted? -->
 <!-- What parts of the proposal need to be resolved before the proposal is stabilized? -->
 <!-- What related issues would you consider out of scope for this proposal but can be addressed in the future? -->
