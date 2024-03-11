@@ -24,9 +24,7 @@ This UX will be displayed for both the Browse and installed tabs.
 It will also be displayed for both the solution level and project level package managers.
 ![Alt text](https://github.com/NuGet/Home/assets/89422562/81b24877-f12f-4783-905c-4a155d3c7693)
 
-The ReadMe file will be selected from disk if available otherwise pulled from package source.
-<!-- Explain the proposal as if it were already implemented and you're teaching it to another person. -->
-<!-- Introduce new concepts, functional designs with real life examples, and low-fidelity mockups or  pseudocode to show how this proposal would look. -->
+The ReadMe file will be selected from disk if available.
 
 ### Technical explanation
 
