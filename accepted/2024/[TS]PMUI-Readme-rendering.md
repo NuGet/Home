@@ -41,12 +41,8 @@ markdownPreview.UpdateContentAsync(markDown ?? string.Empty, ScrollHint.None)
 MarkdownPreviewControl = markdownPreview.VisualElement
 ```
 #### Locating the ReadMe
-For packages that are already on the disk we will retrieve the ReadMe from the root folder of the package. 
+We will focus the MVP on loading the ReadMe only for packages which are already downloaded. 
 
-For remote packages we will download the file and pull the md from the stream response using the [ZipArchive](https://learn.microsoft.com/en-us/dotnet/api/system.io.compression.ziparchive?view=net-8.0) class.
-
-If the feed we're calling allows for [HTTP range requests](https://developer.mozilla.org/en-US/docs/Web/HTTP/Range_requests) we can implement something similar to [Seekable HTTP Range Stream](https://codereview.stackexchange.com/questions/70679/seekable-http-range-stream) to reduce the amount of data we pull. 
-<!-- Explain the proposal in sufficient detail with implementation details, interaction models, and clarification of corner cases. -->
 
 ## Drawbacks
 
@@ -58,9 +54,8 @@ Currently WebView2 controls always render ontop of other controls in the view. [
 
 ## Rationale and alternatives
 By using an existing control we maintain consistency throughout the IDE and can rely on the owner to fix any bugs with the control.
-<!-- Why is this the best design compared to other designs? -->
-<!-- What other designs have been considered and why weren't they chosen? -->
-<!-- What is the impact of not doing this? -->
+
+Due to concerns about performance we will not be downloading the full nupkg temporarily just to access the ReadMe. 
 
 ## Prior Art
 The IMarkdownPreview is currently being used when creating a new pull request inside of Visual Studio.  
@@ -84,10 +79,7 @@ The IMarkdownPreview is currently being used when creating a new pull request in
     https://api.nuget.org/v3-flatcontainer/{PACKAGE ID}/{PACKAGE VERSION}/readme
     
         Example: https://api.nuget.org/v3-flatcontainer/newtonsoft.json/13.0.2/readme
-1. Are we okay with pulling ReadMe exclusively from NuGet.org?
-    - Yes
 1. Where are the ReadMe files saved in a package? 
-    - There are examples of them being in root folder as well as a _content folder.
     - Can use Nuget.Packaging to get ReadMe location from nuspec. 
 1. What do we want the UX to be when an exception or error occurs while reading a ReadMe file? 
 1. Do we want the ReadMe to update whenever a new version is selected for the current package?
@@ -97,6 +89,4 @@ The IMarkdownPreview is currently being used when creating a new pull request in
 <!-- What related issues would you consider out of scope for this proposal but can be addressed in the future? -->
 
 ## Future Possibilities
-Currently there is no way to access the Readme.md without downloading the nupgk. The server team has the ability to return us the MD but this isn't documented. We could make a change to the NuGet API to include RawReadmeUrl which a link to download the MarkDown.
-
-<!-- What future possibilities can you think of that this proposal would help with? -->
+Currently there is no way to access the Readme.md without downloading the nupgk. The server team has the ability to return us the MD but this isn't documented. We want update the response from Server so we can download just the ReadMe. 
