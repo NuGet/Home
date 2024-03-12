@@ -237,10 +237,12 @@ Here is an example of how to configure the NuGet.Config file:
 ```
 
 **Advantages:**
+
 - This approach explicitly configures the intent to use the .NET Tool as a plugin for authentication in the NuGet.Config file itself.
 - Customers can install the plugins as global .NET Tools, eliminating the need to specify a custom location based on the platform.
 
 **Disadvantages:**
+
 - Configuring the setting per feed can be cumbersome if multiple private feeds can use the same .NET tool for authentication.
 
 An alternative approach to address this disadvantage is to declare the plugins explicitly outside of the package source sections.
