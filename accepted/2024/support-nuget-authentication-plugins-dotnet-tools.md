@@ -167,13 +167,13 @@ The new folder structure for NuGet plugins on the Linux platforms is as follows:
 
 ```log
 {user}:~/.nuget/plugins$ dir
-netcore  tools
+netcore  any
 
-{user}:~/.nuget/plugins$ cd tools/
-{user}:~/.nuget/plugins/tools$ dir
+{user}:~/.nuget/plugins$ cd any/
+{user}:~/.nuget/plugins/any$ dir
 botsay  dotnetsay
 
-{user}:~/.nuget/plugins/tools$ ls -la
+{user}:~/.nuget/plugins/any$ ls -la
 total 164
 drwxr-xr-x 3 {user}  4096 Feb 10 08:21 .
 drwxr-xr-x 4 {user}  4096 Feb 10 08:20 ..
