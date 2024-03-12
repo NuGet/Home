@@ -1,7 +1,7 @@
 # ***Support for NuGet authentication plugins deployed via .NET tools***
 
-- Author Name: https://github.com/kartheekp-ms
-- GitHub Issue: https://github.com/NuGet/Home/issues/12567
+- Author Name: <https://github.com/kartheekp-ms>
+- GitHub Issue: <https://github.com/NuGet/Home/issues/12567>
 
 ## Summary
 
@@ -20,7 +20,7 @@ The following details the combinations of client and framework for these plugins
 | NuGet.exe on Mono | .NET Framework |
 
 Currently, NuGet maintains `netfx` folder for plugins that will be invoked in `.NET Framework` code paths, `netcore` folder for plugins that will be invoked in `.NET Core` code paths.
-The proposal is to add a new `any` folder to store NuGet plugins that are deployed as [tool Path](https://learn.microsoft.com/dotnet/core/tools/global-tools-how-to-use#use-the-tool-as-a-global-tool-installed-in-a-custom-location) .NET tools. 
+The proposal is to add a new `any` folder to store NuGet plugins that are deployed as [tool Path](https://learn.microsoft.com/dotnet/core/tools/global-tools-how-to-use#use-the-tool-as-a-global-tool-installed-in-a-custom-location) .NET tools.
 Upon installation, .NET tools are organized in a way that helps NuGet quickly determine which file in the package to run.
 
 | Framework | Root discovery location |
@@ -29,9 +29,7 @@ Upon installation, .NET tools are organized in a way that helps NuGet quickly de
 | .NET Framework | %UserProfile%/.nuget/plugins/netfx |
 | .NET Framework & .NET Core [current proposal] |  %UserProfile%/.nuget/plugins/tools |
 
-
-
-## Motivation 
+## Motivation
 
 Currently, the NuGet plugin architecture requires support and deployment of multiple versions.
 For `.NET Framework`, NuGet searches for files ending in `*.exe`, while for `.NET Core`, it searches for files ending in `*.dll`.
@@ -92,6 +90,7 @@ The setup instructions mentioned in step 2 are platform-specific, but they are s
 
 I proposed using a `tool path` .NET tool because, by default, .NET tools are considered [global](https://learn.microsoft.com/dotnet/core/tools/global-tools).
 This means they are installed in a default directory, such as `%UserProfile%/.dotnet/tools` on Windows, which is then added to the PATH environment variable.
+
 - Global tools can be invoked from any directory on the machine without specifying their location.
 - One version of a tool is used for all directories on the machine.
 However, NuGet cannot easily determine which tool is a NuGet plugin.
@@ -122,7 +121,7 @@ It is ignored if either of the framework-specific variables is specified.
 
 I propose the addition of a `NUGET_DOTNET_TOOLS_PLUGIN_PATHS` environment variable.
 This variable will define the plugins, installed as .NET tools, to be used by both .NET Framework and .NET Core tooling.
-It will take precedence over `NUGET_PLUGIN_PATHS`. 
+It will take precedence over `NUGET_PLUGIN_PATHS`.
 
 The plugins specified in the `NUGET_DOTNET_TOOLS_PLUGIN_PATHS` environment variable will be used regardless of whether the `NUGET_NETFX_PLUGIN_PATHS` or `NUGET_NETCORE_PLUGIN_PATHS` environment variables are set.
 The primary reason for this is that plugins installed as .NET tools can be executed in both .NET Framework and .NET Core tooling.
@@ -147,7 +146,7 @@ On Mac and Linux, where apps typically don't have extensions, to do functionally
 
 The new folder structure for NuGet plugins on the Windows platform is as follows:
 
-```
+```folder
 ├───any
 │   │   dotnetsay.exe
 │   │
@@ -184,13 +183,13 @@ drwxr-xr-x 5 {user}  4096 Feb 10 08:21 .store
 
 ## Drawbacks
 
-- The ideal workflow for repositories accessing private NuGet feeds, such as Azure DevOps, is to easily search for NuGet plugins and install them without needing to know the destination location. 
-However, the current proposal suggests installing the plugin as a tool-path .NET tool. 
+- The ideal workflow for repositories accessing private NuGet feeds, such as Azure DevOps, is to easily search for NuGet plugins and install them without needing to know the destination location.
+However, the current proposal suggests installing the plugin as a tool-path .NET tool.
 As mentioned in the technical explanation section, customers can opt to install NuGet plugins as a global tool instead of a tool-path tool.
 To do this, they need to set the `NUGET_DOTNET_TOOLS_PLUGIN_PATHS` environment variable.
 This variable should point to the location of the .NET Tool executable, which the NuGet Client tooling can invoke when needed.
 
-- There is some risk of the `dotnet tool` introducing breaking changes that could negatively impact NuGet. 
+- There is some risk of the `dotnet tool` introducing breaking changes that could negatively impact NuGet.
 If the `dotnet tool` started writing non-executable files into the directory, it would affect how NuGet discovers and runs plugins at runtime.
 
 ## Rationale and alternatives
@@ -202,10 +201,12 @@ The recommendation was developing a command like `dotnet nuget credential-provid
 Here are the advantages and disadvantages of this approach:
 
 **Advantages:**
+
 - Improved discoverability, as `dotnet tool search` will list packages that are not NuGet plugins.
 - Doesn't require customers to memorize or lookup the NuGet plugin directory location in order to pass it to all `dotnet tool` commands via the `--tool-path` argument, for install, uninstall, and update.
 
 **Disadvantages:**
+
 - The NuGet Client team would be required to maintain all the .NET Commands for installing, updating, and uninstalling the plugins. However, these tasks are already handled by the existing commands in the .NET SDK.
 - This approach would still require the extraction of plugins into either a `netfx` or a `netcore` folder.
 As a result, package authors would need to maintain plugins for both of these target frameworks.
@@ -281,7 +282,7 @@ However, due to limitations in the NuGet Client tooling, they've had to maintain
 
 ## Future Possibilities
 
-### Managing NuGet plugins per repository using .NET Local Tools.
+### Managing NuGet plugins per repository using .NET Local Tools
 
 - A potential future possibility is mentioned under the `Specify the authentication plugin in NuGet.Config file` section.
 In addition to that, if we ever plan to provide users with an option to manage their plugins per repository instead of loading all the available plugins, we can consider using [.NET Local tools](https://learn.microsoft.com/dotnet/core/tools/local-tools-how-to-use).
