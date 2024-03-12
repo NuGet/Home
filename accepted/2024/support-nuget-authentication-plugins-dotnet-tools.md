@@ -48,7 +48,7 @@ The log below shows all possible subcommands.
 However, plugin authors could leverage the .NET SDK to allow their customers to install, uninstall, or update the NuGet plugins more efficiently.
 
 ```log
-~\.nuget\plugins\tools
+~\.nuget\plugins\any
 ❯ .\dotnet-codeartifact-creds.exe
 Required command was not provided.
 
