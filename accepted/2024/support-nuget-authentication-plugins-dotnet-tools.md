@@ -27,7 +27,7 @@ Upon installation, .NET tools are organized in a way that helps NuGet quickly de
 |-----------|------------------------|
 | .NET Core | %UserProfile%/.nuget/plugins/netcore |
 | .NET Framework | %UserProfile%/.nuget/plugins/netfx |
-| .NET Framework & .NET Core [current proposal] |  %UserProfile%/.nuget/plugins/tools |
+| .NET Framework & .NET Core [current proposal] |  %UserProfile%/.nuget/plugins/any |
 
 ## Motivation
 
