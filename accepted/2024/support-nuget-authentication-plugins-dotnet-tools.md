@@ -21,7 +21,7 @@ The following details the combinations of client and framework for these plugins
 
 Currently, NuGet maintains `netfx` folder for plugins that will be invoked in `.NET Framework` code paths, `netcore` folder for plugins that will be invoked in `.NET Core` code paths.
 The proposal is to add a new `any` folder to store NuGet plugins that are deployed as [tool Path](https://learn.microsoft.com/dotnet/core/tools/global-tools-how-to-use#use-the-tool-as-a-global-tool-installed-in-a-custom-location) .NET tools.
-Upon installation, .NET tools are organized in a way that helps NuGet quickly determine which file in the package to run.
+Upon installation, .NET tools are organized in a way that helps NuGet quickly determine which file in the package to run at runtime.
 
 | Framework | Root discovery location |
 |-----------|------------------------|
