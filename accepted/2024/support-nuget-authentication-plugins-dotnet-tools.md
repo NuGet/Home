@@ -76,17 +76,21 @@ Currently, this solution works for the Windows .NET Framework.
 However, the goal is to extend this support cross-platform for all supported .NET runtimes.
 
 By implementing this specification, we offer plugin authors the option to use .NET tools for plugin deployment.
-They can install these as a `tool path` global tool. This eliminates the need to maintain separate versions for `.NET Framework` and `.NET Core`.
+These plugins will be installed as a `tool path` global tool. This eliminates the need to maintain separate versions for `.NET Framework` and `.NET Core`.
 It also simplifies the installation process by removing the necessity for plugin authors to create subcommands like `codeartifact-creds install/uninstall`.
 
 The proposed workflow for repositories that access private NuGet feeds, such as Azure DevOps, would be:
 
 1. Ensure that the dotnet CLI tools are installed.
-2. Execute the command `dotnet tool install Microsoft.CredentialProviders --tool-path "%UserProfile%/.nuget/plugins/tools"` on the Windows platform.
-For Linux and Mac, run `dotnet tool install Microsoft.CredentialProviders --tool-path $HOME/.nuget/plugins`.
-3. Run `dotnet restore --interactive` with a private endpoint. It should 'just work', meaning the credential providers installed in step 2 are used during credential acquisition and are used to authenticate against private endpoints.
+1. Execute the command `dotnet nuget plugin install Microsoft.CredentialProvider`. 
+The `tool path` global tool will be installed in the default NuGet plugins location, as mentioned below.
 
-The setup instructions mentioned in step 2 are platform-specific, but they are simpler compared to the current instructions for installing credential providers.
+| Operating System | Installation Path |
+| ---------------- | ----------------- |
+| Windows | %UserProfile%/.nuget/plugins/any |
+| Linux/Mac | $HOME/.nuget/plugins/any |
+
+1. Run `dotnet restore --interactive` with a private endpoint. It should 'just work', meaning the credential providers installed in step 2 are used during credential acquisition and are used to authenticate against private endpoints.
 
 I proposed using a `tool path` .NET tool because, by default, .NET tools are considered [global](https://learn.microsoft.com/dotnet/core/tools/global-tools).
 This means they are installed in a default directory, such as `%UserProfile%/.dotnet/tools` on Windows, which is then added to the PATH environment variable.
