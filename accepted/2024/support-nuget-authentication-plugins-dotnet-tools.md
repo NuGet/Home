@@ -83,14 +83,14 @@ The proposed workflow for repositories that access private NuGet feeds, such as 
 
 1. Ensure that the dotnet CLI tools are installed.
 1. Execute the command `dotnet nuget plugin install Microsoft.CredentialProvider`. 
+1. Run `dotnet restore --interactive` with a private endpoint. It should 'just work', meaning the credential providers installed in step 2 are used during credential acquisition and are used to authenticate against private endpoints.
+
 The `tool path` global tool will be installed in the default NuGet plugins location, as mentioned below.
 
 | Operating System | Installation Path |
 | ---------------- | ----------------- |
 | Windows | %UserProfile%/.nuget/plugins/any |
 | Linux/Mac | $HOME/.nuget/plugins/any |
-
-1. Run `dotnet restore --interactive` with a private endpoint. It should 'just work', meaning the credential providers installed in step 2 are used during credential acquisition and are used to authenticate against private endpoints.
 
 I proposed using a `tool path` .NET tool because, by default, .NET tools are considered [global](https://learn.microsoft.com/dotnet/core/tools/global-tools).
 This means they are installed in a default directory, such as `%UserProfile%/.dotnet/tools` on Windows, which is then added to the PATH environment variable.
