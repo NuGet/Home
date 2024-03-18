@@ -136,12 +136,12 @@ For example, the [dotnetsay tool](https://nuget.info/packages/dotnetsay/2.1.7) i
 </DotNetCliTool>
 ```
 
-We should also add `dotnet nuget plugin install/uninstall` commands to the .NET SDK.
-These commands will serve as a wrapper for the `dotnet tool install/uninstall` commands.
+We should also add `dotnet nuget plugin install/uninstall/update` commands to the .NET SDK.
+These commands will serve as a wrapper for the `dotnet tool install/uninstall/update` commands.
 The advantage of installing plugins through NuGet commands is that it eliminates the need for users to specify the NuGet plugin path. This makes the process platform-independent and more user-friendly. 
 We should also introduce a `dotnet nuget credentialprovider search` command.
 This will allow customers to search for available Credential Providers that are published as .NET tools.
-I believe we need a separate specification for `dotnet nuget plugin install/uninstall/search` commands to fully understand all the options and the functional/technical details.
+I believe we need a separate specification for `dotnet nuget plugin install/uninstall/update/search` commands to fully understand all the options and the functional/technical details.
 
 This approach is similar to the alternative design that [Andy Zivkovic](https://github.com/zivkan) kindly proposed in [[Feature]: Make NuGet credential providers installable via the dotnet cli](https://github.com/NuGet/Home/issues/11325).
 The recommendation was developing a command like `dotnet nuget credential-provider install Microsoft.Azure.Artifacts.CredentialProvider`.
