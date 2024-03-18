@@ -103,7 +103,12 @@ This makes it easier to identify and invoke the appropriate tool for NuGet opera
 - The binaries are installed in a location that we specify while installing the tool.
 - We can invoke the tool from the installation directory by providing the directory with the command name or by adding the directory to the PATH environment variable.
 - One version of a tool is used for all directories on the machine.
-The `tool path` option aligns well with the design of NuGet plugins architecture, making it the recommended approach for installing and executing NuGet plugins.
+The `tool path` option aligns well with the NuGet plugins architecture design, and hence, it is the recommended approach for installing and executing NuGet plugins.
+
+We should also add `dotnet nuget plugin install/uninstall/search` commands to the .NET SDK.
+These commands will serve as a wrapper for the `dotnet tool install/uninstall` commands.
+The benefit of installing plugins through NuGet commands is that it removes the necessity for the user to specify the NuGet plugin path, making the process platform-independent and more user-friendly.
+I think we need a separate spec for `dotnet nuget plugin install/uninstall/search` commands.
 
 This approach is similar to the alternative design that [Andy Zivkovic](https://github.com/zivkan) kindly proposed in [[Feature]: Make NuGet credential providers installable via the dotnet cli](https://github.com/NuGet/Home/issues/11325).
 The recommendation was developing a command like `dotnet nuget credential-provider install Microsoft.Azure.Artifacts.CredentialProvider`.
@@ -116,7 +121,7 @@ This is an important consideration for plugin customers when installing NuGet pl
 ### Technical explanation
 
 Currently, plugins are discovered through a convention-based directory structure, such as the `%userprofile%/.nuget/plugins` folder on Windows.
-CI/CD scenarios and power users can use environment variables to override this behavior.
+For CI/CD scenarios, and for power users, environment variables can be used to override this behavior.
 Note that only absolute paths are allowed when using these environment variables.
 
 - `NUGET_NETFX_PLUGIN_PATHS`: Defines the plugins used by the .NET Framework-based tooling (NuGet.exe/MSBuild.exe/Visual Studio). This takes precedence over `NUGET_PLUGIN_PATHS`.
