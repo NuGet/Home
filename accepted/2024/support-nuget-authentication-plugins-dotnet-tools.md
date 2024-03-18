@@ -266,7 +266,7 @@ However, due to limitations in the NuGet Client tooling, they've had to maintain
 
 ## Unresolved Questions
 
-- None as of now.
+- The issue with workload installation on Mac and Linux and NuGet credential providers (among other things) is described here: https://github.com/dotnet/sdk/issues/35912#issuecomment-1759774310  Basically, when .NET SDK workload commands are run under sudo, we change the HOME directory so that the .NET SDK doesn’t end up writing files owned by root to the user’s normal HOME directory, which would cause problems when running normal commands not under sudo.  This interferes with NuGet credential providers
 
 ## Future Possibilities
 
