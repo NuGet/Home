@@ -105,6 +105,37 @@ This makes it easier to identify and invoke the appropriate tool for NuGet opera
 - One version of a tool is used for all directories on the machine.
 The `tool path` option aligns well with the NuGet plugins architecture design, and hence, it is the recommended approach for installing and executing NuGet plugins.
 
+The reasons why `.NET tools` were chosen as the deployment mechanism are mentioned below:
+
+- NuGet plugins are console applications. A `.NET tool` is a special NuGet package that contains a console application, which presents a natural fit.
+
+- The .NET SDK has already simplified the process for customers to develop a tool.
+All the plugin authors have to do is set the following properties and execute `dotnet pack` to generate the package:
+
+```xml
+<PackAsTool>true</PackAsTool>
+<ToolCommandName>botsay</ToolCommandName>
+```
+
+- Leveraging `.NET Tools` provides a standard experience for customers to share console applications, with NuGet plugins being one such use case.
+If there is an existing mechanism that works well, is familiar to customers, and fits our use case, I question the benefit of developing a new layout specifically for NuGet plugins.
+
+- Another advantage of this established `.NET tools` approach is that plugin authors won't have to maintain separate code paths for .NET Framework and .NET Core runtimes.
+All these complexities are handled by the .NET SDK by providing a native shim upon the installation of the .NET tool.
+
+Currently, at least to my understanding, the generated `.nupkg` will include a file named `DotnetToolSettings.xml` with additional metadata such as the command name, entry point, and runner.
+
+For example, the [dotnetsay tool](https://nuget.info/packages/dotnetsay/2.1.7) includes the following content:
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<DotNetCliTool Version="1">
+  <Commands>
+    <Command Name="dotnetsay" EntryPoint="dotnetsay.dll" Runner="dotnet" />
+  </Commands>
+</DotNetCliTool>
+```
+
 We should also add `dotnet nuget plugin install/uninstall` commands to the .NET SDK.
 These commands will serve as a wrapper for the `dotnet tool install/uninstall` commands.
 The advantage of installing plugins through NuGet commands is that it eliminates the need for users to specify the NuGet plugin path. This makes the process platform-independent and more user-friendly. 
