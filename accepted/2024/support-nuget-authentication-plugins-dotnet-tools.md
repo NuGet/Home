@@ -151,6 +151,11 @@ Given that this issue has been resolved in the .NET 8 SDK, and considering our p
 
 The `dotnet nuget credentialprovider search` command would allow customers to search for available Credential Providers that are published as .NET tools. However, I believe we need a separate specification for `dotnet nuget plugin install/uninstall/update/search` commands to fully understand all the options and the functional/technical details.
 
+The `dotnet workload` command is separate and has its own set of sub-commands, including `install`, `uninstall`, and `list`.
+These sub-commands are wrappers for the corresponding `dotnet tool` sub-commands.
+Workloads are installed in a different location than .NET tools, which makes it easier for them to be discovered at runtime, addressing a problem that NuGet also faces.
+However, NuGet plugins and .NET tools share the similarity of being console applications.
+
 This approach is similar to the alternative design that [Andy Zivkovic](https://github.com/zivkan) kindly proposed in [[Feature]: Make NuGet credential providers installable via the dotnet cli](https://github.com/NuGet/Home/issues/11325).
 The recommendation was developing a command like `dotnet nuget credential-provider install Microsoft.Azure.Artifacts.CredentialProvider`.
 
