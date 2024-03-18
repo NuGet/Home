@@ -82,7 +82,7 @@ It also simplifies the installation process by removing the necessity for plugin
 The proposed workflow for repositories that access private NuGet feeds, such as Azure DevOps, would be:
 
 1. Ensure that the dotnet CLI tools are installed.
-1. Execute the command `dotnet nuget plugin install Microsoft.CredentialProvider`. 
+1. Execute the command `dotnet nuget plugin install Microsoft.CredentialProvider`.
 1. Run `dotnet restore --interactive` with a private endpoint. It should 'just work', meaning the credential providers installed in step 2 are used during credential acquisition and are used to authenticate against private endpoints.
 
 The `tool path` global tool will be installed in the default NuGet plugins location, as mentioned below.
@@ -323,10 +323,10 @@ However, due to limitations in the NuGet Client tooling, they've had to maintain
 
 ## Unresolved Questions
 
-- The issue concerning workload installation on Mac and Linux, as well as NuGet credential providers, is discussed in this thread: https://github.com/dotnet/sdk/issues/35912#issuecomment-1759774310.
-Essentially, when .NET SDK workload commands are executed under sudo, the HOME directory path is altered.
-This prevents the .NET SDK from writing files owned by root to the user's regular HOME directory, which could lead to issues when running standard commands not under sudo.
-This situation also interferes with NuGet credential providers.
+- The issue regarding workload installation on Mac and Linux, as well as NuGet credential providers, is discussed in [GitHub Issue #35912](https://github.com/dotnet/sdk/issues/35912#issuecomment-1759774310).
+When executing .NET SDK workload commands under sudo, the HOME directory path is modified, preventing the .NET SDK from writing files owned by root to the user's regular HOME directory.
+This alteration can cause problems when running standard commands without sudo and also interferes with NuGet credential providers.
+We have proposed a workaround for this issue in [this comment](https://github.com/dotnet/sdk/issues/35912#issuecomment-2004522180).
 
 ## Future Possibilities
 
