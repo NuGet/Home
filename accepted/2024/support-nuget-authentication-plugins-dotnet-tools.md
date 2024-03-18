@@ -105,6 +105,9 @@ This makes it easier to identify and invoke the appropriate tool for NuGet opera
 - One version of a tool is used for all directories on the machine.
 The `tool path` option aligns well with the design of NuGet plugins architecture, making it the recommended approach for installing and executing NuGet plugins.
 
+This approach is similar to the alternative design that [Andy Zivkovic](https://github.com/zivkan) kindly proposed in [[Feature]: Make NuGet credential providers installable via the dotnet cli](https://github.com/NuGet/Home/issues/11325).
+The recommendation was developing a command like `dotnet nuget credential-provider install Microsoft.Azure.Artifacts.CredentialProvider`.
+
 ### Security considerations
 
 The [.NET SDK docs](https://learn.microsoft.com/dotnet/core/tools/global-tools#check-the-author-and-statistics) clearly state, `.NET tools run in full trust. Don't install a .NET tool unless you trust the author`.
@@ -187,7 +190,7 @@ drwxr-xr-x 5 {user}  4096 Feb 10 08:21 .store
 
 ## Drawbacks
 
-- The ideal workflow for repositories accessing private NuGet feeds, such as Azure DevOps, is to easily search for NuGet plugins and install them without needing to know the destination location.
+- The ideal workflow for repositories accessing private NuGet feeds, such as Azure DevOps, is to easily search for NuGet plugins and install them as global tool.
 However, the current proposal suggests installing the plugin as a tool-path .NET tool.
 As mentioned in the technical explanation section, customers can opt to install NuGet plugins as a global tool instead of a tool-path tool.
 To do this, they need to set the `NUGET_DOTNET_TOOLS_PLUGIN_PATHS` environment variable.
@@ -197,25 +200,6 @@ This variable should point to the location of the .NET Tool executable, which th
 If the `dotnet tool` started writing non-executable files into the directory, it would affect how NuGet discovers and runs plugins at runtime.
 
 ## Rationale and alternatives
-
-### NuGet commands to install credential providers
-
-[Andy Zivkovic](https://github.com/zivkan) kindly proposed an alternative design in [[Feature]: Make NuGet credential providers installable via the dotnet cli](https://github.com/NuGet/Home/issues/11325).
-The recommendation was developing a command like `dotnet nuget credential-provider install Microsoft.Azure.Artifacts.CredentialProvider`.
-Here are the advantages and disadvantages of this approach:
-
-**Advantages:**
-
-- Improved discoverability, as `dotnet tool search` will list packages that are not NuGet plugins.
-- Doesn't require customers to memorize or lookup the NuGet plugin directory location in order to pass it to all `dotnet tool` commands via the `--tool-path` argument, for install, uninstall, and update.
-
-**Disadvantages:**
-
-- The NuGet Client team would be required to maintain all the .NET Commands for installing, updating, and uninstalling the plugins. However, these tasks are already handled by the existing commands in the .NET SDK.
-- This approach would still require the extraction of plugins into either a `netfx` or a `netcore` folder.
-As a result, package authors would need to maintain plugins for both of these target frameworks.
-However, NuGet plugins are executables, and the .NET SDK provides a convenient way for authors to publish an executable that can run on all platforms via .NET Tools.
-This eliminates the need for a framework-specific approach.
 
 ### Specify the the authentication plugin in NuGet.Config file
 
@@ -244,7 +228,7 @@ Here is an example of how to configure the NuGet.Config file:
 **Advantages:**
 
 - This approach explicitly configures the intent to use the .NET Tool as a plugin for authentication in the NuGet.Config file itself.
-- Customers can install the plugins as global .NET Tools, eliminating the need to specify a custom location based on the platform.
+- Customers can install the plugins as global .NET Tools.
 
 **Disadvantages:**
 
