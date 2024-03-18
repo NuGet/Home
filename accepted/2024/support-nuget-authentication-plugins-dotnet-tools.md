@@ -226,6 +226,17 @@ drwxr-xr-x 5 {user}  4096 Feb 10 08:21 .store
 -rwxr-xr-x 1 {user} 75632 Feb 10 08:20 dotnetsay
 ```
 
+## Roadmap
+
+In terms of the implementation roadmap, I propose the following stages:
+
+1. Initially, plugin authors will publish NuGet plugins as .NET Tools. Consumers will install NuGet plugins using `dotnet tool` sub-commands.
+They will specify the plugin's path based on their operating system. We will make the necessary code changes on the NuGet side to enable running the plugins installed as `.NET tools`.
+
+2. Subsequently, we will introduce a `dotnet nuget plugin` subcommand. This will allow users to `install, update, uninstall, and search` for plugins.
+However, we will still rely on the `dotnet tool` command under the hood, as mentioned above.
+Please note that these command names are subject to change based on feedback to the specification we are going to create in the near future.
+
 ## Drawbacks
 
 - The ideal workflow for repositories accessing private NuGet feeds, such as Azure DevOps, is to easily search for NuGet plugins and install them as global tool.
