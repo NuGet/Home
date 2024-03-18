@@ -105,10 +105,12 @@ This makes it easier to identify and invoke the appropriate tool for NuGet opera
 - One version of a tool is used for all directories on the machine.
 The `tool path` option aligns well with the NuGet plugins architecture design, and hence, it is the recommended approach for installing and executing NuGet plugins.
 
-We should also add `dotnet nuget plugin install/uninstall/search` commands to the .NET SDK.
+We should also add `dotnet nuget plugin install/uninstall` commands to the .NET SDK.
 These commands will serve as a wrapper for the `dotnet tool install/uninstall` commands.
-The benefit of installing plugins through NuGet commands is that it removes the necessity for the user to specify the NuGet plugin path, making the process platform-independent and more user-friendly.
-I think we need a separate spec for `dotnet nuget plugin install/uninstall/search` commands.
+The advantage of installing plugins through NuGet commands is that it eliminates the need for users to specify the NuGet plugin path. This makes the process platform-independent and more user-friendly. 
+We should also introduce a `dotnet nuget credentialprovider search` command.
+This will allow customers to search for available Credential Providers that are published as .NET tools.
+I believe we need a separate specification for `dotnet nuget plugin install/uninstall/search` commands to fully understand all the options and the functional/technical details.
 
 This approach is similar to the alternative design that [Andy Zivkovic](https://github.com/zivkan) kindly proposed in [[Feature]: Make NuGet credential providers installable via the dotnet cli](https://github.com/NuGet/Home/issues/11325).
 The recommendation was developing a command like `dotnet nuget credential-provider install Microsoft.Azure.Artifacts.CredentialProvider`.
