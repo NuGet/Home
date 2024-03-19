@@ -261,7 +261,7 @@ This variable should point to the location of the .NET Tool executable, which th
 - There is some risk of the `dotnet tool` introducing breaking changes that could negatively impact NuGet.
 If the `dotnet tool` started writing non-executable files into the directory, it would affect how NuGet discovers and runs plugins at runtime.
 
-- NuGet Client plugin code will only support plugins developed in .NET. See the `Future Possibilities` section for more details.
+- Currently, NuGet Client plugin code will only support plugins developed in .NET. See the `Future Possibilities` section for more details.
 
 ## Rationale and alternatives
 
@@ -353,4 +353,9 @@ When the manifest file is saved in the root directory of a source code repositor
 
 ### Support for non-.NET NuGet plugins
 
-- NuGet Client plugin code must be updated to utilize a standard RPC mechanism, such as StreamJsonRpc, to support NuGet plugins developed in other languages. Until that time, the NuGet Client plugin code will only support plugins developed in .NET.
+- The NuGet Client plugin code needs to be updated to utilize a standard RPC mechanism, such as StreamJsonRpc, in order to support NuGet plugins developed in languages other than .NET.
+Currently, the NuGet Client plugin code only supports plugins developed in .NET.
+The IPC (Inter-Process Communication) used by NuGet is custom-made, and it would be beneficial for plugin implementers if it were based on industry standards.
+This would allow plugin authors to reuse existing implementations for other languages.
+While there is no technical barrier preventing the implementation of a client in a non-.NET language, there is an additional cost associated with reimplementing the plugin protocol.
+This cost serves as a deterrent for writing non-.NET plugins.
