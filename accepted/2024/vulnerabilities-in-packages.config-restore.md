@@ -27,26 +27,8 @@ Note that warnings as errors and no warn are not supported in packages.config pr
 
 #### Configuring NuGet audit
 
-The configuration knobs for packages.config restore auditing functionality will be NuGet.config based.
-
-In particular, there will be 2 new configuration keys:
-
-| Key | Acceptable values | Description | Default |
-|-----|-------------------|-------------|---------|
-| auditForPackagesConfig | enable, disable | Enables or disables NuGet Audit for packages config projects | If not specified, the default will be `enable` |
-| auditLevelForPackagesConfig | Critical, high, moderate, low | Configures the default audit level for NuGet audit for packages config projects |  If not specified, the default will be `low` |
-
-The audit functionality for packages.config restore will be enabled by default.
-To disable it, one can specify a property in the config section of the configuration file.
-
-```xml
-<configuration>
-    <config>
-        <add key="auditForPackagesConfig" value="enable" />
-        <add key="auditLevelForPackagesConfig" value="low" />
-    </config>
-</configuration>
-```
+The configuration knobs for packages.config restore auditing functionality will be MSBuild based.
+The `NuGetAudit` and `NuGetAuditLevel` properties are going to be considered the same way they are in PackageReference audit.
 
 #### Enabling the feature
 
@@ -128,20 +110,30 @@ Given all that, the pros and cons of a property centric vs a nuget.config centri
 
 Another consideration for these 2 properties is that the default are arguably good enough, and that they'd rarely be configured.
 
+### Enable audit through NuGet.Config
+
+| Key | Acceptable values | Description | Default |
+|-----|-------------------|-------------|---------|
+| auditForPackagesConfig | enable, disable | Enables or disables NuGet Audit for packages config projects | If not specified, the default will be `enable` |
+| auditLevelForPackagesConfig | Critical, high, moderate, low | Configures the default audit level for NuGet audit for packages config projects |  If not specified, the default will be `low` |
+
+The audit functionality for packages.config restore will be enabled by default.
+To disable it, one can specify a property in the config section of the configuration file.
+
+```xml
+<configuration>
+    <config>
+        <add key="auditForPackagesConfig" value="enable" />
+        <add key="auditLevelForPackagesConfig" value="low" />
+    </config>
+</configuration>
+```
+
 ## Prior Art
 
 - [Vulnerability reporting in PackageReference restore](../2022/vulnerabilities-in-restore.md)
 
 ## Unresolved Questions
-
-- Should we use MSBuild properties instead?
-- Should the NuGet.config configuration *affect* the PackageReference defaults as well?
-  - The consequence would be that *when* the project properties page displays audit defaults (not yet done), it won't know about the potential impact from the nuget.config file. This is likely not a common scenario.
-  The property names would be `audit` and `auditLevel`.
-
-<!-- What parts of the proposal do you expect to resolve before this gets accepted? -->
-<!-- What parts of the proposal need to be resolved before the proposal is stabilized? -->
-<!-- What related issues would you consider out of scope for this proposal but can be addressed in the future? -->
 
 ## Future Possibilities
 
