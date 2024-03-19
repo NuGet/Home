@@ -353,7 +353,7 @@ In addition to that, if we ever plan to provide users with an option to manage t
 When the manifest file is saved in the root directory of a source code repository, a contributor can clone the repository and invoke a single .NET CLI command such as [`dotnet tool restore`](https://learn.microsoft.com/dotnet/core/tools/dotnet-tool-restore) to install all of the tools listed in the manifest file.
 - Having NuGet plugins under the repository folder eliminates the need for NuGet to load plugins from the user profile.
 
-### Support for non-.NET NuGet plugins
+### Support for NuGet plugins developed in non-.NET languages
 
 - The NuGet Client plugin code needs to be updated to utilize a standard RPC mechanism, such as StreamJsonRpc, in order to support NuGet plugins developed in languages other than .NET.
 The IPC (Inter-Process Communication) used by NuGet is custom-made, and it would be beneficial for plugin implementers if it were based on industry standards.
