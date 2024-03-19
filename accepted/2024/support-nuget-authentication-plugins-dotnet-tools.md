@@ -75,36 +75,6 @@ The use of .NET tools as a deployment mechanism has been a recurring request fro
 Currently, this solution works for the Windows .NET Framework.
 However, the goal is to extend this support cross-platform for all supported .NET runtimes.
 
-By implementing this specification, we offer plugin authors the option to use .NET tools for plugin deployment.
-These plugins will be installed as a `tool path` global tool. This eliminates the need to maintain separate versions for `.NET Framework` and `.NET Core`.
-It also simplifies the installation process by removing the necessity for plugin authors to create subcommands like `codeartifact-creds install/uninstall`.
-
-The proposed workflow for repositories that access private NuGet feeds, such as Azure DevOps, would be:
-
-1. Ensure that the dotnet CLI tools are installed.
-1. Execute the command `dotnet nuget plugin install Microsoft.CredentialProvider`.
-1. Run `dotnet restore --interactive` with a private endpoint. It should 'just work', meaning the credential providers installed in step 2 are used during credential acquisition and are used to authenticate against private endpoints.
-
-The `tool path` global tool will be installed in the default NuGet plugins location, as mentioned below.
-
-| Operating System | Installation Path |
-| ---------------- | ----------------- |
-| Windows | %UserProfile%/.nuget/plugins/any |
-| Linux/Mac | $HOME/.nuget/plugins/any |
-
-I proposed using a `tool path` .NET tool because, by default, .NET tools are considered [global](https://learn.microsoft.com/dotnet/core/tools/global-tools).
-This means they are installed in a default directory, such as `%UserProfile%/.dotnet/tools` on Windows, which is then added to the PATH environment variable.
-
-- Global tools can be invoked from any directory on the machine without specifying their location.
-- One version of a tool is used for all directories on the machine.
-However, NuGet cannot easily determine which tool is a NuGet plugin.
-On the other hand, the `tool path` option allows us to install .NET tools as global tools, but with the binaries located in a specified location.
-This makes it easier to identify and invoke the appropriate tool for NuGet operations.
-- The binaries are installed in a location that we specify while installing the tool.
-- We can invoke the tool from the installation directory by providing the directory with the command name or by adding the directory to the PATH environment variable.
-- One version of a tool is used for all directories on the machine.
-The `tool path` option aligns well with the NuGet plugins architecture design, and hence, it is the recommended approach for installing and executing NuGet plugins.
-
 The reasons why `.NET tools` were chosen as the deployment mechanism are mentioned below:
 
 - NuGet plugins are console applications. A `.NET tool` is a special NuGet package that contains a console application, which presents a natural fit.
@@ -136,6 +106,36 @@ For example, the [dotnetsay tool](https://nuget.info/packages/dotnetsay/2.1.7) i
 </DotNetCliTool>
 ```
 
+By implementing this specification, we offer plugin authors the option to use .NET tools for plugin deployment.
+On the consumer side, these plugins will be installed as a `tool path` global tool. This eliminates the need to maintain separate versions for `.NET Framework` and `.NET Core`.
+It also simplifies the installation process by removing the necessity for plugin authors to create subcommands like `codeartifact-creds install/uninstall`.
+
+The proposed workflow for repositories that access private NuGet feeds, such as Azure DevOps, would be:
+
+1. Ensure that the .NET SDK is installed.
+1. Execute the command `dotnet nuget plugin install Microsoft.CredentialProvider`.
+1. Run `dotnet restore --interactive` with a private endpoint. It should 'just work', meaning the credential providers installed in step 2 are used during credential acquisition and are used to authenticate against private endpoints.
+
+The `dotnet nuget plugin install` command installs the NuGet plugin as `tool path` global .NET tool in the default NuGet plugins location, as mentioned below.
+
+| Operating System | Installation Path |
+| ---------------- | ----------------- |
+| Windows | %UserProfile%/.nuget/plugins/any |
+| Linux/Mac | $HOME/.nuget/plugins/any |
+
+I proposed using a `tool path` .NET tool because, by default, .NET tools are considered [global](https://learn.microsoft.com/dotnet/core/tools/global-tools).
+This means they are installed in a default directory, such as `%UserProfile%/.dotnet/tools` on Windows, which is then added to the PATH environment variable.
+
+- Global tools can be invoked from any directory on the machine without specifying their location.
+- One version of a tool is used for all directories on the machine.
+However, NuGet cannot easily determine which tool is a NuGet plugin.
+On the other hand, the `tool path` option allows us to install .NET tools as global tools, but with the binaries located in a specified location.
+This makes it easier to identify and invoke the appropriate tool for NuGet operations.
+- The binaries are installed in a location that we specify while installing the tool.
+- We can invoke the tool from the installation directory by providing the directory with the command name or by adding the directory to the PATH environment variable.
+- One version of a tool is used for all directories on the machine.
+The `tool path` option aligns well with the NuGet plugins architecture design, and hence, it is the recommended approach for installing and executing NuGet plugins.
+
 We should consider adding `dotnet nuget plugin install/uninstall/update` commands to the .NET SDK as wrappers for the `dotnet tool install/uninstall/update` commands.
 This would simplify the installation process by eliminating the need for users to specify the NuGet plugin path, making the process more user-friendly and platform-independent.
 
@@ -143,9 +143,9 @@ We should also introduce a `dotnet nuget credentialprovider search` command.
 To enable this, plugin authors would simply need to add `<PackageType>CredentialProvider</PackageType>` to their `.csproj` file.
 
 Special thanks to [Nikolche Kolev](https://github.com/nkolev92) for suggesting a verification method.
-This involved creating a .NET tool that includes both `DotnetTool` and `CredentialProvider` as `PackageTypes` in the `.nuspec` file.
-This file is part of the nupkg generated by executing the dotnet pack command.
-The installation of this tool was successful with the .NET 8 SDK. However, it failed with the .NET 7 SDK due to the `.nuspec` in the nupkg containing multiple package types.
+This involved creating a .NET tool and then updating the `PackageTypes` manually in the `.nuspec` file to inlclude both `DotnetTool` and `CredentialProvider`.
+This file is part of the nupkg generated by executing the `dotnet pack` command.
+The installation of this tool with multiple package types was successful with the .NET 8 SDK. However, it failed with the .NET 7 SDK due to the `.nuspec` in the nupkg containing multiple package types.
 
 Given that this issue has been resolved in the .NET 8 SDK, and considering our plans to add `dotnet nuget plugin install/uninstall/update/search` commands and support for NuGet plugins deployed via .NET tools in the latest version, I believe we are on the right track.
 
@@ -261,6 +261,8 @@ This variable should point to the location of the .NET Tool executable, which th
 - There is some risk of the `dotnet tool` introducing breaking changes that could negatively impact NuGet.
 If the `dotnet tool` started writing non-executable files into the directory, it would affect how NuGet discovers and runs plugins at runtime.
 
+- NuGet Client plugin code will only support plugins developed in .NET. See the `Future Possibilities` section for more details.
+
 ## Rationale and alternatives
 
 ### Specify the the authentication plugin in NuGet.Config file
@@ -320,11 +322,17 @@ However, given the limited number of plugin implementations currently available,
 
 ## Prior Art
 
-The AWS team has developed a [.NET tool](https://docs.aws.amazon.com/codeartifact/latest/ug/nuget-cli.html#nuget-configure-cli) to simplify authentication with their private NuGet feeds.
+- The AWS team has developed a [.NET tool](https://docs.aws.amazon.com/codeartifact/latest/ug/nuget-cli.html#nuget-configure-cli) to simplify authentication with their private NuGet feeds.
 In their current implementation, they've added a subcommand, `codeartifact-creds install`.
 This command copies the credential provider to the NuGet plugins folder.
 They also provide an `uninstall` subcommand to remove the files from the NuGet plugin folders.
 However, due to limitations in the NuGet Client tooling, they've had to maintain plugins for both .NET Framework and .NET Core tooling. Additionally, they've had to provide commands to install and uninstall the NuGet plugins.
+
+- The `dotnet workload` command is separate and has its own set of sub-commands, including `install`, `uninstall`, and `list`.
+These sub-commands are wrappers for the corresponding `dotnet tool` sub-commands.
+Workloads are installed in a different location than .NET tools, which makes it easier for them to be discovered at runtime, addressing a problem that NuGet also faces.
+However, NuGet plugins and .NET tools share the similarity of being console applications.
+This prior art will be helpful for us as we consider the implementation of the `dotnet nuget plugin install/uninstall/update/search` commands.
 
 ## Unresolved Questions
 
@@ -342,3 +350,7 @@ In addition to that, if we ever plan to provide users with an option to manage t
 - The advantage of local tools is that the .NET CLI uses manifest files to keep track of tools that are installed locally to a directory.
 When the manifest file is saved in the root directory of a source code repository, a contributor can clone the repository and invoke a single .NET CLI command such as [`dotnet tool restore`](https://learn.microsoft.com/dotnet/core/tools/dotnet-tool-restore) to install all of the tools listed in the manifest file.
 - Having NuGet plugins under the repository folder eliminates the need for NuGet to load plugins from the user profile.
+
+### Support for non-.NET NuGet plugins
+
+- NuGet Client plugin code must be updated to utilize a standard RPC mechanism, such as StreamJsonRpc, to support NuGet plugins developed in other languages. Until that time, the NuGet Client plugin code will only support plugins developed in .NET.
