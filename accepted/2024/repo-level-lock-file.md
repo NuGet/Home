@@ -5,12 +5,12 @@
 
 ## Summary
 
-Applications consisting of multiple solutions (using assembly references between projects) Cannot control their transitive dependencies by using Nuget. The current lock file is on a per-project basis rather than an application/repository basis. Given a `Directory.packages.props` file, each project could be resolved with different versions of transitive dependencies, which a single central lock file would solve, by allowing consistency between package versions across multiple solutions.
+Applications consisting of multiple solutions (using assembly references between projects) cannot control their transitive dependencies by using Nuget. The current lock file is on a per-project basis rather than an application/repository basis. Given a `Directory.packages.props` file, each project could resolve different versions of transitive dependencies, which a single central lock file would solve by allowing consistency between package versions across multiple solutions.
 
 
 ## Motivation 
 
-Monorepositories with multiple solutions utilizing assembly references that deploy all their code together as a single application are unable to use Nuget (with or without CPM) due to transitive version conflicts. This is due to nuget being able to resolve different versions of transitive dependencies for each individual build, as they occur in isolation from one another. A single central lock file allows all transitive dependencies to have locked versions defined at the root, thereby eliminating third-party dependency management software such as Paket.
+Monorepositories with multiple solutions utilizing assembly references that deploy all their code together as a single application are unable to use Nuget (with or without CPM) due to transitive version conflicts. This is due to NuGet being able to resolve different versions of transitive dependencies for each individual build, as they occur in isolation from one another. A single central lock file allows all transitive dependencies to have locked versions defined at the root, thereby eliminating third-party dependency management software such as Paket.
 
 
 ## Explanation
@@ -64,9 +64,9 @@ Some alternatives exist. Namely:
 
 The primary example of prior art for a centralized lock file is [Paket](https://fsprojects.github.io/Paket/) built around this exact concept. It uses a `paket.dependencies` file, similar to the `Directory.packages.props` file from Nuget. It allows for 'groups' to pull two identical dependencies in different versions as each group is resolved independently. It then uses a `paket.lock` to lock the dependencies at the root (right next to the paket.dependencies), which pins all primary and transitive package versions for all projects. A project then includes a package by listing its name in the `paket.references` file in the csproj directory. 
 
-We can draw many parallels between Paket & Nuget (with a central lock file) function. For one, we define all the primary packages & versions at the root. Projects define which specific packages they depend on within the relative projects. Where paket would use groups to include dependencies at different versions, NuGet uses the `VersionOverride` property within the csproj. This is the primary difference in how locks are handled for version differences since Paket utilizes groups and writes the locked package versions into the `paket.lock` file. Nuget (with central locking) writes all the pinned versions into the local csproj lock file.
+We can draw many parallels between Paket & NuGet (with a central lock file) function. For one, we define all the primary packages & versions at the root. Projects define which specific packages they depend on within the relative projects. Where paket would use groups to include dependencies at different versions, NuGet uses the `VersionOverride` property within the csproj. This is the primary difference in how locks are handled for version differences since Paket utilizes groups and writes the locked package versions into the `paket.lock` file. Nuget (with central locking) writes all the pinned versions into the local csproj lock file.
 
-NodeJS has the concept of [Workspaces](https://docs.npmjs.com/cli/v7/using-npm/workspaces#skip-to-content) which act more like Solutions since NodeJs only has the concept of Projects. However a Workspace does allow for all packages to be resolved to the same version, ensuring no version conflicts between different projects within the same workspace. 
+NodeJS has the concept of [Workspaces](https://docs.npmjs.com/cli/v7/using-npm/workspaces#skip-to-content) which act more like Solutions since NodeJS only has the concept of Projects. However a Workspace does allow for all packages to be resolved to the same version, ensuring no version conflicts between different projects within the same workspace. 
 
 ## Unresolved Questions
 
@@ -77,7 +77,7 @@ NodeJS has the concept of [Workspaces](https://docs.npmjs.com/cli/v7/using-npm/w
 * How would the `Directory.packages.props` dependencies be separated out from the project dependencies to generate the lock file? 
 * How does the publish command handle this as it doesn't have full context of all packages. (Could be solved by the restore always running with --locked-mode)
 * How will a project deleted from the repository get deleted from the lock file.
-* How will Lock files be generated with nested `Directoy.packages.props` files.
+* How will Lock files be generated with nested `Directory.packages.props` files?
 
 ## Future Possibilities
 <!-- What future possibilities can you think of that this proposal would help with? -->
