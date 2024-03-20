@@ -81,4 +81,4 @@ NodeJS has the concept of [Workspaces](https://docs.npmjs.com/cli/v7/using-npm/w
 
 ## Future Possibilities
 <!-- What future possibilities can you think of that this proposal would help with? -->
-Using the `TargetFrameworks` property within the `Directory.packages.props` file could narrow down the frameworks resolved for the provided packages. This can simplify the lock file and reduce some unnecessary dependency resolution.
+Using the `TargetFrameworks` property within the `Directory.packages.props` file could narrow down the frameworks resolved for the provided packages. This can simplify the lock file and reduce some unnecessary dependency resolution as well as reduce merge conflicts as there is less content changing less often
