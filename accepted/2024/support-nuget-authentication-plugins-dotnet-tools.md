@@ -84,7 +84,7 @@ All the plugin authors have to do is set the following properties and execute `d
 
 ```xml
 <PackAsTool>true</PackAsTool>
-<ToolCommandName>botsay</ToolCommandName>
+<ToolCommandName>botsay</ToolCommandName> //optional
 ```
 
 - Leveraging `.NET Tools` provides a standard experience for customers to share console applications, with NuGet plugins being one such use case.
