@@ -175,6 +175,7 @@ It will take precedence over `NUGET_PLUGIN_PATHS`.
 The plugins specified in the `NUGET_DOTNET_TOOLS_PLUGIN_PATHS` environment variable will be used regardless of whether the `NUGET_NETFX_PLUGIN_PATHS` or `NUGET_NETCORE_PLUGIN_PATHS` environment variables are set.
 The primary reason for this is that plugins installed as .NET tools can be executed in both .NET Framework and .NET Core tooling.
 If customers prefer to install NuGet plugins as a [tool-path global tool](https://learn.microsoft.com/dotnet/core/tools/global-tools-how-to-use#use-the-tool-as-a-global-tool-installed-in-a-custom-location), they can set the `NUGET_DOTNET_TOOLS_PLUGIN_PATHS` environment variable.This variable should point to the location of the .NET Tool executable that the NuGet Client tooling can invoke when needed.
+
 Considering the varying ways different platforms handle file casing, the implementation could convert all file names to lowercase before checking for a file.
 Specifically, it should look for files whose names begin with `nuget-plugin-*` by scanning all the directories in the PATH environment variable.
 On Windows, NuGet should search for files with the `.exe` extension. On other platforms, it should look for files with the executable bit set.
