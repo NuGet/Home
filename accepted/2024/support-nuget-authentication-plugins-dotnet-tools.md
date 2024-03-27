@@ -204,6 +204,9 @@ If the `dotnet tool` started writing non-executable files into the directory, it
 This serves as a deterrent for developing NuGet plugins in non-.NET languages.
 See the `Future Possibilities` section for more details.
 
+- The discoverability of NuGet plugins published as .NET Tools is challenging for users because the `dotnet tool search` command only filters based on the `PackageType` being `DotnetTool`.
+Please refer to the `Future Possibilities` section for more related information.
+
 ## Rationale and alternatives
 
 ### Installing NuGet plugins as tool-path .NET Tools
@@ -342,6 +345,14 @@ They will specify the plugin's path based on their operating system. We will mak
 However, we will still rely on the `dotnet tool` command under the hood, as mentioned above.
 Please note that these command names are subject to change based on feedback to the specification we are going to create in the near future.
 
+#### Prior art
+
+- The `dotnet workload` command is separate and has its own set of sub-commands, including `install`, `uninstall`, and `list`.
+These sub-commands are wrappers for the corresponding `dotnet tool` sub-commands.
+Workloads are installed in a different location than .NET tools, which makes it easier for them to be discovered at runtime, addressing a problem that NuGet also faces.
+However, NuGet plugins and .NET tools share the similarity of being console applications.
+This prior art will be helpful for us as we consider the implementation of the `dotnet nuget plugin install/uninstall/update/search` commands.
+
 ### Specify the the authentication plugin in NuGet.Config file
 
 To simplify the authentication process with private NuGet feeds, customers can specify the authentication plugins installed as .NET Tools in the `packagesourceCredentials` section of the NuGet.Config file.
@@ -405,12 +416,6 @@ This command copies the credential provider to the NuGet plugins folder.
 They also provide an `uninstall` subcommand to remove the files from the NuGet plugin folders.
 However, due to limitations in the NuGet Client tooling, they've had to maintain plugins for both .NET Framework and .NET Core tooling. Additionally, they've had to provide commands to install and uninstall the NuGet plugins.
 
-- The `dotnet workload` command is separate and has its own set of sub-commands, including `install`, `uninstall`, and `list`.
-These sub-commands are wrappers for the corresponding `dotnet tool` sub-commands.
-Workloads are installed in a different location than .NET tools, which makes it easier for them to be discovered at runtime, addressing a problem that NuGet also faces.
-However, NuGet plugins and .NET tools share the similarity of being console applications.
-This prior art will be helpful for us as we consider the implementation of the `dotnet nuget plugin install/uninstall/update/search` commands.
-
 ## Unresolved Questions
 
 - The issue regarding workload installation on Mac and Linux, as well as NuGet credential providers, is discussed in [GitHub Issue #35912](https://github.com/dotnet/sdk/issues/35912#issuecomment-1759774310).
@@ -435,3 +440,10 @@ The IPC (Inter-Process Communication) used by NuGet is custom-made, and it would
 This would allow plugin authors to reuse existing implementations for other languages.
 While there is no technical barrier preventing the implementation of a client in a non-.NET language, there is an additional cost associated with reimplementing the plugin protocol.
 This cost serves as a deterrent for writing non-.NET plugins.
+
+### Improve the discoverability of NuGet plugins published as .NET Tools
+
+- Currently, the `dotnet pack` command ignores the `PackageType` property when the `PackAsTool` property is set to true.
+This behavior might be due to the fact that `CredentialProvider` is not a recognized `PackageType`.
+If the `dotnet pack` command could generate a .nupkg for .NET Tool with multiple package types, which are found in the `.nuspec` metadata file, then we could introduce a new `dotnet nuget plugin search` command. 
+This command would act as a wrapper for the `dotnet tool search` command, but it would also filter the results based on the additional package type.
