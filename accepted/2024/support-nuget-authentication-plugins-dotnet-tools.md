@@ -124,13 +124,6 @@ By implementing this specification, we offer plugin authors the option to use .N
 On the consumer side, these plugins will be installed as a global tool. This eliminates the need to maintain separate versions for `.NET Framework` and `.NET Core`.
 It also simplifies the installation process by removing the necessity for plugin authors to create subcommands like `codeartifact-creds install/uninstall`.
 
-### Security considerations
-
-The [.NET SDK docs](https://learn.microsoft.com/dotnet/core/tools/global-tools#check-the-author-and-statistics) clearly state, `.NET tools run in full trust. Don't install a .NET tool unless you trust the author`.
-This is an important consideration for plugin customers when installing NuGet plugins via .NET Tools in the future.
-
-### Technical explanation
-
 #### Authoring side approach
 
 To distribute a NuGet cross platform plugin as a .NET Tool, plugin authors need to follow these steps:
@@ -155,6 +148,13 @@ The proposed workflow for repositories that access private NuGet feeds, such as 
 
 Upon installation, these global .NET tools are added to the PATH. This allows NuGet to easily determine which file in the package should be run at runtime.
 
+### Security considerations
+
+The [.NET SDK docs](https://learn.microsoft.com/dotnet/core/tools/global-tools#check-the-author-and-statistics) clearly state, `.NET tools run in full trust. Don't install a .NET tool unless you trust the author`.
+This is an important consideration for plugin customers when installing NuGet plugins via .NET Tools in the future.
+
+### Technical explanation
+
 #### Plugin discovery
 
 Currently, plugins are discovered through a convention-based directory structure, such as the `%userprofile%/.nuget/plugins` folder on `Windows`.
@@ -173,9 +173,12 @@ This variable will define the plugins, installed as .NET tools, to be used by bo
 It will take precedence over `NUGET_PLUGIN_PATHS`.
 
 The plugins specified in the `NUGET_DOTNET_TOOLS_PLUGIN_PATHS` environment variable will be used regardless of whether the `NUGET_NETFX_PLUGIN_PATHS` or `NUGET_NETCORE_PLUGIN_PATHS` environment variables are set.
-The primary reason for this is that plugins installed as .NET tools can be executed in both .NET Framework and .NET Core tooling.stomIf customers prefer to install NuGet plugins as a [tool-path global tool](https://learn.microsoft.com/dotnet/core/tools/global-tools-how-to-use#use-the-tool-as-a-global-tool-installed-in-a-custom-location), they can set the `NUGET_DOTNET_TOOLS_PLUGIN_PATHS` environment variable.f This variable should point to the location of the .NET Tool executable that the NuGet Client tooling can invoke when needed.noenvironment variable](https://github.com/NuGet/NuGet.Client/blob/dev/src/NuGet.Clients/NuGet.CommandLine/MsBuildUtility.cs#L708-L736) to locate `msbuild.exe`.
-Considering that different platforms handle file casing in various ways, the implementation could convert all file names to lower case before checking if the file name begins with `nuget-plugin-*`.
+The primary reason for this is that plugins installed as .NET tools can be executed in both .NET Framework and .NET Core tooling.
+If customers prefer to install NuGet plugins as a [tool-path global tool](https://learn.microsoft.com/dotnet/core/tools/global-tools-how-to-use#use-the-tool-as-a-global-tool-installed-in-a-custom-location), they can set the `NUGET_DOTNET_TOOLS_PLUGIN_PATHS` environment variable.This variable should point to the location of the .NET Tool executable that the NuGet Client tooling can invoke when needed.
+Considering the varying ways different platforms handle file casing, the implementation could convert all file names to lowercase before checking for a file.
+Specifically, it should look for files whose names begin with `nuget-plugin-*` by scanning all the directories in the PATH environment variable.
 On Windows, NuGet should search for files with the `.exe` extension. On other platforms, it should look for files with the executable bit set.
+`NuGet.exe` currently [scans all directories in the PATH environment variable](https://github.com/NuGet/NuGet.Client/blob/dev/src/NuGet.Clients/NuGet.CommandLine/MsBuildUtility.cs#L708-L736) to find `MSBuild.exe`.
 
 #### Plugin execution
 
