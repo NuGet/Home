@@ -443,7 +443,8 @@ This cost serves as a deterrent for writing non-.NET plugins.
 
 ### Improve the discoverability of NuGet plugins published as .NET Tools
 
-- Currently, the `dotnet pack` command ignores the `PackageType` property when the `PackAsTool` property is set to true.
-This behavior might be due to the fact that `CredentialProvider` is not a recognized `PackageType`.
-If the `dotnet pack` command could generate a .nupkg for .NET Tool with multiple package types, which are found in the `.nuspec` metadata file, then we could introduce a new `dotnet nuget plugin search` command. 
-This command would act as a wrapper for the `dotnet tool search` command, but it would also filter the results based on the additional package type.
+- At present, the `dotnet pack` command disregards the `PackageType` property when the `PackAsTool` property is set to true.
+This might be because the new package type, `CredentialProvider`, which I added to the .csproj file, is not a recognized [`PackageType`](https://github.com/NuGet/NuGet.Client/blob/cecbc9a1f7a5cd0ea0a62dea2523f740bbd078d3/src/NuGet.Core/NuGet.Packaging/Core/PackageType.cs#L15-L20).
+If the `dotnet pack` command could generate a .nupkg for .NET Tool with multiple package types, we could introduce a new `dotnet nuget plugin search` command.
+This command would act as a wrapper for the `dotnet tool search` command, further refining the results based on the additional package type, such as `CredentialProvider`.
+These package types can be found in the `.nuspec` metadata file of the generated nupkg.
