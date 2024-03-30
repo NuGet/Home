@@ -26,10 +26,15 @@ Currently, NuGet maintains `netfx` folder for plugins that will be invoked in `.
 | .NET Core | %UserProfile%/.nuget/plugins/netcore |
 | .NET Framework | %UserProfile%/.nuget/plugins/netfx |
 
-This proposal introduces a new workflow for both plugin authors and consumers:
-- Plugin authors will now have the ability to publish their NuGet plugins as .NET Tools.
+This proposal introduces a new workflow for plugin authors, consumers, and NuGet Client tooling:
+- Plugin authors will now be able to publish their NuGet plugins as .NET Tools.
+The only requirement is that the .NET Tool command name should begin with `nuget-plugin-`.
 - Consumers can install these NuGet plugins as [global .NET tools](https://learn.microsoft.com/dotnet/core/tools/global-tools-how-to-use#use-the-tool-as-a-global-tool).
-Upon installation, these global .NET tools are added to the PATH. This allows NuGet to easily determine which file in the package should be run at runtime.
+- Upon installation, these global .NET tools are added to the PATH by the .NET SDK.
+This allows NuGet to easily determine which file in the package should be run at runtime.
+It does this by scanning the `PATH` environment variable for plugins whose file name begins with `nuget-plugin-`.
+On Windows, NuGet will look for plugins with a `.exe` extension, whereas on Linux/Mac, it will look for plugins with the executable bit set.
+These plugins are launched in a separate process, which aligns with the current design.
 
 ## Motivation
 
@@ -128,9 +133,9 @@ It also simplifies the installation process by removing the necessity for plugin
 
 To distribute a NuGet cross platform plugin as a .NET Tool, plugin authors need to follow these steps:
 
-  - Follow [NuGet cross platform plugins](https://learn.microsoft.com/nuget/reference/extensibility/nuget-cross-platform-plugins) guidance.
-  - Ensure that the NuGet package name or the `ToolCommandName` property value begins with `nuget-plugin-*`.
-  - Execute `dotnet pack` to generate the package.
+- Follow [NuGet cross platform plugins](https://learn.microsoft.com/nuget/reference/extensibility/nuget-cross-platform-plugins) guidance.
+- Ensure that the .NET Tool command name begins with `nuget-plugin-*`.
+- Execute `dotnet pack` to generate the package.
 
 ```xml
   <PackAsTool>true</PackAsTool>  
@@ -176,17 +181,28 @@ The plugins specified in the `NUGET_DOTNET_TOOLS_PLUGIN_PATHS` environment varia
 The primary reason for this is that plugins installed as .NET tools can be executed in both .NET Framework and .NET Core tooling.
 If customers prefer to install NuGet plugins as a [tool-path global tool](https://learn.microsoft.com/dotnet/core/tools/global-tools-how-to-use#use-the-tool-as-a-global-tool-installed-in-a-custom-location), they can set the `NUGET_DOTNET_TOOLS_PLUGIN_PATHS` environment variable.This variable should point to the location of the .NET Tool executable that the NuGet Client tooling can invoke when needed.
 
-Considering the varying ways different platforms handle file casing, the implementation could convert all file names to lowercase before checking for a file.
-Specifically, it should look for files whose names begin with `nuget-plugin-*` by scanning all the directories in the PATH environment variable.
-On Windows, NuGet should search for files with the `.exe` extension. On other platforms, it should look for files with the executable bit set.
-`NuGet.exe` currently [scans all directories in the PATH environment variable](https://github.com/NuGet/NuGet.Client/blob/dev/src/NuGet.Clients/NuGet.CommandLine/MsBuildUtility.cs#L708-L736) to find `MSBuild.exe`.
+NuGet should search for files whose names begin with `nuget-plugin-*` by scanning all the directories in the `PATH` environment variable.
+To ensure compatibility across different platforms, the implementation could convert all file names to lowercase before checking for a file.
+
+- On Windows, NuGet should search for plugins using the `.exe` extension.
+The `PATHEXT` environment variable in Windows specifies the file extensions that the operating system considers to be executable.
+When you enter a command without specifying an extension, Windows will look for files with the extensions listed in `PATHEXT` in the directories specified by the `PATH` environment variable.
+For example, if `PATHEXT` is set to `.COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.MSC`, and you enter the command `myprogram`, Windows will search for `myprogram.com`, `myprogram.exe`, `myprogram.bat`, and so on, in that order, in the directories listed in your `PATH` environment variable.
+It will execute the first match it finds.
+Given that .NET Tools are console applications, they should have the `.exe` extension on Windows to be considered valid plugins if the naming convention is followed.
+
+- Similarly, on other platforms, NuGet should search for plugins with the executable bit set to identify them as valid plugins.
+This is because on Mac and Linux, executable files typically don't have extensions.
+Given that .NET Tools, when installed on Linux and Mac, have a native shim with an executable bit set, they should be considered valid plugins if the naming convention is followed.
+
+Currently, `NuGet.exe` [scans all directories in the `PATH` environment variable](https://github.com/NuGet/NuGet.Client/blob/dev/src/NuGet.Clients/NuGet.CommandLine/MsBuildUtility.cs#L708-L736) to find `MSBuild.exe`.
 
 #### Plugin execution
 
 In the [current implementation](https://github.com/NuGet/NuGet.Client/blob/dev/src/NuGet.Core/NuGet.Protocol/Plugins/PluginFactory.cs#L155-L181), NuGet launches the `.exe` file in a separate process when running on the .NET Framework.
 On the other hand, when running on .NET, NuGet executes the `dotnet plugin-in.dll` command in a separate process.
 
-The plan is to slightly adjust this implementation. NuGet will launch the `.exe` file in a separate process when running on Windows, irrespective of whether the runtime is .NET Framework or .NET. 
+The plan is to slightly adjust this implementation. NuGet will launch the `.exe` file in a separate process when running on Windows, irrespective of whether the runtime is .NET Framework or .NET.
 For non-Windows platforms, if the file does not have an extension, it will launch the executable directly in a separate process.
 If the file has a `.dll` extension, it will continue to execute the `dotnet nuget-plugin-name.dll` command in a separate process.
 
@@ -206,6 +222,10 @@ See the `Future Possibilities` section for more details.
 
 - The discoverability of NuGet plugins published as .NET Tools is challenging for users because the `dotnet tool search` command only filters based on the `PackageType` being `DotnetTool`.
 Please refer to the `Future Possibilities` section for more related information.
+
+- On Windows, NuGet searches for plugins using the `.exe` extension.
+This is the case even though Windows recognizes all extensions configured in `PATHEXT` as executables.
+For more information, please refer to the `Future Possibilities` section.
 
 ## Rationale and alternatives
 
@@ -266,7 +286,7 @@ However, NuGet plugins and .NET tools share the similarity of being console appl
 This approach is similar to the alternative design that [Andy Zivkovic](https://github.com/zivkan) kindly proposed in [[Feature]: Make NuGet credential providers installable via the dotnet cli](https://github.com/NuGet/Home/issues/11325).
 The recommendation was developing a command like `dotnet nuget credential-provider install Microsoft.Azure.Artifacts.CredentialProvider`.
 
-### Technical explanation
+#### Technical explanation
 
 If none of the above environment variables are set, NuGet will default to the conventional method of discovering plugins from predefined directories.
 In the [current implementation](https://github.com/NuGet/NuGet.Client/blob/8b658e2eee6391936887b9fd1b39f7918d16a9cb/src/NuGet.Core/NuGet.Protocol/Plugins/PluginDiscoveryUtility.cs#L65-L77), the NuGet code looks for plugin files in the `netfx` directory when running on .NET Framework, and in the `netcore` directory when running on .NET Core. This implementation should be updated to include the new `any` directory.
@@ -327,7 +347,7 @@ drwxr-xr-x 5 {user}  4096 Feb 10 08:21 .store
 **Disadvantages:**
 
 - The ideal workflow for repositories accessing private NuGet feeds, such as Azure DevOps, is to easily search for NuGet plugins and install them as global tool.
-However, this approach suggests installing the plugin as a tool-path .NET tool. 
+However, this approach suggests installing the plugin as a tool-path .NET tool.
 Customers can opt to install NuGet plugins as a global tool instead of a tool-path tool.
 To do this, they need to set the `NUGET_DOTNET_TOOLS_PLUGIN_PATHS` environment variable.
 This variable should point to the location of the .NET Tool executable, which the NuGet Client tooling can invoke when needed.
@@ -448,3 +468,27 @@ This might be because the new package type, `CredentialProvider`, which I added 
 If the `dotnet pack` command could generate a .nupkg for .NET Tool with multiple package types, we could introduce a new `dotnet nuget plugin search` command.
 This command would act as a wrapper for the `dotnet tool search` command, further refining the results based on the additional package type, such as `CredentialProvider`.
 These package types can be found in the `.nuspec` metadata file of the generated nupkg.
+
+### Support for other extensions on Windows.
+
+- In the future, we could consider supporting extensions other than `.exe` configured in `PATHEXT` as executables.
+To achieve this, NuGet would need to identify the correct executable or interpretter to run a particular file.
+For example, to execute a PowerShell script, NuGet would need to launch the process as shown below.
+However, the challenge lies in identifying the appropriate executable for each type of file, which is not an immediate requirement.
+
+```cs
+var processInfo = new System.Diagnostics.ProcessStartInfo
+{
+    FileName = "powershell.exe",
+    Arguments = @"& 'C:\Path\To\Your\Script.ps1'",
+    RedirectStandardOutput = true,
+    UseShellExecute = false,
+    CreateNoWindow = true
+};
+
+var process = System.Diagnostics.Process.Start(processInfo);
+
+// To read the output (if any):
+string output = process.StandardOutput.ReadToEnd();
+process.WaitForExit();
+```
