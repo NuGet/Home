@@ -27,6 +27,7 @@ Currently, NuGet maintains `netfx` folder for plugins that will be invoked in `.
 | .NET Framework | %UserProfile%/.nuget/plugins/netfx |
 
 This proposal introduces a new workflow for plugin authors, consumers, and NuGet Client tooling:
+
 - Plugin authors will now be able to publish their NuGet plugins as .NET Tools.
 The only requirement is that the .NET Tool command name should begin with `nuget-plugin-`.
 - Consumers can install these NuGet plugins as [global .NET tools](https://learn.microsoft.com/dotnet/core/tools/global-tools-how-to-use#use-the-tool-as-a-global-tool).
@@ -469,7 +470,7 @@ If the `dotnet pack` command could generate a .nupkg for .NET Tool with multiple
 This command would act as a wrapper for the `dotnet tool search` command, further refining the results based on the additional package type, such as `CredentialProvider`.
 These package types can be found in the `.nuspec` metadata file of the generated nupkg.
 
-### Support for other extensions on Windows.
+### Support for other extensions on Windows
 
 - In the future, we could consider supporting extensions other than `.exe` configured in `PATHEXT` as executables.
 To achieve this, NuGet would need to identify the correct executable or interpretter to run a particular file.
