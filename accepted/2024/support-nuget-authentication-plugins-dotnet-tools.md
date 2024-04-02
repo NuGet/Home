@@ -53,10 +53,8 @@ For instance, let's consider the two cross-platform authentication plugins that 
 2. **AWS CodeArtifact Credential Provider** - The AWS team has developed a [.NET tool](https://docs.aws.amazon.com/codeartifact/latest/ug/nuget-cli.html#nuget-configure-cli) to facilitate authentication with their private NuGet feeds.
 In their current implementation, they've added a subcommand, `codeartifact-creds install`, which copies the credential provider to the NuGet plugins folder.
 The log below shows all possible subcommands.
-However, plugin authors could leverage the .NET SDK to allow their customers to install, uninstall, or update the NuGet plugins more efficiently.
 
 ```log
-~\.nuget\plugins\any
 ❯ .\dotnet-codeartifact-creds.exe
 Required command was not provided.
 
@@ -72,6 +70,8 @@ Commands:
   configure    Sets or Unsets a configuration
   uninstall    Uninstalls the AWS CodeArtifact NuGet credential provider from the NuGet plugins folder.
 ```
+
+NuGet plugin authors could leverage the .NET SDK to allow their customers to install, uninstall, or update the plugins more efficiently.
 
 ## Explanation
 
