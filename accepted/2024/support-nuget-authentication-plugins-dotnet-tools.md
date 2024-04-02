@@ -221,16 +221,16 @@ If the `dotnet tool` started writing non-executable files into the directory, it
 The reason for this is that running a local tool requires the invocation of the `dotnet tool run` command.
 However, in the current design, we have considered launching the .NET tool executable in a separate process without relying on the said command.
 
-- The IPC (Inter-Process Communication) used by NuGet is custom-made, and it would be beneficial for plugin implementers if it were based on industry standards.
-This serves as a deterrent for developing NuGet plugins in non-.NET languages.
-See the `Future Possibilities` section for more details.
-
 - The discoverability of NuGet plugins published as .NET Tools is challenging for users because the `dotnet tool search` command only filters based on the `PackageType` being `DotnetTool`.
 Please refer to the `Future Possibilities` section for more related information.
 
 - On Windows, NuGet searches for plugins using the `.exe` extension.
 This is the case even though Windows recognizes all extensions configured in `PATHEXT` as executables.
 For more information, please refer to the `Future Possibilities` section.
+
+- The IPC (Inter-Process Communication) used by NuGet is custom-made, and it would be beneficial for plugin implementers if it were based on industry standards.
+This serves as a deterrent for developing NuGet plugins in non-.NET languages.
+See the `Future Possibilities` section for more details.
 
 ## Rationale and alternatives
 
