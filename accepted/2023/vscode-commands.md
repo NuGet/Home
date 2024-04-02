@@ -162,7 +162,7 @@ Once the user makes this selection, if necessary, the package version number wil
 
 ### Authentication to private feeds
 
-If the user is attempting to perform a package operation on a package from an Azure Artifacts that requires the user to sign-in and authenticate their credentials, they will receive a toast, pictured below:
+If the user is attempting to perform a package operation on a package from an Azure Artifacts feed that requires the user to sign-in and authenticate their credentials, they will receive a toast, pictured below:
 
 ![Alt text](../../meta/resources/vscode-commands/azdo-feeds1.png)
 
