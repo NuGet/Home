@@ -41,7 +41,7 @@ These plugins are launched in a separate process, which aligns with the current 
 
 Currently, the NuGet plugin architecture requires support and deployment of multiple versions.
 For `.NET Framework`, NuGet searches for files ending in `*.exe`, while for `.NET Core`, it searches for files ending in `*.dll`.
-These files are typically stored in two distinct folders such as `netfx` and `netcore` under the NuGet plugins base path.
+These files are stored in two distinct folders, `netfx` and `netcore`, under the NuGet plugins base path.
 This design decision is due to the different entry points for `.NET Core` and `.NET Framework`, as explained in the [original design](https://github.com/NuGet/Home/wiki/NuGet-cross-plat-authentication-plugin#plugin-installation-and-discovery).
 `.NET Core` uses files with a `dll` extension, while `.NET Framework` uses files with an `exe` extension as entry points.
 This distinction is further highlighted by the two plugin path environment variables, `NUGET_NETFX_PLUGIN_PATHS` and `NUGET_NETCORE_PLUGIN_PATHS`, which must be set for each framework type.
@@ -150,9 +150,11 @@ The proposed workflow for repositories that access private NuGet feeds, such as 
 
 1. Ensure that the .NET SDK is installed.
 1. Execute the command `dotnet tool install -g Microsoft.CredentialProvider`.
-1. Run `dotnet restore --interactive` with a private endpoint. It should 'just work', meaning the credential providers installed in step 2 are used during credential acquisition and are used to authenticate against private endpoints.
+1. Run `dotnet restore --interactive` with a private endpoint.
+    It should 'just work', meaning the credential providers installed in step 2 are used during credential acquisition and are used to authenticate against private endpoints.
 
-Upon installation, these global .NET tools are added to the PATH. This allows NuGet to easily determine which file in the package should be run at runtime.
+Upon installation, these global .NET tools are added to the PATH.
+This allows NuGet to easily determine which file in the package should be run at runtime.
 
 ### Security considerations
 
@@ -180,7 +182,8 @@ It will take precedence over `NUGET_PLUGIN_PATHS`.
 
 The plugins specified in the `NUGET_DOTNET_TOOLS_PLUGIN_PATHS` environment variable will be used regardless of whether the `NUGET_NETFX_PLUGIN_PATHS` or `NUGET_NETCORE_PLUGIN_PATHS` environment variables are set.
 The primary reason for this is that plugins installed as .NET tools can be executed in both .NET Framework and .NET Core tooling.
-If customers prefer to install NuGet plugins as a [tool-path global tool](https://learn.microsoft.com/dotnet/core/tools/global-tools-how-to-use#use-the-tool-as-a-global-tool-installed-in-a-custom-location), they can set the `NUGET_DOTNET_TOOLS_PLUGIN_PATHS` environment variable.This variable should point to the location of the .NET Tool executable that the NuGet Client tooling can invoke when needed.
+If customers prefer to install NuGet plugins as a [tool-path global tool](https://learn.microsoft.com/dotnet/core/tools/global-tools-how-to-use#use-the-tool-as-a-global-tool-installed-in-a-custom-location), they can set the `NUGET_DOTNET_TOOLS_PLUGIN_PATHS` environment variable.
+This variable should point to the location of the .NET Tool executable that the NuGet Client tooling can invoke when needed.
 
 NuGet should search for files whose names begin with `nuget-plugin-*` by scanning all the directories in the `PATH` environment variable.
 To ensure compatibility across different platforms, the implementation could convert all file names to lowercase before checking for a file.
@@ -203,7 +206,8 @@ Currently, `NuGet.exe` [scans all directories in the `PATH` environment variable
 In the [current implementation](https://github.com/NuGet/NuGet.Client/blob/dev/src/NuGet.Core/NuGet.Protocol/Plugins/PluginFactory.cs#L155-L181), NuGet launches the `.exe` file in a separate process when running on the .NET Framework.
 On the other hand, when running on .NET, NuGet executes the `dotnet plugin-in.dll` command in a separate process.
 
-The plan is to slightly adjust this implementation. NuGet will launch the `.exe` file in a separate process when running on Windows, irrespective of whether the runtime is .NET Framework or .NET.
+The plan is to slightly adjust this implementation.
+NuGet will launch the `.exe` file in a separate process when running on Windows, irrespective of whether the runtime is .NET Framework or .NET.
 For non-Windows platforms, if the file does not have an extension, it will launch the executable directly in a separate process.
 If the file has a `.dll` extension, it will continue to execute the `dotnet nuget-plugin-name.dll` command in a separate process.
 
