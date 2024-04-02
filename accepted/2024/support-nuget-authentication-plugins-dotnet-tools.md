@@ -217,6 +217,10 @@ It launches one provider at a time, and if that provider successfully returns th
 - There is some risk of the `dotnet tool` introducing breaking changes that could negatively impact NuGet.
 If the `dotnet tool` started writing non-executable files into the directory, it would affect how NuGet discovers and runs plugins at runtime.
 
+- This approach doesn't support the installation of NuGet plugins as a [.NET local tool](https://learn.microsoft.com/en-us/dotnet/core/tools/local-tools-how-to-use).
+The reason for this is that running a local tool requires the invocation of the `dotnet tool run` command.
+However, in the current design, we have considered launching the .NET tool executable in a separate process without relying on the said command.
+
 - The IPC (Inter-Process Communication) used by NuGet is custom-made, and it would be beneficial for plugin implementers if it were based on industry standards.
 This serves as a deterrent for developing NuGet plugins in non-.NET languages.
 See the `Future Possibilities` section for more details.
