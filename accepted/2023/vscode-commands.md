@@ -162,13 +162,13 @@ Once the user makes this selection, if necessary, the package version number wil
 
 ### Authentication to private feeds
 
-If the user is attempting to perform a package operation on a package from a source other than NuGet.org that requires the user to sign-in and authenticate their credentials, they will receive a toast, pictured below:
+If the user is attempting to perform a package operation on a package from an Azure Artifacts that requires the user to sign-in and authenticate their credentials, they will receive a toast, pictured below:
 
-![Alt text](../../meta/resources/vscode-commands/privatefeeds1.png)
+![Alt text](../../meta/resources/vscode-commands/azdo-feeds1.png)
 
-When the user clicks the Sign-In button, a browser window will open, and the user will have 90 seconds to sign in and verify their credentials.
+When the user clicks the Show login instructions button, the NuGet output window will open, and the user will have 90 seconds to sign in and verify their credentials.
 
-![Alt text](../../meta/resources/vscode-commands/privatefeeds2.png)
+![Alt text](../../meta/resources/vscode-commands/azdo-feeds2.png)
 
 If the user fails to accomplish this within the time constraint provided, the operation will fail and they will have to retry from the beginning. If the user doesn’t sign-in in time, or at all, and the operation fails, they will receive a toast alerting them of this.
 
