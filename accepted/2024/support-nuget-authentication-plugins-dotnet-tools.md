@@ -220,6 +220,7 @@ If the `dotnet tool` started writing non-executable files into the directory, it
 - This approach doesn't support the installation of NuGet plugins as a [.NET local tool](https://learn.microsoft.com/en-us/dotnet/core/tools/local-tools-how-to-use).
 The reason for this is that running a local tool requires the invocation of the `dotnet tool run` command.
 However, in the current design, we have considered launching the .NET tool executable in a separate process without relying on the said command.
+See the `Future Possibilities` section for more details.
 
 - The discoverability of NuGet plugins published as .NET Tools is challenging for users because the `dotnet tool search` command only filters based on the `PackageType` being `DotnetTool`.
 Please refer to the `Future Possibilities` section for more related information.
