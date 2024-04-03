@@ -24,4 +24,4 @@ jobs:
       - name: Run IceBox Watcher
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: GithubIssueTagger IceBox --add "Triage:NeedsTriageDiscussion"
+        run: GithubIssueTagger IceBox --add "Triage:NeedsTriageDiscussion" --label "Priority:3"
