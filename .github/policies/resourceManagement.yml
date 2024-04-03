@@ -115,7 +115,7 @@ configuration:
       - isNotLabeledWith:
           label: missing-required-type
       - isNotLabeledWith:
-          label: Pipeline:Icebox
+          label: Priority:3
       - isNotLabeledWith:
           label: Epic
       actions:
