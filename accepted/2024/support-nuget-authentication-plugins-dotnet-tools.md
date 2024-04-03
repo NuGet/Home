@@ -142,6 +142,7 @@ This allows NuGet to easily determine which file in the package should be run at
 
 The [.NET SDK docs](https://learn.microsoft.com/dotnet/core/tools/global-tools#check-the-author-and-statistics) clearly state, `.NET tools run in full trust. Don't install a .NET tool unless you trust the author`.
 This is an important consideration for plugin customers when installing NuGet plugins via .NET Tools in the future.
+It's worth noting that this is not a new concern; it applies equally to existing NuGet plugins that use the `netfx` and `netcore` layout.
 
 ### Technical explanation
 
