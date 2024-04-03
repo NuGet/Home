@@ -165,13 +165,19 @@ Since this specification proposes a new plugin discovery and execution mechanism
 For example, if customers prefer to install NuGet plugins as a [tool-path global tool](https://learn.microsoft.com/dotnet/core/tools/global-tools-how-to-use#use-the-tool-as-a-global-tool-installed-in-a-custom-location), they can set the `NUGET_PLUGIN_PATHS` environment variable.
 This variable should point to the location of the .NET Tool executable.
 
+If none of the above environment variables are set, NuGet will default to the conventional method of discovering plugins from predefined directories.
+In the [current implementation](https://github.com/NuGet/NuGet.Client/blob/8b658e2eee6391936887b9fd1b39f7918d16a9cb/src/NuGet.Core/NuGet.Protocol/Plugins/PluginDiscoveryUtility.cs#L65-L77), the NuGet code looks for plugin files in the `netfx` directory when running on .NET Framework, and in the `netcore` directory when running on .NET Core.
+
+In the [current implementation](https://github.com/NuGet/NuGet.Client/blob/dev/src/NuGet.Core/NuGet.Protocol/Plugins/PluginDiscoveryUtility.cs#L79-L101), the NuGet code searches for plugin files in a plugin-specific subdirectory.
+For example, in the case of the Azure Artifacts Credential Provider, the code looks for `*.exe` or `*.dll` files under the "CredentialProvider.Microsoft" directory.
+
 NuGet should search for files whose names begin with `nuget-plugin-*` by scanning all the directories in the `PATH` environment variable.
 To ensure compatibility across different platforms, the implementation could convert all file names to lowercase before checking for a file.
 
 - On Windows, NuGet searches for plugins using the `.exe` or `.bat` extension.
 Since .NET Tools are console applications, they should have the `.exe` extension on Windows to be considered valid plugins if the naming convention is followed.
 However, NuGet does not support all possible extensions recognized by Windows in the `PATHEXT` configuration, such as `.vbs` and `.js` files.
-Instead, NuGet runs batch files (.bat extension) in a separate process, allowing customers to invoke other scripts from the batch file.
+Instead, NuGet will launch batch files (.bat extension) in a separate process, allowing customers to invoke other scripts from the batch file.
 When launching a process from C# code, if `Process.UseShellExecute` is set to `true`, Windows can launch files with their associated programs but does not support console input/output redirection, which is necessary for NuGet's communication with plugins.
 When set to `false`, the `CreateProcess` function is used to start the process directly from the executable file.
 This information is relevant in case we consider supporting other extensions in the future.
@@ -190,7 +196,10 @@ On the other hand, when running on .NET, NuGet executes the `dotnet plugin-in.dl
 The plan is to slightly adjust this implementation.
 NuGet will launch the `.exe` file in a separate process when running on Windows, irrespective of whether the runtime is .NET Framework or .NET.
 For non-Windows platforms, if the file does not have an extension, it will launch the executable directly in a separate process.
-If the file has a `.dll` extension, it will continue to execute the `dotnet nuget-plugin-name.dll` command in a separate process.
+If the file has a `.dll` extension, it will continue to execute the `dotnet plugin-name.dll` command in a separate process.
+It is worth noting that a plugin with a `.dll` extension will only be executed using the dotnet CLI if the file is located under the NuGet plugin-specific `netcore` subdirectory.
+This is to support backward compatibility with the NuGet plugins discovered from predefined plugin directories.
+As mentioned above, during PATH scanning, NuGet searches only for plugins with `.exe` or `.bat` extensions on Windows, and for files with the executable bit set on Linux/Mac.
 
 NuGet is designed to launch credential provider plugins sequentially, not simultaneously.
 This is to avoid multiple authentication prompts from different plugins at the same time.
@@ -198,9 +207,6 @@ If a customer has installed both the legacy and the new .NET Tool credential pro
 It launches one provider at a time, and if that provider successfully returns the credentials for the feed, NuGet will not need to invoke the other provider for the same feed.
 
 ## Drawbacks
-
-- There is some risk of the `dotnet tool` introducing breaking changes that could negatively impact NuGet.
-If the `dotnet tool` started writing non-executable files into the directory, it would affect how NuGet discovers and runs plugins at runtime.
 
 - This approach doesn't support the installation of NuGet plugins as a [.NET local tool](https://learn.microsoft.com/en-us/dotnet/core/tools/local-tools-how-to-use).
 The reason for this is that running a local tool requires the invocation of the `dotnet tool run` command.
@@ -218,7 +224,7 @@ See the `Future Possibilities` section for more details.
 
 ### Installing NuGet plugins as tool-path .NET Tools
 
-#### Functional explanation
+**Functional explanation:**
 
 The proposed workflow for repositories that access private NuGet feeds, such as Azure DevOps, would be:
 
@@ -273,16 +279,7 @@ However, NuGet plugins and .NET tools share the similarity of being console appl
 This approach is similar to the alternative design that [Andy Zivkovic](https://github.com/zivkan) kindly proposed in [[Feature]: Make NuGet credential providers installable via the dotnet cli](https://github.com/NuGet/Home/issues/11325).
 The recommendation was developing a command like `dotnet nuget credential-provider install Microsoft.Azure.Artifacts.CredentialProvider`.
 
-#### Technical explanation
-
-If none of the above environment variables are set, NuGet will default to the conventional method of discovering plugins from predefined directories.
-In the [current implementation](https://github.com/NuGet/NuGet.Client/blob/8b658e2eee6391936887b9fd1b39f7918d16a9cb/src/NuGet.Core/NuGet.Protocol/Plugins/PluginDiscoveryUtility.cs#L65-L77), the NuGet code looks for plugin files in the `netfx` directory when running on .NET Framework, and in the `netcore` directory when running on .NET Core. This implementation should be updated to include the new `any` directory.
-This directory should be added alongside `netcore` in the .NET code paths and `netfx` in the .NET Framework code paths, to ensure backward compatibility.
-
-In the [current implementation](https://github.com/NuGet/NuGet.Client/blob/dev/src/NuGet.Core/NuGet.Protocol/Plugins/PluginDiscoveryUtility.cs#L79-L101), the NuGet code searches for plugin files in a plugin-specific subdirectory.
-For example, in the case of the Azure Artifacts Credential Provider, the code looks for `*.exe` or `*.dll` files under the "CredentialProvider.Microsoft" directory.
-However, when .NET tools are installed in the `any` folder, executable files (like `.exe` files on Windows or files with the executable bit set on Linux & Mac) are placed directly in the `any` directory.
-The remaining files are stored in a `.store` folder. This arrangement eliminates the need to search in subdirectories.
+**Technical explanation:**
 
 NuGet will discover plugins in the new directory by enumerating files, without recursing into child directories.
 This is compatible with the layout that `dotnet tool install` uses, where packages are extracted to a `.store` subdirectory, and shims are put in the tool directory, one file per executable command.
@@ -352,13 +349,13 @@ They will specify the plugin's path based on their operating system. We will mak
 However, we will still rely on the `dotnet tool` command under the hood, as mentioned above.
 Please note that these command names are subject to change based on feedback to the specification we are going to create in the near future.
 
-#### Prior art
+#### Background information
 
 - The `dotnet workload` command is separate and has its own set of sub-commands, including `install`, `uninstall`, and `list`.
 These sub-commands are wrappers for the corresponding `dotnet tool` sub-commands.
 Workloads are installed in a different location than .NET tools, which makes it easier for them to be discovered at runtime, addressing a problem that NuGet also faces.
 However, NuGet plugins and .NET tools share the similarity of being console applications.
-This prior art will be helpful for us as we consider the implementation of the `dotnet nuget plugin install/uninstall/update/search` commands.
+This background information will be helpful if we decide to implement the `dotnet nuget plugin install/uninstall/update/search` commands in the future.
 
 ### Specify the the authentication plugin in NuGet.Config file
 
