@@ -168,8 +168,13 @@ This variable should point to the location of the .NET Tool executable.
 NuGet should search for files whose names begin with `nuget-plugin-*` by scanning all the directories in the `PATH` environment variable.
 To ensure compatibility across different platforms, the implementation could convert all file names to lowercase before checking for a file.
 
-- On Windows, NuGet should search for plugins using the `.exe` or `.bat` extension.
-Given that .NET Tools are console applications, they should have the `.exe` extension on Windows to be considered valid plugins if the naming convention is followed.
+- On Windows, NuGet searches for plugins using the `.exe` or `.bat` extension.
+Since .NET Tools are console applications, they should have the `.exe` extension on Windows to be considered valid plugins if the naming convention is followed.
+However, NuGet does not support all possible extensions recognized by Windows in the `PATHEXT` configuration, such as `.vbs` and `.js` files.
+Instead, NuGet runs batch files (.bat extension) in a separate process, allowing customers to invoke other scripts from the batch file.
+When launching a process from C# code, if `Process.UseShellExecute` is set to `true`, Windows can launch files with their associated programs but does not support console input/output redirection, which is necessary for NuGet's communication with plugins.
+When set to `false`, the `CreateProcess` function is used to start the process directly from the executable file.
+This information is relevant in case we consider supporting other extensions in the future.
 
 - Similarly, on other platforms, NuGet should search for plugins with the executable bit set to identify them as valid plugins.
 This is because on Mac and Linux, executable files typically don't have extensions.
@@ -204,10 +209,6 @@ See the `Future Possibilities` section for more details.
 
 - The discoverability of NuGet plugins published as .NET Tools is challenging for users because the `dotnet tool search` command only filters based on the `PackageType` being `DotnetTool`.
 Please refer to the `Future Possibilities` section for more related information.
-
-- On Windows, NuGet searches for plugins using the `.exe` extension.
-This is the case even though Windows recognizes all extensions configured in `PATHEXT` as executables.
-For more information, please refer to the `Future Possibilities` section.
 
 - The IPC (Inter-Process Communication) used by NuGet is custom-made, and it would be beneficial for plugin implementers if it were based on industry standards.
 This serves as a deterrent for developing NuGet plugins in non-.NET languages.
@@ -454,40 +455,3 @@ This might be because the new package type, `CredentialProvider`, which I added 
 If the `dotnet pack` command could generate a .nupkg for .NET Tool with multiple package types, we could introduce a new `dotnet nuget plugin search` command.
 This command would act as a wrapper for the `dotnet tool search` command, further refining the results based on the additional package type, such as `CredentialProvider`.
 These package types can be found in the `.nuspec` metadata file of the generated nupkg.
-
-### Support for other extensions on Windows
-
-- In the future, we could consider supporting extensions other than `.exe` and `.bat` as executables, which are currently configured in the `PATHEXT` environment variable in Windows.
-The `PATHEXT` variable specifies the file extensions that the operating system recognizes as executable.
-When a command is entered without specifying an extension, Windows searches for files with extensions listed in `PATHEXT` in the directories specified by the `PATH` environment variable.
-For example, if `PATHEXT` includes `.COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.MSC`, and the command is `myprogram`, Windows will search for `myprogram.com`, `myprogram.exe`, `myprogram.bat`, and so on, in that order, in the directories listed in the `PATH` variable.
-It will execute the first match it finds.
-To support other extensions, NuGet would need to identify the appropriate executable or interpreter to run a specific file.
-For example, to execute a JavaScript file, NuGet would need to launch the process as shown below.
-However, the challenge lies in determining the correct executable for each file type, which is not currently a priority.
-
-```cs
-var processInfo = new System.Diagnostics.ProcessStartInfo
-{
-    FileName = "node.exe", // Assuming "node.exe" is in the system PATH
-    Arguments = "nuget-plugin-credprovider.js", // Specify the JavaScript file to run
-    RedirectStandardOutput = true,
-    UseShellExecute = false,
-    CreateNoWindow = true
-};
-
-var process = System.Diagnostics.Process.Start(processInfo);
-
-// To read the output (if any):
-string output = process.StandardOutput.ReadToEnd();
-process.WaitForExit();
-```
-
-- The `ShellExecute` API can launch files but doesn't support console input/output redirection, which is necessary for NuGet's communication with plugins.
-On the other hand, the `CreateProcess` API can only launch native executables.
-The `UseShellExecute` property determines how a process is started.
-When set to `true`, the Windows `ShellExecute` function is used, involving the operating system shell.
-This allows opening file types with their associated programs but loses access to input/output streams.
-When set to `false`, the `CreateProcess` function is used to start the process directly from the executable file.
-If `RedirectStandardOutput` is set to `true`, the process output can be directed to the `StandardOutput` stream.
-This information is relevant in case we consider supporting other extensions in the future.
