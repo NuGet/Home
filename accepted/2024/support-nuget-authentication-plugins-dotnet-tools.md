@@ -34,7 +34,7 @@ The only requirement is that the .NET Tool command name should begin with `nuget
 - Upon installation, these global .NET tools are added to the PATH by the .NET SDK.
 This allows NuGet to easily determine which file in the package should be run at runtime.
 It does this by scanning the `PATH` environment variable for plugins whose file name begins with `nuget-plugin-`.
-On Windows, NuGet will look for plugins with a `.exe` extension, whereas on Linux/Mac, it will look for plugins with the executable bit set.
+On Windows, NuGet will look for plugins with a `.exe` or `.bat` extension, whereas on Linux/Mac, it will look for plugins with the executable bit set.
 These plugins are launched in a separate process, which aligns with the current design.
 
 ## Motivation
@@ -159,23 +159,16 @@ This takes precedence over `NUGET_PLUGIN_PATHS`.
 If this environment variable is set, it overrides the convention-based discovery.
 It is ignored if either of the framework-specific variables is specified.
 
-I propose the addition of a `NUGET_DOTNET_TOOLS_PLUGIN_PATHS` environment variable.
-This variable will define the plugins, installed as .NET tools, to be used by both .NET Framework and .NET Core tooling.
-It will take precedence over `NUGET_PLUGIN_PATHS`.
+The `NUGET_NETFX_PLUGIN_PATHS` and `NUGET_NETCORE_PLUGIN_PATHS` environment variables were [introduced](https://github.com/NuGet/Home/issues/8151) to handle the differences in entry points between .NET Framework and .NET Core.
+Since this specification proposes a new plugin discovery and execution mechanism (explained below), customers can use the existing `NUGET_PLUGIN_PATHS` environment variable to define the plugins used by NuGet Client tooling on both .NET Framework and .NET Core.
 
-The plugins specified in the `NUGET_DOTNET_TOOLS_PLUGIN_PATHS` environment variable will be used regardless of whether the `NUGET_NETFX_PLUGIN_PATHS` or `NUGET_NETCORE_PLUGIN_PATHS` environment variables are set.
-The primary reason for this is that plugins installed as .NET tools can be executed in both .NET Framework and .NET Core tooling.
-If customers prefer to install NuGet plugins as a [tool-path global tool](https://learn.microsoft.com/dotnet/core/tools/global-tools-how-to-use#use-the-tool-as-a-global-tool-installed-in-a-custom-location), they can set the `NUGET_DOTNET_TOOLS_PLUGIN_PATHS` environment variable.
-This variable should point to the location of the .NET Tool executable that the NuGet Client tooling can invoke when needed.
+For example, if customers prefer to install NuGet plugins as a [tool-path global tool](https://learn.microsoft.com/dotnet/core/tools/global-tools-how-to-use#use-the-tool-as-a-global-tool-installed-in-a-custom-location), they can set the `NUGET_PLUGIN_PATHS` environment variable.
+This variable should point to the location of the .NET Tool executable.
 
 NuGet should search for files whose names begin with `nuget-plugin-*` by scanning all the directories in the `PATH` environment variable.
 To ensure compatibility across different platforms, the implementation could convert all file names to lowercase before checking for a file.
 
-- On Windows, NuGet should search for plugins using the `.exe` extension.
-The `PATHEXT` environment variable in Windows specifies the file extensions that the operating system considers to be executable.
-When you enter a command without specifying an extension, Windows will look for files with the extensions listed in `PATHEXT` in the directories specified by the `PATH` environment variable.
-For example, if `PATHEXT` is set to `.COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.MSC`, and you enter the command `myprogram`, Windows will search for `myprogram.com`, `myprogram.exe`, `myprogram.bat`, and so on, in that order, in the directories listed in your `PATH` environment variable.
-It will execute the first match it finds.
+- On Windows, NuGet should search for plugins using the `.exe` or `.bat` extension.
 Given that .NET Tools are console applications, they should have the `.exe` extension on Windows to be considered valid plugins if the naming convention is followed.
 
 - Similarly, on other platforms, NuGet should search for plugins with the executable bit set to identify them as valid plugins.
@@ -464,16 +457,20 @@ These package types can be found in the `.nuspec` metadata file of the generated
 
 ### Support for other extensions on Windows
 
-- In the future, we could consider supporting extensions other than `.exe` configured in `PATHEXT` as executables.
-To achieve this, NuGet would need to identify the correct executable or interpretter to run a particular file.
-For example, to execute a PowerShell script, NuGet would need to launch the process as shown below.
-However, the challenge lies in identifying the appropriate executable for each type of file, which is not an immediate requirement.
+- In the future, we could consider supporting extensions other than `.exe` and `.bat` as executables, which are currently configured in the `PATHEXT` environment variable in Windows.
+The `PATHEXT` variable specifies the file extensions that the operating system recognizes as executable.
+When a command is entered without specifying an extension, Windows searches for files with extensions listed in `PATHEXT` in the directories specified by the `PATH` environment variable.
+For example, if `PATHEXT` includes `.COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.MSC`, and the command is `myprogram`, Windows will search for `myprogram.com`, `myprogram.exe`, `myprogram.bat`, and so on, in that order, in the directories listed in the `PATH` variable.
+It will execute the first match it finds.
+To support other extensions, NuGet would need to identify the appropriate executable or interpreter to run a specific file.
+For example, to execute a JavaScript file, NuGet would need to launch the process as shown below.
+However, the challenge lies in determining the correct executable for each file type, which is not currently a priority.
 
 ```cs
 var processInfo = new System.Diagnostics.ProcessStartInfo
 {
-    FileName = "powershell.exe",
-    Arguments = @"& 'C:\Path\To\Your\Script.ps1'",
+    FileName = "node.exe", // Assuming "node.exe" is in the system PATH
+    Arguments = "nuget-plugin-credprovider.js", // Specify the JavaScript file to run
     RedirectStandardOutput = true,
     UseShellExecute = false,
     CreateNoWindow = true
@@ -485,3 +482,12 @@ var process = System.Diagnostics.Process.Start(processInfo);
 string output = process.StandardOutput.ReadToEnd();
 process.WaitForExit();
 ```
+
+- The `ShellExecute` API can launch files but doesn't support console input/output redirection, which is necessary for NuGet's communication with plugins.
+On the other hand, the `CreateProcess` API can only launch native executables.
+The `UseShellExecute` property determines how a process is started.
+When set to `true`, the Windows `ShellExecute` function is used, involving the operating system shell.
+This allows opening file types with their associated programs but loses access to input/output streams.
+When set to `false`, the `CreateProcess` function is used to start the process directly from the executable file.
+If `RedirectStandardOutput` is set to `true`, the process output can be directed to the `StandardOutput` stream.
+This information is relevant in case we consider supporting other extensions in the future.
