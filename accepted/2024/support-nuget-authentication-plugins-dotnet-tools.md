@@ -52,24 +52,6 @@ For instance, let's consider the two cross-platform authentication plugins that 
 1. **Azure Artifacts Credential Provider** - The [setup](https://github.com/microsoft/artifacts-credprovider/tree/master?tab=readme-ov-file#setup) instructions vary based on the platform.
 2. **AWS CodeArtifact Credential Provider** - The AWS team has developed a [.NET tool](https://docs.aws.amazon.com/codeartifact/latest/ug/nuget-cli.html#nuget-configure-cli) to facilitate authentication with their private NuGet feeds.
 In their current implementation, they've added a subcommand, `codeartifact-creds install`, which copies the credential provider to the NuGet plugins folder.
-The log below shows all possible subcommands.
-
-```log
-❯ .\dotnet-codeartifact-creds.exe
-Required command was not provided.
-
-Usage:
-  dotnet-codeartifact-creds [options] [command]
-
-Options:
-  --version         Show version information
-  -?, -h, --help    Show help and usage information
-
-Commands:
-  install      Installs the AWS CodeArtifact NuGet credential provider into the NuGet plugins folder.
-  configure    Sets or Unsets a configuration
-  uninstall    Uninstalls the AWS CodeArtifact NuGet credential provider from the NuGet plugins folder.
-```
 
 NuGet plugin authors could leverage the .NET SDK to allow their customers to install, uninstall, or update the plugins more efficiently.
 
