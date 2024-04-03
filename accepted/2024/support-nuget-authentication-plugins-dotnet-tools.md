@@ -95,7 +95,7 @@ If there is an existing mechanism that works well, is familiar to customers, and
 - Another advantage of this established `.NET tools` approach is that plugin authors won't have to maintain separate code paths for .NET Framework and .NET Core runtimes.
 All these complexities are handled by the .NET SDK by providing a native shim upon the installation of the .NET tool.
 
-Currently, at least to my understanding, the generated `.nupkg` will include a file named `DotnetToolSettings.xml` with additional metadata such as the command name, entry point, and runner.
+The generated `.nupkg` will include a file named `DotnetToolSettings.xml` with additional metadata such as the command name, entry point, and runner.
 
 For example, the [dotnetsay tool](https://nuget.info/packages/dotnetsay/2.1.7) includes the following content:
 
