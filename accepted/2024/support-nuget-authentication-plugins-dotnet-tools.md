@@ -439,6 +439,7 @@ In addition to that, if we ever plan to provide users with an option to manage t
 - The advantage of local tools is that the .NET CLI uses manifest files to keep track of tools that are installed locally to a directory.
 When the manifest file is saved in the root directory of a source code repository, a contributor can clone the repository and invoke a single .NET CLI command such as [`dotnet tool restore`](https://learn.microsoft.com/dotnet/core/tools/dotnet-tool-restore) to install all of the tools listed in the manifest file.
 - Having NuGet plugins under the repository folder eliminates the need for NuGet to load plugins from the user profile.
+- However, the drawback of this approach is that the local tool must be executed using the dotnet CLI since it is not on the PATH.
 
 ### Improve the discoverability of NuGet plugins published as .NET Tools
 
