@@ -36,6 +36,9 @@ This allows NuGet to easily determine which file in the package should be run at
 It does this by scanning the `PATH` environment variable for plugins whose file name begins with `nuget-plugin-`.
 On Windows, NuGet will look for plugins with a `.exe` or `.bat` extension, whereas on Linux/Mac, it will look for plugins with the executable bit set.
 These plugins are launched in a separate process, which aligns with the current design.
+This approach also supports the development of NuGet plugins in non-.NET languages.
+As long as they follow the naming convention mentioned above, have either the .exe or .bat extension in Windows, and have an executable bit set in Linux/Mac, they will be considered valid plugins.
+However, .NET Tools are the recommended approach for developing NuGet plugins.
 
 ## Motivation
 
@@ -65,7 +68,7 @@ The use of .NET tools as a deployment mechanism has been a recurring request fro
 Currently, this solution works for the Windows .NET Framework.
 However, the goal is to extend this support cross-platform for all supported .NET runtimes.
 
-The reasons why `.NET tools` were chosen as the deployment mechanism are mentioned below:
+The reasons why `.NET tools` were chosen as the recommended deployment mechanism are mentioned below:
 
 - NuGet plugins are console applications. A `.NET tool` is a special NuGet package that contains a console application, which presents a natural fit.
 
@@ -338,18 +341,7 @@ This variable should point to the location of the .NET Tool executable, which th
 
 - This approach doesn't support developing NuGet plugins in non-.NET languages.
 
-#### Roadmap
-
-In terms of the implementation roadmap, I propose the following stages:
-
-1. Initially, plugin authors will publish NuGet plugins as .NET Tools. Consumers will install NuGet plugins using `dotnet tool` sub-commands.
-They will specify the plugin's path based on their operating system. We will make the necessary code changes on the NuGet side to enable running the plugins installed as `.NET tools`.
-
-2. Subsequently, we will introduce a `dotnet nuget plugin` subcommand. This will allow users to `install, update, uninstall, and search` for plugins.
-However, we will still rely on the `dotnet tool` command under the hood, as mentioned above.
-Please note that these command names are subject to change based on feedback to the specification we are going to create in the near future.
-
-#### Background information
+**Background information:**
 
 - The `dotnet workload` command is separate and has its own set of sub-commands, including `install`, `uninstall`, and `list`.
 These sub-commands are wrappers for the corresponding `dotnet tool` sub-commands.
