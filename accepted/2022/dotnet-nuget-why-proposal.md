@@ -121,7 +121,9 @@ dotnet nuget why -h|--help
 
 We will show the resolved versions of packages in the graph, rather than the versions requested by the top-level package.
 
-We will also deduplicate graphs in certain cases. If we have already shown a package's dependencies in the graph in another place, we will truncate the graph at that node and show a `(*)` symbol to indicate that the package's dependencies have already been shown. Further, if multiple target frameworks in a project have the same dependency graph, we will show a combined graph for them. (See [examples](#examples))
+We will deduplicate graphs when multiple target frameworks in a project have the same dependency graph, showing a combined graph for them. (See [examples](#examples))
+
+We can also use a different color to highlight the target package in the graph to make it easier for users to locate it.
 
 #### Arguments
 
@@ -189,7 +191,9 @@ The [cargo tree](https://doc.rust-lang.org/cargo/commands/cargo-tree.html) comma
 
 ![Cargo Tree Example](../../meta/resources/DotnetNugetWhy/CargoTreeExample.png)
 
-## Additional improvements
+The Spectre.Console library provides good tooling for printing console output. Especially relevant for us are the [Tree](https://spectreconsole.net/widgets/tree) module, and the [Markup](https://spectreconsole.net/markup) tooling, which can allow us to show the target package in a different color to highlight its location in the graph.
+
+## Additional improvements / Future work
 
 If not specified, the command searches the current directory for one.
 
@@ -206,6 +210,8 @@ Packages acquired through `PackageDownload` are recorded in the `project.assets.
 The NuGet restore operation downloads other packages during dependency resolution which are not part of the final dependency graph that the `dotnet nuget why` command prints out. The absence of a package id and version in the `project.assets.json` file indicates that a package was downloaded during dependency resolution but is not part of the final dependency graph. In the future these other packages can also be included in the dependency graph that the `dotnet nuget why` command prints out.
 
 Use non-zero exit codes for errors such as when the `project.assets.json` file is not present or the package is not found in the `project.assets.json` file.
+
+If we have already shown a package's dependencies in the graph in another place, we can truncate the graph at that node and show a `(*)` symbol to indicate that the package's dependencies have already been shown. We can add a CLI option let users opt-in to this behavior.
 
 ## Appendix
 
