@@ -65,7 +65,7 @@ Here are the questions we consider when triaging:
 * Has the community at large expressed interest in this functionality? I.e. has it gathered more than 5 up-votes.
 
 After triaging, the issue will fall into one of the following categories:
-* The issue is accepted. A `Priority:2` or `Priority:3` label is added.
+* The issue is accepted. A `Priority:1` or `Priority:2` label is added.
 
 * The issue is closed. A `Resolution:WontFix` label is added.
 
