@@ -118,6 +118,13 @@ dotnet nuget why [<PROJECT>|<SOLUTION>] <PACKAGE_NAME>
 
 dotnet nuget why -h|--help
 ```
+
+We will show the resolved versions of packages in the graph, rather than the versions requested by the top-level package.
+
+We will deduplicate graphs when multiple target frameworks in a project have the same dependency graph, showing a combined graph for them. (See [examples](#examples))
+
+We can also use a different color to highlight the target package in the graph to make it easier for users to locate it.
+
 #### Arguments
 
 - PROJECT | SOLUTION
@@ -142,46 +149,27 @@ Prints out a description of how to use the command.
 
 - List dependency graph of a package given `package id`.
 
-```
-dotnet nuget why packageA
-
-Project 'projectNameA' has the following dependency graph for 'packageA'
-   [net6.0]: 
-      Microsoft.ML (1.0.0) -> Microsoft.ML.Util (1.0.0) -> packageA (1.0.0)
-   [net472]:
-      Microsoft.ML (1.0.0) -> Microsoft.ML.Util (1.0.0) -> packageA (1.0.0)
-
-Project 'projectNameB' has the following dependency graph for 'packageA'
-   [net6.0]:
-      Microsoft.ML (1.1.0) -> Microsoft.ML.Util (1.1.0) -> packageA (1.1.0)
-   [net472]:
-      Microsoft.ML (1.1.0) -> Microsoft.ML.Util (1.1.0) -> packageA (1.1.0)
-```
+  `dotnet nuget why NuGet.Packaging`
+  ![Project With Single DependencyPath](../../meta/resources/DotnetNugetWhy/ProjectWithSingleDependencyPath.png)
 
 - List dependency graph of a package given `package id` when there is a diamond dependency (a package is brought in by more than one path).
 
-```
-dotnet nuget why packageA
-
-Project 'projectNameA' has the following dependency graph for 'packageA'
-   [net6.0]:
-      Microsoft.ML (1.0.0) -> Microsoft.ML.Util (1.0.0) -> packageA (1.0.0)
-      Microsoft.ML (1.0.0) -> Microsoft.ML.SampleUtils (1.0.0) -> packageA (1.0.0)
-```
+  `dotnet nuget why System.Text.Json`
+  ![Project With Diamond Dependency](../../meta/resources/DotnetNugetWhy/ProjectWithDiamondDependency.png)
 
 - List dependency graph of a package given `package id` and `target framework`.
 
-```
-dotnet nuget why packageA -f net6.0
+  `dotnet nuget why NuGet.Packaging -f net6.0`
+  ![Project With Frameworks Option Specified](../../meta/resources/DotnetNugetWhy/ProjectWithFrameworksOptionSpecified.png)
 
-Project 'projectNameA' has the following dependency graph for 'packageA'
-   [net6.0]:
-      Microsoft.ML (1.0.0) -> Microsoft.ML.Util (1.0.0) -> packageA (1.0.0)
+- Multiple projects in a solution.
 
-Project 'projectNameB' has the following dependency graph for 'packageA'
-   [net6.0]:
-      Microsoft.ML (1.1.0) -> Microsoft.ML.Util (1.1.0) -> packageA (1.1.0)
-```
+  `dotnet nuget why System.Text.Json`
+  ![Solution With Multiple Projects](../../meta/resources/DotnetNugetWhy/SolutionWithMultipleProjects.png)
+
+  When the solution includes projects that do not have dependencies on the package
+
+  ![Projects With Empty Graphs](../../meta/resources/DotnetNugetWhy/SolutionWithProjectsThatHaveEmptyGraphs.png)
 
 ## Rationale and Alternatives
 
@@ -199,14 +187,21 @@ When a user highlights a transitive package, they will see a pop-up that display
 
 However, the Package Manager UI view still does not provide the user with enough detail about how transitive packages originate; for example, transitive dependencies that are brought in by a project are hidden. Therefore we propose the `dotnet nuget why` command.
 
-## Additional improvements
+The [cargo tree](https://doc.rust-lang.org/cargo/commands/cargo-tree.html) command can also serve as a good example of how to print dependency trees to the console:
+
+![Cargo Tree Example](../../meta/resources/DotnetNugetWhy/CargoTreeExample.png)
+
+The Spectre.Console library provides good tooling for printing console output. Especially relevant for us are the [Tree](https://spectreconsole.net/widgets/tree) module, and the [Markup](https://spectreconsole.net/markup) tooling, which can allow us to show the target package in a different color to highlight its location in the graph.
+
+## Additional improvements / Future work
+
 If not specified, the command searches the current directory for one.
 
 Add a [--version <VERSION>] option to the command if the user wants to print dependency graphs for a specific version of the package. NuGet currently `flattens`, so it only allows one version of a package per framework to be resolved. See NuGet package versioning for more information.
 
 Allow the customer to look up transitive dependencies of more than one package. For example: `dotnet nuget why [<PROJECT>|<SOLUTION>] packages package1, package2` or `dotnet nuget why [<PROJECT>|<SOLUTION>] package 'nuget.*'`.
 
-Allow the customer to transitive dependencies of more than one framework. For example: `--framework net6.0 --framework netstandard2.0`.
+Allow the customer to look up transitive dependencies of more than one framework. For example: `--framework net6.0 --framework netstandard2.0`.
 
 Create a better visualization of the dependency graph that is printed by the `dotnet nuget why` command by displaying a tree rather than just printing out a list of dependencies. 
 
@@ -215,6 +210,8 @@ Packages acquired through `PackageDownload` are recorded in the `project.assets.
 The NuGet restore operation downloads other packages during dependency resolution which are not part of the final dependency graph that the `dotnet nuget why` command prints out. The absence of a package id and version in the `project.assets.json` file indicates that a package was downloaded during dependency resolution but is not part of the final dependency graph. In the future these other packages can also be included in the dependency graph that the `dotnet nuget why` command prints out.
 
 Use non-zero exit codes for errors such as when the `project.assets.json` file is not present or the package is not found in the `project.assets.json` file.
+
+If we have already shown a package's dependencies in the graph in another place, we can truncate the graph at that node and show a `(*)` symbol to indicate that the package's dependencies have already been shown. We can add a CLI option let users opt-in to this behavior.
 
 ## Appendix
 
