@@ -6,7 +6,7 @@
 
 ## Summary
 
-We want to update the packages pane in the PMUI to render the ReadMe for the selected package.
+We want to update the packages pane in the PMUI to render the ReadMe for the selected package. We also need to update the Nuget Server API to provide a link to download the Readme directly, without having to download the nupkg first.
 
 ## Motivation 
 
@@ -14,9 +14,16 @@ The Readme file is an essential source of information that can help customers un
 By rendering the Readme file directly in the PM UI, customers can easily access the information they need to determine if a package will be helpful to them while searching, browsing, and managing their projects’ packages.
 This enhancement streamlines the user experience and may encourage package authors to create comprehensive Readme documentation when customers will be more likely to rely on it for useful information about the package.
 
+Currently the NuGet Server API has the a property called ReadmeUrl as part of the [Package metadata](https://learn.microsoft.com/en-us/nuget/api/registration-base-url-resource#catalog-entry).
+This is a link to the readme which is being rendered in nuget.org.
+For rendering the ReadMe in the PM UI we need to use the raw markdown.
+Currently the only way to get this markdown requires downloading the nupkg to search inside of it and determine if there is a ReadMe available.
+We want to avoid exploratory nupkg downloads as this can effect performance. We want the API to expose a new property which provides a link to download the markdown.
+
 ## Explanation
 
 ### Functional explanation
+#### PM UI
 When a package is selected we will determine if a ReadMe file exists and if it does we'll render it in the PM UI.
 
 The PM UI will be updated to have tabs for the Package Details and the the ReadMe.
@@ -26,9 +33,15 @@ It will also be displayed for both the solution level and project level package 
 
 The ReadMe file will be selected from disk if available.
 
+#### Nuget Server API
+Package metadata Catalog Entry will be updated to include a new property, ReadmeFileUrl, which will contain a URL that can be used to download the Readme. 
+The URL will only point to the embedded readme for the current package version.
+If no readme is available nothing is returned. 
+
 ### Technical explanation
 
-#### Rendering Markdown
+#### PM UI
+##### Rendering Markdown
 We want to leverage the [IMarkdownPreview](https://devdiv.visualstudio.com/DevDiv/_git/VS-Platform?path=/src/Productivity/MarkdownLanguageService/Impl/Markdown.Platform/Preview/IMarkdownPreview.cs) class to render the ReadMe in the IDE.
 A new instance can be created using [PreviewBuilder](https://devdiv.visualstudio.com/DevDiv/_git/VS-Platform?path=/src/Productivity/MarkdownLanguageService/Impl/Markdown.Platform/Preview/PreviewBuilder.cs).
 
@@ -43,11 +56,16 @@ markdownPreview.UpdateContentAsync(markDown ?? string.Empty, ScrollHint.None)
 //IMarkdownPreview.VisualElement contains the FrameworkElement to be passed to the view
 MarkdownPreviewControl = markdownPreview.VisualElement
 ```
-#### Locating the ReadMe
+##### Locating the ReadMe
 We will focus the MVP on loading the ReadMe only for packages which are already downloaded.
 
 Will use ZipArchive to locate the nuspec within the Nupkg.
 Then use NuspecReader to locate the ReadMe within the NupKg, and extract it using ZipArchive.
+
+#### Nuget Server API
+We will need to define how the URL will be created. There is already an endpoint for downloading the markdown however it's not documented. 
+This url could be passed in the new property. 
+If we want to change the mechanism for serving the Readme it can be changed without requiring any clients to update their code or have to maintain the previous implementation.
 
 ## Drawbacks
 
@@ -60,6 +78,9 @@ So when an upgrade is made we may have to change how we use the control.
 Currently WebView2 controls always render ontop of other controls in the view.
 [Secnario 25254665](https://microsoft.visualstudio.com/Edge/_workitems/edit/25254665).
 PM UI needs to be updated to ensure items don't scroll off screen.
+
+Adding a new property requires the registration to be rebuilt for the server team.
+In order to support legacy readme MDs we would need to find a place to host them in order to avoid exposing implementation details.
 
 ## Rationale and alternatives
 By using an existing control we maintain consistency throughout the IDE and can rely on the owner to fix any bugs with the control.
@@ -76,9 +97,9 @@ Ex. https://www.nuget.org/packages/Newtonsoft.Json#readme-body-tab
 ## Unresolved Questions
 1. Will we show readme in the updates tab?
 1. ~~What do we show if the package has a ReadMe.txt instead of md?~~
-    * The ReadMe is speced as only accepting MD. So we will use the nuspec to determine where the readme is and treat it as md, even if the file is actually txt. 
-1. ~~What do we show if there is no ReadMe defined?~~
-    - Hide the tab from the the details pane
+    * The ReadMe is spec is written as only accepting MD. So we will use the nuspec to determine where the readme is and treat it as md, even if the file is actually txt. 
+1. What do we show if there is no ReadMe defined?
+    * Show the readme tab with a message saying there is no readme for the selected pacakge/version.
 1. ~~Where do we get the ReadMe from when it's not on the disk?~~
     - There is no documented way of getting the ReadMe from the server without downloading the nupkg.
 1. ~~Where are the ReadMe files saved in a package?~~
