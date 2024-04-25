@@ -247,17 +247,13 @@ This means they are installed in a default directory, such as `%UserProfile%/.do
 
 - Global tools can be invoked from any directory on the machine without specifying their location.
 - One version of a tool is used for all directories on the machine.
-However, NuGet cannot easily determine which tool is a NuGet plugin.
+However, NuGet cannot easily determine which global .NET tool is a NuGet plugin.
 On the other hand, the `tool path` option allows us to install .NET tools as global tools, but with the binaries located in a specified location.
 This makes it easier to identify and invoke the appropriate tool for NuGet operations.
-- The binaries are installed in a location that we specify while installing the tool.
-- We can invoke the tool from the installation directory by providing the directory with the command name or by adding the directory to the PATH environment variable.
-- One version of a tool is used for all directories on the machine.
-The `tool path` option aligns well with the NuGet plugins architecture design, and hence, it is the recommended approach for installing and executing NuGet plugins.
+The `tool path` option aligns well with the NuGet plugins architecture design.
 
-By implementing this specification, we offer plugin authors the option to use .NET tools for plugin deployment.
+This approach offers plugin authors the option to use .NET tools for plugin deployment.
 On the consumer side, these plugins will be installed as a `tool path` global tool. This eliminates the need to maintain separate versions for `.NET Framework` and `.NET Core`.
-It also simplifies the installation process by removing the necessity for plugin authors to create subcommands like `codeartifact-creds install/uninstall`.
 
 We should consider adding `dotnet nuget plugin install/uninstall/update` commands to the .NET SDK as wrappers for the `dotnet tool install/uninstall/update` commands.
 This would simplify the installation process by eliminating the need for users to specify the NuGet plugin path, making the process more user-friendly and platform-independent.
@@ -273,11 +269,6 @@ The installation of this tool with multiple package types was successful with th
 Given that this issue has been resolved in the .NET 8 SDK, and considering our plans to add `dotnet nuget plugin install/uninstall/update/search` commands and support for NuGet plugins deployed via .NET tools in the latest version, I believe we are on the right track.
 
 The `dotnet nuget credentialprovider search` command would allow customers to search for available Credential Providers that are published as .NET tools. However, I believe we need a separate specification for `dotnet nuget plugin install/uninstall/update/search` commands to fully understand all the options and the functional/technical details.
-
-The `dotnet workload` command is separate and has its own set of sub-commands, including `install`, `uninstall`, and `list`.
-These sub-commands are wrappers for the corresponding `dotnet tool` sub-commands.
-Workloads are installed in a different location than .NET tools, which makes it easier for them to be discovered at runtime, addressing a problem that NuGet also faces.
-However, NuGet plugins and .NET tools share the similarity of being console applications.
 
 This approach is similar to the alternative design that [Andy Zivkovic](https://github.com/zivkan) kindly proposed in [[Feature]: Make NuGet credential providers installable via the dotnet cli](https://github.com/NuGet/Home/issues/11325).
 The recommendation was developing a command like `dotnet nuget credential-provider install Microsoft.Azure.Artifacts.CredentialProvider`.
