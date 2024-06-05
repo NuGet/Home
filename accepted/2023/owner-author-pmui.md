@@ -47,13 +47,17 @@ When Known Owners are available on a package source, the PM UI Packages list wil
 - The ToolTip on the  package list item will show all Known Owners as a comma-delimited list of plain-text (the way authors are shown, today).
 - Blank space will be shown for packages missing a Known Owner, with nothing beside the package ID.
 
+Packages coming from [NuGet IntelliCode Package Suggestions](https://devblogs.microsoft.com/nuget/intellicode-package-suggestions-for-nuget-in-visual-studio/#:~:text=IntelliCode%20Package%20Suggestions%20use%20a,Netflix%20recommendations%20for%20NuGet%20packages.) are not sourced from a package source, and therefore will not contain Known Owner metadata nor will they be shown as hyperlinks.
+Instead, the author will continue to be shown for these 5 recommended packages.
+
 Example of HyperLinks and a package list item's ToolTip:
 ![The PM UI Packages list showing a page of Owners from NuGet.org beside each package ID as a hyperlink. An example of a tooltip showing the package name, owners, and package description.](../../meta/resources/OwnerAuthor/ownerNuGetOrgLinksNoIcon.png)
 
-|Package Source supports Known Owners|Shown in Packages List|Example
-|--|--|--|
-|No| Author | "by James Newton-King"
-|Yes| Owner only| "by [jamesnk](https://www.nuget.org/profiles/jamesnk), [newtonsoft](https://www.nuget.org/profiles/newtonsoft), [dotnetfoundation](https://www.nuget.org/profiles/dotnetfoundation)"
+|Package Source supports Known Owners|Package is `*` Recommended|Shown in Packages List|Example
+|--|--|--|--|
+|No| N/A | Author | "by James Newton-King"
+|Yes| No | Owner | "by [jamesnk](https://www.nuget.org/profiles/jamesnk), [newtonsoft](https://www.nuget.org/profiles/newtonsoft), [dotnetfoundation](https://www.nuget.org/profiles/dotnetfoundation)"
+|Yes| Yes | Author | "by James Newton-King"
 
 Hyperlink URL values for each Known Owner will depend on which resource the package source supports.
 The URL's value will be shown as a tooltip on each hyperlink.
