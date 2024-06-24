@@ -56,6 +56,8 @@ Additionally, with a change like this, it is imperative that we communicate the 
 There were a few alternative icons also considered for the icon to replace the blue checkmark. They are pictured below.
 ![alt text](image.png)
 ![alt text](image-1.png)
+![alt text](image-2.png)
+
 Ultimately, the decision was made on the lock icon since it most obviously represents its function.
 
 ## Prior Art
