@@ -28,7 +28,7 @@ The blue checkmark is a known cause for confusion and misplaced perceptions of t
 
 The core of this proposal is to simply change the blue checkmark icon to a different signifier of prefix reservation. We don't want to just do away with the icon without a replacement since prefix reservation is still an important concept in the NuGet ecosystem. Our goal in selecting a new icon is to find something that represents "reserved" rather than "verified". Below is a mock-up screenshot of the proposed new prefix reservation icon.
 
-![alt text](lock.jpg)
+![alt text](../../meta/resources/bluecheckmark-replacement/lock.jpg)
 
 The lock icon is a known indicator of security -- which is the purpose of the prefix reservation concept. However, the lock icon doesn't necessarily imply authenticity or some sort of vetted trust. It does a better job of communicating increased security that might come with using a package whose prefix is reserved in terms of protecting from attacks such as dependency confusion, without the potential for misplaced trust in a certain package author. There isn't as much obvious external context with something like a lock icon, as opposed to the blue checkmark (whose context is described in detail in the motivation section above).
 
@@ -54,9 +54,9 @@ Additionally, with a change like this, it is imperative that we communicate the 
 <!-- What other designs have been considered and why weren't they chosen? -->
 <!-- What is the impact of not doing this? -->
 There were a few alternative icons also considered for the icon to replace the blue checkmark. They are pictured below.
-![alt text](image.png)
-![alt text](image-1.png)
-![alt text](image-2.png)
+![alt text](../../meta/resources/bluecheckmark-replacement/image.png)
+![alt text](../../meta/resources/bluecheckmark-replacement/image-1.png)
+![alt text](../../meta/resources/bluecheckmark-replacement/image-2.png)
 
 Ultimately, the decision was made on the lock icon since it most obviously represents its function.
 
