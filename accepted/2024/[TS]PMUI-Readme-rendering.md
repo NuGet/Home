@@ -99,8 +99,8 @@ Ex. https://www.nuget.org/packages/Newtonsoft.Json#README-body-tab
 1. ~~What do we show if there is no README defined?~~
     * Show the README tab with a message saying there is no README for the selected pacakge/version.
 1. ~~Where do we get the README from when it's not on the disk?~~
-    - There is no documented way of getting the README from the server without downloading the nupkg.
-    Will need to document options for feeds to implement.
+    - Will document two ways for servers to provide a the readme.
+    Updating the package metadata to include a link to the readme, and a direct download similar to the way icon is implemented.
 1. ~~Where are the README files saved in a package?~~
     - Can use Nuget.Packaging to get README location from nuspec.
 1. What do we want the UX to be when an exception or error occurs while reading a README file? 
