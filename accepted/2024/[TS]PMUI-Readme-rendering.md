@@ -31,13 +31,13 @@ When no README is available we will display a messsage in the README section.
 
 ##### README File Sources
 * RawReadmeFileUrl in the [package metadata](https://learn.microsoft.com/en-us/nuget/api/registration-base-url-resource).
-* README direct download specified in the [service index](https://learn.microsoft.com/en-us/nuget/api/service-index).
+* README direct download specified in the [package content](https://learn.microsoft.com/en-us/nuget/api/package-base-address-resource).
 * Downloaded nupkg.
 
 #### Nuget API
 A new version of the [package metadata](https://learn.microsoft.com/en-us/nuget/api/registration-base-url-resource) will be documented which will include the field **RawReadmeFileUrl**. This will be a link to download the README and will only be filled if a readme is available to download.
 
-A new [resource](https://learn.microsoft.com/en-us/nuget/api/overview#resources-and-schema) will be documented for the [service index](https://learn.microsoft.com/en-us/nuget/api/service-index). This will define a URL which can be used to download the README.
+A new version of [package content](https://learn.microsoft.com/en-us/nuget/api/package-base-address-resource) which will include a url definition for downloading the README.
 
 ### Technical explanation
 
