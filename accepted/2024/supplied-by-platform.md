@@ -101,6 +101,10 @@ We may capture some of this information in telemetry to track how often this fea
 
 - How flexible should this feature be? MSBuild items vs a file.
   - If we go the approach of MSBuild items, what should the item name be? Example: `PrunedPackageReference`, `IgnorePackageReference`
+- Are projects pruned?
+- What happens when a top level dependency is pruned?
+- Should the dependency reference disappear from the assets file? The extra dependencies here could mess up some algorithms for sure.
+- Should the assets file indicate the pruned packages?
 
 ## Future Possibilities
 
