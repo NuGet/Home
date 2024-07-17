@@ -173,6 +173,7 @@ We can consider not doing this feature and relying on platform packages to simpl
 - Should the pruned package reference dissapear from the dependencies section completely? Strong preference towards no, since it aids visibility.
 - Should the assets file contain the list of pruned packages? Are only ids important, or do we need versions as well?
 - Should the version attribute of PrunedPackageReference be a version range instead? Should the attribute be named MaxVersion instead?
+- What's the list of packages that'll be removed by the .NET SDK? How do we verify it won't break things?
 
 ## Future Possibilities
 
