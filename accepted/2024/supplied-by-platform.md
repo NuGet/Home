@@ -40,11 +40,90 @@ A list of package id/versions to be pruned will be provided by the .NET SDK. The
 When NuGet encounters any of the specified packages or lower, it will simply remove the package from the graph. This package id will not appear in the assets file, but there will be a detailed verbosity message indicating that the package id has been pruned for the given framework.
 
 The feature is framework specific, and can be opted in/out using the `NuGetPrunePlatformPackages` property.
-In the first version in which the feature ships, it will be enabled by default for the framework that matches the major version of the .NET SDK. For example, if it ships in .NET 10, it will be automatically opted in for the `net10.0` framework. In the next version, it'll be enabled for frameworks netcoreapp3.0 and later.
+In .NET 10 SDK, this feature will be enabled for all .NET (Core) target frameworks newer than netcoreapp3.0 by default.
+The feature may be available in minor versions of the .NET 9 SDK as disabled with the above opt-in available.
 
 ### Technical explanation
 
 A list of package id/versions to be pruned will be provided by the .NET SDK.
+To aid this, a new item type and collect targets will be introduced.
+
+The `PrunedPackageReference` item will support the following attributes:
+
+| Attribute | Explanation |
+|-----------|-------------|
+| Version | A NuGet parsable version. The version is consider to the maximum version to be pruned. |
+
+The collect target will be `CollectPrunedPackageReferences`.
+
+When NuGet sees any of these package ids in the resolution, it'll just skip them and log a detailed verbosity message, indicating the package has been skipped.
+Pruning direct PackageReference is *not allowed*.
+We may capture some of this information in telemetry to track how often this feature is being used.
+
+#### Changes to the obj files
+
+`project.assets.json`
+
+```json
+{
+    "NuGet.LibraryModel/6.10.0": {
+        "type": "package",
+        "dependencies": {
+          "NuGet.Common": "6.10.0",
+          "NuGet.Versioning": "6.10.0"
+        },
+        "compile": {
+          "lib/netstandard2.0/NuGet.LibraryModel.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.0/NuGet.LibraryModel.dll": {}
+        }
+      },
+      "NuGet.Packaging/6.10.0": {
+        "type": "package",
+        "dependencies": {
+          "Newtonsoft.Json": "13.0.3",
+          "NuGet.Configuration": "6.10.0",
+          "NuGet.Versioning": "6.10.0",
+          "System.Security.Cryptography.Pkcs": "6.0.4"
+        },
+        "compile": {
+          "lib/net5.0/NuGet.Packaging.dll": {}
+        },
+        "runtime": {
+          "lib/net5.0/NuGet.Packaging.dll": {}
+        }
+      }
+}
+```
+
+The above represents the targets section for a framework.
+NuGet.Versioning is pruned. NuGet.Versioning will appear as a dependency, but it will not be in the list since it was never chosen.
+
+`PackageSpec & project section of the assets file`
+
+TODO NK
+
+### Additional validation considerations
+
+- How does leaving the dependency in the assets file section affect features consuming the assets file.
+  - The solution explorer tree - Prototype shows the solution explorer is skipping the reference.
+  - PM UI tab - Prototype shows that since the reference does not really exist, it is not show at all.
+  - list package - Prototype shows that since the reference does not really exist, it is not show at all.
+  - dotnet nuget why - TODO NK
+
+## Drawbacks
+
+- The risk of this feature is driven by the packages that are being pruned. Given that the list of packages that will be provided by the SDK is already being pruned in a different way, one could argue that the risks have been well mitigated there.
+
+## Rationale and alternatives
+
+<!-- Why is this the best design compared to other designs? -->
+<!-- What other designs have been considered and why weren't they chosen? -->
+<!-- What is the impact of not doing this? -->
+
+### Represent the packages as files
+
 The list will be provided through a property pointing to a file that contains the list of packages in the `<id>|<version>` format, with a newline separating each package id. The property will be: `NuGetPlatformPackagesList`.
 
 An example of the file format:
@@ -56,33 +135,21 @@ System.IO.Pipelines|4.7.0
 System.Security.AccessControl|4.7.0
 ```
 
-Note that this allows existing files such as `C:\Program Files\dotnet\packs\Microsoft.AspNetCore.App.Ref\3.1.10\data\PackageOverrides.txt` to be reused. TODO NK - OK, not really.
-
 NuGet will assume that the file in question is immutable once written on disk. What this means is that in the up to date checks, NuGet just checks the file name, rather than the content itself. This approach matches the runtime.json approach.
 
-When NuGet sees any of these package ids in the resolution, it'll just skip them. NuGet will log a detailed verbosity message, indicating the package has been skipped.
-We may capture some of this information in telemetry to track how often this feature is being used.
+- Pros:
+  - Performance benefits.
+  These lists will contain hundreds of packages.
+  NuGet can cache the package list based on a file. With the current implementation, NuGet needs to maintain a list per framework, per project, arguably with a lot of duplication. Even if NuGet deduplicates the objects reprsenting the packages in some way, it would still register from a memory allocations perspective(which has been a focus), on both NuGet & project-system side.
+  - Eliminate potential misuse.
+- Cons:
+  - The feature is no longer easy to generalize.
+  There are various asks for the ability to simply ignore certain packages from graphs. More often than not, the reason is that an old package is being referenced and cannot be updated.
 
-## Drawbacks
+### Not doing the feature
 
-- The risk of this feature is driven by the packages that are being pruned. Given that the list of packages that will be provided by the SDK is already being pruned in a different way, one could argue that the risks have been well mitigated there.
-
-## Rationale and alternatives
-
-<!-- Why is this the best design compared to other designs? -->
-<!-- What other designs have been considered and why weren't they chosen? -->
-<!-- What is the impact of not doing this? -->
-- An alternative design would be to specify the package list via MSBuild properties.
-  - Pros:
-    - The feature can be generalized, since MSBuild time manipulation provides more flexibility in specifying these packages.
-  - Cons:
-    - The list of packages is always couple of hundred long and can only grow.
-    This would be duplicate for each framework and project.
-    We're paying string allocation cost at both the project-system and NuGet side.
-
-- With security being a focus of NuGet as a package manager, minimizing false positives is essential. The fact that there are still assemblies that ship both as packages and as part of shared frameworks means that the changes of false positives are not going away with a framework update.
-
-- We can consider not doing this feature and relying on platform packages to simply go away, especially with NuGetAudit enabling transitive dependency auditing recently, but that is not going to solve the long term concern of assemblies such `Microsoft.Extensions.Logging`.
+With security being a focus of NuGet as a package manager, minimizing false positives is essential. The fact that there are still assemblies that ship both as packages and as part of shared frameworks means that the changes of false positives are not going away with a framework update.
+We can consider not doing this feature and relying on platform packages to simply go away, especially with NuGetAudit enabling transitive dependency auditing recently, but that is not going to solve the long term concern of assemblies such `Microsoft.Extensions.Logging`.
 
 ## Prior Art
 
@@ -99,12 +166,13 @@ We may capture some of this information in telemetry to track how often this fea
 <!-- What parts of the proposal need to be resolved before the proposal is stabilized? -->
 <!-- What related issues would you consider out of scope for this proposal but can be addressed in the future? -->
 
-- How flexible should this feature be? MSBuild items vs a file.
-  - If we go the approach of MSBuild items, what should the item name be? Example: `PrunedPackageReference`, `IgnorePackageReference`
-- Are projects pruned?
-- What happens when a top level dependency is pruned?
-- Should the dependency reference disappear from the assets file? The extra dependencies here could mess up some algorithms for sure.
-- Should the assets file indicate the pruned packages?
+- MSBuild items/properties vs a file with the data
+- MSBuild item name ideas: `PrunedPackageReference` was used. `IgnoredPackageReference` and `SkippedPackageReference` are alternatives.
+- What if a project id is specified in PrunedPackageReference? Warn? Error? Skip? Prune & Warn?
+- What to do when a direct PackageReference is specified to be pruned?
+- Should the pruned package reference dissapear from the dependencies section completely? Strong preference towards no, since it aids visibility.
+- Should the assets file contain the list of pruned packages? Are only ids important, or do we need versions as well?
+- Should the version attribute of PrunedPackageReference be a version range instead? Should the attribute be named MaxVersion instead?
 
 ## Future Possibilities
 
