@@ -118,10 +118,10 @@ TODO NK
 
 See [Prior art](#net-sdk-package-pruning) for more details on how the .NET SDK prunes packages at runtime today.
 The particular pruning is based on the resulting list of shared frameworks.
-The .NET SDK will provide the list at the beginning of the restore operation.
+The .NET SDK will provide the list at the beginning of the restore operation, as such the .NET SDK *must* only consider direct shared frameworks, and not transitive ones.
 Given that packages are allowed to bring in a shared framework, and that is not known by the .NET SDK at the beginning of restore, package graphs brought in by packages are not going to be pruned with the current solution.
 
-A potential solution may be adding a way to prune additional frameworks as an opt-in. 
+A potential solution may be adding a way to prune additional frameworks as an opt-in.
 
 ## Drawbacks
 
