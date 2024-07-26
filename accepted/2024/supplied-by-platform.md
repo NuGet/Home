@@ -6,7 +6,7 @@
 ## Summary
 
 <!-- One-paragraph description of the proposal. -->
-Provide a means to prune certain packages from packages because those packages are not going to be used at runtime.
+Provide a means to prune certain packages from project graphs because those packages are not going to be used at runtime.
 This helps avoid downloading unnecessary reference and implementation packages that would not have their assemblies used because the versions in the .NET SDK or shared framework would be used instead.
 Finally this avoids false positive by features such as NuGetAudit and other scanners that may be using the dependency graph.
 
@@ -37,10 +37,12 @@ This changes significantly helps align what gets restored and what gets publishe
 <!-- Introduce new concepts, functional designs with real life examples, and low-fidelity mockups or  pseudocode to show how this proposal would look. -->
 
 A list of package id/versions to be pruned will be provided by the .NET SDK. The version will signify the highest version to be pruned.
-When NuGet encounters any of the specified packages or lower, it will simply remove the package from the graph. This package id will not appear in the assets file, but there will be a detailed verbosity message indicating that the package id has been pruned for the given framework.
+When NuGet encounters any of the specified packages or lower, it will simply remove the package from the graph.
+This package id will not be downloaded and will not appear in the assets file libraries or targets section, but there will be a detailed verbosity message indicating that the package id has been pruned for the given framework.
 
 The feature is framework specific, and can be opted in/out using the `NuGetPrunePlatformPackages` property.
-In .NET 10 SDK, this feature will be enabled for all .NET (Core) target frameworks newer than netcoreapp3.0 by default.
+In .NET 10 SDK, this feature will be enabled by default for all .NET (Core) target frameworks newer than netcoreapp3.0.
+This feature may be enabled .NET Framework target frameworks as well.
 The feature may be available in minor versions of the .NET 9 SDK as disabled with the above opt-in available.
 
 ### Technical explanation
@@ -112,6 +114,15 @@ TODO NK
   - list package - Prototype shows that since the reference does not really exist, it is not show at all.
   - dotnet nuget why - TODO NK
 
+### NET SDK - selecting packages to be pruned
+
+See [Prior art](#net-sdk-package-pruning) for more details on how the .NET SDK prunes packages at runtime today.
+The particular pruning is based on the resulting list of shared frameworks.
+The .NET SDK will provide the list at the beginning of the restore operation.
+Given that packages are allowed to bring in a shared framework, and that is not known by the .NET SDK at the beginning of restore, package graphs brought in by packages are not going to be pruned with the current solution.
+
+A potential solution may be adding a way to prune additional frameworks as an opt-in. 
+
 ## Drawbacks
 
 - The risk of this feature is driven by the packages that are being pruned. Given that the list of packages that will be provided by the SDK is already being pruned in a different way, one could argue that the risks have been well mitigated there.
@@ -146,6 +157,10 @@ NuGet will assume that the file in question is immutable once written on disk. W
   - The feature is no longer easy to generalize.
   There are various asks for the ability to simply ignore certain packages from graphs. More often than not, the reason is that an old package is being referenced and cannot be updated.
 
+### Pruning shared frameworks on the fly
+
+Pruning shared frameworks on the fly is a technically challenging feat. In particular, packages being brought in transitively, affecting which other packages are included beyond the dependencies node can potentially lead to unresolveable conflicts. In particular, a package version may bring in a shared framework, which if the shared framework packages were pruned could lead to not selecting the package that brough in the shared framework in the first place.
+
 ### Not doing the feature
 
 With security being a focus of NuGet as a package manager, minimizing false positives is essential. The fact that there are still assemblies that ship both as packages and as part of shared frameworks means that the changes of false positives are not going away with a framework update.
@@ -158,7 +173,18 @@ We can consider not doing this feature and relying on platform packages to simpl
 <!-- What lessons from other communities can we learn from? -->
 <!-- Are there any resources that are relevant to this proposal? -->
 
-- This problem is .NET specific.
+- This problem is .NET specific. Package pruning at the build level is already happening. 
+
+### NET SDK package pruning
+
+The .NET SDK assembly/package pruning is already happening currently.
+The limitations of that implementation are that the package still appear in the assets file, still get downloaded and are thus included in the package auditing.
+The pruning is happening on a per shared framework basis.
+Example:
+
+- Microsoft.NETCore.App 9.0 shared framework, <https://github.com/dotnet/runtime/blob/main/src/installer/pkg/sfx/Microsoft.NETCore.App/PackageOverrides.txt>
+
+- Microsoft.AspNetCore.App 9.0 shared framework, <https://github.com/dotnet/aspnetcore/blob/main/eng/PackageOverrides.txt>
 
 ## Unresolved Questions
 
@@ -173,7 +199,6 @@ We can consider not doing this feature and relying on platform packages to simpl
 - Should the pruned package reference dissapear from the dependencies section completely? Strong preference towards no, since it aids visibility.
 - Should the assets file contain the list of pruned packages? Are only ids important, or do we need versions as well?
 - Should the version attribute of PrunedPackageReference be a version range instead? Should the attribute be named MaxVersion instead?
-- What's the list of packages that'll be removed by the .NET SDK? How do we verify it won't break things?
 
 ## Future Possibilities
 
