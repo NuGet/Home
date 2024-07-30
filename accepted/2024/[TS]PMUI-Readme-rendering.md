@@ -35,9 +35,9 @@ When no README is available we will display a messsage in the README section.
 * Downloaded nupkg.
 
 #### Nuget API
-A new version of the [package metadata](https://learn.microsoft.com/en-us/nuget/api/registration-base-url-resource) will be documented which will include the field **RawReadmeFileUrl**. This will be a link to download the README and will only be filled if a readme is available to download.
+A new version of the [package metadata](https://learn.microsoft.com/en-us/nuget/api/registration-base-url-resource) resource type will be documented which will include the field **RawReadmeFileUrl**. This will be a link to download the README and will only be filled if a readme is available to download.
 
-A new version of [package content](https://learn.microsoft.com/en-us/nuget/api/package-base-address-resource) which will include a url definition for downloading the README.
+A new version of the [package content](https://learn.microsoft.com/en-us/nuget/api/package-base-address-resource) resource type which will include a url definition for downloading the README.
 
 ### Technical explanation
 
@@ -59,17 +59,13 @@ markdownPreview.UpdateContentAsync(markDown ?? string.Empty, ScrollHint.None)
 MarkdownPreviewControl = markdownPreview.VisualElement
 ```
 ##### Locating the README
-We will check which options have been implemented by the feed for downloading the README file. 
+Create a new implementation of the `INuGetResource` interface, `ReadMeDownloadResource`. This will only be available for sources which have implemented the new `PackageBaseAddress` resource type.
 
-If the package metadata version indicates the RawReadmeFileUrl field should be available, then this will be the only option we use for downloading the ReadMe. 
+Update `IPackageSearchMetadata` to include a new method, `GetReadMe`. Implementations of `GetReadMe` will return the raw string of the ReadMe, downloading it using the URL from the `ReadMeDownloadResource`, the `RawReadmeUrl` field in the package metadata, or the local package store.
 
-If the README resource has been added to the service index then we will use the URL format defined to download the README.
-This will involve checking that URL for every package. 
+Update `INuGetSearchService` to include a new method, `GetPackageReadMeAsync` which will retrieve the ReadMe for the package from the `IPackageSearchMetadata` implementations.
 
-If neither of these options are available we will use look for the README in the local file system.
-Meaning we will only render the README for already downloaded packages.
-
-It will be up to the individual feeds to implement a solution that works best for them, or even implement both. 
+Expose the functionality to get the ReadMe in the `PackageItemViewModel`, which will use the `INuGetSearchService` to load the ReadMe.
 
 ## Drawbacks
 MarkdownPreview control currently marked as obsolete since the interface has not been finalized.
