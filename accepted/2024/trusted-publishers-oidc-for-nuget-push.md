@@ -244,11 +244,16 @@ to see all of the properties.
 
 For the sake of simplicity, we will start with the following workflow filters:
 - Filtering for a specific *branch*, as shown in the UI above (branch filter)
-- Filtering for a specific *environment* (a property set in the workflow, overriding the branch)
-- Filtering for a specific *workflow path* (in addition to the previous two filters)
+- Filtering for a specific *environment* (a property optionally set in the workflow)
+- Filtering for a specific *workflow path* (relative file path within the repository)
 
 The screenshot above only shows the branch filter, so the UI will need to be expanded to cover the desired workflow
-filters.
+filters. A suggest UI would have 3 checkboxes:
+- [ ] Filter by branch: __________
+- [ ] Filter by environment: __________
+- [ ] Filter by workflow: __________
+
+At least one filter would need to be checked as to prevent an overly broad trust policy.
 
 Additional filters can be added in the future based on other properties provided in the GitHub OIDC token.
 
@@ -259,6 +264,9 @@ In short, by adding this trust policy, the package author is saying:
 
 Once the package author has added this trust policy, NuGet.org will trust GitHub Actions OIDC tokens matching this
 pattern much like an existing long-lived API key, with the added benefit of the trust policy never expiring.
+
+NuGet package sources must ensure a secure, authenticated session for the user that is adding the trust policy.
+NuGet.org requires two-factor authentication for all web UI sign-ins.
 
 #### What NuGet API operations can be used inside the GitHub Actions workflow?
 
@@ -450,7 +458,7 @@ operation.
 The two-legged approach gives use two big wins:
 
 1. We control the duration the the main credential lives for. The package source can choose how long the NuGet API key
-   lives for. Manual revocation or secret leak detection systems and work for this. NuGet.org has no control over how
+   lives for. Manual revocation or secret leak detection systems can work for this. NuGet.org has no control over how
    long the GitHub Actions OIDC token lives. It's true that GitHub OIDC token could be leaked also, but this problem can
    be mitigated with `jti` controls and even stricter validations of the `exp` claim (i.e. enforcing a shorter lifetime
    for the token trade).
@@ -463,13 +471,17 @@ The two-legged approach gives use two big wins:
 ### NuGet operations that support Trusted Publishers
 
 Currently there are two branches of authentication in NuGet world. First is API-key based authentication for package
-push, package delete (unlist), and package relist. These will support Trusted Publisher-based short-lived API keys. This
-spec focuses on package push but package delete (unlist) and package relist should be supported also, as long as the
-implementation cost/complexity is not affected too much.
+push, package delete (unlist), and package relist. These flows will support Trusted Publisher-based short-lived API
+keys. This spec focuses on package push but package delete (unlist) and package relist should be supported also, as long
+as the implementation cost/complexity is not affected too much. Any additional operation the changes package state could
+be assessed in the future (such as a package deprecation API). All of these "modify package" operations use the
+`X-NuGet-ApiKey` header to send the API key in clear text, thus requiring HTTPS to be secure.
 
-The other branch of NuGet authentication is package source authentication for read-only operations. This typically uses
-a username/password-like flow via HTTP `Basic` authorization header. This flow is not impacted by Trusted Publishers and
-existing mechanisms will not change (such as how credential providers work).
+The other branch of NuGet authentication is package source authentication for **read-only** operations. This typically
+uses a username/password-like flow via HTTP `Basic` authorization header. This flow is not impacted by Trusted
+Publishers and existing mechanisms will not change (such as how credential providers work). Note that token-based
+package sources such as Azure DevOps stuff bearer tokens into the `Basic` password field, as a workaround for NuGet's
+lack of bearer token support (as mentioned in the previous section).
 
 Trusted Publishers will have the biggest impact on the ecosystem when it is supported on NuGet.org. This only needs the
 first branch of auth (API-key) so considering read-only (package download/restore) scenarios is not needed now.
@@ -486,8 +498,11 @@ CI/CD workflows. In the end, this approach could support GitHub Actions via
 identity), as long as you can authenticate as an Entra ID service principal. The drawback of this is that NuGet.org
 would have no control over the workload identity tokens which are accepted and would be opening up a lot more
 authentication scenarios than we really need at this point. This would also require us rationalizing how an Entra ID
-service principal relates to a NuGet.org user or organization profile, which is a lot more work! Maybe it's something we
-need in the distant future, but not now.
+service principal relates to a NuGet.org user or organization profile. Today NuGet.org allows Entra ID (formerly AAD,
+Azure Active Directory) user sign in as well as personal Microsoft account (MSA) sign in. Therefore there is already
+some relationship between NuGet.org and Entra ID. In what way this existing integration would be affected by a service
+principal flow is unclear. So this idea would be a lot more work! Maybe it's something we need in the distant future,
+but not now.
 
 ## Prior Art
 
