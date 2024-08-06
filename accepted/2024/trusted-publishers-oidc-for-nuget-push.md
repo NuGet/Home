@@ -421,7 +421,7 @@ information.
 
 ## Drawbacks
 
-This workflow only helps users who want to build and push their packages on a recognized, Trusted Publisher. Not all
+This workflow only helps users who want to build and push their packages on a recognized Trusted Publisher. Not all
 CI/CD systems will be supported so some users will still need to use the older authentication flows such as long-lived,
 manually rotated API keys.
 
