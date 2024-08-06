@@ -54,7 +54,7 @@ There is a lot of lingo in this document, so here is a reference:
 | Pack              | The name of the package creation operation, produces a .nupkg and optionally a .snupkg                                                                                                    |
 | Package source    | A NuGet.org package feed, or package registry (all synonymous), a destination for push operations                                                                                         |
 | Push              | The name of the package upload operation in NuGet ecosystem                                                                                                                               |
-| Trusted Publisher | An name for a CI/CD environment that can generate OIDC tokens, using workload identity, [described by OpenSSF](https://repos.openssf.org/trusted-publishers-for-all-package-repositories) |
+| Trusted Publisher | A name for a CI/CD environment that can generate OIDC tokens, using workload identity, [described by OpenSSF](https://repos.openssf.org/trusted-publishers-for-all-package-repositories) |
 
 ## Motivation 
 
