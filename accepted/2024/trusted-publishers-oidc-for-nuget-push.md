@@ -45,15 +45,15 @@ There is a lot of lingo in this document, so here is a reference:
 | Term              | Definition                                                                                                                                                                                |
 | ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | CI/CD             | continuous integration/continuous deployment, technologies like GitHub Actions for building or deploying code automatically                                                               |
-| Forge             | A place to store code, often a SaaS offering like GitHub, GitLab, or Bitbucket, often has a CI/CD offering paired                                                                         |
+| forge             | A place to store code, often a SaaS offering like GitHub, GitLab, or Bitbucket, often has a CI/CD offering paired                                                                         |
 | JWKs              | JSON web key set, a set of public keys that can be used to verify an OIDC token                                                                                                           |
 | JWT               | A JSON web token, a format of bearer token used for web authentication flows including OIDC, contains interesting "claims" (properties) in clear text                                     |
 | NuGet API key     | one of the authentication mechanisms used for uploading packages to a package source, a hex string starting with `oy2` when from NuGet.org                                                |
 | nupkg             | The file extension for a NuGet package, produced by NuGet pack, uploaded by NuGet push                                                                                                    |
 | OIDC              | OpenID Connect, an authentication protocol build on OAuth 2.0, think of it as a way for NuGet.org to trust GitHub Actions via a JWT included in package upload                            |
-| Pack              | The name of the package creation operation, produces a .nupkg and optionally a .snupkg                                                                                                    |
-| Package source    | A NuGet.org package feed, or package registry (all synonymous), a destination for push operations                                                                                         |
-| Push              | The name of the package upload operation in NuGet ecosystem                                                                                                                               |
+| pack              | The name of the package creation operation, produces a .nupkg and optionally a .snupkg                                                                                                    |
+| package source    | A NuGet.org package feed, or package registry (all synonymous), a destination for push operations                                                                                         |
+| push              | The name of the package upload operation in NuGet ecosystem                                                                                                                               |
 | Trusted Publisher | A name for a CI/CD environment that can generate OIDC tokens, using workload identity, [described by OpenSSF](https://repos.openssf.org/trusted-publishers-for-all-package-repositories) |
 
 ## Motivation 
@@ -123,6 +123,8 @@ tier, enabled by default after adding a workflow YAML definition to your reposit
 billing for GitHub
 Actions](https://docs.github.com/en/billing/managing-billing-for-github-actions/about-billing-for-github-actions). I
 will provide more details below on what the GitHub Actions workflow YAML looks like for NuGet.org Trusted Publishers.
+There is no requirement on whether the GitHub repository is public or private. Any valid token issued by the
+`https://token.actions.githubusercontent.com` issuer is acceptable.
 
 From our data, 61% of active packages have a repository URL or [SourceLink](https://github.com/dotnet/sourcelink)
 pointing to GitHub on the latest version of their package.
@@ -305,6 +307,11 @@ Unlike API key definitions, there is no "Expires In" field, because a trust poli
 Multiple trust policies can be defined. If any of the trust policies match the incoming package and GitHub Action token,
 the operation will be allowed. If the package ID is new and there is ambiguity on which package owner should be assigned
 to the package (due to multiple matching trust policies), the most recently created trust policy will be used.
+
+If a package is transferred to another owner (i.e. the owner of the trust policy is removed as a owner of the package
+the policy was intended for), the trust policy will no longer be effective. This is much like the current API key flow
+where you could create an API key for `Microsoft.*`, but this does not give you access to all `Microsoft.*` packages --
+only ones that the package owner scope has direct ownership of at the time of package push.
 
 ### Step 2: add a GitHub Actions workflow with NuGet.org Trusted Publisher authentication
 
@@ -529,10 +536,33 @@ Ask away!
 
 ## Future Possibilities
 
-- Enable additional CI/CD systems that support OIDC tokens
-  - Azure DevOps is next on the popularity list. Their workload identity federation is very focused on Azure today
-    ([blog](https://devblogs.microsoft.com/devops/workload-identity-federation-for-azure-deployments-is-now-generally-available/)).
-  - Gitee appears to be a Chinese source forge. We have not heard from our users about Gitee and NuGet.org integration.
-  - PyPI supports GitLab. We could follow suit if we hear from our users.
-- Enable NuGet authentication provider integration, to avoid token expiration for long workflows
-- Connect this effort with build provenance, tracked by [NuGet/Home#13581](https://github.com/NuGet/Home/issues/13581)
+### Enable additional CI/CD systems that support OIDC tokens
+  
+Azure DevOps is next on the popularity list. Their workload identity federation is very focused on Azure today
+([blog](https://devblogs.microsoft.com/devops/workload-identity-federation-for-azure-deployments-is-now-generally-available/)).
+
+Gitee appears to be a Chinese source forge. We have not heard from our users about Gitee and NuGet.org integration.
+
+PyPI supports GitLab. We could follow suit if we hear from our users.
+
+The Trusted Publishers (i.e. forges, CI/CD platforms) that NuGet.org chooses to adopt in the future will be evaluated on
+a case-by-case basis. We will consider factors such (but not limited to):
+- Does the Trusted Publisher provide a generic or NuGet-targeted OIDC token system?
+  - In other words, we don't want to hack in Trusted Publisher support if the OIDC token is really meant for something
+    besides NuGet.
+- How popular is the Trusted Publisher in our user base?
+  - Trusted Publishers need specific UI elements on NuGet.org and this specific work should justifiable given our other
+    priorities.
+- Is there transparency from the Trusted Publisher around the issued tokens?
+  - In other words, is it very clear to us and the even package consumers that a token is a sufficient replacement for
+    an API-key from a security perspective.
+
+### Enable NuGet authentication provider integration, to avoid token expiration for long workflows
+
+We will wait for evidence that the short-lived token lifetime duration (15 minutes) is not sufficient for all workflow
+push operations.
+
+### Connect this effort with build provenance, tracked by [NuGet/Home#13581](https://github.com/NuGet/Home/issues/13581)
+
+This effort can be seen as a first step to enable build provenance, since it encourages package authors to move their
+build, pack, and push operations to a trusted build environment.
