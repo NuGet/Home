@@ -106,7 +106,7 @@ header.
 
 The package source MUST NOT opt to return the an existing compatible API key (i.e. it must not cache the API key for
 subsequent calls). To do so would require the original API key to be stored in plain text. NuGet.org API keys are hashed
-prior to storage (much like standard recommendations around storing passwords). The the package source has concerns on
+prior to storage (much like standard recommendations around storing passwords). The package source has concerns on
 scalability it must opt to rate limit the endpoint instead of caching. NuGet.org will rate limit the endpoint to 1 API
 key created per 30 seconds, per user.
 
