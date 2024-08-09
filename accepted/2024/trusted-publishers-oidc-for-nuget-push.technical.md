@@ -238,3 +238,7 @@ Ruby's [`rubygems/release-gem` step](https://github.com/marketplace/actions/rele
 
 The `nuget/login` step should be tolerant of throttling responses from the token service endpoint. The step should allow
 some amount of waiting and retrying on 412 Too Many Requests responses, using retry response headers if available. 
+
+GitHub Actions [secret
+masking](https://docs.github.com/en/actions/security-for-github-actions/security-guides/using-secrets-in-github-actions)
+will be used to reduce the risk of a short-lived NuGet API getting logged in clear text.
