@@ -33,8 +33,10 @@ package can help us properly validate JWTs in our NuGet/NuGetGallery ASP.NET app
 In addition to the general JWT checks, specific checks are made for each Trusted Publisher. For GitHub Actions, the
 following checks will be made:
 
-- `sub` claim matches `{repo owner}/{repo name}:.*` (case insensitive)
+- `sub` claim has a `repo:{repo owner}/{repo name}:` prefix (case insensitive)
   - The suffix of the `sub` is implied by the other checks
+  - Example, when an environment is set: `repo:octo-org/octo-repo:environment:Production`
+  - Example, for a specific branch and no environment is set: `repo:octo-org/octo-repo:ref:refs/heads/demo-branch`
 - `repository_owner` claim matches the `{repo owner}` name (case insensitive)
 - `repository_owner_id` claim matches the numeric owner ID recorded at the time of the trust policy creation
   - This is to avoid resurrection attacks.
@@ -43,12 +45,13 @@ following checks will be made:
   - This is to avoid resurrection attacks.
 - If a branch filter is provided in the trust policy:
   - `ref_type` claim must be `branch`
-  - `ref` claim must be `refs/head/{branch}` (case insensitive)
+  - `ref` claim must be `refs/head/{branch}` (case sensitive, branch names of differing case can coexist)
 - If an environment filter is provided in the trust policy:
   - `environment` claim must be `{environment}` (case insensitive)
 - If a workflow path filter is provided in the trust policy:
    - `job_workflow_ref` claim must be `{repo owner}/{repo name}/{workflow path}@.*` (case insensitive)
-   - The workflow path should be normalized to `/` path separators at the time of trust policy creation
+   - The workflow path should be normalized to `/` path separators at the time of trust policy creation, by the package
+     source, for better UX
 
 A list of possible claims to verify against is available in GitHub's [Understanding the OIDC
 token](https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/about-security-hardening-with-openid-connect#understanding-the-oidc-token)
@@ -104,11 +107,14 @@ Content-Type: application/json
 Authorization failures on this endpoint must return HTTP 401 Unauthorized with an `WWW-Authenticate: Bearer` response
 header.
 
-The package source MUST NOT opt to return the an existing compatible API key (i.e. it must not cache the API key for
-subsequent calls). To do so would require the original API key to be stored in plain text. NuGet.org API keys are hashed
-prior to storage (much like standard recommendations around storing passwords). The package source has concerns on
-scalability it must opt to rate limit the endpoint instead of caching. NuGet.org will rate limit the endpoint to 1 API
-key created per 30 seconds, per user.
+The package source MUST NOT return an existing compatible API key and MUST generate a new one on demand (e.g. it must
+not cache the API key for subsequent calls). To do so would require the original API key to be stored in plain text.
+NuGet.org API keys are hashed prior to storage (much like standard recommendations around storing passwords). The
+package source has concerns on scalability it must opt to rate limit the endpoint instead of caching. NuGet.org will
+rate limit the endpoint to 1 API key created per 30 seconds, per user.
+
+API keys are expected to be cached on the client side, in a secure manner, to allow the needed number of authorized API
+operations (e.g. push).
 
 Unlike normal API keys, no warning message will be returned from the push endpoint (or any other authenticated endpoint)
 as the API key nears its expiration. Additionally, no reminder email will be sent when these short-lived API keys are
