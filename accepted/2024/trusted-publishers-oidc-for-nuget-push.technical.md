@@ -78,11 +78,14 @@ Deleting a trust policy should have the effect of deleting all related short-liv
 
 A new endpoint will be needed for trading an bearer token (OIDC token, a JWT) for an API key. The endpoint URL will be
 discoverable via the [V3 service index](https://learn.microsoft.com/en-us/nuget/api/overview#service-index) and a new
-resource type which is `ApiKeyService/1.0.0`. For NuGet.org, the service index is available at
-`https://api.nuget.org/v3/index.json`. The new resource URL be something like `https://www.nuget.org/api/v2/api-key`.
+resource type which is `TokenService/1.0.0`. For NuGet.org, the service index is available at
+`https://api.nuget.org/v3/index.json`. The new resource URL be something like `https://www.nuget.org/api/v2/token`.
+
+This new resource will be referred to as the **token service**. This generic name will allow for future dynamic
+authorization scenarios beyond trading a bearer token for a NuGet API key.
 
 ```
-POST /api/v2/api-key HTTP/1.1
+POST /api/v2/token HTTP/1.1
 Host: www.nuget.org
 Authorization: Bearer {OIDC token}
 Content-Type: application/json
@@ -99,19 +102,21 @@ HTTP/1.1 200 OK
 Content-Type: application/json
 
 {
-   "api_key": "{short lived API key in clear text}",
-   "expires": "{ISO 8601 timestamp of expiration}"
+   "token_type": "api_key",
+   "expires": "{ISO 8601 timestamp of expiration}",
+   "api_key": "{short lived API key in clear text}"
 }
 ```
-
-Authorization failures on this endpoint must return HTTP 401 Unauthorized with an `WWW-Authenticate: Bearer` response
-header.
 
 The package source MUST NOT return an existing compatible API key and MUST generate a new one on demand (e.g. it must
 not cache the API key for subsequent calls). To do so would require the original API key to be stored in plain text.
 NuGet.org API keys are hashed prior to storage (much like standard recommendations around storing passwords). The
 package source has concerns on scalability it must opt to rate limit the endpoint instead of caching. NuGet.org will
 rate limit the endpoint to 1 API key created per 30 seconds, per user.
+
+Authorization failures on this endpoint must return HTTP 401 Unauthorized with an `WWW-Authenticate: Bearer` response
+header. Throttling failures on this endpoint MUST return HTTP 429 Too Many Requests and MAY return the standard
+`Retry-After` response header.
 
 API keys are expected to be cached on the client side, in a secure manner, to allow the needed number of authorized API
 operations (e.g. push).
@@ -131,13 +136,50 @@ These short-lived API keys will not be visible in the NuGet.org UI.
 
 NuGet.org MAY record the JWT and related details (e.g. JWKS) for auditing and feature adoption purposes.
 
+NuGet.org will produce API keys that last 15 minutes, but this value is subject to change as we learn more about how
+this feature is used in practice. PyPI uses this duration ([source](https://docs.pypi.org/trusted-publishers/)). Also,
+15 minutes will support about 99% of push sessions on NuGet.org. For the sake of this analysis, a push session is a
+sequence of push operations from a distinct package owner set, where the pushes are no more than 5 minutes apart. Below
+is a table of push sessions of various durations. The difference between 15 minute and 1 hour API key life givens less
+than 1% of additional coverage.
+
+<!--
+
+```kusto
+let MaxDistanceBetweenNeighbors = 5m;
+let MaxDistanceFromFirst = 30d;
+NiPackageVersions
+| where ResultType == "Available"
+| join kind=inner NiPackageOwners on LowerId
+| extend Owners = array_strcat(array_sort_asc(Owners), ", ")
+| order by Owners asc, Created asc
+| extend PushSession = row_window_session(Created, MaxDistanceFromFirst, MaxDistanceBetweenNeighbors, Owners != prev(Owners))
+| summarize PushCount = count(), PushSessionDuration = max(Created) - min(Created) by Owners, PushSession
+| where PushSession > ago(365d)
+| summarize (PushSessionDuration, PushCount) = arg_max(PushSessionDuration, PushCount) by Owners
+| summarize
+    ['% with single push'] = round(100.0 * countif(PushCount == 1) / count(), 2),
+    ['% < 1m'] = round(100.0 * countif(PushSessionDuration < 1m) / count(), 2),
+    ['% < 5m'] = round(100.0 * countif(PushSessionDuration < 5m) / count(), 2),
+    ['% < 10m'] = round(100.0 * countif(PushSessionDuration < 10m) / count(), 2),
+    ['% < 15m'] = round(100.0 * countif(PushSessionDuration < 15m) / count(), 2),
+    ['% < 30m'] = round(100.0 * countif(PushSessionDuration < 30m) / count(), 2),
+    ['% < 1h'] = round(100.0 * countif(PushSessionDuration < 1h) / count(), 2)
+```
+
+--> 
+
+| % with single push | % < 1m | % < 5m | % < 10m | % < 15m | % < 30m | % < 1h |
+| ------------------ | ------ | ------ | ------- | ------- | ------- | ------ |
+| 63.23              | 75.32  | 93.49  | 98      | 99.12   | 99.84   | 99.95  |
+
 ## Other package sources
 
 Other NuGet package sources aside from NuGet.org could also implement this protocol. They would need to implement the
 token trade endpoint.
 
 The `nuget/login` action could be implemented so that it supports and V3 package source, as long as it has a
-`ApiKeyService/1.0.0` resource in the service index. This level of flexibility should be implemented anyways so that it
+`TokenService/1.0.0` resource in the service index. This level of flexibility should be implemented anyways so that it
 can be tested against NuGet DEV and INT pre-production environments.
 
 It would be the responsibility of the package source to implement OIDC token validation as well as expressing trust
@@ -180,12 +222,12 @@ variables to trade the request token for a GitHub Actions OIDC token with the `n
 custom `aud` claim can be fetched by appending `audience={desired aud}` query string to the
 `ACTIONS_ID_TOKEN_REQUEST_URL` or by using the `@actions/core` JavaScript library.
 
-This latter GitHub Actions OIDC token will be send to the `ApiKeyService/1.0.0` resource, found via the `source`
+This latter GitHub Actions OIDC token will be send to the `TokenService/1.0.0` resource, found via the `source`
 parameter provided to the action. The `source` parameter must point to a V3 service index (JSON document). The service
-index and the `ApiKeyService/1.0.0` resource URL must both be HTTPS.
+index and the `TokenService/1.0.0` resource URL must both be HTTPS.
 
 The `NuGet/login` GitHub Action can use the NuGet.Protocol .NET package to determine the URL for the "create API key"
-endpoint, via the `ApiKeyService/1.0.0` resource in the V3 service index. For cross-platform reason, the GitHub Action
+endpoint, via the `TokenService/1.0.0` resource in the V3 service index. For cross-platform reason, the GitHub Action
 will either be a [JavaScript action or a composite
 action](https://docs.github.com/en/actions/creating-actions/about-custom-actions#types-of-actions) (to be determined
 during implementation). At this times, it seems it would be easiest to implement a JavaScript action and not use
@@ -193,3 +235,6 @@ during implementation). At this times, it seems it would be easiest to implement
 
 Once this `nuget/login` GitHub Action is complete, it will be published to the GitHub Action Marketplace, much like
 Ruby's [`rubygems/release-gem` step](https://github.com/marketplace/actions/release-gem).
+
+The `nuget/login` step should be tolerant of throttling responses from the token service endpoint. The step should allow
+some amount of waiting and retrying on 412 Too Many Requests responses, using retry response headers if available. 

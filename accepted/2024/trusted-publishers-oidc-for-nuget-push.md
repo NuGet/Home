@@ -560,7 +560,7 @@ a case-by-case basis. We will consider factors such (but not limited to):
 ### Enable NuGet authentication provider integration, to avoid token expiration for long workflows
 
 We will wait for evidence that our selected short-lived token lifetime duration is not sufficient for all workflow push
-operations.
+operations. As mentioned in the technical document, we will start with 15 minutes and adjust later if needed.
 
 ### Connect this effort with build provenance, tracked by [NuGet/Home#13581](https://github.com/NuGet/Home/issues/13581)
 
