@@ -187,19 +187,19 @@ policies.
 
 ## Auditing usage on NuGet.org
 
-To help us understand the success of this feature and record priviledged actions for security auditing, we will at least
+To help us understand the success of this feature and record privileged actions for security auditing, we will at least
 record minimal information about the OIDC token trade, such as the repository owner, repository name, workflow path,
 etc. Existing auditing for API key usage will be used anywhere the short-lived API key is used.
 
 The metadata available in a GitHub Actions OIDC token is mentioned in GitHub's [Understanding the OIDC
 token](https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/about-security-hardening-with-openid-connect#understanding-the-oidc-token).
 
-These claims could offer useful indicators to package consumers about the package. In order to support a future effort
-for [SLSA Build L1](https://slsa.dev/spec/v1.0/levels#build-l1), NuGet.org may record additional properties provided in
-the OIDC token so that they could adorn the package details page. This would be in addition to minimal records kept for
-security auditing purposes but would not extent beyond what is provided by GitHub Actions in their token or their public
-OIDC endpoints (e.g. JWKS). This is not as strong as signed provenance artifacts but can augment the freeform metadata
-we have today such as repository URL, project URL, or SourceLink information.
+These claims could offer useful indicators to package consumers about the package. In order to support a future effort,
+NuGet.org may record additional properties provided in the OIDC token so that they could adorn the package details page.
+This would be in addition to minimal records kept for security auditing purposes but would not extent beyond what is
+provided by GitHub Actions in their token or their public OIDC endpoints (e.g. JWKS). This is not as strong as signed
+provenance artifacts but can augment the freeform metadata we have today such as repository URL, project URL, or
+SourceLink information.
 
 Imagine showing "this package version was published from GitHub repository X, at commit Y", with some linked docs and
 caveats, on the package details page. I think it can be useful without being authoritative, much like project URL or
@@ -210,6 +210,12 @@ Note that this metadata provided in the token is not enough for a build provenan
 announcement](https://github.blog/security/supply-chain-security/introducing-npm-package-provenance/)). This is because
 a proper build provenance story has signed attestation occurring inside the Trusted Publisher. See [SLSA Build
 L2](https://slsa.dev/spec/v1.0/levels#build-l2) for more information.
+
+The existing repository metadata (e.g. repository URL) shown on the package details page and any additional metadata we
+show based on the OIDC token requires the package consumer to trust both the Trusted Publisher (GitHub Actions) and the
+registry (NuGet.org) that they are not tampering with the metadata. This is the risk inherent to [SLSA Build
+L1](https://slsa.dev/spec/v1.0/levels#build-l1). If we do opt to adorn package details package with more metadata, we
+will be careful to clarify the risks and the "trustability" of the information shown.
 
 ## The `nuget/login` GitHub Action step
 

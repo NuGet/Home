@@ -42,18 +42,18 @@ the rich context and prior art.
 
 There is a lot of lingo in this document, so here is a reference:
 
-| Term              | Definition                                                                                                                                                                                |
-| ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| CI/CD             | continuous integration/continuous deployment, technologies like GitHub Actions for building or deploying code automatically                                                               |
-| forge             | A place to store code, often a SaaS offering like GitHub, GitLab, or Bitbucket, often has a CI/CD offering paired                                                                         |
-| JWKs              | JSON web key set, a set of public keys that can be used to verify an OIDC token                                                                                                           |
-| JWT               | A JSON web token, a format of bearer token used for web authentication flows including OIDC, contains interesting "claims" (properties) in clear text                                     |
-| NuGet API key     | one of the authentication mechanisms used for uploading packages to a package source, a hex string starting with `oy2` when from NuGet.org                                                |
-| nupkg             | The file extension for a NuGet package, produced by NuGet pack, uploaded by NuGet push                                                                                                    |
-| OIDC              | OpenID Connect, an authentication protocol build on OAuth 2.0, think of it as a way for NuGet.org to trust GitHub Actions via a JWT included in package upload                            |
-| pack              | The name of the package creation operation, produces a .nupkg and optionally a .snupkg                                                                                                    |
-| package source    | A NuGet.org package feed, or package registry (all synonymous), a destination for push operations                                                                                         |
-| push              | The name of the package upload operation in NuGet ecosystem                                                                                                                               |
+| Term              | Definition                                                                                                                                                                               |
+| ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| CI/CD             | continuous integration/continuous deployment, technologies like GitHub Actions for building or deploying code automatically                                                              |
+| forge             | A place to store code, often a SaaS offering like GitHub, GitLab, or Bitbucket, often has a CI/CD offering paired                                                                        |
+| JWKs              | JSON web key set, a set of public keys that can be used to verify an OIDC token                                                                                                          |
+| JWT               | A JSON web token, a format of bearer token used for web authentication flows including OIDC, contains interesting "claims" (properties) in clear text                                    |
+| NuGet API key     | one of the authentication mechanisms used for uploading packages to a package source, a hex string starting with `oy2` when from NuGet.org                                               |
+| nupkg             | The file extension for a NuGet package, produced by NuGet pack, uploaded by NuGet push                                                                                                   |
+| OIDC              | OpenID Connect, an authentication protocol build on OAuth 2.0, think of it as a way for NuGet.org to trust GitHub Actions via a JWT included in package upload                           |
+| pack              | The name of the package creation operation, produces a .nupkg and optionally a .snupkg                                                                                                   |
+| package source    | A NuGet.org package feed, or package registry (all synonymous), a destination for push operations                                                                                        |
+| push              | The name of the package upload operation in NuGet ecosystem                                                                                                                              |
 | Trusted Publisher | A name for a CI/CD environment that can generate OIDC tokens, using workload identity, [described by OpenSSF](https://repos.openssf.org/trusted-publishers-for-all-package-repositories) |
 
 ## Motivation 
@@ -195,16 +195,16 @@ Here is a summary of known forges, based on package URL, repository URL, SourceL
    | extend ["% of owners"] = round(100.0 * Owners / TotalUniqueOwnersSets, 2)
 -->
 
-| Forge        | Package IDs | Owners | % of package IDs | % of owners |
-| ------------ | ----------- | ------ | ---------------- | ----------- |
-| GitHub       | 74440       | 14742  | 61.37            | 55.77       |
+| Forge        | Package IDs | Owners | % of package IDs | % of owners | Has CI/CD OIDC                                                                                                                                         |
+| ------------ | ----------- | ------ | ---------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| GitHub       | 74440       | 14742  | 61.37            | 55.77       | [Yes](https://docs.github.com/en/actions/security-for-github-actions/security-hardening-your-deployments/about-security-hardening-with-openid-connect) |
 | (unknown)    | 42738       | 10997  | 35.24            | 41.6        |
-| Azure DevOps | 1448        | 238    | 1.19             | 0.9         |
-| Gitee        | 1440        | 188    | 1.19             | 0.71        |
-| GitLab       | 825         | 165    | 0.68             | 0.62        |
-| Bitbucket    | 392         | 98     | 0.32             | 0.37        |
-| Codeberg     | 6           | 3      | 0                | 0.01        |
-| Gitea        | 1           | 1      | 0                | 0           |
+| Azure DevOps | 1448        | 238    | 1.19             | 0.9         | [Yes, but Azure-specific](https://learn.microsoft.com/en-us/azure/devops/pipelines/release/configure-workload-identity?view=azure-devops)              |
+| Gitee        | 1440        | 188    | 1.19             | 0.71        | No?                                                                                                                                                    |
+| GitLab       | 825         | 165    | 0.68             | 0.62        | [Yes](https://docs.gitlab.com/ee/integration/openid_connect_provider.html)                                                                             |
+| Bitbucket    | 392         | 98     | 0.32             | 0.37        | [Yes](https://support.atlassian.com/bitbucket-cloud/docs/integrate-pipelines-with-resource-servers-using-oidc/)                                        |
+| Codeberg     | 6           | 3      | 0                | 0.01        | No?                                                                                                                                                    |
+| Gitea        | 1           | 1      | 0                | 0           | No?                                                                                                                                                    |
 
 (considering only latest package versions metadata of packages published in the past year, our definition of "active
 packages")
@@ -556,6 +556,24 @@ a case-by-case basis. We will consider factors such (but not limited to):
 - Is there transparency from the Trusted Publisher around the issued tokens?
   - In other words, is it very clear to us and the even package consumers that a token is a sufficient replacement for
     an API-key from a security perspective.
+
+### Enforce short-lived (OIDC) auth for onboarded packages/package owners
+
+When a package owner opts to start using this Trusted Publishers feature, they have improved their security posture from
+no longer depending on long-lived secrets that have are very damaging if leaked. We could choose to enforce this
+improved authentication flow by doing some combination of the following:
+
+- Invalidate all existing API keys at the time of trust policy creation
+- Require short-lived API keys (no UI or long-lived API key auth) on a package ID after it has a single short-lived API
+  key push
+- Require all packages owned by the user to use short-lived API keys after a trust policy is created
+
+It's unclear how these enforcements would work for packages with multiple owners or with users that are members of
+organizations.
+
+We will consider this sort of enforcement some time after the initial release of the feature. We won't know what kind of
+blockers users will run in to and in what cases they may still need to use short lived and long lived API keys at the
+same time.
 
 ### Enable NuGet authentication provider integration, to avoid token expiration for long workflows
 
