@@ -42,18 +42,18 @@ the rich context and prior art.
 
 There is a lot of lingo in this document, so here is a reference:
 
-| Term              | Definition                                                                                                                                                                                |
-| ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| CI/CD             | continuous integration/continuous deployment, technologies like GitHub Actions for building or deploying code automatically                                                               |
-| forge             | A place to store code, often a SaaS offering like GitHub, GitLab, or Bitbucket, often has a CI/CD offering paired                                                                         |
-| JWKs              | JSON web key set, a set of public keys that can be used to verify an OIDC token                                                                                                           |
-| JWT               | A JSON web token, a format of bearer token used for web authentication flows including OIDC, contains interesting "claims" (properties) in clear text                                     |
-| NuGet API key     | one of the authentication mechanisms used for uploading packages to a package source, a hex string starting with `oy2` when from NuGet.org                                                |
-| nupkg             | The file extension for a NuGet package, produced by NuGet pack, uploaded by NuGet push                                                                                                    |
-| OIDC              | OpenID Connect, an authentication protocol build on OAuth 2.0, think of it as a way for NuGet.org to trust GitHub Actions via a JWT included in package upload                            |
-| pack              | The name of the package creation operation, produces a .nupkg and optionally a .snupkg                                                                                                    |
-| package source    | A NuGet.org package feed, or package registry (all synonymous), a destination for push operations                                                                                         |
-| push              | The name of the package upload operation in NuGet ecosystem                                                                                                                               |
+| Term              | Definition                                                                                                                                                                               |
+| ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| CI/CD             | continuous integration/continuous deployment, technologies like GitHub Actions for building or deploying code automatically                                                              |
+| forge             | A place to store code, often a SaaS offering like GitHub, GitLab, or Bitbucket, often has a CI/CD offering paired                                                                        |
+| JWKs              | JSON web key set, a set of public keys that can be used to verify an OIDC token                                                                                                          |
+| JWT               | A JSON web token, a format of bearer token used for web authentication flows including OIDC, contains interesting "claims" (properties) in clear text                                    |
+| NuGet API key     | one of the authentication mechanisms used for uploading packages to a package source, a hex string starting with `oy2` when from NuGet.org                                               |
+| nupkg             | The file extension for a NuGet package, produced by NuGet pack, uploaded by NuGet push                                                                                                   |
+| OIDC              | OpenID Connect, an authentication protocol build on OAuth 2.0, think of it as a way for NuGet.org to trust GitHub Actions via a JWT included in package upload                           |
+| pack              | The name of the package creation operation, produces a .nupkg and optionally a .snupkg                                                                                                   |
+| package source    | A NuGet.org package feed, or package registry (all synonymous), a destination for push operations                                                                                        |
+| push              | The name of the package upload operation in NuGet ecosystem                                                                                                                              |
 | Trusted Publisher | A name for a CI/CD environment that can generate OIDC tokens, using workload identity, [described by OpenSSF](https://repos.openssf.org/trusted-publishers-for-all-package-repositories) |
 
 ## Motivation 
@@ -272,37 +272,17 @@ NuGet.org requires two-factor authentication for all web UI sign-ins.
 
 #### What NuGet API operations can be used inside the GitHub Actions workflow?
 
-To scope the ways in which a GitHub trust policy can be used, similar scoping rules to the current API key flow can be
-set on the GitHub Actions trust policy:
+We will not implement scoping rules as flexible as the current long-lived API key flow on the GitHub Actions trust
+policy. See the [Enable existing scoping features allowed on long-lived API
+keys](#enable-existing-scoping-features-allowed-on-long-lived-api-keys) section below for why we are keeping it simple.
 
-![Scope form](meta/trusted-publishers-oidc-for-nuget-push/scope-form.png)
+In short, all NuGet API key operations will be supported by the GitHub Actions workflow: pushing new package IDs,
+updating existing package IDs, unlisting/relisting package versions.
 
-Just like the existing API scoping feature, there are 3 dimensions which a trust policy can be scoped. For more
-information about scopes on API keys, see [Scoped API
-keys](https://learn.microsoft.com/en-us/nuget/nuget-org/scoped-api-keys). In summary:
-
-- **Package owner**: for users that are members of one or more organizations, it's important to know which package owner
-  this trust policy acts on behalf of. For example, in my screenshot above the package owner is set to `joelverhagen`,
-  so packages owned only by my `snoozecorp` organization will not accept package uploads via this trust policy. This is
-  also important to define who is the initial owner of a package that is newly created. In this example, if I push a new
-  `Knapcode.MyBestPackage` package ID, the new package ID will be owned by `joelverhagen`, not `snoozecorp` or any other
-  organization that I am a member of based on this package owner definition. This resolves the ["Pending" Trusted
-  Publishers](https://repos.openssf.org/trusted-publishers-for-all-package-repositories#pending-trusted-publishers)
-  problem.
-
-- **Scopes**: the scope radio buttons and checkboxes define what kind of operations the trust policy can be used for.
-  For example, can the trust policy be used to unlist packages in addition to publishing new packages? Can only versions
-  on existing package IDs be published? Or new package IDs be created as well?
-
-- **Glob pattern**: this defines which package IDs the trust policy can apply to, based on a wildcard pattern (called
-  "glob" in this context for historical reasons). If you want the trust policy to apply to all package IDs you own, you
-  would specify `*`. Note that a broad wildcard like `*` does not supersede access controls on package IDs you do not
-  own. It just defines which if your packages the trust policy can work for.
-
-The screenshot above allows only new package versions to be pushed for packages owned by `joelverhagen`, having IDs
-starting in `Knapcode.`. New package IDs cannot be created in this case nor can packages be unlisted.
-
-Unlike API key definitions, there is no "Expires In" field, because a trust policy never expires.
+The user must still select the package owner that the trust policy applies to since this allows a new package ID to have
+the proper owner: either the user themself or an organization they are a member of. This resolves the ["Pending" Trusted
+Publishers](https://repos.openssf.org/trusted-publishers-for-all-package-repositories#pending-trusted-publishers)
+problem.
 
 Multiple trust policies can be defined. If any of the trust policies match the incoming package and GitHub Action token,
 the operation will be allowed. If the package ID is new and there is ambiguity on which package owner should be assigned
@@ -505,11 +485,195 @@ CI/CD workflows. In the end, this approach could support GitHub Actions via
 identity), as long as you can authenticate as an Entra ID service principal. The drawback of this is that NuGet.org
 would have no control over the workload identity tokens which are accepted and would be opening up a lot more
 authentication scenarios than we really need at this point. This would also require us rationalizing how an Entra ID
-service principal relates to a NuGet.org user or organization profile. Today NuGet.org allows Entra ID (formerly AAD,
-Azure Active Directory) user sign in as well as personal Microsoft account (MSA) sign in. Therefore there is already
-some relationship between NuGet.org and Entra ID. In what way this existing integration would be affected by a service
-principal flow is unclear. So this idea would be a lot more work! Maybe it's something we need in the distant future,
-but not now.
+service principal relates to a NuGet.org user or organization profile.
+
+Today NuGet.org allows Entra ID (formerly AAD, Azure Active Directory) user sign in as well as personal Microsoft
+account (MSA) sign in. Therefore there is already some relationship between NuGet.org and Entra ID. In what way this
+existing integration would be affected by a service principal flow is unclear. So this idea would be a lot more work!
+Maybe it's something we need in the distant future, but not now.
+
+### Enable existing scoping features allowed on long-lived API keys
+
+Today, long-lived API keys can be scoped by package owner, by allowed action, and by package ID (via a wildcard
+pattern).
+
+![Scope form](meta/trusted-publishers-oidc-for-nuget-push/scope-form.png)
+
+For more information about scopes on API keys, see [Scoped API
+keys](https://learn.microsoft.com/en-us/nuget/nuget-org/scoped-api-keys). In summary:
+
+- **Package owner**: for users that are members of one or more organizations, it's important to know which package owner
+  this trust policy acts on behalf of. For example, in my screenshot above the package owner is set to `joelverhagen`,
+  so packages owned only by my `snoozecorp` organization will not accept package uploads via this trust policy. This is
+  also important to define who is the initial owner of a package that is newly created. In this example, if I push a new
+  `Knapcode.MyBestPackage` package ID, the new package ID will be owned by `joelverhagen`, not `snoozecorp` or any other
+  organization that I am a member of based on this package owner definition.
+
+- **Scopes**: the scope radio buttons and checkboxes define what kind of operations the trust policy can be used for.
+  For example, can the trust policy be used to unlist packages in addition to publishing new packages? Can only versions
+  on existing package IDs be published? Or new package IDs be created as well?
+
+- **Glob pattern**: this defines which package IDs the trust policy can apply to, based on a wildcard pattern (called
+  "glob" in this context for historical reasons). If you want the trust policy to apply to all package IDs you own, you
+  would specify `*`. Note that a broad wildcard like `*` does not supersede access controls on package IDs you do not
+  own. It just defines which if your packages the trust policy can work for.
+
+The screenshot above allows only new package versions to be pushed for packages owned by `joelverhagen`, having IDs
+starting in `Knapcode.`. New package IDs cannot be created in this case nor can packages be unlisted.
+
+The package owner scoping is necessary so that an API key operates on behalf of the proper package owner (i.e. the user
+themself or an organization they are a member of).
+
+The other two scoping options both have a mix of adoption, as shown below.
+
+#### Allowed action usage
+
+<!--
+
+  WITH
+  CredentialScopes AS (
+      SELECT
+          c.[Key] AS CredentialKey,
+          c.UserKey,
+          c.Created,
+          c.ExpirationTicks,
+          s.[Key] AS ScopeKey,
+          s.Subject,
+          s.AllowedAction,
+          s.OwnerKey,
+          IIF(s.AllowedAction = 'package:verify', 1, 0) AS AllowsPackageVerify,
+          IIF(s.AllowedAction = 'package:push', 1, 0) AS AllowsPackagePush,
+          IIF(s.AllowedAction = 'package:unlist', 1, 0) AS AllowsPackageUnlist,
+          IIF(s.AllowedAction = 'package:pushversion', 1, 0) AS AllowsPackagePushVersion
+      FROM dbo.[Credentials] c
+      LEFT OUTER JOIN dbo.Scopes s ON c.[Key] = s.CredentialKey
+      WHERE c.Expires > SYSDATETIME() AND c.[Type] LIKE 'apikey.%'
+  ),
+  CredentialAllowedActions AS (
+      SELECT
+          CredentialKey,
+          IIF(SUM(AllowsPackageVerify) > 0, 1, 0) AS AllowsPackageVerify,
+          IIF(SUM(AllowsPackagePush) > 0, 1, 0) AS AllowsPackagePush,
+          IIF(SUM(AllowsPackageUnlist) > 0, 1, 0) AS AllowsPackageUnlist,
+          IIF(SUM(AllowsPackagePushVersion) > 0, 1, 0) AS AllowsPackagePushVersion
+      FROM CredentialScopes
+      GROUP BY CredentialKey
+  ),
+  CredentialAllowedActionsSummary AS (
+      SELECT AllowsPackagePush, AllowsPackagePushVersion, AllowsPackageUnlist, COUNT(*) AS [Count]
+      FROM CredentialAllowedActions
+      WHERE AllowsPackageVerify = 0
+      GROUP BY AllowsPackagePush, AllowsPackagePushVersion, AllowsPackageUnlist
+  )
+  SELECT
+      AllowsPackagePush [Push],
+      AllowsPackagePushVersion [Push version],
+      AllowsPackageUnlist [Unlist],
+      ROUND(100.0 * [Count] / (SELECT SUM([Count]) FROM CredentialAllowedActionsSummary), 2) AS [% of total]
+  FROM CredentialAllowedActionsSummary
+  ORDER BY [Count] DESC
+
+-->
+
+| Push | Push version | Unlist | % of total | Notes                                              |
+| ---- | ------------ | ------ | ---------- | -------------------------------------------------- |
+| 1    | 0            | 0      | 79.76      | Push new IDs and update existing IDs               |
+| 1    | 0            | 1      | 12.58      | Push new IDs and update existing IDs, allow unlist |
+| 0    | 1            | 0      | 6.77       | Update existing IDs                                |
+| 0    | 0            | 1      | 0.48       | Allow unlist                                       |
+| 0    | 1            | 1      | 0.41       | Update existing IDs, allow unlist                  |
+
+Note that "Push" implies "Push version" allowed action.
+
+The first two rows should be considered "high priviledge" API keys. They account for about 93% of the API keys. This
+suggests users do not care much about limiting the allowed action of an API key.
+
+#### Package ID pattern usage
+
+<!--
+
+  WITH
+  CredentialInfo AS (
+      SELECT
+          c.[Key] AS CredentialKey,
+          c.UserKey,
+          c.Created,
+          c.ExpirationTicks,
+          s.[Key] AS ScopeKey,
+          s.Subject,
+          s.AllowedAction,
+          s.OwnerKey,
+          IIF(s.Subject = '*', 1, 0) AS MatchAll,
+          IIF(s.Subject != '*' AND s.Subject LIKE '%*', 1, 0) AS MatchPrefix,
+          IIF(s.Subject != '*' AND s.Subject LIKE '*%', 1, 0) AS MatchSuffix,
+          IIF(s.Subject != '*' AND s.Subject LIKE '%*%', 1, 0) AS MatchPrefixSuffix,
+          IIF(s.Subject NOT LIKE '%*%', 1, 0) AS MatchExact
+      FROM dbo.[Credentials] c
+      LEFT OUTER JOIN dbo.Scopes s ON c.[Key] = s.CredentialKey
+      WHERE c.Expires > SYSDATETIME() AND c.[Type] LIKE 'apikey.%' AND s.AllowedAction != 'package:verify'
+  ),
+  CredentialSubjects AS (
+      SELECT
+          CredentialKey,
+          SUM(MatchAll) AS MatchAll,
+          SUM(MatchPrefix) AS MatchPrefix,
+          SUM(MatchSuffix) AS MatchSuffix,
+          IIF(SUM(MatchPrefix) = 0 AND SUM(MatchSuffix) = 0 AND SUM(MatchPrefixSuffix) > 0, SUM(MatchPrefixSuffix), 0) AS MatchPrefixSuffix,
+          SUM(MatchExact) AS MatchExact
+      FROM CredentialInfo
+      GROUP BY CredentialKey
+  ),
+  CredentialSubjectTypes AS (
+      SELECT
+          CredentialKey,
+          CASE
+              WHEN MatchAll > 0 THEN 'Glob, match all'
+              WHEN MatchExact = 1 AND MatchAll + MatchPrefix + MatchSuffix + MatchPrefixSuffix = 0 THEN 'Exact match, single'
+              WHEN MatchExact > 1 AND MatchAll + MatchPrefix + MatchSuffix + MatchPrefixSuffix = 0 THEN 'Exact match, multiple'
+              WHEN MatchExact = 0 AND MatchAll + MatchPrefix + MatchSuffix + MatchPrefixSuffix > 0 THEN  'Glob, partial match'
+              ELSE 'Glob and exact match'
+          END AS [Type]
+      FROM CredentialSubjects
+  ),
+  CredentialSubjectsSummary AS (
+      SELECT [Type], COUNT(*) AS [Count]
+      FROM CredentialSubjectTypes
+      GROUP BY [Type]
+  )
+  SELECT
+      [Type],
+      ROUND(100.0 * [Count] / (SELECT SUM([Count]) FROM CredentialSubjectsSummary), 2) AS [% of total]
+  FROM CredentialSubjectsSummary
+  ORDER BY [Count] DESC
+
+-->
+
+| Type                  | % of total | Example                              |
+| --------------------- | ---------- | ------------------------------------ |
+| Glob, match all       | 57.26      | `*`                                  |
+| Exact match, single   | 20.58      | `NuGet.Protocol`                     |
+| Glob, partial match   | 14.59      | `NuGet.*`                            |
+| Exact match, multiple | 6.92       | `NuGet.Protocol`, `NuGet.Frameworks` |
+| Glob and exact match  | 0.65       | `Microsoft.*`, `NuGet.Protocol`      |
+
+This form of scoping based on package ID has a lot more variety than the previous section. Close to half of users go
+very broad with their scoping (`*`, allow all package IDs). The 2nd place scoping is very specific: only a single
+package ID can be modified with the API key.
+
+The current UI defaults to an empty glob pattern text field and a list of visible checkboxes for all of the package IDs
+the user has upload permissions for. This requires the user to provide *some* input. It's not clear whether this UI
+gently encourages users to click the checkboxes since that's probably quicker than typing. I were to guess, the adoption
+of `*` would go up a lot if we defaulted the package ID text field to `*`.
+
+#### Conclusion
+
+Since the majority use case for both allowed action and package ID scoping is a very permissive option, we won't enable
+these two scoping options for short-lived API keys. The short-lived API keys will be able to perform any operation on
+any package ID (e.g. `*` pattern).
+
+We can add this level of configuration later as users request it.
+
+The package owner dropdown is still needed.
 
 ## Prior Art
 
