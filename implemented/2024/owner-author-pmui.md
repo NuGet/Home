@@ -3,6 +3,7 @@
 
 - Donnie Goodson ([donnie-msft](https://github.com/donnie-msft))
 - GitHub Issue <https://github.com/NuGet/Home/issues/12501>
+- Status: Implemented in VS 17.12 Preview 1 (Packages List portion done in 17.11)
 
 ## Summary
 
