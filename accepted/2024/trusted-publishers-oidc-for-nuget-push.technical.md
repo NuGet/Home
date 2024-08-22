@@ -140,7 +140,7 @@ NuGet.org will produce API keys that last 15 minutes, but this value is subject 
 this feature is used in practice. PyPI uses this duration ([source](https://docs.pypi.org/trusted-publishers/)). Also,
 15 minutes will support about 99% of push sessions on NuGet.org. For the sake of this analysis, a push session is a
 sequence of push operations from a distinct package owner set, where the pushes are no more than 5 minutes apart. Below
-is a table of push sessions of various durations. The difference between 15 minute and 1 hour API key life givens less
+is a table of push sessions of various durations. The difference between 15 minute and 1 hour API key life gives less
 than 1% of additional coverage.
 
 <!--
