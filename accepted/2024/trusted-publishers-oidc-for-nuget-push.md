@@ -662,7 +662,7 @@ package ID can be modified with the API key.
 
 The current UI defaults to an empty glob pattern text field and a list of visible checkboxes for all of the package IDs
 the user has upload permissions for. This requires the user to provide *some* input. It's not clear whether this UI
-gently encourages users to click the checkboxes since that's probably quicker than typing. I were to guess, the adoption
+gently encourages users to click the checkboxes since that's probably quicker than typing. If I were to guess, the adoption
 of `*` would go up a lot if we defaulted the package ID text field to `*`.
 
 #### Conclusion
