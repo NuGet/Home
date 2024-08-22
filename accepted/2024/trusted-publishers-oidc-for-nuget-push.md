@@ -585,7 +585,7 @@ The other two scoping options both have a mix of adoption, as shown below.
 
 Note that "Push" implies "Push version" allowed action.
 
-The first two rows should be considered "high priviledge" API keys. They account for about 93% of the API keys. This
+The first two rows should be considered "high privilege" API keys. They account for about 93% of the API keys. This
 suggests users do not care much about limiting the allowed action of an API key.
 
 #### Package ID pattern usage
