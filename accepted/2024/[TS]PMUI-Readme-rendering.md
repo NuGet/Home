@@ -106,9 +106,9 @@ This will be a link to download the README and will only be filled if a readme i
     ...
 }
 ```
-##### PackageBaseAddress/6.12.0
+##### ReadmeUriTemplate/6.12.0
 
-A new version of the [package content](https://learn.microsoft.com/en-us/nuget/api/package-base-address-resource) resource type which will include a url definition for downloading the README.
+A new resource `ReadmeUriTemplate/6.12.0` similar to the [ReportAbuseUriTemplate](https://learn.microsoft.com/en-us/nuget/api/report-abuse-resource) resource type which will include a url definition for downloading the README.
 
 ```json
 {
@@ -116,14 +116,14 @@ A new version of the [package content](https://learn.microsoft.com/en-us/nuget/a
     "resources": [
         ...,
         {
-            "@id": "https://apidev.nugettest.org/v3/flatcontainer/",
-            "@type": "PackageBaseAddress/6.12.0"
+            "@id": "https://apidev.nugettest.org/v3/flatcontainer/{lower_id}/{lower_version}/readme",
+            "@type": "ReadmeUriTemplate/6.12.0"
         },
         ...
     ]
 }
 ```
-`GET {@id}/{LOWER_ID}/{LOWER_VERSION}/readme` would return the README if it's available.
+In code we would take the id provided and replace the {lower_id} and {lower_version} in the strings with the package we are trying to get the README for.
 
 ### Technical explanation
 #### Rendering Markdown
