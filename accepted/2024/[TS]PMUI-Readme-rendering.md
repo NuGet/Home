@@ -194,7 +194,8 @@ Ex. https://www.nuget.org/packages/Newtonsoft.Json#README-body-tab
     Updating the package metadata to include a link to the readme, and a direct download similar to the way nuspec and nupkg are implemented.
 1. ~~Where are the README files saved in a package?~~
     - Can use Nuget.Packaging to get README location from nuspec.
-1. What do we want the UX to be when an exception or error occurs while reading a README file? 
+1. ~~What do we want the UX to be when an exception or error occurs while reading a README file?~~
+    - Inform the users that an exception occurred. If time permits allow for a retry.
 1. ~~Do we want the README to update whenever a new version is selected for the current package?~~
    - Yes.
 <!-- What parts of the proposal do you expect to resolve before this gets accepted? -->
