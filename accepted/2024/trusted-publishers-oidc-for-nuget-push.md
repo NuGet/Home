@@ -244,16 +244,20 @@ supplies a variety of metadata in the OIDC token available to workflow runs. Ref
 token](https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/about-security-hardening-with-openid-connect#understanding-the-oidc-token)
 to see all of the properties.
 
-For the sake of simplicity, we will start with the following workflow filters:
-- Filtering for a specific *branch*, as shown in the UI above (branch filter)
+We will start with the following workflow filters:
+- Filtering for a *branch* pattern (e.g. `main` or `releases/*`), as shown in the UI above (branch filter)
 - Filtering for a specific *environment* (a property optionally set in the workflow)
 - Filtering for a specific *workflow path* (relative file path within the repository)
+- Filtering for a *tag* pattern (e.g. `v*`)
 
 The screenshot above only shows the branch filter, so the UI will need to be expanded to cover the desired workflow
-filters. A suggest UI would have 3 checkboxes:
-- [ ] Filter by branch: __________
-- [ ] Filter by environment: __________
+filters. A suggest UI would have 4 checkboxes:
 - [ ] Filter by workflow: __________
+- [ ] Filter by environment: __________
+- [ ] Filter by branch: __________ (wildcard pattern supported)
+- [ ] Filter by tag: __________ (wildcard pattern supported)
+
+The branch and tag option are mutually exclusive.
 
 At least one filter would need to be checked as to prevent an overly broad trust policy.
 

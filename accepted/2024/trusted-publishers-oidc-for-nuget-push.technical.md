@@ -45,13 +45,16 @@ following checks will be made:
   - This is to avoid resurrection attacks.
 - If a branch filter is provided in the trust policy:
   - `ref_type` claim must be `branch`
-  - `ref` claim must be `refs/head/{branch}` (case sensitive, branch names of differing case can coexist)
+  - `ref` claim must be `refs/head/{branch}` (case sensitive, branch names of differing case can coexist, branch match supports wildcards)
 - If an environment filter is provided in the trust policy:
   - `environment` claim must be `{environment}` (case insensitive)
 - If a workflow path filter is provided in the trust policy:
    - `job_workflow_ref` claim must be `{repo owner}/{repo name}/{workflow path}@.*` (case insensitive)
    - The workflow path should be normalized to `/` path separators at the time of trust policy creation, by the package
      source, for better UX
+- If a tag filter is provided in the trust policy:
+  - `ref_type` claim must be `tag`
+  - `ref` claim must match `refs/tags/{tag-pattern}` (case sensitive, tag names of differing case can coexist, tag match supports wildcards)
 
 A list of possible claims to verify against is available in GitHub's [Understanding the OIDC
 token](https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/about-security-hardening-with-openid-connect#understanding-the-oidc-token)
