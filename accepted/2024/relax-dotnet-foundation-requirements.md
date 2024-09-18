@@ -2,6 +2,7 @@
 <!-- Replace `Title` with an appropriate title for your design -->
 
 - Author Name @glennawatson
+- Issue https://github.com/NuGet/NuGetGallery/issues/10187
 
 ## Summary
 
