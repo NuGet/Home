@@ -26,7 +26,7 @@ with Trusted Signing.
 #### How would this be implemented?
 
 The first step would be to store the EKU that is inside the certificate that was used to sign the NuGet package with Trusted
-Signing. The certificate of Tursted Signing is only valid for thee days but it contains an EKU to that can be used to get the
+Signing. The certificate of Trusted Signing is only valid for thee days but it contains an EKU to that can be used to get the
 identity of the owner of the certificate. There are two EKU's in the certificate. One that tells us that it was signed with
 Trusted Signing (`1.3.6.1.4.1.311.97.1.0`) and another one that contains the Public Trust identity (e.g. 
 `1.3.6.1.4.1.311.97.990309390.766961637.194916062.941502583`). More details about this can be found here:
@@ -36,7 +36,7 @@ I would like to propose to link EKU's to the user in a similar way as that is no
 
 ![EKU](images/trusted-signing-eku.png)
 
-But his would require a user to enter that EKU in the interface to link it with their account. We could also start with
+But this would require a user to enter that EKU in the interface to link it with their account. We could also start with
 automatically linking the EKU to the user by using the current "certificate upload" interface. The user would need to do the
 following:
 - Extract the `.cer` file of the signing certificate from the NuGet package.
@@ -102,11 +102,11 @@ functionality right away so that is why I think this could be added as a second 
 
 #### How would this be implemented?
 
-When a `.cer` file is uploaded only the tumbprint is stored because the certificate is not parsed by the NuGet Gallery due to
+When a `.cer` file is uploaded only the thumbprint is stored because the certificate is not parsed by the NuGet Gallery due to
 security reasons. This means we cannot add the Public trust identity EKU record when a certificate is uploaded. For a user that
 has access to the Azure Portal it would be easier to copy the EKU from the interface:
 
-![Azure Porta;](images/trusted-signing-azure.png)
+![Azure Portal](images/trusted-signing-azure.png)
 
 And this can also be done before a NuGet package has been signed. This copied value should then be entered into a form that adds
 this EKU to the user. As mentioned earlier the Subject and Issuer will be set once the first package that has this EKU is uploaded.
