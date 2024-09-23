@@ -53,7 +53,7 @@ to the interface have been made. But I don't think a lot of people will need thi
 
 The EKU will only be linked when the following conditions are true:
 - The package was signed within the last X days where X should be decided by the NuGet team (not sure if this is really necessary).
-- The signing certificate is signed by `Microsoft Identity Verification Root Certificate Authority 2020`.
+- The signing certificate must be issued by the CA certificate `Microsoft Identity Verification Root Certificate Authority 2020`.
   (https://learn.microsoft.com/en-us/azure/trusted-signing/concept-trusted-signing-trust-models)
 - The signing certificate has a valid counter-signature (timestamp).
 - The signing certificate contains the Trusted Signing EKU.
@@ -88,8 +88,8 @@ but I think it would be best to show the EKU's in a separate table.
 
 This image demonstrates how this would look when a user has both an EKU and certificate linked to their account. As mentioned in
 step 1 the certificate would no longer be shown and the user would only see their EKU's. The Subject and Issuer will be extracted
-from the certificate the first time and added to the EKU data. Uploads in the future could result in a new Issuer so this should
-be updated but a change of Subject would result in a different EKU so there is no need to update this.
+from the certificate the first time and added to the EKU data. Future uploads should also check the Subject and Issuer and update
+the data if they have changed.
 
 #### How does this help the user?
 
