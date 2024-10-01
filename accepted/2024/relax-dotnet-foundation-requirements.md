@@ -15,6 +15,11 @@ The foundation is having complaints from maintainers that they can't control the
 We do want to have the project to have some sort of signing since we offer projects free signing certificates to mitigate any costs to the project.
 
 We have had discussions and approval by the .NET Foundation board, and also discussed with our Project Committe and they have agreed to these requirements.
+
+The project committee met on the 12th September 2024 with the meeting minute notes here: https://github.com/dotnet-foundation/projects/issues/398 and agreed upon relaxing the requirements to requiring signing that matches the current NuGet.org trusted signing as per below.
+
+The .NET Foundation board met on the 18th September 2024 00:00 UTC time and agreed to go with the project committe recommendation. Board members will attest to that in the PR.
+
 ## Explanation
 
 ### Functional explanation
