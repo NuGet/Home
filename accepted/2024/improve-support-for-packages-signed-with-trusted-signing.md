@@ -52,7 +52,7 @@ is now linked to the user. That will mean that the user would need to contact th
 to the interface have been made. But I don't think a lot of people will need this functionality right away.
 
 The EKU will only be linked when the following conditions are true:
-- The package was signed within the last X days where X should be decided by the NuGet team (not sure if this is really necessary).
+- The package was signed within the last 30 days.
 - The signing certificate must be issued by the CA certificate `Microsoft Identity Verification Root Certificate Authority 2020`.
   (https://learn.microsoft.com/en-us/azure/trusted-signing/concept-trusted-signing-trust-models)
 - The signing certificate has a valid counter-signature (timestamp).
