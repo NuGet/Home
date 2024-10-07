@@ -12,10 +12,10 @@ be released separately but I can also understand that the NuGet team would want 
 ## Motivation
 
 Earlier this year [Trusted Signing](https://learn.microsoft.com/en-us/azure/trusted-signing/) was launched by Microsoft and 
-recently support for this was added to `dotnet sign`. Packages signed with this can be uploaded to the NuGet Gallery. But
-because the certificate is only valid for three days a user will probably always need to update their certificate on their 
-account page. I would like to propose a set of changes to improve the experience for users that sign their NuGet package
-with Trusted Signing.
+recently support for this was added to [Sign CLI](https://github.com/dotnet/sign). Packages signed with this can be uploaded
+to the NuGet Gallery. But because the certificate is only valid for a short time a user will probably always need to update their
+certificate on their account page. I would like to propose a set of changes to improve the experience for users that sign their
+NuGet package with Trusted Signing.
 
 ## Explanation
 
