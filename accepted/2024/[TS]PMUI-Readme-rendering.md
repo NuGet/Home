@@ -25,6 +25,8 @@ The PM UI will be updated to have tabs for the Package Details and the the READM
 This UX will be displayed for both the Browse and installed tabs.
 It will also be displayed for both the solution level and project level package managers.
 ![Alt text](https://github.com/NuGet/Home/assets/89422562/81b24877-f12f-4783-905c-4a155d3c7693)
+Local packages will only be rendered in Installed tab.
+We want to avoid users browsing for packages and only seeing README for packages in the Global Packages Folder. 
 
 When no README is available we will display a messsage in the README section.
 ![alt text](../../meta/resources/ReadMePMUI/NoReadMeFound.png)
