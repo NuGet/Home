@@ -8,7 +8,7 @@
 
 <!-- One-paragraph description of the proposal. -->
 
-## Motivation 
+## Motivation
 
 <!-- Why are we doing this? What pain points does this solve? What is the expected outcome? -->
 
