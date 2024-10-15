@@ -40,7 +40,9 @@ A list of package id/versions to be pruned will be provided by the .NET SDK. The
 When NuGet encounters any of the specified packages or lower, it will simply remove the package from the graph.
 This package id will not be downloaded and will not appear in the assets file libraries or targets section, but there will be a detailed verbosity message indicating that the package id has been pruned for the given framework.
 
-The feature is framework specific, and can be opted in/out using the `NuGetEnablePrunedPackages` property.
+The feature is framework specific, and can be opted in/out using the `RestoreEnablePackagePruning` property.
+
+If a
 
 ### Technical explanation
 
@@ -56,8 +58,17 @@ The `PrunedPackageReference` item will support the following attributes:
 The collect target will be `CollectPrunedPackageReferences`.
 
 When NuGet sees any of these package ids in the resolution, it'll just skip them and log a message in detailed verbosity, indicating the package has been skipped.
-Pruning direct PackageReference is *not allowed*.
 We may capture some of this information in telemetry to track how often this feature is being used.
+
+Duplicate item checking will be performed the same way it is performed for all other NUGet items such as `CollectPackageReferences`.
+
+#### Special scenarios
+
+- Pruning direct PackageReference of current project - Warn and don't prune.
+- Pruning direct PackageReference of transitve projects - Warn and don't prune.
+- Pruning transitive packages of current project - Prune
+- Pruning package ids that are projects - Warn and don't prune
+- Pruning package id that matches the current project - Error
 
 #### Changes to the obj files
 
@@ -130,8 +141,9 @@ It will be included in the "project" section of the assets file, internally call
 - How does leaving the dependency in the assets file section affect features consuming the assets file.
   - The solution explorer tree - Prototype shows the solution explorer is skipping the reference.
   - PM UI tab - Prototype shows that since the reference does not really exist, it is not shown at all.
-  - list package - Prototype shows that since the reference does not really exist, it is not shown at all.
-  - dotnet nuget why - TODO NK
+  - PM UI tab - Solution view
+  - list package - Completes succesfully with/without pruned packages. Correctly reports pruned packages aren't part of the graph.
+  - dotnet nuget why - Completes succesfully with/without pruned packages. Correctly reports pruned packages aren't part of the graph.
 
 ### NET SDK - selecting packages to be pruned
 
@@ -210,12 +222,11 @@ Example:
 <!-- What related issues would you consider out of scope for this proposal but can be addressed in the future? -->
 
 - MSBuild items/properties vs a file with the data
-- MSBuild item name ideas: `PrunedPackageReference` was used. `IgnoredPackageReference` and `SkippedPackageReference` are alternatives.
-- What if a project id is specified in PrunedPackageReference? Warn? Error? Skip? Prune & Warn?
-- What to do when a direct PackageReference is specified to be pruned?
+- Special cases handling
 - Should the pruned package reference dissapear from the dependencies section completely? Strong preference towards no, since it aids visibility.
 - Should the assets file contain the list of pruned packages? Are only ids important, or do we need versions as well?
 - Should the version attribute of PrunedPackageReference be a version range instead? Should the attribute be named MaxVersion instead?
+- Do we even need a way to disable PackagePruning on the NuGet side? Should `RestoreEnablePackagePruning` exist?
 
 ## Future Possibilities
 
