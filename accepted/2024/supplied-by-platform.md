@@ -5,7 +5,6 @@
 
 ## Summary
 
-<!-- One-paragraph description of the proposal. -->
 Provide a means to prune certain packages from project graphs because those packages are not going to be used at runtime.
 This helps avoid downloading unnecessary reference and implementation packages that would not have their assemblies used because the versions in the .NET SDK or shared framework would be used instead.
 This avoids false positive by features such as NuGetAudit and other scanners that may be using the dependency graph.
@@ -32,9 +31,6 @@ This changes significantly helps align what gets restored and what gets publishe
 ## Explanation
 
 ### Functional explanation
-
-<!-- Explain the proposal as if it were already implemented and you're teaching it to another person. -->
-<!-- Introduce new concepts, functional designs with real life examples, and low-fidelity mockups or  pseudocode to show how this proposal would look. -->
 
 A list of package id/versions to be pruned will be provided by the .NET SDK. The version will signify the highest version to be pruned.
 When NuGet encounters any of the specified packages or lower, it will simply remove the package from the graph.
@@ -158,10 +154,6 @@ Given that packages are allowed to bring in a shared framework, and that is not 
 
 ## Rationale and alternatives
 
-<!-- Why is this the best design compared to other designs? -->
-<!-- What other designs have been considered and why weren't they chosen? -->
-<!-- What is the impact of not doing this? -->
-
 ### Represent the packages as files
 
 The list will be provided through a property pointing to a file that contains the list of packages in the `<id>|<version>` format, with a newline separating each package id. The property will be: `NuGetPlatformPackagesList`.
@@ -197,11 +189,6 @@ We can consider not doing this feature and relying on platform packages to simpl
 
 ## Prior Art
 
-<!-- What prior art, both good and bad are related to this proposal? -->
-<!-- Do other features exist in other ecosystems and what experience have their community had? -->
-<!-- What lessons from other communities can we learn from? -->
-<!-- Are there any resources that are relevant to this proposal? -->
-
 - This problem is .NET specific. Package pruning at the build level is already happening. 
 
 ### NET SDK package pruning
@@ -217,10 +204,6 @@ Example:
 
 ## Unresolved Questions
 
-<!-- What parts of the proposal do you expect to resolve before this gets accepted? -->
-<!-- What parts of the proposal need to be resolved before the proposal is stabilized? -->
-<!-- What related issues would you consider out of scope for this proposal but can be addressed in the future? -->
-
 - MSBuild items/properties vs a file with the data
 - Should the pruned package reference dissapear from the dependencies section completely? Strong preference towards no, since it aids visibility.
 - Should the assets file contain the list of pruned packages? Are only ids important, or do we need versions as well?
@@ -228,7 +211,9 @@ Example:
 
 ## Future Possibilities
 
-<!-- What future possibilities can you think of that this proposal would help with? -->
+- Say a project has a transitive framework reference brought through a package.
+If there are packages in the graph that are part of the shared framework only brought in transitively, they would not be pruned.
+The SDK could detect this occurence and warn the user.
 
 ## References
 
