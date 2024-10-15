@@ -8,7 +8,7 @@
 <!-- One-paragraph description of the proposal. -->
 Provide a means to prune certain packages from project graphs because those packages are not going to be used at runtime.
 This helps avoid downloading unnecessary reference and implementation packages that would not have their assemblies used because the versions in the .NET SDK or shared framework would be used instead.
-Finally this avoids false positive by features such as NuGetAudit and other scanners that may be using the dependency graph.
+This avoids false positive by features such as NuGetAudit and other scanners that may be using the dependency graph.
 
 ## Motivation
 
@@ -20,10 +20,10 @@ Even .NET 9, there are certain assemblies that ship as both packages, but are al
 
 There are a few benefits:
 
-It is trivial to make the assumption that the fewer packages need to be downloaded, the better the performance will be.
+The fewer packages need to be downloaded, the better the performance of the restore algorithm will be.
 Beyond that, the extra packages within the graph, do make the resolution step more challenging. Some of the targeting packs used to bring in such a large package graph, that affected the resolution performance significantly. See  and <https://github.com/NuGet/Home/issues/11993> for more details. Furthermore, certain versions of popular packages have taken dependencies on these targeting packs for historical reasons. Such an example is <https://www.nuget.org/packages/log4net/2.0.10> which performs significantly better than <https://www.nuget.org/packages/log4net/2.0.9> when installed in a .NET (Core) projects, see <https://github.com/NuGet/Home/issues/10030>.
 
-Certain versions of these packages are no longer  part of the project graph, thus reducing the chances of false positive scanning.
+Certain versions of these packages are no longer  part of the project graph, thus reducing the chances of false positives during scanning.
 This is especially important in the context of assemblies that are part of shared frameworks. The build time conflict resolution ensures that the most up to date version is used, despite the fact that the user referenced package may habe vulnerabilities.
 Examples: <https://github.com/dotnet/sdk/issues/30659#issuecomment-2072567192>.
 
@@ -40,10 +40,7 @@ A list of package id/versions to be pruned will be provided by the .NET SDK. The
 When NuGet encounters any of the specified packages or lower, it will simply remove the package from the graph.
 This package id will not be downloaded and will not appear in the assets file libraries or targets section, but there will be a detailed verbosity message indicating that the package id has been pruned for the given framework.
 
-The feature is framework specific, and can be opted in/out using the `NuGetPrunePlatformPackages` property.
-In .NET 10 SDK, this feature will be enabled by default for all .NET (Core) target frameworks newer than netcoreapp3.0.
-This feature may be enabled .NET Framework target frameworks as well.
-The feature may be available in minor versions of the .NET 9 SDK as disabled with the above opt-in available.
+The feature is framework specific, and can be opted in/out using the `NuGetEnablePrunedPackages` property.
 
 ### Technical explanation
 
@@ -58,7 +55,7 @@ The `PrunedPackageReference` item will support the following attributes:
 
 The collect target will be `CollectPrunedPackageReferences`.
 
-When NuGet sees any of these package ids in the resolution, it'll just skip them and log a detailed verbosity message, indicating the package has been skipped.
+When NuGet sees any of these package ids in the resolution, it'll just skip them and log a message in detailed verbosity, indicating the package has been skipped.
 Pruning direct PackageReference is *not allowed*.
 We may capture some of this information in telemetry to track how often this feature is being used.
 
@@ -104,14 +101,36 @@ NuGet.Versioning is pruned. NuGet.Versioning will appear as a dependency, but it
 
 `PackageSpec & project section of the assets file`
 
-TODO NK
+The list of PrunedPackageReference items must only include relevant packages.
+It will be included in the "project" section of the assets file, internally called the PackageSpec, similarly like the centralPackageVersions.
+
+```json
+  "project": {
+    "frameworks": {
+      "net8.0": {
+        "targetAlias": "net8.0",
+        "dependencies": {
+          "MyDependency": {
+            "target": "Package",
+            "version": "[2.3.0, )",
+            "versionCentrallyManaged": true
+          },
+        },
+        "centralPackageVersions": {
+          "MyDependency": "2.3.0",
+          "Microsoft.Build": "17.10.4",
+        },
+        "prunedPackageReferences": {
+          "System.Text.Json": "8.0.5"
+        }
+```
 
 ### Additional validation considerations
 
 - How does leaving the dependency in the assets file section affect features consuming the assets file.
   - The solution explorer tree - Prototype shows the solution explorer is skipping the reference.
-  - PM UI tab - Prototype shows that since the reference does not really exist, it is not show at all.
-  - list package - Prototype shows that since the reference does not really exist, it is not show at all.
+  - PM UI tab - Prototype shows that since the reference does not really exist, it is not shown at all.
+  - list package - Prototype shows that since the reference does not really exist, it is not shown at all.
   - dotnet nuget why - TODO NK
 
 ### NET SDK - selecting packages to be pruned
@@ -120,8 +139,6 @@ See [Prior art](#net-sdk-package-pruning) for more details on how the .NET SDK p
 The particular pruning is based on the resulting list of shared frameworks.
 The .NET SDK will provide the list at the beginning of the restore operation, as such the .NET SDK *must* only consider direct shared frameworks, and not transitive ones.
 Given that packages are allowed to bring in a shared framework, and that is not known by the .NET SDK at the beginning of restore, package graphs brought in by packages are not going to be pruned with the current solution.
-
-A potential solution may be adding a way to prune additional frameworks as an opt-in.
 
 ## Drawbacks
 
