@@ -42,8 +42,6 @@ This package id will not be downloaded and will not appear in the assets file li
 
 The feature is framework specific, and can be opted in/out using the `RestoreEnablePackagePruning` property.
 
-If a
-
 ### Technical explanation
 
 A list of package id/versions to be pruned will be provided by the .NET SDK.
@@ -65,7 +63,7 @@ Duplicate item checking will be performed the same way it is performed for all o
 #### Special scenarios
 
 - Pruning direct PackageReference of current project - Warn and don't prune.
-- Pruning direct PackageReference of transitve projects - Warn and don't prune.
+- Pruning direct PackageReference of transitive projects - Prune
 - Pruning transitive packages of current project - Prune
 - Pruning package ids that are projects - Warn and don't prune
 - Pruning package id that matches the current project - Error
@@ -139,9 +137,9 @@ It will be included in the "project" section of the assets file, internally call
 ### Additional validation considerations
 
 - How does leaving the dependency in the assets file section affect features consuming the assets file.
-  - The solution explorer tree - Prototype shows the solution explorer is skipping the reference.
-  - PM UI tab - Prototype shows that since the reference does not really exist, it is not shown at all.
-  - PM UI tab - Solution view
+  - The solution explorer tree - The solution explorer skips transitive references.
+  - PM UI tab - The transitive packages aren't shown at all.
+  - PM UI tab - The transitive packages aren't shown at all.
   - list package - Completes succesfully with/without pruned packages. Correctly reports pruned packages aren't part of the graph.
   - dotnet nuget why - Completes succesfully with/without pruned packages. Correctly reports pruned packages aren't part of the graph.
 
