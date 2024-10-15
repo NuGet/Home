@@ -134,6 +134,8 @@ It will be included in the "project" section of the assets file, internally call
         }
 ```
 
+The pruned packages won't be represented in the assets file in any other way.
+
 ### Additional validation considerations
 
 - How does leaving the dependency in the assets file section affect features consuming the assets file.
@@ -220,11 +222,9 @@ Example:
 <!-- What related issues would you consider out of scope for this proposal but can be addressed in the future? -->
 
 - MSBuild items/properties vs a file with the data
-- Special cases handling
 - Should the pruned package reference dissapear from the dependencies section completely? Strong preference towards no, since it aids visibility.
 - Should the assets file contain the list of pruned packages? Are only ids important, or do we need versions as well?
 - Should the version attribute of PrunedPackageReference be a version range instead? Should the attribute be named MaxVersion instead?
-- Do we even need a way to disable PackagePruning on the NuGet side? Should `RestoreEnablePackagePruning` exist?
 
 ## Future Possibilities
 
