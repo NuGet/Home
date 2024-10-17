@@ -37,6 +37,7 @@ When NuGet encounters any of the specified packages or lower, it will simply rem
 This package id will not be downloaded and will not appear in the assets file libraries or targets section, but there will be a detailed verbosity message indicating that the package id has been pruned for the given framework.
 
 The feature is framework specific, and can be opted in/out using the `RestoreEnablePackagePruning` property.
+Pruning is only possible for transitive packages, if a direct package reference is attempted to be pruned, a warning will be raised.
 
 ### Technical explanation
 
