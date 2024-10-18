@@ -26,7 +26,7 @@ NuGet package with Trusted Signing.
 #### How would this be implemented?
 
 The first step would be to store the EKU that is inside the certificate that was used to sign the NuGet package with Trusted
-Signing. The certificate of Trusted Signing is only valid for thee days but it contains an EKU to that can be used to get the
+Signing. The certificate of Trusted Signing is currently only valid for three days, but it contains an EKU to that can be used to get the
 identity of the owner of the certificate. There are two EKU's in the certificate. One that tells us that it was signed with
 Trusted Signing (`1.3.6.1.4.1.311.97.1.0`) and another one that contains the Public Trust identity (e.g. 
 `1.3.6.1.4.1.311.97.990309390.766961637.194916062.941502583`). More details about this can be found here:
