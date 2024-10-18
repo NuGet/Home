@@ -111,7 +111,7 @@ The list of PrunedPackageReference items must only include relevant packages.
 It will be included in the "project" section of the assets file, internally called the PackageSpec, similarly like the centralPackageVersions.
 
 ```json
-  "project": {
+  {
     "frameworks": {
       "net8.0": {
         "targetAlias": "net8.0",
@@ -129,6 +129,9 @@ It will be included in the "project" section of the assets file, internally call
         "prunedPackageReferences": {
           "System.Text.Json": "8.0.5"
         }
+      }
+    }
+  }
 ```
 
 The pruned packages won't be represented in the assets file in any other way.
