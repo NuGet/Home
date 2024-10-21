@@ -33,14 +33,14 @@ When no README is available we will display a messsage in the README section.
 
 ##### README File Sources
 
-* RawReadmeFileUrl in the [package metadata](https://learn.microsoft.com/en-us/nuget/api/registration-base-url-resource).
-* README direct download specified in the [package content](https://learn.microsoft.com/en-us/nuget/api/package-base-address-resource).
+* ReadmeFileUrl in the [package metadata](https://learn.microsoft.com/en-us/nuget/api/registration-base-url-resource).
+* README direct download specified in a new resource `ReadmeUriTemplate/6.12.0`.
 * Downloaded nupkg.
 
 #### Nuget API
 ##### RegistrationsBaseUrl/6.12.0
 
-A new version of the [package metadata](https://learn.microsoft.com/en-us/nuget/api/registration-base-url-resource) resource type will be documented which will include the field **RawReadmeFileUrl**.
+A new version of the [package metadata](https://learn.microsoft.com/en-us/nuget/api/registration-base-url-resource) resource type will be documented which will include the field **ReadmeFileUrl**.
 This will be a link to download the README and will only be filled if a readme is available to download.
 
 ###### index.json
@@ -83,7 +83,7 @@ This will be a link to download the README and will only be filled if a readme i
                         "licenseUrl": "https://dev.nugettest.org/packages/Newtonsoft.Json/13.0.3/license",
                         "readmeUrl": "https://dev.nugettest.org/packages/Newtonsoft.Json/13.0.3#show-readme-container",
                         //New field
-                        "rawReadmeUrl": "https://apidev.nugettest.org/v3/flatcontainer/newtonsoft.json/13.0.3/readme",
+                        "readmeFileUrl": "https://apidev.nugettest.org/v3/flatcontainer/newtonsoft.json/13.0.3/readme",
                         "listed": true,
                         "minClientVersion": "2.12",
                         "packageContent": "https://apidev.nugettest.org/v3-flatcontainer/newtonsoft.json/13.0.3/newtonsoft.json.13.0.3.nupkg",
@@ -150,7 +150,7 @@ MarkdownPreviewControl = markdownPreview.VisualElement
 Create a new implementation of the `INuGetResource` interface, `ReadMeDownloadResource`.
 This will only be available for sources which have implemented the new `PackageBaseAddress` resource type.
 
-Update `IPackageSearchMetadata` to include the `RawReadmeUrl` field. 
+Update `IPackageSearchMetadata` to include the `ReadmeFileUrl` field. 
 `LocalPackageSearchMetadata` will put the location of the readme on the disk in this field. 
 When the field is deserialized the field will contain the value returned from the server if `RegistrationsBaseUrl/6.12.0` is implemented. 
 If only `PackageBaseAddress/6.12.0` is implemented then NuGet.Protocol will populate it with the URL.
