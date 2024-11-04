@@ -89,7 +89,6 @@ Duplicate item checking will be performed the same way it is performed for all o
         "dependencies": {
           "Newtonsoft.Json": "13.0.3",
           "NuGet.Configuration": "6.10.0",
-          "NuGet.Versioning": "6.10.0",
           "System.Security.Cryptography.Pkcs": "6.0.4"
         },
         "compile": {
@@ -103,7 +102,9 @@ Duplicate item checking will be performed the same way it is performed for all o
 ```
 
 The above represents the targets section for a framework.
-NuGet.Versioning is pruned. NuGet.Versioning will appear as a dependency, but it will not be in the list since it was never chosen.
+NuGet.Versioning is pruned. NuGet.Versioning *will not appear* as a dependency and it will not be in list since it was never chosen.
+
+To improve diagnosability, a [new section detailing the list of packages pruned](#future-possibilities) *may* be added later.
 
 `PackageSpec & project section of the assets file`
 
@@ -208,16 +209,16 @@ Example:
 
 ## Unresolved Questions
 
-- MSBuild items/properties vs a file with the data
-- Should the pruned package reference dissapear from the dependencies section completely? Strong preference towards no, since it aids visibility.
-- Should the assets file contain the list of pruned packages? Are only ids important, or do we need versions as well?
-- Should the version attribute of PrunedPackageReference be a version range instead? Should the attribute be named MaxVersion instead?
+- There are some considerations about how conflict resolution in the SDK is handling with Aliasing. We should investigate that and match the behavior in this implementation.
 
 ## Future Possibilities
 
+- Add a section that indicates the list of pruned packages durign the restore operation.
 - Say a project has a transitive framework reference brought through a package.
 If there are packages in the graph that are part of the shared framework only brought in transitively, they would not be pruned.
 The SDK could detect this occurence and warn the user.
+- A code/csproj fixer for the warning indicating that a direct PackageReference was specified for pruning.
+- Should platform package pruning data represent GA of a framework or the serviced version? <https://github.com/dotnet/sdk/issues/44566>
 
 ## References
 
