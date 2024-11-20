@@ -207,9 +207,18 @@ Example:
 
 - Microsoft.AspNetCore.App 9.0 shared framework, <https://github.com/dotnet/aspnetcore/blob/main/eng/PackageOverrides.txt>
 
-## Unresolved Questions
+#### Aliases and Package Pruning
 
-- There are some considerations about how conflict resolution in the SDK is handling with Aliasing. We should investigate that and match the behavior in this implementation.
+PackageReference, ProjectReference and Reference items all support the Aliases metadata. 
+
+In the build side conflict resolution, <https://github.com/dotnet/sdk/blob/262b9c3d6cf67287f649e38d83e6c5d9d08feb8a/src/Tasks/Common/ConflictResolution/ResolvePackageFileConflicts.cs#L178-L182>, assemblies are pruned, so when aliases are seen, the assemblies are deduplicated and the aliases metadata is kept.
+This is possible, because there are 2 references that are found and the alias is preserved even if the exact assembly being used is changed. 
+
+The [PackageReference Aliases](https://learn.microsoft.com/en-us/nuget/consume-packages/package-references-in-project-files#packagereference-aliases) metadata, only works on direct PackageReference and as such it's not relevant here since we don't prune direct PackageReference.
+
+Another way to specify metadata on assemblies coming from packages would be MSBuild's item Update, but in that case, the metadata will aply to the dll references only and as such isn't going to be broken by this work.
+
+## Unresolved Questions
 
 ## Future Possibilities
 
