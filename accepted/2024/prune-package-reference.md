@@ -1,4 +1,4 @@
-# ***Pruning platform provided packages***
+# ***PrunePackageReference - Support for Pruning platform provided packages***
 
 - Nikolche Kolev <https://github.com/nkolev92>
 - [7344](https://github.com/NuGet/Home/issues/7344)
