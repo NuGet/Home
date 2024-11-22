@@ -44,13 +44,13 @@ Pruning is only possible for transitive packages, if a direct package reference 
 A list of package id/versions to be pruned will be provided by the .NET SDK.
 To aid this, a new item type and collect targets will be introduced.
 
-The `PrunedPackageReference` item will support the following attributes:
+The `PrunePackageReference` item will support the following attributes:
 
 | Attribute | Explanation |
 |-----------|-------------|
 | Version | A NuGet parsable version. The version is consider to the maximum version to be pruned. |
 
-The collect target will be `CollectPrunedPackageReferences`.
+The collect target will be `CollectPrunePackageReferences`.
 
 When NuGet sees any of these package ids in the resolution, it'll just skip them and log a message in detailed verbosity, indicating the package has been skipped.
 We may capture some of this information in telemetry to track how often this feature is being used.
@@ -108,7 +108,7 @@ To improve diagnosability, a [new section detailing the list of packages pruned]
 
 `PackageSpec & project section of the assets file`
 
-The list of PrunedPackageReference items must only include relevant packages.
+The list of PrunePackageReference items must only include relevant packages.
 It will be included in the "project" section of the assets file, internally called the PackageSpec, similarly like the centralPackageVersions.
 
 ```json
@@ -127,7 +127,7 @@ It will be included in the "project" section of the assets file, internally call
           "MyDependency": "2.3.0",
           "Microsoft.Build": "17.10.4",
         },
-        "prunedPackageReferences": {
+        "prunePackageReferences": {
           "System.Text.Json": "8.0.5"
         }
       }
