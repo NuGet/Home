@@ -45,30 +45,37 @@ This proposal is focused on bringing the CLI experience up to funcional parity w
 
 ### Updating all packages to the latest version
 
-When users want to ensure their NuGet dependencies are up to date, they can run a command in .NET CLI `dotnet package update`.
+When users want to ensure their NuGet dependencies are up to date, they can run a command in .NET CLI `dotnet package update` for a project or a solution.
 
 ```CLI
-C:\> dotnet package update
+C:\> dotnet package update [<SOLUTION_PATH>|<PROJECT_PATH_>]
 
 Fixing outdated packages in ContosoUniversity.sln
- Updated UmbracoForms 8.4.1 to 8.7.1
- Updated Newtonsoft.Json 11.0.1 to 13.0.3
+ ContosoLibrary:
+  Updated UmbracoForms 8.4.1 to 8.7.1
+  Updated Newtonsoft.Json 11.0.1 to 13.0.3
+
+ ContosoApp:
+  Updated UmbracoForms 8.4.0 to 8.7.1
     
-Updated 2 packages in 36 scanned packages.
+Updated 3 packages in 36 scanned packages.
 ```
 
 ### Fixing vulnerabilities
 
-When users run `dotnet build` or `dotnet restore` commands in CLI, if they see any warnings related to vulnerabilities in their project’s NuGet dependencies, they can run `dotnet package update --vulnerable` CLI command to try to remediate all the vulnerabilities.
+When users run `dotnet build` or `dotnet restore` commands in CLI, if they see any warnings related to vulnerabilities in their project’s NuGet dependencies, they can run `dotnet package update --vulnerable` CLI command to try to remediate all the vulnerabilities. This includes both direct and transitive.
 
 ```CLI
-C:\> dotnet package update --vulnerable
-
+C:\ContosoApp\> dotnet package update --vulnerable
 
 Fixing vulnernable packages in ContosoUniversity.sln
- Upgrading UmbracoForms 8.4.1 to 8.7.1
+ ContosoLibrary:
+  Upgrading UmbracoForms 8.4.1 to 8.7.1
+
+ ContosoApp:
+  Updated UmbracoForms 8.4.0 to 8.7.1
     
-Fixed 1 package in 36 scanned packages.
+Fixed 2 packages in 36 scanned packages.
 ```
 
 In the future this can be extended to fix deprecated versions.
@@ -105,7 +112,22 @@ The algorithm of the fixing process will have the following steps:
 Example:
 
 ```CLI
-C:\> dotnet package update --vulnerable
+C:\ContosoApp\> dotnet package update --vulnerable
+
+Fixing vulnernable packages in ContosoUniversity.sln
+ ContosoLibrary:
+  Upgrading UmbracoForms 8.4.1 to 8.7.1
+
+ ContosoApp:
+  Updated UmbracoForms 8.4.0 to 8.7.1
+    
+Fixed 2 packages in 36 scanned packages.
+```
+
+Another option for the output with more information (will review with CLI team to decide which one to pick):
+
+```CLI
+C:\> dotnet package update --vulnerable [<SOLUTION_PATH>|<PROJECT_PATH_>]
 
 Fetching package metadata from: 'https://api.nuget.org/v3/index.json'
 Loaded 23 security advisories from 'https://api.nuget.org/v3/index.json'
@@ -173,8 +195,8 @@ In the "failures" and "warnings" should be the information about what projects w
 Priority: P1
 
 - 0 - The command will exit with a 0 exit code if no vulnerabilities or outdated packages were found and no changes were made.
-- 1 - The command will exit with a 1 exit code if changes were successfull and the PR is submitted.
-- 2 - The command will exit with a 2 exit code if any error has occured, PR will not be submitted.
+- 1 - The command will exit with a 1 exit code if changes were successful and the PR is submitted.
+- 2 - The command will exit with a 2 exit code if any error has occurred, PR will not be submitted.
 
 ##### Endpoints
 
@@ -183,6 +205,16 @@ NuGet will use existing endpoints to optimize the speed of audit results.
 - [Vulnerability](https://docs.microsoft.com/en-us/nuget/api/registration-base-url-resource#vulnerabilities)
 - Outdated - no existing endpoint, will need to call a source.
 - [Deprecation](https://docs.microsoft.com/en-us/nuget/api/registration-base-url-resource#package-deprecation) for future possible improvements.
+
+## Rationale and alternatives
+
+<!-- Why is this the best design compared to other designs? -->
+<!-- What other designs have been considered and why weren't they chosen? -->
+<!-- What is the impact of not doing this? -->
+
+### Alternatives considrered
+
+We could enable the option for the users to pick if they want only direct vulnerabilities to be resolved or direct and transitive. We decided to not do so and implement the resolution of all vulnerabilities as we believe that better corresponds to our goal of increasing security across all .NET applications. 
 
 ## Prior Art
 
