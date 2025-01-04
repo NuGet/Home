@@ -212,7 +212,7 @@ NuGet will use existing endpoints to optimize the speed of audit results.
 <!-- What other designs have been considered and why weren't they chosen? -->
 <!-- What is the impact of not doing this? -->
 
-### Alternatives considrered
+### Alternatives considered
 
 We could enable the option for the users to pick if they want only direct vulnerabilities to be resolved or direct and transitive. We decided to not do so and implement the resolution of all vulnerabilities as we believe that better corresponds to our goal of increasing security across all .NET applications. 
 
@@ -222,13 +222,41 @@ We could enable the option for the users to pick if they want only direct vulner
 <!-- Do other features exist in other ecosystems and what experience have their community had? -->
 <!-- What lessons from other communities can we learn from? -->
 <!-- Are there any resources that are relevent to this proposal? -->
-- [snyk](https://snyk.io/)
-- [npm audit](https://docs.npmjs.com/cli/v7/commands/npm-audit)
-- [cargo audit](https://github.com/RustSec/cargo-audit)
+
+### [npm audit](https://docs.npmjs.com/cli/v7/commands/npm-audit)
+
+NPM has audit built in, which runs automatically on `npm install`, and it has an `npm audit fix` command.
+The docs say fix will upgrade to a compatible version (it doesn't specify what compatible means, my guess is the matching the version range requested), and `--force` can be used to allow it to pick any version.
+NPM Audit sends the list of used packages to the package registry, which responds with which packages are vulnerable (and presumably what versions vulnerabilities are fixed with).
+
+There is an `npm update` command, to update all packages to the latest version.
+However, it appears to be constrained to the version ranges specified by each package in `package.json`, so in effect it just updates the lock file to the highest floating range requested.
+The command `npm install` is used to install packages, but the docs don't specify the behavior if a different version of the package is already installed.
+Neither command appears to have audit related functionality, or features to upgrade packages with known vulnerabilities, although audit runs by default on any install/update.
+
+### [cargo audit](https://github.com/RustSec/cargo-audit)
+
+Rust's cargo does not have audit functionality built in, and a crate must be installed, in addition to being run manually.
+The `cargo-audit` crate supports both checking for vulnerabilities, as well as a fix command.
+Cargo's audit appears to use a git repository as its data source.
+
+### [pip audit](https://pypi.org/project/pip-audit/)
+
+Python's pip does not appear to have an audit function built in, so it needs to be explicitly installed and run by customers who want to use it.
+It has a `--fix` command, but the documentation doesn't provide any additional information.
+The docs say that it gets advisory information from the PyPI JSON API, which appears to be a per-package details endpoint.
+
 - [dotnet outdated](https://github.com/dotnet-outdated/dotnet-outdated)
-- [dotnet retire](https://github.com/retirenet/dotnet-retire)
-- [NuGet Defense](https://github.com/digitalcoyote/NuGetDefense)
-  
+
+The `dotnet-outdated` tool is a general package update tool for .NET projects on the CLI.
+It does not appear to have functionality related to updating only packages with security advisories.
+
+- [OWASP Dependency-Check (Maven)](https://owasp.org/www-project-dependency-check/)
+
+Maven is a build tool for Java, including package management.
+It supports plugins, and OWASP's Dependency-Check can be used as a plugin to detect packages with known vulnerabilities.
+The docs don't mention any tooling to automatically update package versions to without vulnerabilities.
+
 ## Future Possibilities
 
 <!-- What future possibilities can you think of that this proposal would help with? -->
