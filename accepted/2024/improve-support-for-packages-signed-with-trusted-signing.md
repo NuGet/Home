@@ -106,7 +106,7 @@ I personally don't think users would really need this functionality right away s
 
 When a `.cer` file is uploaded only the thumbprint is stored because the certificate is not parsed by the NuGet Gallery due to
 security reasons. This means we cannot add the Durable Identity Value record when a certificate is uploaded. For a user that
-has access to the Azure Portal it would be easier to copy the Durable Identity Value from the interface:
+has access to the Azure Portal it would be easier to copy the Durable Identity Value from the interface of the Azure Portal:
 
 ![Azure Portal](images/trusted-signing-azure.png)
 
