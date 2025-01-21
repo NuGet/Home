@@ -49,7 +49,7 @@ This proposal is focused on bringing the CLI experience up to funcional parity w
 When users want to ensure their NuGet dependencies are up to date, they can run a command in .NET CLI `dotnet package update` for a project or a solution.
 
 ```CLI
-C:\> dotnet package update [<SOLUTION_PATH>|<PROJECT_PATH_>]
+C:\> dotnet package update [<SOLUTION_PATH>|<PROJECT_PATH>]
 
 Fixing outdated packages in ContosoUniversity.sln
  ContosoLibrary:
