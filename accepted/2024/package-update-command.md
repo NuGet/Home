@@ -9,7 +9,8 @@
 
 <!-- One-paragraph description of the proposal. -->
 The `dotnet package update` feature is designed to enhance the user experience by enabling .NET developers to address security vulnerabilities, deprecated packages, and outdated versions of their NuGet dependencies with a single command.
-This improvement will, in turn, bolster the overall security and reliability of .NET applications. The feature will build upon the existing NuGet Audit functionality.
+This improvement will, in turn, bolster the overall security and reliability of .NET applications.
+The feature will build upon the existing NuGet Audit functionality.
 
 ## Motivation
 
