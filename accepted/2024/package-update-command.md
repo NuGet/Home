@@ -26,7 +26,6 @@ Visual Studio
 - Has a means to update all packages to latest
 - Has a means to update a single package to latest (which can be challenging)
 - Has a vulnerability filter, which in turn can allow you to update all vulnerable packages to latest
-dotnet
 
 CLI
 
@@ -90,7 +89,7 @@ In the future this can be extended to fix deprecated versions.
 
 #### dotnet package update
 
-The `dotnet package update` command will update all the NuGet dependencies to the latest versions.
+The `dotnet package update` command without any other arguments or options will update all the NuGet dependencies to the latest versions.
 
 ```CLI
 C:\> dotnet package update --help
@@ -99,7 +98,10 @@ dotnet package update [<PROJECT>|<SOLUTION>] [--vulnerable] [--mode <MODE>] [-v|
 
 #### --vulnerable
 
-This flag will try to update only packages that have direct or transitive vulnerabilities. The remediation is calculated with an implicit dotnet audit to then apply directly to a resulting package graph. It can add packages, remove packages, and update packages depending on the problem it's attempting to resolve. It does not take into consideration downgrading to a compatible version if a higher one has already been specified.
+This flag will try to update only packages that have direct or transitive vulnerabilities.
+The remediation is calculated with an implicit dotnet audit to then apply directly to a resulting package graph.
+It can add packages, remove packages, and update packages depending on the problem it's attempting to resolve.
+It does not take into consideration downgrading to a compatible version if a higher one has already been specified.
 The algorithm of the fixing process will have the following steps:
 
 1. Identify  vulnerabilities in the graph
@@ -196,8 +198,8 @@ In the "failures" and "warnings" should be the information about what projects w
 Priority: P1
 
 - 0 - The command will exit with a 0 exit code if no vulnerabilities or outdated packages were found and no changes were made.
-- 1 - The command will exit with a 1 exit code if changes were successful and the PR is submitted.
-- 2 - The command will exit with a 2 exit code if any error has occurred, PR will not be submitted.
+- 1 - The command will exit with a 1 exit code if changes were successful.
+- 2 - The command will exit with a 2 exit code if any error has occurred.
 
 ##### Endpoints
 
@@ -215,7 +217,8 @@ NuGet will use existing endpoints to optimize the speed of audit results.
 
 ### Alternatives considered
 
-We could enable the option for the users to pick if they want only direct vulnerabilities to be resolved or direct and transitive. We decided to not do so and implement the resolution of all vulnerabilities as we believe that better corresponds to our goal of increasing security across all .NET applications. 
+We could enable the option for the users to pick if they want only direct vulnerabilities to be resolved or direct and transitive.
+We decided to not do so and implement the resolution of all vulnerabilities as we believe that better corresponds to our goal of increasing security across all .NET applications. 
 
 ## Prior Art
 
