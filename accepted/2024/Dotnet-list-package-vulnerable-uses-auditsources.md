@@ -6,17 +6,22 @@
 
 ## Summary
 
-Enable the use of `<AuditSources>` in the `dotnet list package --vulnerable` command to identify vulnerable packages in a project. Currently, the command only queries vulnerability data from the Registration API of `<PackageSources>` defined in the NuGet.config file. This proposal extends functionality to include `<AuditSources>` for improved flexibility and accuracy in vulnerability detection.
+Enable the use of `<AuditSources>` in the `dotnet list package --vulnerable` command to identify vulnerable packages in a project. 
+Currently, the command only queries vulnerability data from the Registration API of `<PackageSources>` defined in the NuGet.config file. 
+This proposal extends functionality to include `<AuditSources>` for improved flexibility and accuracy in vulnerability detection.
 
 ## Motivation
 
-Currently, `<AuditSources>` specified in NuGet.config are ignored during the execution of `dotnet list package --vulnerable`. This limits the ability of users to leverage specialized audit sources for vulnerability data. Supporting `<AuditSources>` will:
+Currently, `<AuditSources>` specified in NuGet.config are ignored during the execution of `dotnet list package --vulnerable`. 
+This limits the ability of users to leverage specialized audit sources for vulnerability data. Supporting `<AuditSources>` will:
 
 - Provide more flexibility to users by allowing alternate sources for vulnerability data.
 - Enhance the accuracy of vulnerability detection by using dedicated audit sources.
 - Maintain backward compatibility by falling back to the current behavior if `<AuditSources>` are not specified.
 
-It is important to note that the current implementation of dotnet list package uses `<PackageSources>` only, which currently rely on the Registration API to fetch vulnerability data. Addressing this limitation is a broader issue we would like to resolve in the future (see [#13026)](https://github.com/NuGet/Home/issues/13026). This proposal, however, focuses solely on adding support for `<AuditSources>`, which will utilize the VulnerabilityInfo resource of the specified sources.
+It is important to note that the current implementation of dotnet list package uses `<PackageSources>` only, which currently rely on the Registration API to fetch vulnerability data.
+Addressing this limitation is a broader issue we would like to resolve in the future (see [#13026)](https://github.com/NuGet/Home/issues/13026). 
+This proposal, however, focuses solely on adding support for `<AuditSources>`, which will utilize the VulnerabilityInfo resource of the specified sources.
 
 ## Explanation
 
