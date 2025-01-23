@@ -80,12 +80,14 @@ Log the following
 ## Drawbacks
 
 <!-- Why should we not do this? -->
+- Performance Overhead: Generating and hashing the DGSpec file adds slight overhead to the dotnet list package.
 
 ## Rationale and alternatives
 
 <!-- Why is this the best design compared to other designs? -->
 <!-- What other designs have been considered and why weren't they chosen? -->
 <!-- What is the impact of not doing this? -->
+- **Force Restore Every Time**: Automatically run restore when dotnet list package is called.
 
 ## Prior Art
 
