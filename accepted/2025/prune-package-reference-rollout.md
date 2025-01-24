@@ -38,9 +38,13 @@ We validated the .NET SDK build that it *does not affect the builds negatively o
 - dotnet/runtime - <https://github.com/dotnet/roslyn/pull/76896>
 - dotnet/aspnetcore - <https://github.com/dotnet/aspnetcore/pull/60025>
 
-## Drawbacks
+## Risks and drawbacks
 
-- May lead to some build issues for builds with a lot of customization.
+It may lead to some build issues for if a build has customization such as:
+
+- If a project manually references an assembly or props/targets from a package from the global packages folder. Note that pruning is not allowed for direct dependencies, so this would need to be a transitive package.
+  - Manual assembly coping - at runtime, the platform version will be preferred anyways, but it could lead to the build failing if the package cannot be found on disk anymore.
+  - Test projects that are used for integration testing may have set-ups that manually copy assemblies to the build output folder for the project.
 
 ## Rationale and alternatives
 
