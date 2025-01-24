@@ -35,17 +35,18 @@ We validated the .NET SDK build that it *does not affect the builds negatively o
 - NuGet/NuGet.Client
 - dotnet/sdk
 - dotnet/roslyn - <https://github.com/dotnet/roslyn/pull/76898>
-- dotnet/runtime - <https://github.com/dotnet/roslyn/pull/76896>
+- dotnet/runtime - <https://github.com/dotnet/runtime/pull/111767>
 - dotnet/aspnetcore - <https://github.com/dotnet/aspnetcore/pull/60025>
 
-## Risks and drawbacks
+### Observable build changes
 
-It may lead to some build issues for if a build has customization such as:
-
-- If a project manually references an assembly or props/targets from a package from the global packages folder. Note that pruning is not allowed for direct dependencies, so this would need to be a transitive package.
-  - Manual assembly coping - at runtime, the platform version will be preferred anyways, but it could lead to the build failing if the package cannot be found on disk anymore.
-  - Test projects that are used for integration testing may have set-ups that manually copy assemblies to the build output folder for the project.
-- Issues with packages lock files - Customers using lock files may see fewer packages downloaded with the newer SDKs and if they're locked mode, they'll see failures. (Packages lock files are used in about 1% of all projects). For customers with lock files, we recommend that they lock down both their tooling and packages.
+- Customers who expect the output of their project to produce identical results will notice smaller deps files. This is intentional.
+- Customers who use packages lock files (1% usage) with locked mode may notice fewer dependencies in their lock files. This is intentional.
+- Customers who observe the output of component governance / NuGet Audit will notice these components are no longer reported. This is intentional.
+- Customers with builds that have customization may run into build failures if they are:
+  - Manually referencing an assembly or props/targets from a package from the global packages folder. Note that pruning is not allowed for direct dependencies, so this would need to be a transitive package.
+    - Manual assembly coping - at runtime, the platform version will be preferred anyways, but it could lead to the build failing if the package cannot be found on disk anymore.
+  - We don't foresee this is a common scenario given that the packages being pruned are usually within the framework and customers shouldn't need to anything additional to make things work.
 
 ## Rationale and alternatives
 
