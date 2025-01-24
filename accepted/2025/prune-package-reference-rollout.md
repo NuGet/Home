@@ -45,6 +45,7 @@ It may lead to some build issues for if a build has customization such as:
 - If a project manually references an assembly or props/targets from a package from the global packages folder. Note that pruning is not allowed for direct dependencies, so this would need to be a transitive package.
   - Manual assembly coping - at runtime, the platform version will be preferred anyways, but it could lead to the build failing if the package cannot be found on disk anymore.
   - Test projects that are used for integration testing may have set-ups that manually copy assemblies to the build output folder for the project.
+- Issues with packages lock files - Customers using lock files may see fewer packages downloaded with the newer SDKs and if they're locked mode, they'll see failures. (Packages lock files are used in about 1% of all projects). For customers with lock files, we recommend that they lock down both their tooling and packages.
 
 ## Rationale and alternatives
 
