@@ -24,13 +24,19 @@ The packages that are being pruned carried assemblies that were excluded from th
 
 - As we are enabling this feature in .NET 10 Preview 1, it gives a very long runway should we eventually decide to go with a more convervative roll-out strategy.
 - If there are any issues, users can easily disable the feature by setting `RestoreEnablePackagePruning` to `false` in their project/props.
-- In addition to all the automation testing, we validated that enabling pruning *does not affect the builds negatively of the following repos*:
-  - NuGet/NuGet.Client
-  - dotnet/sdk
-  - dotnet/roslyn - <https://github.com/dotnet/roslyn/pull/76898>
-  - dotnet/runtime - <https://github.com/dotnet/roslyn/pull/76896>
-  - dotnet/aspnetcore - <https://github.com/dotnet/aspnetcore/pull/60025>
 - We will continuously monitor telemetry and feedback around the feature through all the previews.
+
+### Testing & Validation
+
+The feature has been development since November and the implementation has been extensively tested through automation, but we also ensured that our own repos can dogfood without any issues.
+
+We validated the .NET SDK build that it *does not affect the builds negatively of the following repos*:
+
+- NuGet/NuGet.Client
+- dotnet/sdk
+- dotnet/roslyn - <https://github.com/dotnet/roslyn/pull/76898>
+- dotnet/runtime - <https://github.com/dotnet/roslyn/pull/76896>
+- dotnet/aspnetcore - <https://github.com/dotnet/aspnetcore/pull/60025>
 
 ## Drawbacks
 
