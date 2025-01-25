@@ -1,4 +1,4 @@
-# ***PrunePackageReference in .NET 10***
+# PrunePackageReference in .NET 10
 
 - Nikolche Kolev <https://github.com/nkolev92>
 - [#NuGet/Client.Engineering#3110](https://github.com/NuGet/Client.Engineering/issues/3110)
