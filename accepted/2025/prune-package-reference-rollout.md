@@ -38,7 +38,7 @@ We validated the .NET SDK build that it *does not affect the builds negatively o
 - dotnet/runtime - <https://github.com/dotnet/runtime/pull/111767>
 - dotnet/aspnetcore - <https://github.com/dotnet/aspnetcore/pull/60025>
 
-### Observable build changes and risks
+### Observable build changes
 
 - Customers who expect the output of their project to produce identical results will notice smaller deps files. This is intentional.
 - Customers who observe the output of component governance / NuGet Audit will notice these components are no longer reported. This is intentional.
