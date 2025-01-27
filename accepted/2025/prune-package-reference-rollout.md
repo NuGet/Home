@@ -8,7 +8,7 @@
 `NuGetAudit` scans the dependencies in your package graph for vulnerabilities, reporting vulnerabilities for every package that ended up in your resulting graph.
 
 [`PrunePackageReference`](https://github.com/NuGet/Home/blob/dev/accepted/2024/prune-package-reference.md) allows NuGet to skip platform packages that are already available within the framework that the project is building.
-For example, if your project, targetting .NET 9 has a transitive dependency to System.Text.Json 8.0.4, which is vulnerable, enabling pruning will allow NuGet to skip it. This package will not be downloaded and it will not appear in the dependencies.
+For example, if your project, targetting .NET 9 has a transitive dependency to System.Text.Json 8.0.4, which is vulnerable, enabling pruning will allow NuGet to prune it from the defined list of dependencies during graph resolution. This package will not be downloaded and it will not appear in the resolved dependency graph.
 
 We propose that we enable the `PrunePackageReference` feature by default for *all* .NET (Core) and .NET Standard 2.0 and above in .NET 10 preview 1 to reduce false positives by NuGetAudit and related scanning tools and improve performance.
 
