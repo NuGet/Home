@@ -45,7 +45,7 @@ We validated the .NET SDK build that it *does not affect the builds negatively o
 - Customers who use packages lock files (1% usage) with locked mode may run into restore failures due to restore bringing in fewer dependencies. This is intentional.
 - Customers with builds that have customization may run into build failures if they are:
   - Manually referencing an assembly or props/targets from a package from the global packages folder. Note that pruning is not allowed for direct dependencies, so this would need to be a transitive package.
-    - Manual assembly coping - at runtime, the platform version will be preferred anyways, but it could lead to the build failing if the package cannot be found on disk anymore.
+    - Manually copying assembly during a build - at runtime, the platform version will be preferred anyways, but it could lead to the build failing if the package cannot be found on disk anymore.
   - We don't expect this to be a common scenario given that the packages being pruned are within the framework and customers do not need do to anything custom to make things work.
 
 ## Rationale and alternatives
