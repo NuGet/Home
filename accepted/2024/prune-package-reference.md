@@ -155,7 +155,8 @@ Given that packages are allowed to bring in a shared framework, and that is not 
 
 ## Drawbacks
 
-- The risk of this feature is driven by the packages that are being pruned. Given that the list of packages that will be provided by the SDK is already being pruned in a different way, one could argue that the risks have been well mitigated there.
+- The risk of this feature is driven by the packages that are being pruned.
+Given that the list of packages that will be provided by the SDK is already being pruned in a different way, one could argue that the risks have been well mitigated there. However, there is a change we end up pruning more/fewer packages in the end. There's also a chance we end up getting new dependencies since pruning packages may have an effect on the outcome of the cousin dependency rule.
 
 ## Rationale and alternatives
 
