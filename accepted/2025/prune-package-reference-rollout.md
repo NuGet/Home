@@ -1,4 +1,4 @@
-# ***PrunePackageReference in .NET 10***
+# PrunePackageReference in .NET 10
 
 - Nikolche Kolev <https://github.com/nkolev92>
 - [#NuGet/Client.Engineering#3110](https://github.com/NuGet/Client.Engineering/issues/3110)
@@ -8,7 +8,7 @@
 `NuGetAudit` scans the dependencies in your package graph for vulnerabilities, reporting vulnerabilities for every package that ended up in your resulting graph.
 
 [`PrunePackageReference`](https://github.com/NuGet/Home/blob/dev/accepted/2024/prune-package-reference.md) allows NuGet to skip platform packages that are already available within the framework that the project is building.
-For example, if your project, targetting .NET 9 has a transitive dependency to System.Text.Json 8.0.4, which is vulnerable, enabling pruning will allow NuGet to skip it. This package will not be downloaded and it will not appear in the dependencies.
+For example, if your project, targetting .NET 9 has a transitive dependency to System.Text.Json 8.0.4, which is vulnerable, enabling pruning will allow NuGet to prune it from the defined list of dependencies during graph resolution. This package will not be downloaded and it will not appear in the resolved dependency graph.
 
 We propose that we enable the `PrunePackageReference` feature by default for *all* .NET (Core) and .NET Standard 2.0 and above in .NET 10 preview 1 to reduce false positives by NuGetAudit and related scanning tools and improve performance.
 
@@ -45,7 +45,7 @@ We validated the .NET SDK build that it *does not affect the builds negatively o
 - Customers who use packages lock files (1% usage) with locked mode may run into restore failures due to restore bringing in fewer dependencies. This is intentional.
 - Customers with builds that have customization may run into build failures if they are:
   - Manually referencing an assembly or props/targets from a package from the global packages folder. Note that pruning is not allowed for direct dependencies, so this would need to be a transitive package.
-    - Manual assembly coping - at runtime, the platform version will be preferred anyways, but it could lead to the build failing if the package cannot be found on disk anymore.
+    - Manually copying assembly during a build - at runtime, the platform version will be preferred anyways, but it could lead to the build failing if the package cannot be found on disk anymore.
   - We don't expect this to be a common scenario given that the packages being pruned are within the framework and customers do not need do to anything custom to make things work.
 
 ## Rationale and alternatives
