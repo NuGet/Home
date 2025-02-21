@@ -1,7 +1,5 @@
 name: Documentation Issue
 description: Report an issue with the NuGet Client documentation
-title: ''
-assignees: ''
 labels: ["Type:Docs", "Triage:Untriaged"]
 
 body:
