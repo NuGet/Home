@@ -29,24 +29,22 @@ Ensuring an implicit restore will maintain synchronization between the assets fi
 
 When a user executes a NuGet command that requires restore, the system should:
 
-1. **Check if restore has been performed and is up to date**
-   - If it is missing, restore must be triggered implicitly.
-   - If it is outdated (i.e., the project file has changed since the last restore), implicit restore should also occur.
+1. **Perform restore**
 
 2. **Provide a `--no-restore` option**
    - Users who want to skip restore due to performance concerns or when they are confident the assets file is up-to-date should be able to pass this flag.
 
 3. **Handle scenarios where restore is unsuccessful**
    - If implicit restore fails due to network issues, package source unavailability, or conflicting dependencies, the command should fail with a clear error message.
-   - If `--no-restore` is specified and the assets file is missing or outdated, the command should either:
-     - Proceed with a warning that the results may be inaccurate.
+   - If `--no-restore` is specified, the command should:
+     - Assume the information from the assets file is correct.
 
 ### Technical explanation
 
 <!-- Explain the proposal in sufficient detail with implementation details, interaction models, and clarification of corner cases. -->
 
-The command should invoke restore **only when necessary**, checking the assets file has against the project dgspec has.
-The `--no-restore` flag should override automatic restore, and the command should verify the presence of a valid assets file before proceeding.
+The command must execute restore **prior to performing its own actions**. It should assume that restore will handle no-op restores when restore is unnecessary.
+If the `--no-restore` flag is specified, implicit restore should be bypassed.
 
 ## Drawbacks
 
