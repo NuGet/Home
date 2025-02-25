@@ -7,14 +7,14 @@
 <!-- One-paragraph description of the proposal. -->
 NuGet is already available across platforms since it ships as part of the .NET SDK.
 However, `NuGet.exe` is a .NET Framework application that works on the Mono runtime, making it possible to run on other platforms like Mac and Linux.
-Support for `NuGet.exe` is not officially supported on the Mono runtime, but does require some maintenance overhead since we still run tests against this environment.
+`NuGet.exe` is not officially supported on the Mono runtime, but does require some maintenance overhead since we still run tests against this environment.
 In order to reduce complexity of our build pipelines, we would like to stop running out tests on the Mono runtime.
 
 
 ## Motivation
 <!-- Why are we doing this? What pain points does this solve? What is the expected outcome? -->
 The Mono runtime was the original cross-platform implementation of the .NET Framework.
-With the creation of the .NET SDK, which is also cross-platform, it is now highly recommended that users port their applications to .NET Core rather than build .NET Framework applications that require Mono.
+With the development of .NET Core, which is also cross-platform, it is now highly recommended that users port their applications to .NET Core rather than build .NET Framework applications that require Mono.
 
 The last major release of the Mono Project was in July 2019, with minor patch releases since that time. The last patch release was February 2024.
 The WineHQ organization has taken over stewardship of the project and will potentially still work on security or bug fixes.
