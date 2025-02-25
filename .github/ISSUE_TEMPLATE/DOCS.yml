@@ -5,10 +5,11 @@ labels: ["Type:Docs", "Triage:Untriaged"]
 body:
   - type: input
     attributes:
-      value: |
-        **Docs Page URL**
-        Please provide the URL of the NuGet documentation page where you found the issue.
-
+      label: Docs Page URL
+      description: Please provide the URL of the NuGet documentation page where you found the issue.
+      placeholder: ex. https://learn.microsoft.com/nuget/consume-packages/install-use-packages-visual-studio
+    validations:
+      required: true
   - type: textarea
     id: description
     attributes:
