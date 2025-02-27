@@ -8,7 +8,7 @@
 NuGet is already available across platforms since it ships as part of the .NET SDK.
 However, `NuGet.exe` is a .NET Framework application that works on the Mono runtime, making it possible to run on other platforms like Mac and Linux.
 `NuGet.exe` is not officially supported on the Mono runtime, but does require some maintenance overhead since we still run tests against this environment.
-In order to reduce complexity of our build pipelines, we would like to stop running out tests on the Mono runtime.
+In order to reduce complexity of our build pipelines, we would like to stop running our tests on the Mono runtime.
 
 
 ## Motivation
