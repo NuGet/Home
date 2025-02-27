@@ -51,7 +51,7 @@ There are a few places in our code with [Mono-specific logic](https://github.com
 However, we should add XML doc comments to indicate that Mono isn't supported but we should not remove the code either.
 
 To stop running tests on Mono we could simply disable [the parameter](https://github.com/NuGet/NuGet.Client/blob/dev/eng/pipelines/pull_request.yml#L40) by default which would be simpler.
-Alternatively, we could completely remote it from the pipeline YAML.
+Alternatively, we could completely remove it from the pipeline YAML.
 Since the functionality could get broken over time, there's no guarantee that leaving the option in place would work going forward.
 
 ## Drawbacks/Risks
