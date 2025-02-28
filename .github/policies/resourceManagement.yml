@@ -516,5 +516,21 @@ configuration:
       - removeLabel:
           label: Status:No recent activity
       description: '[stale community PR] [5-4] Remove "Status:No recent activity" if there are any reviews.'
+    - if:
+      - payloadType: Issues
+      - labelAdded:
+          label: breaking-change
+      then:
+      - addLabel:
+          label: needs-breaking-change-doc-created
+      - addReply:
+          reply: >-
+            Added `needs-breaking-change-doc-created` label because this issue has the `breaking-change` label. 
+
+
+            1. [ ] Create and link to this issue a matching issue in the dotnet/docs repo using the [breaking change documentation template](https://aka.ms/dotnet/docs/new-breaking-change-issue), then remove this `needs-breaking-change-doc-created` label.
+
+
+            Tagging @nuget/dotnetcompat for awareness of the breaking change.
 onFailure: 
 onSuccess: 
