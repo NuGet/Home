@@ -58,7 +58,7 @@ Since the functionality could get broken over time, there's no guarantee that le
 <!-- Why should we not do this? -->
 
 NuGet does not want to break Mono functionality or remove anyone's ability to run `NuGet.exe` on Mono.
-However, by no longer running the tests on the Mono runtime, we will not be able to guarantee that we don't unintentionally break something.
+However, by no longer running the tests on the Mono runtime, we will not be aware if we unintentionally broke something or if something changed in the platform that broke `NuGet.exe`.
 
 At this time, we consider the risk to be low because:
 1. `NuGet.exe` continues to be tested on .NET Framework and Mono should have the same APIs available.
