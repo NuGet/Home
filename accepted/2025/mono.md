@@ -70,7 +70,7 @@ At this time, we consider the risk to be low because:
 MicroBuild, an internal-only tool for build infrastructure in the Developer Division uses `NuGet.exe` to acquire plug-ins.
 On Windows, it downloads the latest version of `NuGet.exe` from https://dist.nuget.org/win-x86-commandline/latest/nuget.exe.
 On Linux, it downloads the latest version of `NuGet.exe` via `apt -y install nuget`.
-There is a chance we could break Mono compatibilty, leading to widespread infrastructure issues.
+There is a chance we could break Mono compatibility, leading to widespread infrastructure issues.
 Since we won't be removing any Mono code from NuGet, it is unlikely that this would happen.
 Also, MicroBuild could pin to an older version of `NuGet.exe` if needed.
 
