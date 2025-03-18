@@ -529,8 +529,5 @@ configuration:
 
 
             1. [ ] Create and link to this issue a matching issue in the dotnet/docs repo using the [breaking change documentation template](https://aka.ms/dotnet/docs/new-breaking-change-issue), then remove this `needs-breaking-change-doc-created` label.
-
-
-            Tagging @nuget/dotnetcompat for awareness of the breaking change.
 onFailure: 
 onSuccess: 
