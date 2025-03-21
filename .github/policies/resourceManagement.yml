@@ -531,8 +531,6 @@ configuration:
             1. [ ] Create and link to this issue a matching issue in the dotnet/docs repo using the [breaking change documentation template](https://aka.ms/dotnet/docs/new-breaking-change-issue), then remove this `needs-breaking-change-doc-created` label.
 
 
-
             You can refer to the [.NET SDK breaking change guidelines](https://github.com/dotnet/sdk/blob/main/documentation/project-docs/breaking-change-guidelines.md)
-
 onFailure: 
 onSuccess: 
