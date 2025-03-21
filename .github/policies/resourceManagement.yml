@@ -517,7 +517,7 @@ configuration:
           label: Status:No recent activity
       description: '[stale community PR] [5-4] Remove "Status:No recent activity" if there are any reviews.'
     - if:
-      - payloadType: Issues
+      - payloadType: Pull_Request
       - labelAdded:
           label: breaking-change
       then:
@@ -525,12 +525,15 @@ configuration:
           label: needs-breaking-change-doc-created
       - addReply:
           reply: >-
-            Added `needs-breaking-change-doc-created` label because this issue has the `breaking-change` label. 
+            Added `needs-breaking-change-doc-created` label because this PR has the `breaking-change` label. 
 
 
             1. [ ] Create and link to this issue a matching issue in the dotnet/docs repo using the [breaking change documentation template](https://aka.ms/dotnet/docs/new-breaking-change-issue), then remove this `needs-breaking-change-doc-created` label.
+ 
+            2. [ ] Ask a committer to mail the `.NET SDK Breaking Change Notification` email list.
 
 
             You can refer to the [.NET SDK breaking change guidelines](https://github.com/dotnet/sdk/blob/main/documentation/project-docs/breaking-change-guidelines.md)
+      description: Add breaking change doc label to PR
 onFailure: 
 onSuccess: 
