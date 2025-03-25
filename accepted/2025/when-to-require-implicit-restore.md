@@ -57,6 +57,13 @@ If the `--no-restore` flag is specified, implicit restore should be bypassed.
 <!-- What is the impact of not doing this? -->
 1. **Requiring Manual Restore**: Users must manually run `dotnet restore` before commands. Rejected as it introduces usability friction.
 
+This was discussed in the following PR: https://github.com/NuGet/Home/pull/14065
+
+The proposal: 
+The proposal aims to improve the user experience of the `dotnet list package` command by ensuring it only displays accurate and up-to-date package information.
+If the project has been modified since the last restore, the command should detect the change and prompt the user to run `dotnet restore` again before listing packages.
+This prevents users from being misled by stale data and reinforces the expectation that a restore must reflect the current state of the project.
+
 ## Prior Art
 
 <!-- What prior art, both good and bad are related to this proposal? -->
