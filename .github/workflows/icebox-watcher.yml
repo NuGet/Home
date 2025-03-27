@@ -19,7 +19,7 @@ jobs:
         run: dotnet nuget add source --username github-actions --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/nuget/index.json"
         
       - name: Install GitHubIssueTagger
-        run: dotnet tool install --global NuGet.Internal.GitHubIssueTagger
+        run: dotnet tool install --global NuGet.Internal.GitHubIssueTagger --allow-roll-forward
 
       - name: Run IceBox Watcher
         env:
