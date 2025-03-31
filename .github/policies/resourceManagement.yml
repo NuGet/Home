@@ -523,7 +523,7 @@ configuration:
       then:
       - addReply:
           reply: >-
-            Refer to the [.NET SDK breaking change guidelines](https://github.com/dotnet/sdk/blob/main/documentation/project-docs/breaking-change-guidelines.md#required-process-for-all-net-sdk-breaking-changes)
+            For changes in NuGet functionality (such as NuGet Restore changes), refer to the [.NET SDK breaking change guidelines](https://github.com/dotnet/sdk/blob/main/documentation/project-docs/breaking-change-guidelines.md#required-process-for-all-net-sdk-breaking-changes)
       description: Add breaking change doc instructions to issue
 onFailure: 
 onSuccess: 
