@@ -15,7 +15,7 @@ jobs:
   Run-IceBox-Watcher:
     runs-on: ubuntu-latest
     steps:
-      - name: Install .NET 8.x
+      - name: Install Latest .NET SDK
         run: |
           curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --install-dir $HOME/dotnet
           dotnet --info
