@@ -15,6 +15,10 @@ jobs:
   Run-IceBox-Watcher:
     runs-on: ubuntu-latest
     steps:
+      - name: Install .NET 8.x
+        run: |
+          curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin -version 8.x --install-dir /Users/runner/hostedtoolcache/dotnet
+          dotnet --info
       - name: Set up NuGet authentication
         run: dotnet nuget add source --username github-actions --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/nuget/index.json"
         
