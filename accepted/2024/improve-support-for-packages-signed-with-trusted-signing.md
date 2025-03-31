@@ -55,7 +55,8 @@ functionality right away.
 
 The Durable Identity Value will only be linked when the following conditions are true:
 - The package was signed within the last 30 days.
-- The signing certificate must be issued by the root CA certificate `Microsoft Identity Verification Root Certificate Authority 2020`.
+- The signing certificate's issuer must chain to the `Microsoft ID Verified Code Signing PCA 2021` certificate that is issued by the
+  root CA certificate `Microsoft Identity Verification Root Certificate Authority 2020`.
   (https://learn.microsoft.com/en-us/azure/trusted-signing/concept-trusted-signing-trust-models)
 - The signing certificate contains the Trusted Signing EKU.
 - The signing certificate contains an EKU with the Durable Identity Value.
