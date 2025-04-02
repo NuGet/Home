@@ -1,0 +1,26 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <!-- Add a new MsBuild task to check for invalid projects without NuGet.targets -->
+  <Target Name="CheckForInvalidProjectsWithoutNuGetTargets" Condition=" '$(RestoreUseSkipNonexistentTargets)' == 'true' ">
+    <ItemGroup>
+      <InvalidProjects Include="@(FilteredRestoreGraphProjectInputItemsWithoutDuplicates)" Condition="!Exists('%(Identity)')">
+        <Message Importance="high" Text="Warning: Project '%(Identity)' does not contain NuGet.targets and will be skipped during restore." />
+      </InvalidProjects>
+    </ItemGroup>
+  </Target>
+
+  <!-- Update the existing MsBuild task to include the new task for static graph restore -->
+  <Target Name="StaticGraphRestore" DependsOnTargets="CheckForInvalidProjectsWithoutNuGetTargets">
+    <MsBuild Condition=" '$(RestoreUseSkipNonexistentTargets)' == 'true' "
+        BuildInParallel="$(RestoreBuildInParallel)"
+        Projects="@(FilteredRestoreGraphProjectInputItemsWithoutDuplicates)"
+        Targets="_IsProjectRestoreSupported"
+        SkipNonexistentTargets="true"
+        Properties="$(_GenerateRestoreGraphProjectEntryInputProperties)">
+      <Output
+          TaskParameter="TargetOutputs"
+          ItemName="FilteredRestoreGraphProjectInputItems" />
+    </MsBuild>
+  </Target>
+
+</Project>
