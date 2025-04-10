@@ -3,7 +3,7 @@
 ## How do I create a proposal?
 
 - Fork or clone https://github.com/NuGet/Home
-- Copy `meta/template.md` into `proposed/<year>/your-proposal-name.md`
+- Copy `meta/template.md` into `accepted/<year>/your-proposal-name.md`
 - Fill in the template with your proposal.
 - Submit a PR to the `NuGet/Home` repo
 - (Optional) Create a new discussion to talk about it https://github.com/NuGet/Home/discussions/new
@@ -16,22 +16,19 @@ All discussions surrounding a proposal are covered by the [.NET Foundation code 
 
 ## What happens to a proposal?
 
-When there is consensus among the NuGet contributors and .NET community of the direction of the proposal, it will go into one of three states.
-
-- `accepted` - The proposal has been accepted and work will be scheduled to implement it.
-- `withdrawn` - The proposal has been rejected or withdrawn by the author.
-- `implemented` - The proposal has already been accepted and implemented into the product.
-
-Once a proposal has been reviewed on GitHub with all interested parties having an opportunity to review it, and at least one NuGet contributor has signed off on the proposal, the PR will be accepted and merged.
+When there is consensus among the NuGet contributors and .NET community of the direction of the proposal, and at least one NuGet contributor has signed off on the proposal, it will be merged into the `Accepted` folder (eg, `accepted/<year>/your-proposal-name.md`).
+Otherwise, the proposal will be withdrawn by closing the PR with the reasoning mentioned in the PR.
 
 ## What happens when a proposal is accepted?
 
-When a proposal is reviewed and accepted, it will be moved from `proposed` to `accepted`. Once accepted, it will be scheduled by the NuGet contributors to be implemented or put up for grabs for anyone to implement by making a PR in the appropriate repository.
-
-## What happens when a proposal is withdrawn?
-
-When a proposal is reviewed for its accuracy and relevance and no longer fits the goals of the project or is no longer a candidate for implementation, a proposal will be moved from `accepted` to `withdrawn` with a clear reason as to why it was moved. 
+Once accepted, it will be scheduled by the NuGet contributors to be implemented or put up for grabs for anyone to implement by making a PR in the appropriate repository.
 
 ## What happens when a proposal is implemented?
 
-When the changes described in the proposal have been implemented and merged into the relevant repository and due for release the corresponding proposal will be moved from `accepted` to `implemented`. If you'd like to implement an `accepted` proposal, please make a PR in the appropriate repository and mention the proposal in the PR. 
+When the changes described in the accepted proposal have been implemented and merged into the relevant repository and due for release the corresponding proposal will be moved to the `implemented` folder. The linked GitHub issue will be closed upon merging to the relevant branch.
+
+If you'd like to implement an `accepted` proposal, please make a PR in the appropriate repository and mention the proposal in the PR and Issue.
+
+## What happens when a proposal is withdrawn?
+
+When a proposal is reviewed for its accuracy and relevance and no longer fits the goals of the project or is no longer a candidate for implementation, the PR containing the proposal will be **Closed** with a clear reason as to why. We do not lock conversations on these PRs, so future discussions can happen on the closed PR in case the community input or the circumstances preventing implementation changes.

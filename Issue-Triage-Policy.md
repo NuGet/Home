@@ -9,8 +9,8 @@ The chart uses three major states. They are easily identifiable:
 | -------- | --------------------------------------------- |
 | Waiting for triaging | has any label starts with `Triage:`|
 | Closed | matches the query is:closed |
-| Backlog| has label `Pipeline:Backlog` |
-| Under Consideration | has label `Pipeline:Under Consideration` |
+| Backlog| has label `Priority:1` or `Priority:2` |
+| Under Consideration | has label `Priority:3` |
 
 
 In the rest of this document, we'll go into more detail about each of the activities of triaging and how we make decisions.
@@ -37,17 +37,17 @@ If an issue misses information that we need to understand the issue, we assign t
 The bot is monitoring all issues labeled `WaitingForCustomer`. If we don't receive the needed information within 14 days, the bot will add a `no recent activity` label and a comment. After another 14 days without any comment from the author, the bot closes the issue and add `Resolution:NeedMoreInfo` label.
 
 ### Important Issues
-We assign the `Priority:0` or `Priority:1` label to issues that is:
+We assign the `Priority:1` label to issues that are:
 - a regression from a previous RTM
 - high-impacting to the community
 - core scenario blocking
 
 ### Asking for Help
-We label issues with `help wanted` to encourage the community to take up. If issues are suitable for beginners, we may add the `good first issue` label and we add code pointers that help beginners to get started with a PR.
+We label issues with `help wanted` to encourage the community to take up. If issues are suitable for beginners, we may add the `good first issue` label and we add code pointers that help beginners to get started with a pull request.
 
-Sometimes, we get issues that we can't or don't have the time to reproduce due to the complexity or time requirements of the setup but that we indeed suspect to be issues. We label those issues with `Triage:Investigate`. What we are looking for is help in reproducing and analyzing the issue. In the best of all worlds, we receive a PR from you. :smiley:
+Sometimes, we get issues that we can't or don't have the time to reproduce due to the complexity or time requirements of the setup but that we indeed suspect to be issues. We label those issues with `Triage:Investigate`. What we are looking for is help in reproducing and analyzing the issue. In the best of all worlds, we receive a pull request from you. :smiley:
 
-Please note, issues with the `Pipeline:Backlog` label usually have higher impact than issues with the `Pipeline:Under Consideration` label. So, if you'd like to make more impact, please prioritize working on fixing issues with the `Pipeline:Backlog` label.
+Please note, issues with the `Priority:2` label usually have higher impact than issues with the `Priority:3` label. So, if you'd like to make more impact, please prioritize working on fixing issues with the `Priority:2` label.
 
 ### Managing feature requests
 We appreciate everyone who takes their time creating issues of feature requests to help us improve our product. In theory, we could keep all issues open no matter if what will happen in the future. But that makes it hard to understand what has realistic chances to ever make it into the repository. 
@@ -65,13 +65,12 @@ Here are the questions we consider when triaging:
 * Has the community at large expressed interest in this functionality? I.e. has it gathered more than 5 up-votes.
 
 After triaging, the issue will fall into one of the following categories:
-* The issue is accepted. A `Pipeline:Backlog` label is added.
+* The issue is accepted. A `Priority:1` or `Priority:2` label is added.
 
 * The issue is closed. A `Resolution:WontFix` label is added.
 
-* The feature is under consideration. A `Pipeline:Under Consideration` label is added. 
-A bot monitors the issues having `Pipeline:Under Consideration` label. If an issue surpasses the 5 up-votes in 90 days, the bot adds `Triage:NeedsTriageDiscussion` label and we will have a second triaging process. If an issue has been added `Pipeline:Under Consideration` label with less than 5 up-votes for more than 90 days, the bot will close the issue.
-During the second triaging process, we will do more analysis to determine the cost/benefit. We will add `Pipeline:Backlog` label to the issue if we decide to accept the issue. Otherwise, the issue will be closed with an explanation why we do so.
+* The feature is under consideration. A `Priority:3` label is added. 
+A bot monitors the issues having a `Priority:3` label. If an issue receives 5 or more up-votes in 90 days, the bot adds a `Triage:NeedsTriageDiscussion` label. The NuGet team meets weekly to discuss issues labeled `Triage:NeedsTriageDiscussion` and we will do more analysis to determine the cost/benefit. If we decide the issue should be on the backlog, we will change the priority label to `Priority:2`.
 
 > [!Note]
 > Currently, the threshold is 5 up-votes. We start with this low threshold as we don't want to miss your voices. Going forward, we might need to adjust the threshold if it doesn't fit well.
