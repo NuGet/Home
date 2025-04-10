@@ -49,7 +49,7 @@ While creating a pull request, please also include the intent for which you'd li
 ## Issue Triage Policy
 
 The NuGet team receives a significant amount of bugs and feature requests and while we'd love to address everyone's concern, this isn't practical.
-[Read more about our issue triage policy.](.\Issue-Triage-Policy.md)
+[Read more about our issue triage policy.](Issue-Triage-Policy.md)
 
 ## Contributing Fixes
 If you are interested in fixing issues and contributing directly to the code base, please see the document [Contribute To NuGet](https://github.com/NuGet/Home/wiki/Contribute-to-NuGet).

@@ -1,6 +1,5 @@
 name: Behavior Change
 description: When you want NuGet to work differently than it does.
-title: "[DCR]: "
 labels: ["Type:DCR", "Triage:Untriaged"]
 body:
   - type: markdown

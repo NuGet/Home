@@ -1,6 +1,5 @@
 name: Feature Request
 description: "When you want a new feature for something that doesn't already exist"
-title: "[Feature]: "
 labels: ["Type:Feature", "Triage:Untriaged"]
 body:
   - type: markdown

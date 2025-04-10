@@ -1,15 +1,14 @@
-# Title
+# ***Untitled***
+<!-- Replace `Title` with an appropriate title for your design -->
 
-- Author Name (GitHub username link)
-- Start Date (YYYY-MM-DD)
-- GitHub Issue (GitHub Issue link)
-- GitHub PR (GitHub PR link)
+- Author Name <!-- GitHub username link -->
+- GitHub Issue <!-- GitHub Issue link -->
 
 ## Summary
 
 <!-- One-paragraph description of the proposal. -->
 
-## Motivation 
+## Motivation
 
 <!-- Why are we doing this? What pain points does this solve? What is the expected outcome? -->
 
