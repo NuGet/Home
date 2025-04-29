@@ -26,10 +26,12 @@ jobs:
           dotnet --info
 
       - name: Build GitHubIssueTagger
+        working-directory: Entropy/GithubIssueTagger
         run: |
-          dotnet build Entropy/GitHubIssueTagger/GitHubIssueTagger.csproj
+          dotnet build
 
       - name: Run IceBox Watcher
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: dotnet run --project Entropy/GitHubIssueTagger/GitHubIssueTagger.csproj -- IceBox --label "Priority:3"
+        working-directory: Entropy/GithubIssueTagger
+        run: dotnet run -- IceBox --label "Priority:3"
