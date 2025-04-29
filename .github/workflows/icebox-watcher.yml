@@ -18,7 +18,7 @@ jobs:
       - name: Clone Entropy
         run: |
           git clone https://github.com/NuGet/Entropy
-          git switch zivkan-GithubIssueTagger-HttpRetry
+          git -C Entropy switch zivkan-GithubIssueTagger-HttpRetry
 
       - name: Install Latest .NET SDK
         run: |
@@ -27,9 +27,9 @@ jobs:
 
       - name: Build GitHubIssueTagger
         run: |
-          dotnet build GitHubIssueTagger/GitHubIssueTagger.csproj
+          dotnet build Entropy/GitHubIssueTagger/GitHubIssueTagger.csproj
 
       - name: Run IceBox Watcher
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: dotnet run --project GithubIssueTagger -- IceBox --label "Priority:3"
+        run: dotnet run --project Entropy/GitHubIssueTagger/GitHubIssueTagger.csproj -- IceBox --label "Priority:3"
