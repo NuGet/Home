@@ -11,6 +11,24 @@ on:
         description: 'The Entropy repo branch to use'
         required: true
         default: 'main'
+      LabelToCheck:
+        description: 'The label to check for upvotes'
+        required: true
+        default: 'Priority:3'
+      Upvotes:
+        description: 'Upvote threshold'
+        required: true
+        type: number
+        default: 5
+      AddOnThreshold:
+        description: 'Add label when threshold is reached'
+        required: true
+        type: boolean
+        default: false
+      LabelToAdd:
+        description: 'The label to add to the upvoted issue'
+        required: true
+        default: 'Triage:NeedsTriageDiscussion'
 
 permissions:
   issues: write
@@ -39,6 +57,16 @@ jobs:
 
       - name: Run IceBox Watcher
         env:
+          # The defaults on the workflow_dispatch don't apply to the scheduled trigger.
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LABEL_TO_CHECK: ${{ inputs.LabelToCheck || 'Priority:3' }}
+          UPVOTE_THRESHOLD: ${{ inputs.Upvotes || 5 }}
+          ADD_ON_THRESHOLD: ${{ inputs.AddOnThreshold || true }}
+          LABEL_TO_ADD: ${{ inputs.LabelToAdd || 'Triage:NeedsTriageDiscussion' }}
         working-directory: Entropy/GithubIssueTagger
-        run: dotnet run -- IceBox --label "Priority:3"
+        run: |
+          if $ADD_ON_THRESHOLD; then
+            dotnet run -- IceBox --label $LABEL_TO_CHECK --upvotes $UPVOTE_THRESHOLD --add $LABEL_TO_ADD
+          else
+            dotnet run -- IceBox --label $LABEL_TO_CHECK --upvotes $UPVOTE_THRESHOLD
+          fi
