@@ -6,19 +6,26 @@ on:
     - cron: '34 13 * * *'
   # Allow manual triggering, so testing changes is easier
   workflow_dispatch:
+    inputs:
+      entrypyBranch:
+        description: 'The Entropy repo branch to use'
+        required: true
+        default: 'main'
 
 permissions:
-  packages: read
   issues: write
 
 jobs:
   Run-IceBox-Watcher:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Clone Entropy
+        env:
+          BRANCH: ${{ inputs.entrypyBranch || 'main' }}
         run: |
           git clone https://github.com/NuGet/Entropy
-          git -C Entropy switch zivkan-GithubIssueTagger-HttpRetry
+          git -C Entropy switch $BRANCH
 
       - name: Install Latest .NET SDK
         run: |
