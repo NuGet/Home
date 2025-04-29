@@ -15,17 +15,21 @@ jobs:
   Run-IceBox-Watcher:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
+        with:
+          repository: NuGet/Entropy
+          ref: zivkan-GithubIssueTagger-HttpRetry
+
       - name: Install Latest .NET SDK
         run: |
           curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --install-dir $HOME/dotnet
           dotnet --info
-      - name: Set up NuGet authentication
-        run: dotnet nuget add source --username github-actions --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/nuget/index.json"
-        
-      - name: Install GitHubIssueTagger
-        run: dotnet tool install --global NuGet.Internal.GitHubIssueTagger
+
+      - name: Build GitHubIssueTagger
+        run: |
+          dotnet build GitHubIssueTagger/GitHubIssueTagger.csproj
 
       - name: Run IceBox Watcher
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: GithubIssueTagger IceBox --add "Triage:NeedsTriageDiscussion" --label "Priority:3"
+        run: dotnet run --project GithubIssueTagger -- IceBox --label "Priority:3"
