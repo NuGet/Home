@@ -15,10 +15,10 @@ jobs:
   Run-IceBox-Watcher:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-        with:
-          repository: NuGet/Entropy
-          ref: zivkan-GithubIssueTagger-HttpRetry
+      - name: Clone Entropy
+        run: |
+          git clone https://github.com/NuGet/Entropy
+          git switch zivkan-GithubIssueTagger-HttpRetry
 
       - name: Install Latest .NET SDK
         run: |
