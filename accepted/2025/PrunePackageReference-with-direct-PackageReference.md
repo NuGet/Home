@@ -7,7 +7,10 @@
 
 ## Summary
 
-<!-- One-paragraph description of the proposal. -->
+Change the NU1510 heuristic in multi-targeting scenarios to only be raised when the package would be completely removed from the project.
+This would ensure customers don't end up a potentially more challenging to manage conditional PackageReference scenario.
+
+Also, this proposal explores the idea of pruning direct package references, the technical details around and the benefits of doing the work.
 
 ## Motivation
 
@@ -17,14 +20,17 @@ In [#14196](https://github.com/NuGet/Home/issues/14196), we have an example of a
 The warning would lead the customer to write a condition targeting netstandard2.0 only.
 If the customers decide upgrade the package while still targeting net8.0, it may lead to the netstandard2.0 version of their library not being compatible with the net8.0 version and *nothing* will warn of this potential concern that may lead to runtime errors for customers referencing this package.
 
-In the same, a reconsideration of the pruning behavior for direct package references was also suggested. 
+In the same, a reconsideration of the pruning behavior for direct package references was also suggested.
 
 ## Explanation
 
 ### Functional explanation
 
+This design builds on the previous pruning specs, [PrunePackageReference roll-out](../2025/prune-package-reference-rollout.md) and [PrunePackageReference](../2024/prune-package-reference.md).
+
 #### Scenarios for direct PackageReference items
 
+The motivation for the pruning overall is that we'd want to reduce the overhead of customers managing components that can be managed by the runtime.
 We want customers to remove unnecessary PackageReference items.
 As a long as a package is specified within a project but it's not needed, it adds maintenance overhead:
 
@@ -107,7 +113,7 @@ For multi-targeted projects, the warning will be raised if at least one of the f
 We will raise an NU1510 when the PackageReference can be completely removed from the project file.
 In other words, when a package would be pruned for every target framework it is specified in, raise NU1510.
 
-In order to ensure continuity, and minimize disruption that would be caused by raising NU1510 for existing projects, as per the [Breaking Change guidelines](https://github.com/dotnet/sdk/blob/main/documentation/project-docs/breaking-change-guidelines.md#tie-potentially-impactful-changes-to-the-target-tfm) NU1510 will only be raised for projects targeting net10, requiring an explicit customer action to get this diagnostic.
+In order to provide continuity, and minimize disruption that would be caused by raising NU1510 for existing projects, as per the [Breaking Change guidelines](https://github.com/dotnet/sdk/blob/main/documentation/project-docs/breaking-change-guidelines.md#tie-potentially-impactful-changes-to-the-target-tfm) NU1510 will only be raised for projects targeting net10, requiring an explicit customer action to get this diagnostic.
 
 Referring back to the [scenarios](#scenarios-for-direct-packagereference-items) listed above:
 
@@ -177,10 +183,13 @@ The biggest drawback is cost. Direct pruning requires a lot of parts to be updat
 
 ## Drawbacks
 
+- Additional UX concepts for both 1st and 3rd party tooling that manage packages.
+- Cost of direct PackageReference pruning vs the potential benefit since customers in affected scenarios with a vulnerable package would either get a NU1510 or get a legit audit warning.
+
 ## Rationale and alternatives
 
 - Update the NU1510 heuristic only. Retain the current behavior for pruning.
-- Instead of removing the direct PackageReference from the graph completely, treat it as `IncludeAssets="none"`. This would allow get us benefits from Component Governance, in a more cost-effective way. `NuGetAudit` would also need to be updated to stop auditing unused packages, similarly to how Component Governance approaches the problem. TODO NK - Find an issue.
+- Instead of removing the direct PackageReference from the graph completely, treat it as `IncludeAssets="none"`. This would allow get us benefits from Component Governance, in a more cost-effective way. `NuGetAudit` would also need to be updated to stop auditing unused packages, similarly to how Component Governance approaches the problem. [Make ExcludeAssets visible in Audit and nuget why](https://github.com/NuGet/Home/issues/13860)
 
 ## Prior Art
 
@@ -201,3 +210,4 @@ N/A
 - Change the warning icon for a missing direct package reference to something that accounts for the pruned packages.
 - Block installation of packages that would be pruned. Effectively, do not allow System.Text.Json 8.0.0 to be installed in a project targeting `net10.0` only. The heuristic could be similar to the one of NU1510, block the installation if a NU1510 is raised for the package id being installed.
 - [#14126: Warning rollout for PrunePackageReference](https://github.com/NuGet/Home/issues/14126) - We may want a way to enable how this warning is surfaced for customers that do not target .NET 10.0.
+- NuGet vulnerability warnings for direct PackageReference can account for the fact that a package would be pruned and provide that information. We could also choose to raise a NU1510 warning when a vulnerability is reported for that package during NuGet Audit.
