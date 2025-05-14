@@ -112,16 +112,31 @@ Referring back to the [scenarios](#scenarios-for-direct-packagereference-items) 
 | Scenario | NU1510 | Notes |
 |----------|--------|-------|
 | 1 | Yes | |
-| 2a | No | The warning may be beneficial, but keeping it for simplicity |
+| 2a | No | The warning may be beneficial, but complex heuristic would be harder to reason about. |
 | 2b | No | Eventual runtime failure risks |
 | 2c | No | Eventual runtime failure risks |
 | 2d | Yes | Removal of the PR leads to the package being completely gone from the project. |
 
-#### Should we prune direct package references
+#### Pruning direct PackageReference items
 
-The benefits of pruning are that external scanners and audit functionality no longer sees those package references raising false positives.
+The primary motivation for pruning is audit functionality and external scanners no longer sees those package references and raise false positives.
+Transitively pruned packages do not appear in the assets file as dependencies of the packages that originally referenced them.
+They have effectively been selected as unnecessary during the framework selection step of dependency resolution.
+The only place the id appears in the assets file is the `project` section under the `packagesToPrune`.
 
-Direct are ideally are minimal and what users first update when they transitive vulnerabilties.
+Direct PackageReference appear in the project file and we would need to be able to answer questions about the statu of the package itself.
+To allow components to reason about the direct dependencies, the list of pruned packages will be represented in a new section as well.
+Similar to transitively pruned packages, direct  dependencies that were pruned *will not* appear in the targets section and  affect build in any way.
+
+```json
+"prunedPackages" : {
+        "net9.0": {
+          "System.Text.Json": "[9.0.0, )"
+        }
+}
+```
+
+Direct packages tend to be minimal and what users first update when they transitive vulnerabilties.
 Tooling such as dependabot depends on the packages found in the project file.
 The NuGet Package Manager UI surfaces all the direct dependencies in the UI as well, and shows an `Update` count for direct packages that are out of date.
 Components in Visual Studio depend on NuGet's [GetInstalledPackagesAsync](https://learn.microsoft.com/en-us/nuget/visual-studio-extensibility/nuget-api-in-visual-studio#inugetprojectservice-interface) API for looking up packages as well for deciding whether to install certain packages.
@@ -129,36 +144,36 @@ Finally dotnet list package is the CLI equivalent of the package manager UI.
 
 Currently, direct packages are always available should a restore succeed.
 With a pruned reference, the package is explicitly not available, but not in an error state.
-In addition, a pruned package should not be audit for vulnerabilities, but ideally is audited for deprecations.
+In addition, a pruned package should not be audited for vulnerabilities, but ideally is audited for deprecations.
 
 For the components mentioned above, we need to define their behavior for pruned packages.
 
 | Component | Pruned direct PackageReference behavior | Notes |
 |-----------|-----------------------------------------|-------|
-| Package Manager UI (Installed tab) | Show | The customer needs to see that they've specified the PackageReference and should be able to remove that package |
-| Package Manager UI (Updates) | Show | An update to the package may lead to it not being pruned anymore, and the customer needs to be able to make that decision. |
-| dotnet list package | Show | Similar as Package Manager UI, installed tab |
-| dotnet list package --outdated | Show | A customer needs to be able to update, as an update may make a package not pruned anymore |
-| Solution Explorer | Show | The package needs to indicate why it was not "resolved". The solution explorer currently adds a warning icon next to unresolved packages (ie, not found in the project.assets.json file) |
-| GetInstalledPackagesAsync | Show | Depends on the scenario, they may be trying to achieve similar behavior to what the PM UI and list package commands provide. TODO: The installed packages *always* has a resolved version, what should that version be listed as? The same version? If so, should NuGet ensure the package version is resolvable? |
+| Package Manager UI (Installed tab) | Show | The customer needs to see that they've specified the PackageReference and should be able to remove that package. Only the requested version will be used for any logic, that means requested/resolved are expected to the same. |
+| Package Manager UI (Updates) | Show | An update to the package may lead to it not being pruned anymore, and the customer needs to be able to make that decision. Only the requested version will be used for any logic, that means requested/resolved are expected to the same. |
+| dotnet list package | Show | Similar as Package Manager UI, installed tab. The list package has a requested/resolved column. The resolved column should match the requested, as well as an additional indicator similar to auto-referenced. |
+| dotnet list package --outdated | Show | A customer needs to be able to update, as an update may make a package not pruned anymore. The resolved column should match the requested, as well as an additional indicator similar to auto-referenced. |
+| Solution Explorer | Show | The package needs to indicate why it was not "resolved". The solution explorer currently adds a warning icon next to unresolved packages (ie, not found in the project.assets.json file). We should change the indicator to something different. |
+| GetInstalledPackagesAsync | Show | Depends on the scenario, they may be trying to achieve similar behavior to what the PM UI and list package commands provide. The [NuGetInstalledPackage](https://github.com/NuGet/NuGet.Client/blob/dev/src/NuGet.Clients/NuGet.VisualStudio.Contracts/NuGetInstalledPackage.cs) type from the INuGetProjectService (that test explorer and roslyn use), will have the following changes: `Version` => null, the documentation will be updated to say the package is in either an error case or pruned, InstallPath => null, similarly if the package does not exist, the installation path does not exist. |
+
+Given that pruning is an offline operation, ie NuGet does not talk to the sources for pruned packages, we never validate that the requested package exists and the specified version may be incorrect. This is likely to not be of too much consequence, since it's only really possible with hand-editing, and the impact of it is minimal since the package is not used anyways.
+
+### Should we prune direct PackageReference
 
 When the NU1510 warning is raised, we are giving the customer a clear signal that they need to remove the PackageReference.
 In these scenarios, whether we prune direct package references is not very critical.
 
 In the partial prune scenarios such as 2b and 2c, pruning could be beneficial in the .NET leg, helping avoid additional audit warnings.
-However, due to the fact that the PackageReference is in other frameworks, the benefit is likewise partial, since if the package itself had a vulnerability, the audit warning will be warranted since the customer is using it in a case where it is not being pruned.
+However, due to the fact that the PackageReference is in other frameworks, the benefit is probably more minimal, since if the package itself had a vulnerability, the audit warning will be warranted since the customer is using it in a case where it is not being pruned.
 
 The following is a list of pros and cons of pruning direct references.
+
 | Pros | Cons |
 |------|------|
-
-TODO NK
-
-TODO NK - Indicate in the assets file that a package has been pruned.
+| Pruning applies to every package, regardless of direct vs transitive | |
 
 ## Drawbacks
-
-<!-- Why should we not do this? -->
 
 ## Rationale and alternatives
 
@@ -168,10 +183,15 @@ N/A
 
 ## Unresolved Questions
 
+- What should `dotnet list package` show for direct pruned packages? Should it show the version specified as requested?
+- What should the GetInstalledPackages return for the pruned direct packages? 
 - Should we add a setting to prune direct package references
 
 ## Future Possibilities
 
 <!-- What future possibilities can you think of that this proposal would help with? -->
 
+- Visualize pruned packages in the PM UI Installed/Updates tabs. Note that the PM UI does not have visualization support for multi-targeting, so the heuristic here should be similar to the one for the NU1510 warning.
+- Change the warning icon for a missing direct package reference to something that accounts for the pruned packages.
+- Block installation of packages that would be pruned. Effectively, do not allow System.Text.Json 8.0.0 to be installed in a project targeting `net10.0` only. The heuristic could be similar to the one of NU1510, block the installation if a NU1510 is raised for the package id being installed.
 - [#14126: Warning rollout for PrunePackageReference](https://github.com/NuGet/Home/issues/14126) - We may want a way to enable how this warning is surfaced for customers that do not target .NET 10.0.
