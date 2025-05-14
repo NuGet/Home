@@ -197,10 +197,11 @@ N/A
 
 ## Unresolved Questions
 
-- What should `dotnet list package` show for direct pruned packages? Should it show the version specified as requested?
-- What should the GetInstalledPackages return for the pruned direct packages?
-- Should we add a setting to prune direct package references?
-- Validate how 3rd party components would behave with unresolved direct package references.
+- Should we prune direct packages? If the answer is yes, the following unresolved questions apply:
+  - What should `dotnet list package` show for direct pruned packages? Should it show the version specified as requested?
+  - What should the GetInstalledPackages return for the pruned direct packages?
+  - Should we add a setting to prune direct package references?
+  - Validate how 3rd party components would behave with unresolved direct package references.
 
 ## Future Possibilities
 
