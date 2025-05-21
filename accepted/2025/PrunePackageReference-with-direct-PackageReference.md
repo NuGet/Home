@@ -207,8 +207,10 @@ N/A
 
 <!-- What future possibilities can you think of that this proposal would help with? -->
 
-- Visualize pruned packages in the PM UI Installed/Updates tabs. Note that the PM UI does not have visualization support for multi-targeting, so the heuristic here should be similar to the one for the NU1510 warning.
-- Change the warning icon for a missing direct package reference to something that accounts for the pruned packages.
+- If we prune direct packages:
+  - Visualize pruned packages in the PM UI Installed/Updates tabs. Note that the PM UI does not have visualization support for multi-targeting, so the heuristic here should be similar to the one for the NU1510 warning.
+  - Change the warning icon for a missing direct package reference to something that accounts for the pruned packages.
 - Block installation of packages that would be pruned. Effectively, do not allow System.Text.Json 8.0.0 to be installed in a project targeting `net10.0` only. The heuristic could be similar to the one of NU1510, block the installation if a NU1510 is raised for the package id being installed.
 - [#14126: Warning rollout for PrunePackageReference](https://github.com/NuGet/Home/issues/14126) - We may want a way to enable how this warning is surfaced for customers that do not target .NET 10.0.
 - NuGet vulnerability warnings for direct PackageReference can account for the fact that a package would be pruned and provide that information. We could also choose to raise a NU1510 warning when a vulnerability is reported for that package during NuGet Audit.
+- [[DCR]: ExcludeAssets="all" should exclude the package from the restore graph](https://github.com/NuGet/Home/issues/11567) covers a similar idea of removing packages from restore, like direct pruning would. Treating pruned packages with `IncludeAssets="none"` followed by excluding this package from all auditing may yield similar results.
