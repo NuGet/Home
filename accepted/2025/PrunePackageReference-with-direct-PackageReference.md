@@ -208,6 +208,7 @@ N/A
 
 - Should we prune direct packages? If the answer is yes, the following unresolved questions apply:
   - What should `dotnet list package` show for direct pruned packages? Should it show the version specified as requested?
+    - It can be marked in a similar way that auto-referenced packages are marked. `> Newtonsoft.Json           (A)   [13.0.2, )   13.0.2`
   - What should the GetInstalledPackages return for the pruned direct packages?
   - Should we add a setting to prune direct package references?
   - Validate how 3rd party components would behave with unresolved direct package references.
