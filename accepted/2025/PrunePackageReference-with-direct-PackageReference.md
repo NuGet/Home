@@ -10,7 +10,7 @@
 Change the NU1510 heuristic in multi-targeting scenarios to only be raised when the package would be completely removed from the project.
 This would ensure customers don't end up a potentially more challenging to manage conditional PackageReference scenario.
 
-Also, this proposal explores the idea of pruning direct package references, the technical details around and the benefits of doing the work.
+This proposal also explores the idea of pruning direct package references, the technical details around and the benefits of doing the work.
 
 ## Motivation
 
@@ -19,6 +19,13 @@ As of .NET 10, Preview 4, `PrunePackageReference` does not prune direct PackageR
 In [#14196](https://github.com/NuGet/Home/issues/14196), we have an example of a project targeting netstandard2.0;net8.0 and referencing System.Text.Json 8.0.x.
 The warning would lead the customer to write a condition targeting netstandard2.0 only.
 If the customers decide upgrade the package while still targeting net8.0, it may lead to the netstandard2.0 version of their library not being compatible with the net8.0 version and *nothing* will warn of this potential concern that may lead to runtime errors for customers referencing this package.
+
+To understand those potential runtime issues, let's take the following example:
+Package LibX targets was built from this project, and targets net9.0 and netstandard2.0, with a conditional reference on STJ 10.0.
+Package LibYDependsOnX was build against LibX and it targets net8.0.
+A project uses LibYDependsOnX targeting net8.0. At this point it's consuming STJ 10.0, getting the reference through LibX.
+Then the project retargets to net9.0, and now it is *not* getting a STJ 10.0 as a dependency, despite LibYDependsOnX potentially depending on it.
+Note that this potential runtime issue is a general problem with packages that multi-target, where the dependencies of less specific frameworks like netstandard2.0 cannot be broader than more the specific frameworks like net9.0.  
 
 In the same, a reconsideration of the pruning behavior for direct package references was also suggested.
 
@@ -36,14 +43,14 @@ As a long as a package is specified within a project but it's not needed, it add
 
 - It may be accidentally updated by tooling such as dependabot
 - It may appear as a direct reference in the Package Manager UI or list package or others tools that list the project dependencies.
-- The package might become vulnerable in the future, causing NuGetAudit warnings that could be avoided by letting the SDK use the target's reference assemblies (update the runtime to fix the vulnerability)
+- It is still part of auditing functionality such as NuGetAudit, deprecation etc.
 
 Given that pruning is a per framework feature, there a few scenarios to consider for the handling of direct package references, primarily revolving around multi-targeting:
 
 1. Single framework
 If the direct package reference is within the pruning range, we would like for the customer to remove the PackageReference and reduce the overhead.
 
-1. Multi framework scenario
+2. Multi framework scenario
 a. .NET & .NET Framework scenario
 
 ```csproj
@@ -57,6 +64,7 @@ a. .NET & .NET Framework scenario
 ```
 
 For .NET, the package is unnecessary, and ideally we'd want the customer to consider conditionally referencing the System.Text.Json reference.
+Note that even in these situations, there's a theoretical way to end up with runtime issues, but it would require that a .NET Framework package references a package that references both, and then a .NET application reference this package.
 
 b. .NET & .NET Standard scenario
 
@@ -70,9 +78,9 @@ b. .NET & .NET Standard scenario
   </ItemGroup>
 ```
 
-For .NET, the package is unnecessary, but if the customer removes the reference and then at a later point point updates the PackageReference without bumping the target framework, it may lead to a situation where the netstandard2.0 version of their package has a broader API surface area than net9.0 and potentially leading to runtime issues.
+For .NET, the package is unnecessary, but if the customer removes the reference and then at a later point point updates the PackageReference without bumping the target framework, it may lead to a situation where the netstandard2.0 version of their package has a broader API surface area than net9.0 and potentially leading to runtime issues as talked about in the [Motivation](#motivation).
 
-c. Multiple .NET frameworks, package specified for all frameworks 
+c. Multiple .NET frameworks, package specified for all frameworks.
 
 ```csproj
   <PropertyGroup>
