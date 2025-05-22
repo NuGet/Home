@@ -36,6 +36,7 @@ As a long as a package is specified within a project but it's not needed, it add
 
 - It may be accidentally updated by tooling such as dependabot
 - It may appear as a direct reference in the Package Manager UI or list package or others tools that list the project dependencies.
+- The package might become vulnerable in the future, causing NuGetAudit warnings that could be avoided by letting the SDK use the target's reference assemblies (update the runtime to fix the vulnerability)
 
 Given that pruning is a per framework feature, there a few scenarios to consider for the handling of direct package references, primarily revolving around multi-targeting:
 
