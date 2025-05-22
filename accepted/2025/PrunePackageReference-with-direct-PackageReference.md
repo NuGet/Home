@@ -144,7 +144,7 @@ Similar to transitively pruned packages, direct  dependencies that were pruned *
 }
 ```
 
-Direct packages tend to be minimal and what users first update when they transitive vulnerabilties.
+Direct packages tend to be minimal and what users first update when they have transitive vulnerabilties.
 Tooling such as dependabot depends on the packages found in the project file.
 The NuGet Package Manager UI surfaces all the direct dependencies in the UI as well, and shows an `Update` count for direct packages that are out of date.
 Components in Visual Studio depend on NuGet's [GetInstalledPackagesAsync](https://learn.microsoft.com/en-us/nuget/visual-studio-extensibility/nuget-api-in-visual-studio#inugetprojectservice-interface) API for looking up packages as well for deciding whether to install certain packages.
