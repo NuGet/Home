@@ -183,12 +183,12 @@ When the NU1510 warning is raised, we are giving the customer a clear signal tha
 In these scenarios, whether we prune direct package references is not very critical.
 
 In the partial prune scenarios such as 2b and 2c, pruning could be beneficial in the .NET leg, helping avoid additional audit warnings.
-However, due to the fact that the PackageReference is in other frameworks, the benefit is probably more minimal, since if the package itself had a vulnerability, the audit warning will be warranted since the customer is using it in a case where it is not being pruned.
-There are a few things that pruning of direct packages introduces:
+However, due to the fact that the PackageReference is in other frameworks, the benefit is more minimal, since if the package itself had a vulnerability, the audit warning will be warranted since the customer is using it in a case where it is not being pruned.
 
-- The new concept of a pruned direct package. For transitive pruning, the end user would not see anything beyond a reduction in packages downloaded. For direct packages, the PM UI, list & why commands.
+Pruning of direct packages would introduce the new concept of a pruned direct package. For transitive pruning, the end user would not see anything beyond a reduction in packages downloaded. For direct packages, the PM UI, list & why commands.
 
-The biggest drawback is cost. Direct pruning requires a lot of parts to be updated and the benefit is minimal. Only 5% of .NET SDK based projects are suspected to be multi-targeted and data analysis would suggest only 1-2% of projects could ever fall into this scenario and all of that disregards the per framework considerations.
+From a cost/benefit perspective, direct pruning requires a lot of parts to be updated and there is not a big benefit in the core scenario where a package has vulnerabilities (warnings would still be raised since the package is still used).
+Only 5% of .NET SDK based projects are suspected to be multi-targeted, and it would be challenging to get more specificity at this point.
 
 ## Drawbacks
 
