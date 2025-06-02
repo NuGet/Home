@@ -1,21 +1,13 @@
 # Using NuGet for MCP servers
 
-- Author Names: Jon Douglas ([@jondouglas](https://github.com/jondouglas)), Joel Verhagen
-  ([@joelverhagen](https://github.com/joelverhagen))
+- Author Names: Jon Douglas ([@jondouglas](https://github.com/jondouglas)), Joel Verhagen ([@joelverhagen](https://github.com/joelverhagen))
 - GitHub Issue: [NuGet/NuGetGallery#10461](https://github.com/NuGet/NuGetGallery/issues/10461)
 
 ## Summary
 
-Today it is possible for an [MCP](https://modelcontextprotocol.io/introduction) server to be implemented in many
-different programming languages. The protocol is relatively agnostic to the underlying programming language. However,
-client tooling such as VS Code is tailored to specific runtimes when installing and launching a local MCP server. VS
-Code, for example, supports [Docker, Python, and npm MCP
-servers](https://code.visualstudio.com/docs/copilot/chat/mcp-servers#_configuration-format) (as of June 2025). Other
-runtimes such as .NET are supported via custom steps, such as wrapping the app in Docker/npx or installing the MCP
-server out of band and then executing it by a command name available in `PATH`.
+Today it is possible for an [MCP](https://modelcontextprotocol.io/introduction) server to be implemented in many different programming languages. The protocol is relatively agnostic to the underlying programming language. However, client tooling such as VS Code is tailored to specific runtimes when installing and launching a local MCP server. VS Code, for example, supports [Docker, Python, and npm MCP servers](https://code.visualstudio.com/docs/copilot/chat/mcp-servers#_configuration-format) (as of June 2025). Other runtimes such as .NET are supported via custom steps, such as wrapping the app in Docker/npx or installing the MCP server out of band and then executing it by a command name available in `PATH`.
 
-This document describes several steps needed to improve the use of local MCP servers written in .NET. We focus primarily
-on the packaging (NuGet) perspective but will reference ongoing or completed work in the .NET ecosystem.
+This document describes several steps needed to improve the use of local MCP servers written in .NET. We focus primarily on the packaging (NuGet) perspective but will reference ongoing or completed work in the .NET ecosystem.
 
 We will streamline the authoring, discovery, installation, and execution of local MCP servers written in .NET.
 
@@ -25,7 +17,7 @@ The main missing pieces are:
 2. [Browsing experience on NuGet.org tailored to MCP server packages](#improve-browsing-experience)
 3. [Single-shot execution of .NET tools](#enable-single-shot-execution-for-net-tools)
 4. [Support for NuGet packages in the MCP metaregistry](#add-support-for-nuget-packages-in-the-mcp-registry)
-5. [Support for NuGet package MCP server installation in IDEs, e.g. VS Code](#add-support-for-nuget-packages-in-vs-code)
+5. [Support for NuGet package MCP server installation in IDEs, e.g., VS Code](#add-support-for-nuget-packages-in-vs-code)
 
 ## Motivation
 
@@ -33,11 +25,9 @@ As an MCP server author, it should be easy to create MCP servers in .NET and hos
 
 As an MCP server consumer (user), it should be easy to discover MCP servers and execute them in your IDE of choice. 
 
-Most of the groundwork is done to ship a .NET MCP server. The SDK is available at
-[modelcontextprotocol/csharp-sdk](https://github.com/modelcontextprotocol/csharp-sdk). However conventions for packaging
-them with NuGet are not well defined.
+Most of the groundwork is done to ship a .NET MCP server. The SDK is available at [modelcontextprotocol/csharp-sdk](https://github.com/modelcontextprotocol/csharp-sdk). However, conventions for packaging them with NuGet are not well defined.
 
-Some Microsoft MCP servers are implemented in .NET but distributed via npm, for example [@azure/mcp](https://www.npmjs.com/package/@azure/mcp). This is a fine approach if an node.js runtime and npm packaging are not concerns. For MCP authors that want to target an environment where .NET runtime is available, and not depend on npm, Python, or Docker, we should enable an end-to-end experience using just .NET and the MCP client IDE of choose (e.g. VS Code).
+Some Microsoft MCP servers are implemented in .NET but distributed via npm, for example [@azure/mcp](https://www.npmjs.com/package/@azure/mcp). This is a fine approach if a Node.js runtime and npm packaging are not concerns. For MCP authors that want to target an environment where the .NET runtime is available, and not depend on npm, Python, or Docker, we should enable an end-to-end experience using just .NET and the MCP client IDE of choice (e.g., VS Code).
 
 ## Explanation
 
@@ -45,17 +35,13 @@ Some Microsoft MCP servers are implemented in .NET but distributed via npm, for 
 
 #### Today's experience
 
-To create a .NET MCP server today. the experience is somewhat self-guided and results in a NuGet package that looks no
-different from any other .NET CLI tool.
+To create a .NET MCP server today, the experience is somewhat self-guided and results in a NuGet package that looks no different from any other .NET CLI tool.
 
-An MCP server author can create a .NET console app, consume the [ModelContextProtocol NuGet
-package](https://www.nuget.org/packages/ModelContextProtocol), and implement tools that will be available to the LLM.
-The SDK helps with the stdio-based protocol that allows the end user's IDE to launch, discover, and invoke tools.
+An MCP server author can create a .NET console app, consume the [ModelContextProtocol NuGet package](https://www.nuget.org/packages/ModelContextProtocol), and implement tools that will be available to the LLM. The SDK helps with the stdio-based protocol that allows the end user's IDE to launch, discover, and invoke tools.
 
-The author will decide CLI arguments or environment variables are needed to invoke the MCP server. 
+The author will decide what CLI arguments or environment variables are needed to invoke the MCP server.
 
-When the MCP server is ready, the author will pack the [project as a tool with `<PackAsTool>`](https://learn.microsoft.com/en-us/dotnet/core/tools/global-tools-how-to-create) and publish the NuGet package to NuGet.org (or their
-private package feed), so that it can be used by other people.
+When the MCP server is ready, the author will pack the [project as a tool with `<PackAsTool>`](https://learn.microsoft.com/en-us/dotnet/core/tools/global-tools-how-to-create) and publish the NuGet package to NuGet.org (or their private package feed), so that it can be used by other people.
 
 This approach works, but has a couple of problems:
 
@@ -100,7 +86,7 @@ To allow the package author to communicate the needed parameters to launch the M
 }
 ```
 
-NuGet.org will scrape the README.md for a JSON code block with a `servers` JSON property containign a property matching the current package ID. If found, it will place the JSON in the command palette for easy copying. If not found, a default MCP JSON will be generated:
+NuGet.org will scrape the README.md for a JSON code block with a `servers` JSON property containing a property matching the current package ID. If found, it will place the JSON in the command palette for easy copying. If not found, a default MCP JSON will be generated:
 
 
 ```json
@@ -115,11 +101,11 @@ NuGet.org will scrape the README.md for a JSON code block with a `servers` JSON 
 }
 ```
 
-In a future phase, we can introduce a more machine readable format for the MCP server's inputs, args, and environment variables. This would require alignment across other programming ecosystems (Python or npm MCP servers have the same need) and IDE (VS Code and other MCP-enabled tools).
+In a future phase, we can introduce a more machine-readable format for the MCP server's inputs, args, and environment variables. This would require alignment across other programming ecosystems (Python or npm MCP servers have the same need) and IDEs (VS Code and other MCP-enabled tools).
 
 #### Project template
 
-To improve the project setup experience, we will introduce a new project template. The template will be available via `dotnet new mcp-server`. The will create a .csproj for a CLI tool, with a stable MCP SDK dependency version, and an `McpServer` server package type.
+To improve the project setup experience, we will introduce a new project template. The template will be available via `dotnet new mcp-server`. This will create a .csproj for a CLI tool, with a stable MCP SDK dependency version, and an `McpServer` server package type.
 
 The .csproj will have the following shape:
 
@@ -148,7 +134,7 @@ The .csproj will have the following shape:
 
 An MCP server can be published as a .NET tool or with any custom package type.
 
-.NET tool MCP servers are not differentiated from any other .NET tool so an end user can't find them easily amount the hundreds of .NET tools or thousands of other NuGet packages.
+.NET tool MCP servers are not differentiated from any other .NET tool, so an end user can't find them easily among the hundreds of .NET tools or thousands of other NuGet packages.
 
 It is possible to filter by any package type using the NuGet.org search UI by manipulating the URL, or by using the V3 search API. But this is hard to discover for end users.
 
@@ -176,7 +162,7 @@ It is not possible to download and run a .NET tool in a single command today. Th
 
 #### New experience: `dotnet tool exec` / `dnx`
 
-The .NET team is working on a single-shot experience similar to `npx`. This is not work done by the NuGet team so we'll just link to the existing efforts.
+The .NET team is working on a single-shot experience similar to `npx`. This is not work done by the NuGet team, so we'll just link to the existing efforts.
 
 - GitHub issues: [dotnet/sdk#31103](https://github.com/dotnet/sdk/issues/31103), [dotnet/sdk#47517](https://github.com/dotnet/sdk/issues/47517)
 - Design document: [dotnet/designs#334 - Add a design proposal for dotnet tool exec and dnx](https://github.com/dotnet/designs/pull/334) 
@@ -199,7 +185,7 @@ We will publish/link to guidance on how to publish a NuGet-based MCP server to t
 
 ### Add support for NuGet packages in VS Code
 
-### Today's experience
+#### Today's experience
 
 Similar to the previous section, NuGet is not a recognized MCP server host.
 
@@ -207,39 +193,37 @@ Similar to the previous section, NuGet is not a recognized MCP server host.
 
 #### Add NuGet to the list
 
-We will work with the VS Code team to add a NuGet option to the list which updates the user's `mcp.json` to invoke `dnx` with the provided package ID.
+We will work with the VS Code team to add a NuGet option to the list, which updates the user's `mcp.json` to invoke `dnx` with the provided package ID.
 
 Once Visual Studio has a corresponding experience ([the current experience is manually editing the `mcp.json`](https://learn.microsoft.com/en-us/visualstudio/ide/mcp-servers?view=vs-2022)), we will ensure NuGet is supported similarly.
 
 ## Rollout plan
 
 1. Enable `McpServer` support on NuGet.org search and the package details page, behind a feature flag.
-2. Work with Microsoft and community MCP server implementors to package as NuGet.
-   - As of June 2025, there are 28 .NET tools on NuGet.org that use the MCP SDK. Newer versions should have `McpServer` package type.
+2. Work with Microsoft and community MCP server implementers to package as NuGet.
+   - As of June 2025, there are 28 .NET tools on NuGet.org that use the MCP SDK. Newer versions should have the `McpServer` package type.
    - Some Microsoft MCP servers are implemented in .NET but distributed via npm, for example [@azure/mcp](https://www.npmjs.com/package/@azure/mcp).
-3. Wait for `dnx` to land in a .NET 10 preview
-4. Work with MCP registry and VS Code to get NuGet support, perhaps providing PRs/OSS contributions ourselves.
+3. Wait for `dnx` to land in a .NET 10 preview.
+4. Work with the MCP registry and VS Code to get NuGet support, perhaps providing PRs/OSS contributions ourselves.
 5. Enable MCP server UI on NuGet.org.
 6. Publish a document on learn.microsoft.com on how to create your own NuGet MCP server. 
 
 ## Future Possibilities
 
-We will wait on publishing an MCP server template until the .NET MCP SDK has announced a stable API surface area. It is currently in prerelease.
+We will wait to publish an MCP server template until the .NET MCP SDK has announced a stable API surface area. It is currently in prerelease.
 
 ## Prior Art
 
-We should replicate what is already working for npm, PyPI and Docker.
+We should replicate what is already working for npm, PyPI, and Docker.
 
 ## Unresolved Questions
 
 - What guidance should be provided for private MCP server implementations?
   - For example, if you publish an `McpServer` to your Azure DevOps feed, what MCP registry should be used?
-  
-- What schema should be used for a machine readable MCP server startup instruction?
+- What schema should be used for a machine-readable MCP server startup instruction?
   - The package author could include an `mcp.json` in the NuGet package [matching the MCP registry OpenAPI spec](https://github.com/modelcontextprotocol/registry/blob/a4cefcf05f81466ad65e7c3971e76d0f6d60783e/docs/openapi.yaml#L183-L201).
-
 - How are client runtime requirements expressed?
-  - For example, if an MCP server needs a certain .NET version how is this communicated to the end user before failure occurs?
+  - For example, if an MCP server needs a certain .NET version, how is this communicated to the end user before failure occurs?
 
 ## Drawbacks
 
