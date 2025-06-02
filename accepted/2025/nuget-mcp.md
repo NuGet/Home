@@ -86,7 +86,7 @@ To allow the package author to communicate the needed parameters to launch the M
 }
 ```
 
-NuGet.org will scrape the README.md for a JSON code block with a `servers` JSON property containing a property matching the current package ID. If found, it will place the JSON in the command palette for easy copying. If not found, a default MCP JSON will be generated:
+NuGet.org will scrape the README.md for a JSON code block with a `servers` JSON property containing a property matching the current package ID. If found, it will place the JSON in the command palette for easy copying. Other MCP JSON configuration shapes will be investigated also. It appears Anthropic uses `mcpServers` in their JSON. If no recognized JSON format is found, a default MCP JSON will be generated:
 
 
 ```json
@@ -127,6 +127,8 @@ The .csproj will have the following shape:
 
 </Project>
 ```
+
+The template will also include a README.md that can be scraped for an MCP JSON snippet (or another machine readable format depending on [modelcontextprotocol/registry#118](https://github.com/modelcontextprotocol/registry/discussions/118)).
 
 ### Improve browsing experience
 
@@ -222,6 +224,7 @@ We should replicate what is already working for npm, PyPI, and Docker.
   - For example, if you publish an `McpServer` to your Azure DevOps feed, what MCP registry should be used?
 - What schema should be used for a machine-readable MCP server startup instruction?
   - The package author could include an `mcp.json` in the NuGet package [matching the MCP registry OpenAPI spec](https://github.com/modelcontextprotocol/registry/blob/a4cefcf05f81466ad65e7c3971e76d0f6d60783e/docs/openapi.yaml#L183-L201).
+  - I opened a discussion about this on the MCP registry repo: [Embed runtime instructions inside the package artifact](https://github.com/modelcontextprotocol/registry/discussions/118)
 - How are client runtime requirements expressed?
   - For example, if an MCP server needs a certain .NET version, how is this communicated to the end user before failure occurs?
 
