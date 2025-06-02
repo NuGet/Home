@@ -212,7 +212,7 @@ Once Visual Studio has a corresponding experience ([the current experience is ma
 
 ## Future Possibilities
 
-We will wait to publish an MCP server template until the .NET MCP SDK has announced a stable API surface area. It is currently in prerelease.
+We will wait to publish an MCP server template until the .NET MCP SDK has announced a stable API surface area. It is currently in prerelease. In addition we will continue to keep eyes on the development of the [MCP specification](https://modelcontextprotocol.io/development/updates) and [MCP Registry](https://github.com/modelcontextprotocol/registry).
 
 ## Prior Art
 
