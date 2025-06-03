@@ -61,7 +61,16 @@ The resulting MCP server .nupkg will have two package types: `DotnetTool` and `M
 
 #### Startup instructions
 
-To allow the package author to communicate the needed parameters to launch the MCP server, we will take a phased approach. First, we will instruct the package author to provide a sample code block in their package README markdown matching the following format:
+We have two options to encode the startup instructions into the package:
+
+1. Instruct the package author to include the desired consumer MCP JSON in the readme, and allow NuGet.org to scrape the JSON from the README markdown (a code block matching a certain pattern).
+2. Embed standardized, machine-readable information in the package to allow tooling to know of the startup instructions required for the MCP server
+   - This could be the same [author `mcp.json`](https://github.com/modelcontextprotocol/registry/blob/main/tools/publisher/README.md) used for publishing to the MCP registry, embedded in the root of the package.
+   - This could be information in a new .nuspec field.
+   - The core idea here is to include similar information as the [`package` entity in the MCP registry Open API schema](https://github.com/modelcontextprotocol/registry/blob/3df06d38d9b6590f6ba9bfde56fb3583d8ff4e9d/docs/openapi.yaml#L165-L200). This is essentially the information provided by the MCP registry to MCP client tooling to enable MCP server installation and setup.
+   - See [modelcontextprotocol/registry#118](https://github.com/modelcontextprotocol/registry/discussions/118) for discussion.
+
+The JSON we would like to either scrape from the README (option 1 above) or generate from machine-readable startup instructions (options 2 above) would look like this.
 
 ```json
 {
@@ -86,7 +95,7 @@ To allow the package author to communicate the needed parameters to launch the M
 }
 ```
 
-NuGet.org will scrape the README.md for a JSON code block with a `servers` JSON property containing a property matching the current package ID. If found, it will place the JSON in the command palette for easy copying. Other MCP JSON configuration shapes will be investigated also. It appears Anthropic uses `mcpServers` in their JSON. If no recognized JSON format is found, a default MCP JSON will be generated:
+For option 1, NuGet.org would look in README.md for a JSON code block with a `servers` JSON property containing a property matching the current package ID. If found, it will place the JSON in the command palette for easy copying. Other MCP JSON configuration shapes will be investigated also. It appears Anthropic uses `mcpServers` in their JSON. If no recognized JSON format is found, a default MCP JSON will be generated:
 
 
 ```json
@@ -100,8 +109,6 @@ NuGet.org will scrape the README.md for a JSON code block with a `servers` JSON 
   }
 }
 ```
-
-In a future phase, we can introduce a more machine-readable format for the MCP server's inputs, args, and environment variables. This would require alignment across other programming ecosystems (Python or npm MCP servers have the same need) and IDEs (VS Code and other MCP-enabled tools).
 
 #### Project template
 
@@ -121,6 +128,18 @@ The .csproj will have the following shape:
     <PackageType>McpServer</PackageType>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- option 1 for startup instructions, scrape them from a JSON code block in the README.md -->
+    <None Include="README.md" Pack="true" PackagePath="/" />
+
+    <!-- option 2 for startup instructions, define a machine readable format -->
+    <None Include="mcp.json" Pack="true" PackagePath="/" />
+  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="ModelContextProtocol" Version="1.0.0" />
   </ItemGroup>
@@ -128,7 +147,7 @@ The .csproj will have the following shape:
 </Project>
 ```
 
-The template will also include a README.md that can be scraped for an MCP JSON snippet (or another machine readable format depending on [modelcontextprotocol/registry#118](https://github.com/modelcontextprotocol/registry/discussions/118)).
+The template will also include machine readable startup instructions (aligning with the [startup instructions](#startup-instructions) described above).
 
 ### Improve browsing experience
 
