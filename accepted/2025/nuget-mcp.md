@@ -219,6 +219,8 @@ Similar to the previous section, NuGet is not a recognized MCP server host.
 
 We will work with the VS Code team to add a NuGet option to the list, which updates the user's `mcp.json` to invoke `dnx` with the provided package ID.
 
+This is tracked by [microsoft/vscode-copilot#15329](https://github.com/microsoft/vscode-copilot/issues/15329).
+
 Once Visual Studio has a corresponding experience ([the current experience is manually editing the `mcp.json`](https://learn.microsoft.com/en-us/visualstudio/ide/mcp-servers?view=vs-2022)), we will ensure NuGet is supported similarly.
 
 ## Rollout plan
