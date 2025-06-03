@@ -169,7 +169,7 @@ We will add the "MCP Server" (`McpServer`) type to the list.
 
 #### Package details page
 
-The package details page will be enhanced to have a new MCP Server tab in the command palette, using the JSON snippet scraped from the README.md (or generated if not found). 
+The package details page will be enhanced to have a new MCP Server tab in the command palette, using the JSON snippet scraped from the README.md (or generated if not found).
 
 <img src="../../meta/resources/nuget-mcp/command-palette.png" alt="Sample of the generated command palette" width="800">
 
@@ -179,19 +179,20 @@ See the [Startup instructions](#startup-instructions) section above for more det
 
 #### Today's experience
 
-It is not possible to download and run a .NET tool in a single command today. This is in contrast to npm, Python, and Docker. For example, an MCP server on npm can be started by VS Code using `npx`. 
+It is not possible to download and run a .NET tool with a single command today. This is in contrast to npm, Python, and Docker. For example, an MCP server on npm can be started by VS Code using `npx`.
 
 #### New experience: `dotnet tool exec` / `dnx`
 
 The .NET team is working on a single-shot experience similar to `npx`. This is not work done by the NuGet team, so we'll just link to the existing efforts.
 
 - GitHub issues: [dotnet/sdk#31103](https://github.com/dotnet/sdk/issues/31103), [dotnet/sdk#47517](https://github.com/dotnet/sdk/issues/47517)
-- Design document: [dotnet/designs#334 - Add a design proposal for dotnet tool exec and dnx](https://github.com/dotnet/designs/pull/334) 
+- Design document: [dotnet/designs#334 - Add a design proposal for dotnet tool exec and dnx](https://github.com/dotnet/designs/pull/334)
+  - Proposal PR: [dotnet/sdk#48443](https://github.com/dotnet/sdk/pull/48443)
 - Design document: [dotnet/designs#333 - Add proposal for RID-specific .NET Tool packages](https://github.com/dotnet/designs/pull/333)
 
 The sample JSON above leverages this new single-shot command execution.
 
-RID-specific tools solve the "giant package" problem but is not necessarily a hard blocker for the experience.
+RID-specific tools solve the "giant package" problem but are not necessarily a hard blocker for the experience.
 
 ### Add support for NuGet packages in the MCP registry
 
@@ -237,6 +238,8 @@ Once Visual Studio has a corresponding experience ([the current experience is ma
 ## Future Possibilities
 
 We will wait to publish an MCP server template until the .NET MCP SDK has announced a stable API surface area. It is currently in prerelease. In addition we will continue to keep eyes on the development of the [MCP specification](https://modelcontextprotocol.io/development/updates) and [MCP Registry](https://github.com/modelcontextprotocol/registry).
+
+As MCP servers are run in more and more places, we can consider enhacing the MSBuild project file to enable an MCP server dependency. This could allow the MCP server to be available to the editor (instead of defined in client `mcp.json` configuration) or on a CI for build-time tasks. For example, an MCP server could be used inside an analyzer to produce or fix build warnings. This could work much like the existing [build integration that NuGet has to ship MSBuild props and targets](https://learn.microsoft.com/en-us/nuget/concepts/msbuild-props-and-targets). Thanks Jeff Kluge ([@jeffkl](https://github.com/jeffkl)) for the idea!
 
 ## Prior Art
 
