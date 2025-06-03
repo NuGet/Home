@@ -254,6 +254,7 @@ We should replicate what is already working for npm, PyPI, and Docker.
   - I opened a discussion about this on the MCP registry repo: [Embed runtime instructions inside the package artifact](https://github.com/modelcontextprotocol/registry/discussions/118)
 - How are client runtime requirements expressed?
   - For example, if an MCP server needs a certain .NET version, how is this communicated to the end user before failure occurs?
+- How would the MCP server template ship? Would it be part of the .NET SDK or ship from the MCP SDK repo as a third party template? 
 
 ## Drawbacks
 
