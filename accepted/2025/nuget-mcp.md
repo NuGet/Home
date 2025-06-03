@@ -187,8 +187,11 @@ The .NET team is working on a single-shot experience similar to `npx`. This is n
 
 - GitHub issues: [dotnet/sdk#31103](https://github.com/dotnet/sdk/issues/31103), [dotnet/sdk#47517](https://github.com/dotnet/sdk/issues/47517)
 - Design document: [dotnet/designs#334 - Add a design proposal for dotnet tool exec and dnx](https://github.com/dotnet/designs/pull/334) 
+- Design document: [dotnet/designs#333 - Add proposal for RID-specific .NET Tool packages](https://github.com/dotnet/designs/pull/333)
 
 The sample JSON above leverages this new single-shot command execution.
+
+RID-specific tools solve the "giant package" problem but is not necessarily a hard blocker for the experience.
 
 ### Add support for NuGet packages in the MCP registry
 
