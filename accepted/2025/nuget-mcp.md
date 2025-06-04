@@ -29,6 +29,10 @@ Most of the groundwork is done to ship a .NET MCP server. The SDK is available a
 
 Some Microsoft MCP servers are implemented in .NET but distributed via npm, for example [@azure/mcp](https://www.npmjs.com/package/@azure/mcp). This is a fine approach if a Node.js runtime and npm packaging are not concerns. For MCP authors that want to target an environment where the .NET runtime is available, and not depend on npm, Python, or Docker, we should enable an end-to-end experience using just .NET and the MCP client IDE of choice (e.g., VS Code).
 
+## Success criteria
+
+Ideally, we will publish a guide on learn.microsoft.com on how to create, pack, publish, and browse an MCP server, targeted at potential MCP server authors. A bonus would be working with Microsoft teams working on .NET MCP servers to publish to NuGet.org in addition to or instead of their existing delivery mechanisms.
+
 ## Explanation
 
 ### Improve MCP server authoring
@@ -63,14 +67,23 @@ The resulting MCP server .nupkg will have two package types: `DotnetTool` and `M
 
 We have two options to encode the startup instructions into the package:
 
-1. Instruct the package author to include the desired consumer MCP JSON in the readme, and allow NuGet.org to scrape the JSON from the README markdown (a code block matching a certain pattern).
-2. Embed standardized, machine-readable information in the package to allow tooling to know of the startup instructions required for the MCP server
-   - This could be the same [author `mcp.json`](https://github.com/modelcontextprotocol/registry/blob/main/tools/publisher/README.md) used for publishing to the MCP registry, embedded in the root of the package.
+1. Instruct the package author to include the desired consumer MCP JSON in the README, and allow NuGet.org to scrape the JSON from the README markdown (a code block matching a certain pattern).
+   
+2. Embed standardized, machine-readable information in the package to allow tooling to know the startup instructions required for the MCP server.
+   - This could be the same [author `server.json`](https://github.com/modelcontextprotocol/registry/blob/main/tools/publisher/README.md) used for publishing to the MCP registry, embedded in the root of the package.
    - This could be information in a new .nuspec field.
    - The core idea here is to include similar information as the [`package` entity in the MCP registry Open API schema](https://github.com/modelcontextprotocol/registry/blob/3df06d38d9b6590f6ba9bfde56fb3583d8ff4e9d/docs/openapi.yaml#L165-L200). This is essentially the information provided by the MCP registry to MCP client tooling to enable MCP server installation and setup.
    - See [modelcontextprotocol/registry#118](https://github.com/modelcontextprotocol/registry/discussions/118) for discussion.
 
-The JSON we would like to either scrape from the README (option 1 above) or generate from machine-readable startup instructions (options 2 above) would look like this.
+| Option            | Pros | Cons |
+| ----------------- | ----- | ----- |
+| 1. Scrape Markdown | *"soft commitment, wait and see"*<br>- Allows the package author to choose the consumption syntax<br>- Easier to integrate with NuGet.org (README is already read)<br>- Does not bet on any specific schema yet | - May be brittle if the JSON shape varies too much<br>- NuGet.org specific (custom scrape code)
+| 2a. Embed server.json | *"align with MCP registry schema"*<br>- Would adhere to a schema defined in the ecosystem<br>- Allows other .nupkg readers to see it easily<br>- Shares effort with MCP registry publishing<br>- Likely to be stable after MCP registry launch | - There are other machine-readable formats like VS Code mcp.json<br>- Diverges from npm/pypi, which do not have rich MCP support<br>- Needs mapping code to generate consumption JSON (mcp.json)
+| 2b. Embed mcp.json | *"align with VS Code config schema"*<br>- Would adhere to a schema defined in the ecosystem<br>- Allows other .nupkg readers to see it easily<br>- Makes VS Code consumption very clear | - There are other machine-readable formats like Claude format<br>- Picks a format that may change over time (VS Code config)
+
+**I propose we start with option 2a since it is client-agnostic and positions the package author for publishing to the MCP registry as a next step.**
+
+The resulting JSON available to copy on the NuGet.org page (either scraped from the README [option 1], mapped from server.json [option 2a], or copied from mcp.json [option 2b]) would look like this:
 
 ```json
 {
@@ -95,7 +108,7 @@ The JSON we would like to either scrape from the README (option 1 above) or gene
 }
 ```
 
-For option 1, NuGet.org would look in README.md for a JSON code block with a `servers` JSON property containing a property matching the current package ID. If found, it will place the JSON in the command palette for easy copying. Other MCP JSON configuration shapes will be investigated also. It appears Anthropic uses `mcpServers` in their JSON. If no recognized JSON format is found, a default MCP JSON will be generated:
+For option 1, NuGet.org would look in README.md for a JSON code block with a `servers` JSON property containing a property matching the current package ID. If found, it will place the JSON in the command palette for easy copying. Other MCP JSON configuration shapes will be investigated also. It appears Anthropic uses `mcpServers` in their JSON. If no recognized JSON was found, we would either generate a default JSON (likely missing required arguments and environment variables) or say "see project documentation for how to start the MCP server".
 
 
 ```json
@@ -122,7 +135,6 @@ The .csproj will have the following shape:
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net10.0</TargetFramework>
-    <RootNamespace>Contoso.MySuperMcp</RootNamespace>
 
     <PackAsTool>true</PackAsTool>
     <PackageType>McpServer</PackageType>
@@ -136,7 +148,10 @@ The .csproj will have the following shape:
     <!-- option 1 for startup instructions, scrape them from a JSON code block in the README.md -->
     <None Include="README.md" Pack="true" PackagePath="/" />
 
-    <!-- option 2 for startup instructions, define a machine readable format -->
+    <!-- option 2a for startup instructions, use MCP registry format -->
+    <None Include="server.json" Pack="true" PackagePath="/" />
+
+    <!-- option 2b for startup instructions, use VS Code configuration format -->
     <None Include="mcp.json" Pack="true" PackagePath="/" />
   </ItemGroup>
 
@@ -147,7 +162,7 @@ The .csproj will have the following shape:
 </Project>
 ```
 
-The template will also include machine readable startup instructions (aligning with the [startup instructions](#startup-instructions) described above).
+The template will also include machine-readable startup instructions (aligning with the [startup instructions](#startup-instructions) described above).
 
 ### Improve browsing experience
 
@@ -237,9 +252,9 @@ Once Visual Studio has a corresponding experience ([the current experience is ma
 
 ## Future Possibilities
 
-We will wait to publish an MCP server template until the .NET MCP SDK has announced a stable API surface area. It is currently in prerelease. In addition we will continue to keep eyes on the development of the [MCP specification](https://modelcontextprotocol.io/development/updates) and [MCP Registry](https://github.com/modelcontextprotocol/registry).
+We will wait to publish an MCP server template until the .NET MCP SDK has announced a stable API surface area. It is currently in prerelease. In addition, we will continue to keep an eye on the development of the [MCP specification](https://modelcontextprotocol.io/development/updates) and [MCP Registry](https://github.com/modelcontextprotocol/registry).
 
-As MCP servers are run in more and more places, we can consider enhacing the MSBuild project file to enable an MCP server dependency. This could allow the MCP server to be available to the editor (instead of defined in client `mcp.json` configuration) or on a CI for build-time tasks. For example, an MCP server could be used inside an analyzer to produce or fix build warnings. This could work much like the existing [build integration that NuGet has to ship MSBuild props and targets](https://learn.microsoft.com/en-us/nuget/concepts/msbuild-props-and-targets). Thanks Jeff Kluge ([@jeffkl](https://github.com/jeffkl)) for the idea!
+As MCP servers are run in more and more places, we can consider enhancing the MSBuild project file to enable an MCP server dependency. This could allow the MCP server to be available to the editor (instead of defined in client `mcp.json` configuration) or on a CI for build-time tasks. For example, an MCP server could be used inside an analyzer to produce or fix build warnings. This could work much like the existing [build integration that NuGet has to ship MSBuild props and targets](https://learn.microsoft.com/en-us/nuget/concepts/msbuild-props-and-targets). Thanks to Jeff Kluge ([@jeffkl](https://github.com/jeffkl)) for the idea!
 
 ## Prior Art
 
@@ -250,11 +265,16 @@ We should replicate what is already working for npm, PyPI, and Docker.
 - What guidance should be provided for private MCP server implementations?
   - For example, if you publish an `McpServer` to your Azure DevOps feed, what MCP registry should be used?
 - What schema should be used for a machine-readable MCP server startup instruction?
-  - The package author could include an `mcp.json` in the NuGet package [matching the MCP registry OpenAPI spec](https://github.com/modelcontextprotocol/registry/blob/a4cefcf05f81466ad65e7c3971e76d0f6d60783e/docs/openapi.yaml#L183-L201).
+  - The package author could include a `server.json` in the NuGet package [matching the MCP registry OpenAPI spec](https://github.com/modelcontextprotocol/registry/blob/a4cefcf05f81466ad65e7c3971e76d0f6d60783e/docs/openapi.yaml#L183-L201).
   - I opened a discussion about this on the MCP registry repo: [Embed runtime instructions inside the package artifact](https://github.com/modelcontextprotocol/registry/discussions/118)
+
+## Resolved questions
+
+- How would the MCP server template ship? Would it be part of the .NET SDK or ship from the MCP SDK repo as a third-party template? 
+  - **Answer:** this should be shipped from the .NET MCP SDK repository as a sibling artifact with the dependency packages. The template would iterate along with the SDK as it changes.
 - How are client runtime requirements expressed?
   - For example, if an MCP server needs a certain .NET version, how is this communicated to the end user before failure occurs?
-- How would the MCP server template ship? Would it be part of the .NET SDK or ship from the MCP SDK repo as a third party template? 
+  - **Answer:** we will not try to solve this problem, aside from documenting this potential issue and roll-forward capabilities in the guide we publish. We will depend on IDE enhancements (VS Code could detect the missing runtime and help fulfill it) or .NET SDK enhancements. This is a general problem for running .NET tools, not specific to MCP.
 
 ## Drawbacks
 
