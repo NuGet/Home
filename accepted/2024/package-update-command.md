@@ -1,9 +1,11 @@
 # dotnet package update command
 
 - [Olia Gavrysh](https://github.com/OliaG/)
+- [Andy Zivkovic](https://github.com/zivkan/)
 - Start Date (2024-11-11)
 - [#13372](https://github.com/NuGet/Home/issues/13372)
 - [#4103](https://github.com/NuGet/Home/issues/4103)
+- [#14304](https://github.com/NuGet/Home/issues/14304)
 
 ## Summary
 
@@ -39,16 +41,50 @@ CLI
 - No means to update to all latest packages on the CLI
 - No means for update heuristics, such as, update my vulnerable packages
 
-This proposal is focused on bringing the CLI experience up to funcional parity with the experience in Visual Studio and make developers more productive by providing a single command to update all packages to the latest version and a way to update all vulnerable packages.
+This proposal is focused on bringing the CLI experience up to functional parity with the experience in Visual Studio and make developers more productive by providing a single command to update all packages to the latest version and a way to update all vulnerable packages.
 
-## User experience
+## Explanation
 
-### Updating all packages to the latest version
+### Functional explanation
 
-When users want to ensure their NuGet dependencies are up to date, they can run a command in .NET CLI `dotnet package update` for a project or a solution.
+The `dotnet package update -h` help text might look something like this:
 
-```CLI
-C:\> dotnet package update [<SOLUTION_PATH>|<PROJECT_PATH>]
+```text
+Description:
+  Update referenced packages in a project or solution.
+
+Usage:
+  NuGet.CommandLine.XPlat package update [<packages>...] [options]
+
+Arguments:
+  <packages>  Package reference in the form of a package identifier like 'Newtonsoft.Json' or package identifier and version separated by '@' like 'Newtonsoft.Json@13.0.3'.
+
+Options:
+  --format <console|json>  Specifies the output format type.
+  --mode <direct|promote>  The implementation will have a description here to explain the differences between direct and promote.
+  --project                Path to a project or solution file, or a directory.
+  --vulnerable             Update packages with a known vulnerability.
+  -?, -h, --help           Show help and usage information
+```
+
+### Scenarios
+
+#### Works with other features
+
+This probably can go without saying, but it's expected that all `dotnet package update` commands work with all other Nuget features.
+
+For example, projects that use Central Package Management should have versions updated in the Directory.Packages.props file.
+Another example is when a nuget.config has enabled Package Source Mapping, the updated packages must take into account the versions available on the enabled sources, so that subsequent restores will be successful.
+
+Similarly, since `dotnet package update` is part of the .NET SDK, it's only expected to work with projects that work with `dotnet build`.
+Therefore, some Visual Studio projects will not work, where they can't be built with the dotnet CLI.
+
+#### Updating all packages to the latest version
+
+Running `dotnet package update` without specifying any packages, or options such as `--vulnerable`, will automatically update all packages to the highest version.
+
+```text
+C:\> dotnet package update
 
 Fixing outdated packages in ContosoUniversity.sln
  ContosoLibrary:
@@ -57,62 +93,14 @@ Fixing outdated packages in ContosoUniversity.sln
 
  ContosoApp:
   Updated UmbracoForms 8.4.0 to 8.7.1
-    
+
 Updated 3 packages in 36 scanned packages.
 ```
 
-### Fixing vulnerabilities
+#### Fixing vulnerabilities
 
-When users run `dotnet build` or `dotnet restore` commands in CLI, if they see any warnings related to vulnerabilities in their project’s NuGet dependencies, they can run `dotnet package update --vulnerable` CLI command to try to remediate all the vulnerabilities. This includes both direct and transitive.
-
-```CLI
-C:\ContosoApp\> dotnet package update --vulnerable
-
-Fixing vulnernable packages in ContosoUniversity.sln
- ContosoLibrary:
-  Upgrading UmbracoForms 8.4.1 to 8.7.1
-
- ContosoApp:
-  Updated UmbracoForms 8.4.0 to 8.7.1
-    
-Fixed 2 packages in 36 scanned packages.
-```
-
-In the future this can be extended to fix deprecated versions.
-
-## Explanation
-
-### Functional explanation
-
-<!-- Explain the proposal as if it were already implemented and you're teaching it to another person. -->
-<!-- Introduce new concepts, functional designs with real life examples, and low-fidelity mockups or  pseudocode to show how this proposal would look. -->
-
-#### dotnet package update
-
-The `dotnet package update` command without any other arguments or options will update all the NuGet dependencies to the latest versions.
-
-```CLI
-C:\> dotnet package update --help
-dotnet package update [<PROJECT>|<SOLUTION>] [--vulnerable] [--mode <MODE>] [-v|--verbosity <LEVEL>] [--json] 
-```
-
-#### --vulnerable
-
-This flag will try to update only packages that have direct or transitive vulnerabilities.
-The remediation is calculated with an implicit dotnet audit to then apply directly to a resulting package graph.
-It can add packages, remove packages, and update packages depending on the problem it's attempting to resolve.
-It does not take into consideration downgrading to a compatible version if a higher one has already been specified.
-The algorithm of the fixing process will have the following steps:
-
-1. Identify  vulnerabilities in the graph
-1. Distinguish which are top level, transitive level, etc.,
-1. Resolve any compatibility conflicts
-1. Apply the patch/update/fix
-1. Restore dependencies
-1. Verify that issues were resolved  . Provide the report to the user.
-1. If the issues were not resolved or were partially resolved, we will still commit the fixes and notify users about what was and was not fixed and what are the recommended manual steps with links to documentation.
-
-Example:
+When users run `dotnet build` or `dotnet restore` commands in CLI, if they see any warnings related to vulnerabilities in their project’s NuGet dependencies, they can run `dotnet package update --vulnerable` CLI command to try to remediate all the vulnerabilities.
+This includes both direct and transitive.
 
 ```CLI
 C:\ContosoApp\> dotnet package update --vulnerable
@@ -127,87 +115,70 @@ Fixing vulnernable packages in ContosoUniversity.sln
 Fixed 2 packages in 36 scanned packages.
 ```
 
-Another option for the output with more information (will review with CLI team to decide which one to pick):
+Using the `--vulnerable` option should update the package to the lowest version that is higher than the currently reference version, which does not have a known vulnerability.
+For example, if `Contoso.Security` version 1.0.0 is currently referenced by the project, and the package source has versions 1.0.1 and 2.0.0 available, 1.0.1 should be selected.
+This is in contrast to `dotnet package update Contoso.Security` which will update to the highest version of the package.
 
-```CLI
-C:\> dotnet package update --vulnerable [<SOLUTION_PATH>|<PROJECT_PATH_>]
+If package identifiers are provided in addition to the `--vulnerable` option, only those packages should be updated.
+Any package provided that does not have a known vulnerability will be skipped.
 
-Fetching package metadata from: 'https://api.nuget.org/v3/index.json'
-Loaded 23 security advisories from 'https://api.nuget.org/v3/index.json'
-Scanning ContosoUniversity.sln (36 NuGet dependencies)
+The `--mode` option will allow customers to choose what strategy of resolving vulnerabilities will be used.
+The `direct` mode would only look for direct package references with known vulnerabilities and upgrade them.
+The `promote` mode would also check transitive packages (equivalent to restore's `<NuGetAuditMode>all`), and add a PackageReference to the package (therefore promoting it to a direct reference).
+Later, more advanced modes can be added.
 
-error: Vulnernable packages found!
-[net5.0]:
-Top-level Package     Requested Resolved Severity Advisory URL
-> UmbracoForms      8.4.1  8.4.1  Moderate https://github.com/advisories/GHSA-8m73-w2r2-6xxj
-
-Transitive Package  Resolved Severity Advisory URL
-> Microsoft.Data.OData 5.2.0  Moderate https://github.com/advisories/GHSA-mv2r-q4g5-j8q5
-
-Found 1 top-level Moderate severity vulnerability & 1 transtive Moderate severity vulnerability package(s) in 36 scanned packages.
-
-Fixing vulnernable packages in ContosoUniversity.sln
- Upgrading UmbracoForms 8.4.1 to 8.7.1
-
-Fixed 2 packages in 36 scanned packages.
-```
-
-#### --mode
-
-Priority: P1 for `promote`; P2 for `closest` and switching the default to `closest`.
-
-| Mode | Explanation |
-|------|-------------|
-| `promote` | the algorithm will always promote transitive packages to top level. This is an easy to implement feature that we will release in MVP. |
-| `closest` | the algorithm will try to upgrade the direct package reference, and if that doesn't work, it will walk the graph one dependency level at a time trying to upgrade that, until it gets to the package with the known vulnerability. Once this mode is implemented, it should be set to be the default one. |
+In the future a similar option to fix deprecated versions can be added.
 
 #### --format json
 
 Priority: P2
 
-Provides a detailed report in a JSON format:
+A JSON schema will be decided closer to implementation.
+A new design document will be created specifically for it, to avoid slowing down the approval of this design document and implementation of other features.
 
-```json
-  "added": [
-    {
-      "name": "Microsoft.AspNetCore.MVC",
-      "version": "2.2.0"
-    }
-  ],
-  "removed": [
-      {
-        "name": "anurse.testing.TestDeprecatedPackage",
-        "version": "1.0.0"
-      }
-  ],
-  "updated": [
-    {
-      "name": "UmbracoForms",
-      "version": "8.7.1",
-      "previousVersion": "8.4.1"
-    }
-  ],
-  "failures": [],
-  "warnings": []
-```
+There is potential complexity with designing the schema, as the text output can be tailored to the command line arguments provided.
+For example, `dotnet package update` to update all packages might update just the packages that were updated.
+But `dotnet package update pkg1 pkg2 pkg3` might say pkg1 and pkg2 were updated, but pkg3 was already up to date.
+Similarly, using `--vulnerable` could have vulnerability specific output.
 
-In the "failures" and "warnings" should be the information about what projects were not updated due to failed pipeline or different reassons like no solution was found, the format of the project file is not supported, etc.
+Some consideration may be needed to decide how much of the same information should be reported in the json (particularly when packages are not updated), and if the json schema should be the same for all commands, or if `--vulnerable` should have a different output schema than without `--vulnerable`.
 
-##### Exit Codes
+Please provide feedback at <https://github.com/NuGet/Home/issues/14360>
+
+#### Exit Codes
 
 Priority: P1
 
-- 0 - The command will exit with a 0 exit code if no vulnerabilities or outdated packages were found and no changes were made.
-- 1 - The command will exit with a 1 exit code if changes were successful.
+- 0 - The command will exit with a 0 exit code if at least one package was updated without any error.
+- 1 - The command will exit with a 1 exit code if no packages were updated, but otherwise no error occurred.
 - 2 - The command will exit with a 2 exit code if any error has occurred.
 
-##### Endpoints
+### Technical explanation
 
-NuGet will use existing endpoints to optimize the speed of audit results.
+<!-- Explain the proposal in sufficient detail with implementation details, interaction models, and clarification of corner cases. -->
 
-- [Vulnerability](https://docs.microsoft.com/en-us/nuget/api/registration-base-url-resource#vulnerabilities)
-- Outdated - no existing endpoint, will need to call a source.
-- [Deprecation](https://docs.microsoft.com/en-us/nuget/api/registration-base-url-resource#package-deprecation) for future possible improvements.
+#### dotnet CLI integration
+
+The dotnet CLI has many features, and are evolving while we implement this design.
+So, there is a lot of additional scope for quality of life improvements.
+But we should also adhere to general CLI design principals.
+
+One example is that bad input should be handled in the command line parser.
+For example, is a version string is expected, it should be validated in System.CommandLine's argument or option validator, or custom parser.
+Don't do validation in the command runner's logic and then provide these input errors in a different user experience than other parser errors.
+
+Another example, tab completion.
+Not only of the command and its options, but if a package name is partially typed, tab completion could complete the full package name.
+In the scope of `dotnet package update`, this likely means packages already installed in projects, whereas `dotnet package add` would check package sources for available packages.
+Similarly for package versions.
+
+In .NET 9, MSBuild enabled the Terminal Logger by default.
+It's easiest if you test `dotnet build` and `dotnet build -tl:false` yourself on a solution with at least 10 projects (some of which can be built in parallel) to understand how it changes output.
+But my short description is that it no longer treats the console as a forward-only output, but parallel work can be displayed one line per task and lines are updated to show progress.
+Similarly, we should consider what output would give customers the best experience, especially when a large solution is being updated, so many projects and packages might be impacted, therefore taking some time before the command is complete.
+
+Most of these improvements can be considered low priority enhancements after the initial feature set is implemented.
+But easy opportunities to make quality-of-life improvements should be taken rather than delaying them as lower priority.
 
 ## Rationale and alternatives
 
@@ -217,8 +188,38 @@ NuGet will use existing endpoints to optimize the speed of audit results.
 
 ### Alternatives considered
 
-We could enable the option for the users to pick if they want only direct vulnerabilities to be resolved or direct and transitive.
-We decided to not do so and implement the resolution of all vulnerabilities as we believe that better corresponds to our goal of increasing security across all .NET applications. 
+#### Extending dotnet package update
+
+The existing `dotnet package add` command can already update a PackageReference to a newer version.
+However, it would be unintuitive for `dotnet package add` without any arguments updated all packages to the highest version, given the verb is `add`.
+Similarly, `dotnet package add --update` feels unusual, and something like `dotnet package add --vulnerable` to update already referenced packages don't feel right.
+Therefore, a new `dotnet package update` command is more desirable.
+
+#### A vulnerability specific command
+
+Command names similar to `dotnet nuget fix`, `dotnet nuget audit fix`, `dotnet package audit` were considered, but while discussing with some stakeholders, we thought that `dotnet package update --vulnerable` would be the most intuitive, even if it does require more letters to be typed.
+
+#### Considering `--version` option
+
+The `dotnet package add` command had a `--version` option since it was first created.
+Similarly, other commands such as `dotnet tool install` have `--version` options.
+In the 9.0.300 .NET SDK, `dotnet add package` was extended to allow specifying the version in the package id string, using syntax `{package id}@{version}`, for example `NuGet.Protocol@6.10.0`.
+Other dotnet CLI have also been updated to allow this `@` syntax.
+
+Since the `@` syntax is new, it's probably not well known, so some people might expect a `--version` option.
+But if the CLI help output explicitly mentions it, like `dotnet package add -h` does, then it should be easily discoverable.
+
+Another scenario is when a customer wants to update multiple packages to the same version, they might like `dotnet package update pkg1 pkg2 --version 12.34.56`.
+
+However, allowing this would raise questions like `dotnet package update pkg1@1.2.3 pkg2@2.3.4 pkg3 pkg4 --version 3.4.5`.
+In this example, which packages does the version 3.4.5 apply to?
+Personally, I find pkg3 and pkg4 the most intuitive.
+Put another way, specifying `--version` could mean disabling "update to highest version".
+
+Alternatively, we could not provide the `--version` option at all for new commands and embrace the `@` syntax.
+The biggest downside to this is when multiple packages are updated to the same version, that version string needs to be repeated multiple times.
+With the .NET Libraries team updating all of their packages every release, even when there are no code changes in a patch version (possibly only a dependency version update, but sometimes not even that), it will be a common scenario that multiple `System.*` and `Microsoft.*` packages will be updated at the same time to the same version.
+But it avoids all ambiguity.
 
 ## Prior Art
 
@@ -265,6 +266,7 @@ The docs don't mention any tooling to automatically update package versions to w
 
 <!-- What future possibilities can you think of that this proposal would help with? -->
 
-- In the future the basic algorithm could check for breaking changes in fixed versions.
+- A new mode for `--vulnerable` that would walk the package graph for transitive packages with known vulnerabilities, and update the package closest to the direct reference.
+- When transitive packages are promoted to resolve a vulnerability warning, somehow mark the package reference (or package version, in case of CPM), so a later package update can remove the pinning when it's no longer needed.
 - This functionality may be reused to implement a one-click fix in the Visual Studio UI experience.
 - Enable fixes for deprecations and outdated versions as well together with an option for the users to choose what they want to fix (vulnerabilities, depreciation, outdated versions).
