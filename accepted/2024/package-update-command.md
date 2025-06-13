@@ -100,7 +100,7 @@ Updated 3 packages in 36 scanned packages.
 #### Fixing vulnerabilities
 
 When users run `dotnet build` or `dotnet restore` commands in CLI, if they see any warnings related to vulnerabilities in their project’s NuGet dependencies, they can run `dotnet package update --vulnerable` CLI command to try to remediate all the vulnerabilities.
-This includes both direct and transitive.
+The `--mode` option can be used to choose between direct package references only, or to also update transitive packages.
 
 ```CLI
 C:\ContosoApp\> dotnet package update --vulnerable
@@ -126,6 +126,7 @@ The `--mode` option will allow customers to choose what strategy of resolving vu
 The `direct` mode would only look for direct package references with known vulnerabilities and upgrade them.
 The `promote` mode would also check transitive packages (equivalent to restore's `<NuGetAuditMode>all`), and add a PackageReference to the package (therefore promoting it to a direct reference).
 Later, more advanced modes can be added.
+When a project is using CPM and transitive pinning is enabled, no PackageReference should be added, just the PackageVersion in the Directory.Packages.props file.
 
 In the future a similar option to fix deprecated versions can be added.
 
@@ -261,6 +262,19 @@ It does not appear to have functionality related to updating only packages with 
 Maven is a build tool for Java, including package management.
 It supports plugins, and OWASP's Dependency-Check can be used as a plugin to detect packages with known vulnerabilities.
 The docs don't mention any tooling to automatically update package versions to without vulnerabilities.
+
+## Unresolved Questions
+
+<!-- What parts of the proposal do you expect to resolve before this gets accepted? -->
+<!-- What parts of the proposal need to be resolved before the proposal is stabilized? -->
+<!-- What related issues would you consider out of scope for this proposal but can be addressed in the future? -->
+
+- CPM integration
+
+CPM adds more complexity than other NuGet features.
+Should `dotnet package update` upgrade `GlobalPackageReference`s?
+Should it allow you to modify Directory.Packages.props when only one project is provided, not the whole solution?
+When run on a solution, should it check for unused `PackageVersion`s and provide a way to remove them?
 
 ## Future Possibilities
 
