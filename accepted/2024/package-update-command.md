@@ -308,13 +308,6 @@ The docs don't mention any tooling to automatically update package versions to w
 <!-- What parts of the proposal need to be resolved before the proposal is stabilized? -->
 <!-- What related issues would you consider out of scope for this proposal but can be addressed in the future? -->
 
-- CPM integration
-
-CPM adds more complexity than other NuGet features.
-Should `dotnet package update` upgrade `GlobalPackageReference`s?
-Should it allow you to modify Directory.Packages.props when only one project is provided, not the whole solution?
-When run on a solution, should it check for unused `PackageVersion`s and provide a way to remove them?
-
 ## Future Possibilities
 
 <!-- What future possibilities can you think of that this proposal would help with? -->
