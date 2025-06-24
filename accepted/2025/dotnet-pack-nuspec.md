@@ -44,10 +44,12 @@ customer won't need to learn a new command
 
 This new subcommand will help us add all current nuget.exe pack options more easily and don't worry about existing pack options  
 
-**Current result of running `nuget.exe pack -h` and `dotnet pack -h`**  
-`nuget.exe pack -h`: ![output of  `nuget.exe pack -h`](/meta/resources/dotnet-pack-nuspec/nuget%20pack%20-h%20ss.png)  
 
-`dotnet pack -h`: ![output of `dotnet pack -h`](/meta/resources/dotnet-pack-nuspec/dotnet%20pack%20-h%20ss.png) 
+**Current result of running `nuget.exe pack -h` and `dotnet pack -h`**  
+`nuget.exe pack -h`: ![output of running nuget.exe pack -h](../../meta/resources/dotnet-pack-nuspec/nuget%20pack%20-h%20ss.png)
+
+
+`dotnet pack -h`: ![output of `dotnet pack -h`](../../meta/resources/dotnet-pack-nuspec/dotnet%20pack%20-h%20ss.png) 
 
 
 
