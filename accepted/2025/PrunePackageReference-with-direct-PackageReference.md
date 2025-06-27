@@ -250,8 +250,6 @@ N/A
 
 ## Future Possibilities
 
-<!-- What future possibilities can you think of that this proposal would help with? -->
-
 - If we prune direct or we apply PrivateAssets=all and IncludeAssets=none to those packages:
   - Visualize pruned packages in the PM UI Installed/Updates tabs. Note that the PM UI does not have visualization support for multi-targeting, so the heuristic here should be similar to the one for the NU1510 warning.
 - If we prune direct packages:
