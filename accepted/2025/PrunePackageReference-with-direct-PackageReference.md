@@ -10,7 +10,7 @@
 Change the NU1510 heuristic in multi-targeting scenarios to only be raised when the package would be completely removed from the project.
 This would ensure customers don't end up a potentially more challenging to manage conditional PackageReference scenario.
 
-This proposal also explores the idea of pruning direct package references, the technical details around and the benefits of doing the work.
+This proposal explores various ideas for pruning direct package references, the technical details around and the benefits of doing the work.
 
 ## Motivation
 
@@ -44,11 +44,12 @@ As a long as a package is specified within a project but it's not needed, it add
 - It may be accidentally updated by tooling such as dependabot
 - It may appear as a direct reference in the Package Manager UI or list package or others tools that list the project dependencies.
 - It is still part of auditing functionality such as NuGetAudit, deprecation etc.
+- It will be listed as a dependency of packages (thus needing them to be pruned.)
 
 Given that pruning is a per framework feature, there a few scenarios to consider for the handling of direct package references, primarily revolving around multi-targeting:
 
 1. Single framework
-If the direct package reference is within the pruning range, we would like for the customer to remove the PackageReference and reduce the overhead.
+If the direct package reference is within the pruning range, we the customer to remove the PackageReference and reduce the management overhead.
 
 2. Multi framework scenario
 a. .NET & .NET Framework scenario
@@ -63,7 +64,7 @@ a. .NET & .NET Framework scenario
   </ItemGroup>
 ```
 
-For .NET, the package is unnecessary, and ideally we'd want the customer to consider conditionally referencing the System.Text.Json reference.
+For .NET, the package is unnecessary, and ideally we'd want the customer to consider conditionally reference the System.Text.Json package.
 Note that even in these situations, there's a theoretical way to end up with runtime issues, but it would require that a .NET Framework package references a package that references both, and then a .NET application reference this package.
 
 b. .NET & .NET Standard scenario
@@ -134,14 +135,57 @@ Referring back to the [scenarios](#scenarios-for-direct-packagereference-items) 
 | 2c | No | Eventual runtime failure risks |
 | 2d | Yes | Removal of the PR leads to the package being completely gone from the project. |
 
-#### Pruning direct PackageReference items
+#### Direct PackageReference in pruning range
 
 The primary motivation for pruning is that the audit functionality and external scanners no longer sees those package references and raise false positives.
 Transitively pruned packages do not appear in the assets file as dependencies of the packages that originally referenced them.
 They have effectively been selected as unnecessary during the framework selection step of dependency resolution.
 The only place the id appears in the assets file is the `project` section under the `packagesToPrune`.
 
-Direct PackageReference appear in the project file and we would need to be able to answer questions about the statu of the package itself.
+When the NU1510 warning is raised, we are giving the customer a clear signal that they need to remove the PackageReference.
+In these scenarios, what happens to the direct package references is not very critical.
+
+In the partial prune scenarios such as 2b and 2c, pruning directs like transitive could be beneficial in the .NET leg, helping avoid additional audit warnings.
+However, due to the fact that the PackageReference is in other frameworks, the benefit is more minimal, since if the package itself had a vulnerability, the audit warning will be warranted since the customer is using it in a case where it is not being pruned.
+
+#### Should we prune direct PackageReference similarly to transitives
+
+[Pruning of direct packages](#how-pruning-direct-packagereference-similarly-to-transitive-would-work) would introduce the new concept of a pruned direct package.
+For transitive pruning, the end user would not see anything beyond a reduction in packages downloaded. For direct packages, the PM UI, list & why commands need to updated as well. From a cost/benefit perspective, direct pruning requires a lot of parts to be updated and there is not a big benefit in the core scenario where a package has vulnerabilities (warnings would still be raised since the package is still used).
+Only 5% of .NET SDK based projects are suspected to be multi-targeted, and it would be challenging to get more specificity at this point.
+
+#### Direct PackageReference in the pruning range are treated with `PrivateAssets=all` and `IncludeAssets=none`
+
+If a direct PackageReference is within the pruning range, we can treat with `PrivateAssets=all` and `IncludeAssets=none`.
+
+The direct packages are still resolved. No need to introduce special concepts for direct packages that are not resolved.
+
+`PrivateAssets=all` means that they will not be:
+
+- Transitive project through project - this is pretty inconsequential to the larger story, since as a transitive package, it would be pruned in the referencing project as well (assuming pruning wasn't explicitly disabled).
+- Be part of the resulting package - This is beneficial in scenarios like 2a, 2b and 2c where we can't raise an NU1510 warning due to the risks of conditional PackageReference. We would effectively be removing this package for the user, without them having to apply it themselves.
+Additionally, in single framework scenarios, prunable packages would be removed from the package definition completely, which is effectively NuGet applying the `NU1510` heuristic for the customer. Given that the `NU1510` warning is enabled for `.NET 10` only, this would clean-up packages targeting net9.0 and earlier of unnecessary dependencies.
+
+`IncludeAssets=none` will be used to clearly indicate that the package would not be used at compile or runtime.
+
+The one very clear problem with this proposal is that this is a breaking change.
+You upgrade the .NET SDK and now your package has different dependencies without a clear indication.
+The whole PrunePackageReference feature is a breaking change itself, but in the case of transitive package pruning, the benefits are no audit warnings, since the package is not used at all, so very low chances of things going wrong.
+In the directs case, we'd be change the package.
+
+## Drawbacks
+
+- Additional UX concepts for both 1st and 3rd party tooling that manage packages.
+- Cost of direct PackageReference pruning vs the potential benefit since customers in affected scenarios with a vulnerable package would either get a NU1510 or get a legit audit warning.
+
+## Rationale and alternatives
+
+- Update the NU1510 heuristic only. Retain the current behavior for pruning.
+- Prune direct PackageReference similarly to transitives
+
+### How pruning direct PackageReference similarly to transitive would work
+
+Direct PackageReference appear in the project file and we would need to be able to answer questions about the status of the package itself.
 To allow components to reason about the direct dependencies, the list of pruned packages will be represented in a new section as well.
 Similar to transitively pruned packages, direct  dependencies that were pruned *will not* appear in the targets section and  affect build in any way.
 
@@ -177,29 +221,6 @@ For the components mentioned above, we need to define their behavior for pruned 
 
 Given that pruning is an offline operation, ie NuGet does not talk to the sources for pruned packages, we never validate that the requested package exists and the specified version may be incorrect. This is likely to not be of too much consequence, since it's only really possible with hand-editing, and the impact of it is minimal since the package is not used anyways.
 
-### Should we prune direct PackageReference
-
-When the NU1510 warning is raised, we are giving the customer a clear signal that they need to remove the PackageReference.
-In these scenarios, whether we prune direct package references is not very critical.
-
-In the partial prune scenarios such as 2b and 2c, pruning could be beneficial in the .NET leg, helping avoid additional audit warnings.
-However, due to the fact that the PackageReference is in other frameworks, the benefit is more minimal, since if the package itself had a vulnerability, the audit warning will be warranted since the customer is using it in a case where it is not being pruned.
-
-Pruning of direct packages would introduce the new concept of a pruned direct package. For transitive pruning, the end user would not see anything beyond a reduction in packages downloaded. For direct packages, the PM UI, list & why commands.
-
-From a cost/benefit perspective, direct pruning requires a lot of parts to be updated and there is not a big benefit in the core scenario where a package has vulnerabilities (warnings would still be raised since the package is still used).
-Only 5% of .NET SDK based projects are suspected to be multi-targeted, and it would be challenging to get more specificity at this point.
-
-## Drawbacks
-
-- Additional UX concepts for both 1st and 3rd party tooling that manage packages.
-- Cost of direct PackageReference pruning vs the potential benefit since customers in affected scenarios with a vulnerable package would either get a NU1510 or get a legit audit warning.
-
-## Rationale and alternatives
-
-- Update the NU1510 heuristic only. Retain the current behavior for pruning.
-- Instead of removing the direct PackageReference from the graph completely, treat it as `IncludeAssets="none"`. This would allow get us benefits from Component Governance, in a more cost-effective way. `NuGetAudit` would also need to be updated to stop auditing unused packages, similarly to how Component Governance approaches the problem. [Make ExcludeAssets visible in Audit and nuget why](https://github.com/NuGet/Home/issues/13860)
-
 ## Prior Art
 
 N/A
@@ -223,4 +244,5 @@ N/A
 - Block installation of packages that would be pruned. Effectively, do not allow System.Text.Json 8.0.0 to be installed in a project targeting `net10.0` only. The heuristic could be similar to the one of NU1510, block the installation if a NU1510 is raised for the package id being installed.
 - [#14126: Warning rollout for PrunePackageReference](https://github.com/NuGet/Home/issues/14126) - We may want a way to enable how this warning is surfaced for customers that do not target .NET 10.0.
 - NuGet vulnerability warnings for direct PackageReference can account for the fact that a package would be pruned and provide that information. We could also choose to raise a NU1510 warning when a vulnerability is reported for that package during NuGet Audit.
-- [[DCR]: ExcludeAssets="all" should exclude the package from the restore graph](https://github.com/NuGet/Home/issues/11567) covers a similar idea of removing packages from restore, like direct pruning would. Treating pruned packages with `IncludeAssets="none"` followed by excluding this package from all auditing may yield similar results.
+- [[DCR]: ExcludeAssets="all" should exclude the package from the restore graph](https://github.com/NuGet/Home/issues/11567) covers a similar idea of removing packages from restore, like direct pruning would.
+- [Make ExcludeAssets visible in Audit and nuget why](https://github.com/NuGet/Home/issues/13860)
