@@ -192,8 +192,8 @@ Note that we could consider gating the `PrivateAssets=all` addition to net10.0 b
 
 ## Rationale and alternatives
 
-- Update the NU1510 heuristic only. Retain the current behavior for pruning.
-- Prune direct PackageReference similarly to transitives
+- Don't change the direct PackageReference handling.
+- Prune direct PackageReference similarly to transitives.
 
 ### How pruning direct PackageReference similarly to transitive would work
 
@@ -241,6 +241,7 @@ N/A
 
 - How should we handle direct packages? `PrivateAssets=all`, prune completely or no action.
   - If the answer is `PrivateAssets=all`, should we gate it behind the net10.0 framework being used?
+    - The impact is more minimal, but we're fully following the [Breaking Change guidelines](https://github.com/dotnet/sdk/blob/main/documentation/project-docs/breaking-change-guidelines.md#tie-potentially-impactful-changes-to-the-target-tfm).
   - If the answer is prune completely, the following unresolved questions apply:
     - What should `dotnet list package` show for direct pruned packages? Should it show the version specified as requested?
       - It can be marked in a similar way that auto-referenced packages are marked. `> Newtonsoft.Json           (A)   [13.0.2, )   13.0.2`
