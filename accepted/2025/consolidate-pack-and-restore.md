@@ -10,8 +10,11 @@ Merge the pack and restore functionality into 1 package/assembly, reducing techn
 
 ## Motivation
 
-To run pack on a classic csproj, you need install the [NuGet.Build.Tasks.Pack](https://www.nuget.org/packages/NuGet.Build.Tasks.Pack) package. This makes the restore/build & pack tooling disjoint. In addition to upgrading the msbuild/VS versions, you need to remember to upgrade the NuGet.Build.Tasks.Pack package as well and that's simply not something people do frequently (similarly to how people don't always align NuGet.exe and the Visual Studio versions).
-Within the .NET SDK, the restore & pack packages are not in the same folder. The restore targets and assemblies are in the root folder, while the pack assembly and targets are in an SDK folder (that has both .NET & .NET Framework assemblies ilmerged).
+To run pack on a classic csproj, you need install the [NuGet.Build.Tasks.Pack](https://www.nuget.org/packages/NuGet.Build.Tasks.Pack) package.
+This makes the restore/build & pack tooling disjoint.
+In addition to upgrading the msbuild/VS versions, you need to remember to upgrade the NuGet.Build.Tasks.Pack package as well and that's simply not something people do frequently (similarly to how people don't always align NuGet.exe and the Visual Studio versions).
+Within the .NET SDK, the restore & pack packages are not in the same folder.
+The restore targets and assemblies are in the root folder, while the pack assembly and targets are in an SDK folder (that has both .NET & .NET Framework assemblies ilmerged).
 What this means is that we have multiple copies of the same assemblies, including resources, adding about 20MB to the total unzipped size of the .NET SDK.
 
 ## Explanation
@@ -32,8 +35,12 @@ The following table contains details about the behavior of how pack is run for e
 When using the dotnet commands, there are no proposed changes in behavior.
 When using the msbuild commands, there are 2 changes:
 
-- When running msbuild /t:pack on an .NET SDK based project, the pack targets from MSBuild will be imported. This allows us to avoid shipping the .NET Framework version of pack in the .NET SDK and unifies the restore & pack functionality compared to what we currently have which is build & pack are aligned. I don't think there's an easy answer here.
-- When running classic csproj, we will need to make the pack target project style aware. What that means is that we will change the pack target to no-op when the project style is not PackageReference. This is a *change* compared to the previous behavior.
+- When running msbuild /t:pack on an .NET SDK based project, the pack targets from MSBuild will be imported.
+This allows us to avoid shipping the .NET Framework version of pack in the .NET SDK and unifies the restore & pack functionality compared to what we currently have which is build & pack are aligned.
+I don't think there's an easy answer here.
+- When running classic csproj, we will need to make the pack target project style aware.
+What that means is that we will change the pack target to no-op when the project style is not PackageReference.
+This is a *change* compared to the previous behavior.
 
 | tool | Project Style | Result |
 |---------|---------------|--------|
@@ -42,7 +49,7 @@ When using the msbuild commands, there are 2 changes:
 | dotnet | classic csproj | N/A |
 | msbuild | .NET SDK | Uses .NET SDK pack, which contains .NET Framework assemblies |
 | msbuild | classic PackageReference | Uses the new msbuild pack |
-| msbuild | classic csproj | Completes successfully, but the target no-ops. |
+| msbuild | classic csproj | Completes successfully, but the target no-ops.|
 
 The NuGet.Build.Tasks.Pack.targets imported order will be the same in .NET SDK based projects (meaning the NuGet.Targets will not import the NuGet.Build.Tasks.Pack.targets).
 In MSBuild based projects, we will add a project level import for the pack targets similar to how the .NET SDK imports are done (TBD).
@@ -63,6 +70,7 @@ In the .NET SDK project scenario, this does introduce some behavioral changes in
 
 Currently, the minimum MSBuild version for the .NET SDK 10.0.x is 17.13, so we would effectively be breaking someone using .NET 10 SDK with MSBuild 17.13 and 17.14 before we could add the pack targets in the next version of MSBuild.
 We could add the .NET Framework implementation of pack in the package to enable the MSBuild /t:pack scenarios older MSBuild and the .NET 10 SDK.
+See [open questions](#unresolved-questions).
 
 ### Technical explanation
 
@@ -104,11 +112,16 @@ To summarize, we will need to do the following technical work:
 - Make NuGet.targets import NuGet.Build.Tasks.Pack.targets
 We could do this, but it is less disruptive for .NET SDK projects, the priority scenario to change up the import order.
 - Keep the .NET Framework implementation of pack until the minimum MSBuild version is moved to the first version of MSBuild that contains the pack targets.
+- Keep the .NET Framework implementation of pack into the SDK forever.
+This means that pack will always run from the .NET SDK, regardless of whether it's invoked by dotnet or msbuild.
 
 ## Prior Art
 
 ## Unresolved Questions
 
-- 
+- Should we keep the .NET Framework implementation of pack for a few releases, until the minimum MSBuild version of the .NET SDK becomes the one that carries its own MSBuild implementation.
 
 ## Future Possibilities
+
+- Stop ilmerging pack, <https://github.com/NuGet/Home/issues/13079>.
+- With every variant of this proposal, We could remove netstandard2.0 from our project graph, making our builds much faster.
