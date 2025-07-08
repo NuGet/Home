@@ -56,19 +56,18 @@ This is the ideal implementation.
 | Option / Flag        | Description                                                        | Notes / Status for .nuspec-only support                        | Comparison (`nuget pack -h` / `dotnet pack -h`)                |
 |----------------------|--------------------------------------------------------------------|---------------------------------------------------------------|---------------------------------------------------------------|
 | `--property` / `-p:` | Set or override a property for token replacement in `.nuspec`.     | Reused; interpret for token replacement, not just MSBuild.     | `-Properties` in `nuget pack`, `--property` in `dotnet pack`   |
-| `--output`           | Specifies the output directory for the generated package.           | Reused; already available.                                     | `-OutputDirectory` in `nuget pack`, `--output` in `dotnet pack`|
-| `--basepath`         | Specifies the base path for resolving relative file paths.          | New; needed for file path resolution in `.nuspec`.             | `-BasePath` in `nuget pack`, not present in `dotnet pack`      |
+| `--version`          | Specifies the version of the package.                               | Reused; overrides <version> in .nuspec if both are specified.   | `-Version` in `nuget pack`, `--version` in `dotnet pack`       |
 
 > **Note:**  
 > This table focuses on options that are new, reused with modified behavior, or require special handling for .nuspec-only support.
-> Project-specific and unrelated options (like `--configuration`, `--no-build`, etc.) are omitted for clarity and relevance.
+> Project-specific and unrelated options (like `--no-build`) are omitted for clarity and relevance.
+> Options that are standard in the dotnet CLI, such as `--configuration` and `--output`, will be reused without modification.
 
 ## Limitations
 
 - Only a subset of options are exposed as CLI flags for .nuspec-only packaging.
 - Most .nuspec metadata, including advanced fields like `<serviceable>`, must be set directly in the .nuspec file.
 - For dynamic or automated scenarios, use token replacement in the .nuspec and pass values via `--property`.
-- The `--version` flag does not override a hardcoded `<version>` in the `.nuspec` file. To dynamically set the version, define a token in the `.nuspec` file and use `--property Version=<value>` to replace it.
 - `--no-package-analysis`: Skips package analysis after building the package. This is not currently supported in .nuspec-only scenarios. As a result, this flag will not be available for .nuspec-only support.
 
 ## Rationale and Alternatives
