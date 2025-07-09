@@ -6,7 +6,9 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thanks for taking the time to file an issue!
+        Thank you for taking the time to file this issue. In order to resolve it, we just need a few details from you.
+
+        The more detail you provide, the more likely it will be for us to be able to identify what is going on and how to solve it!
         
   - type: dropdown
     id: issue-type
@@ -60,7 +62,6 @@ body:
       placeholder: |
         Example:
         "Summarize the following code..."
-      value: ""
     validations:
       required: true
 
@@ -70,7 +71,6 @@ body:
       label: Expected Response
       description: What did you expect the MCP server to respond with?
       placeholder: Describe what the correct or intended behavior would be.
-      value: ""
     validations:
       required: true
 
@@ -80,7 +80,6 @@ body:
       label: Actual Response
       description: What response did the server actually return?
       placeholder: Paste or summarize the actual response.
-      value: ""
     validations:
       required: true
 
