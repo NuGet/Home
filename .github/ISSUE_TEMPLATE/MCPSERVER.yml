@@ -1,7 +1,7 @@
 name: NuGet MCP Server Issue
 description: Report a bug, suggestion, or behavior discrepancy for the NuGet MCP Server (Model Context Protocol)
 title: "[MCP Server]: "
-labels: ["Product:NuGetMCPServer", "Triage:Untriaged"]
+labels: ["Product:MCPServer", "Triage:Untriaged"]
 body:
   - type: markdown
     attributes:
