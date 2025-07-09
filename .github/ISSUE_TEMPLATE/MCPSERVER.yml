@@ -6,7 +6,6 @@ body:
   - type: markdown
     attributes:
       value: |
-        ## 🧠 NuGet MCP Server Feedback
         Thank you for taking the time to file an issue!  
         Please fill out the sections below to help us triage and resolve your issue effectively.
 
