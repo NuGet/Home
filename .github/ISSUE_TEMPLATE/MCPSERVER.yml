@@ -1,0 +1,94 @@
+name: NuGet MCP Server Issue
+description: Report a bug, suggestion, or behavior discrepancy for the NuGet MCP Server (Model Context Protocol)
+title: "[MCP Server]: "
+labels: ["Product:NuGetMCPServer", "Triage:Untriaged"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## 🧠 NuGet MCP Server Feedback
+        Thank you for taking the time to file an issue!  
+        Please fill out the sections below to help us triage and resolve your issue effectively.
+
+  - type: dropdown
+    id: issue-type
+    attributes:
+      label: Issue Type
+      description: What type of issue are you reporting?
+      options:
+        - Bug
+        - Feature
+        - Question
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: mcp-server-package-version
+    attributes:
+      label: MCP Server Package Version
+      placeholder: e.g., 0.1.0-preview
+
+  - type: input
+    id: dotnet-version
+    attributes:
+      label: .NET Version
+      description: Run `dotnet --info` and provide the first line.
+      placeholder: e.g., .NET 10.0.0
+
+  - type: checkboxes
+    id: environment
+    attributes:
+      label: Environment
+      description: Where is the MCP server running?
+      options:
+        - label: Visual Studio
+        - label: VS Code
+        - label: GitHub Copilot Coding Agent
+        - label: CLI
+        - label: Other (please specify below)
+
+  - type: input
+    id: environment-other
+    attributes:
+      label: If "Other", please specify
+      description: Provide details if your environment isn't listed.
+
+  - type: textarea
+    id: prompt
+    attributes:
+      label: Prompt or Input
+      description: What prompt or input was sent to the MCP server?
+      placeholder: |
+        Example:
+        "Summarize the following code..."
+      value: ""
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Response
+      description: What did you expect the MCP server to respond with?
+      placeholder: Describe what the correct or intended behavior would be.
+      value: ""
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Response
+      description: What response did the server actually return?
+      placeholder: Paste or summarize the actual response.
+      value: ""
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context or Description
+      description: Provide any additional information or background that may help us understand the issue.
+      placeholder: Optional details, related observations, or links.
