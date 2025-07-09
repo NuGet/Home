@@ -6,9 +6,8 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thank you for taking the time to file an issue!  
-        Please fill out the sections below to help us triage and resolve your issue effectively.
-
+        Thanks for taking the time to file an issue!
+        
   - type: dropdown
     id: issue-type
     attributes:
