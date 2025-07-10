@@ -48,7 +48,7 @@ body:
         - Chrome
         - Safari
         - Microsoft Edge
-      if: version == "1.0.3 (Edge)"
+    if: version == "1.0.3 (Edge)"
   - type: textarea
     id: logs
     attributes:
