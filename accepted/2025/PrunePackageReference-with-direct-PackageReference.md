@@ -77,7 +77,7 @@ b. .NET & .NET Standard scenario
   </ItemGroup>
 ```
 
-For .NET, the package is unnecessary, but if the customer removes the reference and then at a later point point updates the PackageReference without bumping the target framework, it may lead to a situation where the netstandard2.0 version of their package has a broader API surface area than net9.0 and potentially leading to runtime issues as talked about in the [Motivation](#motivation).
+For .NET 9, the package is unnecessary, but if the customer removes the reference and then at a later point point updates the PackageReference without bumping the target framework, it may lead to a situation where the netstandard2.0 version of their package has a broader API surface area than net9.0 and potentially leading to runtime issues as talked about in the [Motivation](#motivation).
 
 c. Multiple .NET frameworks, package specified for all frameworks.
 
