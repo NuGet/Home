@@ -33,11 +33,8 @@ The following table contains details about the behavior of how pack is run for e
 | msbuild | classic csproj | Fails with `The target "pack" does not exist in the project` |
 
 When using the dotnet commands, there are no proposed changes in behavior.
-When using the msbuild commands, there are 2 changes:
+When using the msbuild commands, there is 1 change:
 
-- When running msbuild /t:pack on an .NET SDK based project, the pack targets from MSBuild will be imported.
-This allows us to avoid shipping the .NET Framework version of pack in the .NET SDK and unifies the restore & pack functionality compared to what we currently have which is build & pack are aligned.
-I don't think there's an easy answer here.
 - When running classic csproj, we will need to make the pack target project style aware.
 What that means is that we will change the pack target to no-op when the project style is not PackageReference.
 This is a *change* compared to the previous behavior.
@@ -53,24 +50,13 @@ This is a *change* compared to the previous behavior.
 
 The NuGet.Build.Tasks.Pack.targets imported order will be the same in .NET SDK based projects (meaning the NuGet.Targets will not import the NuGet.Build.Tasks.Pack.targets).
 In MSBuild based projects, we will add a project level import for the pack targets similar to how the .NET SDK imports are done (TBD).
+We will ensure that when `msbuild /t:pack` is invoked that the pack targets are imported from the .NET SDK. This means we will need the NuGet.Build.Tasks package to contain the .NET Framework assemblies needed for pack, potentially by ilmerging them.
 
 These changes also lead to the NuGet.Build.Tasks.Pack package no longer being published.
 We will mark this package as deprecated and publish guidance for customers.
 
 Today, when the NuGet.Build.Tasks.Pack is installed, it's preferred over the .NET SDK built in targets.
-We could figure out a way to make the new imports be preferred, but that's not a priority right now.
-
-In the .NET SDK project scenario, this does introduce some behavioral changes in the msbuild /t:pack scenarios.
-
-| msbuild | .NET SDK | Result |
-| new | 10.0.x | Uses the new msbuild pack |
-| new | 9.0.x | Uses the 9.0.x .NET SDK pack |
-| old | 10.0.x | Fails. |
-| old | 9.0.x | Uses the 9.0.x .NET SDK pack |
-
-Currently, the minimum MSBuild version for the .NET SDK 10.0.x is 17.13, so we would effectively be breaking someone using .NET 10 SDK with MSBuild 17.13 and 17.14 before we could add the pack targets in the next version of MSBuild.
-We could add the .NET Framework implementation of pack in the package to enable the MSBuild /t:pack scenarios older MSBuild and the .NET 10 SDK.
-See [open questions](#unresolved-questions).
+We will ensure that the new targets are always preferred, since they are always going to be newer than the package.
 
 ### Technical explanation
 
@@ -119,9 +105,8 @@ This means that pack will always run from the .NET SDK, regardless of whether it
 
 ## Unresolved Questions
 
-- Should we keep the .NET Framework implementation of pack for a few releases, until the minimum MSBuild version of the .NET SDK becomes the one that carries its own MSBuild implementation.
-
 ## Future Possibilities
 
 - Stop ilmerging pack, <https://github.com/NuGet/Home/issues/13079>.
 - With every variant of this proposal, We could remove netstandard2.0 from our project graph, making our builds much faster.
+- Remove .NET Framework variant of NuGet.Build.Tasks (Pack) after <https://github.com/dotnet/msbuild/issues/11142> is implemented.
