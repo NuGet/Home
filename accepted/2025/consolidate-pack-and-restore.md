@@ -87,7 +87,6 @@ To summarize, we will need to do the following technical work:
 - When the insertion into the .NET SDK happens, make the imports and layout changes in the .NET SDK.
 - Make the Pack target project style aware, don't invoke it on non-PackageReference based projects.
 - Add an import for the NuGet.Build.Tasks.Pack.targets into MSBuild, but make it .NET SDK aware to avoid double loading the targets.
-  - When we have new msbuild and old SDK, we should ensure the pack targets are loaded from new msbuild by setting NuGetBuildTasksPackTargets to the MSBuild version and setting ImportNuGetBuildTasksPackTargetsFromSdk to false.
 
 ## Drawbacks
 
