@@ -33,7 +33,7 @@ The following list summarizes the list of per framework changes that would happe
   - `IncludeAssets='none'` ensures that the assemblies from this package are not used during the build. Before pruning existed, the conflict resolution during the build ensured that platform assemblies were preferred over those coming from the packages.
   - `PrivateAssets='all'` ensures that the packages aren't included in packages or through project references.
 - Customers with builds that have customization may run into build failures if they are:
-  - Manually referencing an assembly or props/targets from a package from the global packages folder. Note that pruning is not allowed for direct dependencies, so this would need to be a transitive package.
+  - Manually referencing an assembly or props/targets from a package from the global packages folder. Note that pruning does not remove direct dependencies, so this would need to be a transitive package.
     - Manually copying assembly during a build - at runtime, the platform version will be preferred anyways, but it could lead to the build failing if the package cannot be found on disk anymore.
   - We don't expect this to be a common scenario given that the packages being pruned are within the framework and customers do not need do to anything custom to make things work.
 - If the project targets .NET 10, [NU1510](https://github.com/NuGet/docs.microsoft.com-nuget/blob/main/docs/reference/errors-and-warnings/NU1510.md) and [NU1511](https://github.com/NuGet/docs.microsoft.com-nuget/blob/main/docs/reference/errors-and-warnings/NU1510.md) may be raised.
