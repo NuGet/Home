@@ -79,35 +79,35 @@ NuGetAudit cannot be partially enabled.
 | net9.0;net10.0 | all |
 - Pruning runs per framework, or in other words, it can be partially enabled.
 - Every customer can enable pruning in their projects already (shipped originally in 9.0.200) by setting `RestoreEnablePackagePruning=true`
-- We should fix <https://github.com/dotnet/sdk/issues/49917>, regardless of the defaults, but some defaults increase the criticality of the it. We can always say pruning is not supported for <= .NET (Core) 2.2.
+- We should fix <https://github.com/dotnet/sdk/issues/49917>, regardless of the defaults, but some defaults increase the criticality of it. We can always say pruning is not supported for <= .NET (Core) 2.2.
 
 #### All .NET & .NET Standard 2.0 >=
 
 Pros:
 
-- NET 10 P1 behavior. Nearly completely eliminates NuGetAudit, component governance and 3rd party scanner false positives.
+- NET 10 P1 behavior. Nearly completely eliminates false positives om NuGetAudit, component governance and 3rd party scanners.
   - We have had pruning for transitive enabled since .NET 10 preview 1, and we have not received any breaking bugs aside from the NU1510 diagnostics, which has been fixed, and is disabled for projects targeting .NET 9 and earlier)
 - Unnecessary platform packages will not be a part of any package built with the .NET 10 SDK (due to direct PrivateAssets=all)
 
 Cons:
 
 - Potential of a breaking change for pre-existing projects.
-- NuGetAuditMode is gonna be direct for a large majority of existing projects (Only 1% of restores have NuGetAuditMode=all)
+- NuGetAuditMode is gonna be direct for a large majority of existing projects, which target .NET 9 and older (Only 1% of restores have manually enabled NuGetAuditMode=all)
 We will see reduction in downloads of these packages and reduction of these packages being part of newly published packages, but we won't necessarily reduce the warnings count (overall we do want to eliminate vulnerable package usage).
 The primary benefit is prunable packages not appearing in newly published packages due to automatic PrivateAssets=all.
 
-#### >= .NET 3 & .NET Standard 2.0 >=
+#### >= .NET (Core) 3 & .NET Standard 2.0 >=
 
 Pros:
 
 - Nearly completely eliminates NuGetAudit and component governance false positives. .NET CoreApp 2.2 comprise under 10% of projects.
-- Bug free zone. This is the broadest set of frameworks we can enable it for that has not encountered pruning bugs.
+- Bug free zone. This is the broadest set of frameworks we can enable it for that has not encountered pruning bugs yet.
 
 Cons:
 
 - Potential of a breaking change for pre-existing projects.
 - NuGetAuditMode is gonna be direct for a large majority of existing projects (Only 1% of restores have NuGetAuditMode=all)
-We will see reduction in downloads of these packages and reduction of these packages being part of newly published packages, but we won't necessarily reduce the warnings count (overall we do want to eliminate vulnerable package usage).
+We will see reduction in downloads of these packages and reduction of these packages being part of newly published packages, but we won't necessarily reduce the warnings count, since the warnings are not being raised (overall we do want to eliminate vulnerable package usage).
 The primary benefit is prunable packages not appearing in newly published packages due to automatic PrivateAssets=all.
 - If we are going to go with this approach, we are better off fixing the bug and enabling it for all .NET frameworks or just declaring pruning unavaiable for <= .NET Core 2.2 and not fixing the bug.
 
@@ -126,6 +126,7 @@ Cons:
 We will see reduction in downloads of these packages and reduction of these packages being part of newly published packages, but we won't necessarily reduce the warnings count (overall we do want to eliminate vulnerable package usage).
 The primary benefit is prunable packages not appearing in newly published packages due to automatic PrivateAssets=all.
 - We are making a TFM based enablement on the runtime supported, but that logic really only applies for applications, but pruning and audit are enabled for both apps and libraries. Library authors will often target lower version of the framework because that's all they need.
+Some relevant context in <https://github.com/dotnet/sdk/issues/28518>.
 
 ### >= .NET 10 only
 
@@ -152,10 +153,11 @@ Pros:
 Cons:
 
 - Potential of a breaking change for pre-existing projects. However, the benefits for these customers are more obvious, since they are likely to see fewer vulnerability warnings. They made an explicit decision to adopt NuGetAudit, and they will likely be receptive of a feature improve NuGetAudit itself. (see example: <https://github.com/dotnet/sdk/issues/49226>)
+- Features get a bit tangled and enabling one feature opting you into another one could cause confusion.
 
 ## Prior Art
 
-- Pruning is the restore equivalent of [the build time conflict resolution](<https://github.com/dotnet/sdk/blob/262b9c3d6cf67287f649e38d83e6c5d9d08feb8a/src/Tasks/Common/ConflictResolution/ResolvePackageFileConflicts.cs#L178-L182>), that is current enable for every framework.
+- Pruning is the restore equivalent of [the build time conflict resolution](<https://github.com/dotnet/sdk/blob/262b9c3d6cf67287f649e38d83e6c5d9d08feb8a/src/Tasks/Common/ConflictResolution/ResolvePackageFileConflicts.cs#L178-L182>), that is currently enabled for every framework.
 
 ## Unresolved Questions
 
