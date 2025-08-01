@@ -86,7 +86,7 @@ NuGetAudit cannot be partially enabled.
 
 Pros:
 
-- NET 10 P1 behavior. Nearly completely eliminates false positives om NuGetAudit, component governance and 3rd party scanners.
+- NET 10 P1 behavior. Nearly completely eliminates false positives of NuGetAudit, component governance and 3rd party scanners.
   - We have had pruning for transitive enabled since .NET 10 preview 1, and we have not received any breaking bugs aside from the NU1510 diagnostics, which has been fixed, and is disabled for projects targeting .NET 9 and earlier)
 - Unnecessary platform packages will not be a part of any package built with the .NET 10 SDK (due to direct PrivateAssets=all)
 
