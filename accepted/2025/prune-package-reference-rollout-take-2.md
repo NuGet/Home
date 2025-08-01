@@ -37,7 +37,7 @@ The following list summarizes the list of per framework changes that would happe
   - Manually referencing an assembly or props/targets from a package from the global packages folder. Note that pruning does not remove direct dependencies, so this would need to be a transitive package.
     - Manually copying assembly during a build - at runtime, the platform version will be preferred anyways, but it could lead to the build failing if the package cannot be found on disk anymore.
   - Aliases for PackageReference that will be pruned will stop working. This is *unlikely* to be a problem, since we normally wouldn't expect customers to alias platform packages.
-  - We don't expect this to be a common scenario given that the packages being pruned are within the framework and customers do not need do to anything custom to make things work.
+  - We don't expect this to be a common scenario given that the packages being pruned are within the framework and customers do not need to do anything custom to make things work.
 - If the project targets .NET 10, [NU1510](https://github.com/NuGet/docs.microsoft.com-nuget/blob/main/docs/reference/errors-and-warnings/NU1510.md) and [NU1511](https://github.com/NuGet/docs.microsoft.com-nuget/blob/main/docs/reference/errors-and-warnings/NU1510.md) may be raised.
 
 ## Explanation
