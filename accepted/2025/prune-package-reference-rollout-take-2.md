@@ -163,7 +163,7 @@ Pros:
 - Not a breaking change.
 - Addresses false positives for .NET 10 and above.
 - Projects multi-targeting .NET 10  get full benefits of pruning.
-Matches the NuGetAudit behavior, so new defaults work well together, but are still independent (ie, you could have pruning without audit)
+Matches the NuGetAudit behavior, so new defaults work well together, but are still independent (ie, you could have pruning without audit).
 
 Cons:
 
@@ -176,3 +176,7 @@ Cons:
 ## Unresolved Questions
 
 - Precise Roll-out strategy for PrunePackageReference for .NET 10 SDK.
+
+## Future possibilities
+
+If we go the safer route, like for example only for .NET 10 only or when .NET 10 is multi-targeted, we can later choose to enable it for all remaining frameworks in .NET 10.
