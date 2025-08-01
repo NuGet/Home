@@ -12,6 +12,7 @@ The ideas explored are:
 - Enabling pruning for all .NET versions + .NET Standard 2.0+ (.NET 10 Preview 1 behavior)
 - Enabling pruning for .NET 8+ and .NET Standard 2.0+ (proposed .NET 10 Preview 7 behavior)
 - Enabling pruning for .NET 10 only (new)
+- Enabling pruning for all frameworks when .NET 10 is targeted  (new)
 - Enabling pruning when NuGetAuditMode is all. (new)
 
 ## Motivation
@@ -154,6 +155,19 @@ Cons:
 
 - Potential of a breaking change for pre-existing projects. However, the benefits for these customers are more obvious, since they are likely to see fewer vulnerability warnings. They made an explicit decision to adopt NuGetAudit, and they will likely be receptive of a feature improve NuGetAudit itself. (see example: <https://github.com/dotnet/sdk/issues/49226>)
 - Features get a bit tangled and enabling one feature opting you into another one could cause confusion.
+
+### >= .NET 10 enables pruning for all frameworks
+
+Pros:
+
+- Not a breaking change.
+- Addresses false positives for .NET 10 and above.
+- Projects multi-targeting .NET 10  get full benefits of pruning.
+Matches the NuGetAudit behavior, so new defaults work well together, but are still independent (ie, you could have pruning without audit)
+
+Cons:
+
+- Does not address false positives for every customer actively getting false positive warnings (0% of projects in 17.14 get the benefit.)
 
 ## Prior Art
 
