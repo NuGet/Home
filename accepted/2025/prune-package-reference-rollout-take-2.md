@@ -15,6 +15,8 @@ The ideas explored are:
 - Enabling pruning for all frameworks when .NET 10 is targeted  (new)
 - Enabling pruning when NuGetAuditMode is all. (new)
 
+Post-discussion, the discussion was to go with `Enabling pruning for all frameworks when .NET 10 is targeted  (new)`.
+
 ## Motivation
 
 The main benefits of pruning
@@ -73,11 +75,11 @@ For the following list comparing the approaches a few things are important to co
 - NuGetAuditMode=all for projects targeting .NET 10 or above.
 What this means is that if at least 1 framework is .NET 10, the whole projects auditing warnings.
 NuGetAudit cannot be partially enabled.
-| Frameworks | NuGetAuditMode |
-|------------|----------------|
-| net10.0 | all |
-| net9.0 | direct |
-| net9.0;net10.0 | all |
+    | Frameworks | NuGetAuditMode |
+    |------------|----------------|
+    | net10.0 | all |
+    | net9.0 | direct |
+    | net9.0;net10.0 | all |
 - Pruning runs per framework, or in other words, it can be partially enabled.
 - Every customer can enable pruning in their projects already (shipped originally in 9.0.200) by setting `RestoreEnablePackagePruning=true`
 - We should fix <https://github.com/dotnet/sdk/issues/49917>, regardless of the defaults, but some defaults increase the criticality of it. We can always say pruning is not supported for <= .NET (Core) 2.2.
@@ -86,7 +88,7 @@ NuGetAudit cannot be partially enabled.
 
 Pros:
 
-- NET 10 P1 behavior. Nearly completely eliminates false positives of NuGetAudit, component governance and 3rd party scanners.
+- NET 10 P1 behavior. Nearly completely eliminates false positives in NuGetAudit, component governance and 3rd party scanners.
   - We have had pruning for transitive enabled since .NET 10 preview 1, and we have not received any breaking bugs aside from the NU1510 diagnostics, which has been fixed, and is disabled for projects targeting .NET 9 and earlier)
 - Unnecessary platform packages will not be a part of any package built with the .NET 10 SDK (due to direct PrivateAssets=all)
 
@@ -175,8 +177,7 @@ Cons:
 
 ## Unresolved Questions
 
-- Precise Roll-out strategy for PrunePackageReference for .NET 10 SDK.
-
 ## Future possibilities
 
-If we go the safer route, like for example only for .NET 10 only or when .NET 10 is multi-targeted, we can later choose to enable it for all remaining frameworks in .NET 10.
+- Consider enabling for all frameworks in future releases.
+- Encourage customers with NuGetAuditMode=all to enable pruning
