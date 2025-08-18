@@ -21,12 +21,11 @@ This leads to analyzers being included in projects, which is not the expected be
 ### Functional explanation
 
 Enable analyzer assets to respect asset filtering options like other asset types.
-When enabled via `<EnableIndicateAnalyzerAssets>true</EnableIndicateAnalyzerAssets>`:
+When enabled via `<RestoreEnableAnalyzerAssets>true</RestoreEnableAnalyzerAssets>`:
 - Analyzers will be tracked in the `project.assets.json` file under a new "analyzers" group.
 - PrivateAssets/ExcludeAssets will correctly filter analyzers, preventing them from being included in projects that should not have them.
-- Developers will gain proper control over analyzer inclusion
 
-This feature will initially be behind a feature flag defined as `<EnableIndicateAnalyzerAssets>`. 
+This feature will initially be behind a feature flag defined as `<RestoreEnableAnalyzerAssets>`. 
 This property should be set as true in the project file. 
 This is done to avoid a breaking change.
 
@@ -34,11 +33,13 @@ This is done to avoid a breaking change.
 
 #### File Structure
 
-|Pattern|Description|Example|
-|---|---|---|
-|`analyzers/dotnet/cs/{name}.dll`|C# analyzers|`analyzers/dotnet/cs/MyAnalyzer.dll`|
-|`analyzers/dotnet/vb/{name}.dll`|VB.NET analyzers|`analyzers/dotnet/vb/MyAnalyzer.dll`|
-|`analyzers/dotnet/{language}/{name}.dll`|Language-specific analyzers|`analyzers/dotnet/{language}/MyAnalyzer.dll`|
+|Pattern|Description|
+|---|---|
+|`analyzers/dotnet/{language}/{name}.dll`|Language-specific analyzers|
+
+Examples: 
+- `analyzers/dotnet/cs/MyAnalyzer.dll` (C# analyzer)
+- `analyzers/dotnet/vb/MyAnalyzer.dll` (VB.NET analyzer)
 
 **NuGet Changes**
 
@@ -50,13 +51,13 @@ This is done to avoid a breaking change.
 Update SDK asset resolution logic (e.g., ResolvePackageAssets.cs) to:
 - Read analyzer assets directly from the "analyzers" group in "targets", instead of scanning all files in "libraries".
 - Only load analyzers that are listed in this group.
-- When `<EnableIndicateAnalyzerAssets>` is set to true, the SDK will only use the analyzer group that is in the assets file to determine which analyzers to include. 
+- When `<RestoreEnableAnalyzerAssets>` is set to true, the SDK will only use the analyzer group that is in the assets file to determine which analyzers to include. 
 - If the analyzers group is missing from the assets file and the feature flag is enabled, the SDK won't fall back to legacy scanning. 
-  - In this case, no analyzers will be selected, even if analyzer assets exist in the packages.
 - If the feature flag is not set or is false, the SDK will use the legacy scanning behavior to discover analyzers and preserve compatibility. 
 
 **Example Output**
 ```json
+"version": 4,
 "targets": {
   ".NETCoreApp,Version=v8.0": {
     "My.Analyzer.Package/1.0.0": {
@@ -82,13 +83,13 @@ Validate correct behavior with:
 
 ### Current Behavior (Without Feature Flag)
 
-| Attribute | What It Should Do | What Actually Happens | project.assets.json |
-|-----------|-------------------|----------------------|---------------------|
-| `PrivateAssets="analyzers"` | Prevent analyzers from flowing to dependent projects | analyzers still flow transitively | No analyzer information tracked |
-| `ExcludeAssets="analyzers"` | Exclude analyzers from this project entirely | analyzers still included | No analyzer information tracked |
-| `IncludeAssets="compile;runtime"` | Only include compile and runtime assets (exclude analyzers) | **Analyzers still included** - not controlled by asset filtering | No analyzer information tracked |
+| Attribute | What It Should Do | What Happens |
+|-----------|-------------------|--------------|
+| `PrivateAssets="analyzers"` | Prevent analyzers from flowing to dependent projects | Analyzers still flow transitively |
+| `ExcludeAssets="analyzers"` | Exclude analyzers from this project entirely | Analyzers still included |
+| `IncludeAssets="compile;runtime"` | Only include compile and runtime assets (exclude analyzers) | **Analyzers still included** - not controlled by asset filtering |
 
-### New Behavior (With EnableIndicateAnalyzerAssets=true)
+### New Behavior (With RestoreEnableAnalyzerAssets=true)
 
 **Scenario 1: Library with PrivateAssets**
 ```xml
@@ -109,8 +110,10 @@ Validate correct behavior with:
 **App's project.assets.json (references Library):**
 ```json
 "MyAnalyzer/1.0.0": {
-  "type": "package"
-  // No "analyzers" section - blocked by PrivateAssets
+  "type": "package",
+  "analyzers": {
+    "analyzers/dotnet/cs/_._": {}
+  }
 }
 ```
 
@@ -127,7 +130,7 @@ Result: App's project.assets.json will not contain analyzer entries for LibraryW
 ```
 Project A -> Project B -> Package C (with analyzers)
 ```
-
+- **Default Behavior of Analyzers:** `PrivateAssets=build;contentFiles;analyzers`
 - **Without PrivateAssets:** Analyzers flow from C to B to A
 - **With PrivateAssets on B's reference to C:** Analyzers stop at B
 
@@ -135,11 +138,13 @@ Project A -> Project B -> Package C (with analyzers)
 
 ### No Breaking Changes Initially 
 
-This feature is opt-in via `<EnableIndicateAnalyzerAssets>true</EnableIndicateAnalyzerAssets>`, so existing projects will not be affected until they explicitly enable it.
+For projects using the latest TFM, this feature will be enabled by default. 
+
+Otherwise, this feature is going to be opt-in via `<RestoreEnableAnalyzerAssets>true</RestoreEnableAnalyzerAssets>`, so existing projects will not be affected until they explicitly enable it.
 
 ### When Enabled by Default
 
-Projects using `PrivateAssets="analyzers"` or `ExcludeAssets="analyzers"` will start working as intended:
+Projects using `PrivateAssets="analyzers"` or `ExcludeAssets="analyzers"` will start working as intended
 
 **Build Behavior Changes:**
 - Missing analyzer diagnostics in dependent projects
@@ -149,11 +154,12 @@ Projects using `PrivateAssets="analyzers"` or `ExcludeAssets="analyzers"` will s
 **CI/CD Pipeline Impact:**
 - Builds expecting certain analyzers may fail
 - Builds may pass that previously failed on analyzer warnings
+- Since analyzers are also source generators, it may fail because transitive analyzers that were included are no longer applied due to them respecting asset filtering.
 
 **Mitigation:**
 ```xml
 <PropertyGroup>
-  <EnableIndicateAnalyzerAssets>false</EnableIndicateAnalyzerAssets>
+  <RestoreEnableAnalyzerAssets>false</RestoreEnableAnalyzerAssets>
 </PropertyGroup>
 ```
 
@@ -198,6 +204,8 @@ This was confirmed by inspecting the `project.assets.json`, which included both 
 <!-- What related issues would you consider out of scope for this proposal but can be addressed in the future? -->
 
 ## Future Possibilities
+
+This is a feature that is going to be enabled by default for all builds in the future
 
 Something that would be valuable would be an analysis of NuGet packages that have analyzers, and focusing on analyzers as dependencies. 
 It would also look at the impact of the `IncludeAssets` and `ExcludeAssets` settings. 
