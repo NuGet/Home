@@ -26,7 +26,7 @@ When enabled via `<RestoreEnableAnalyzerAssets>true</RestoreEnableAnalyzerAssets
 - PrivateAssets/ExcludeAssets will correctly filter analyzers, preventing them from being included in projects that should not have them.
 
 This feature will initially be behind a feature flag defined as `<RestoreEnableAnalyzerAssets>`. 
-This property should be set as true in the project file. 
+This property should be set to true in the project file. 
 This is done to avoid a breaking change.
 
 ### Technical explanation
@@ -190,12 +190,30 @@ It also maintains backward compatibility by being opt-in via a feature flag, all
 
 NuGet's existing asset filtering system (compile, runtime assets) provides the model.
 
+**Content Files**
 Language-specific content selection (`contentFiles/{language}/`) demonstrates similar filtering patterns already work in the ecosystem.
-For example, a package can include assets such as `empty.txt` in both `contentFiles/cs/net9.0/` and `contentFiles/vb/net9.0/`, mapped via the `packagepath` property.
 
-To validate this behavior, a test was performed using a .NET 9 project that packed `empty.txt` into both C# and VB.NET content file folders. 
-The resulting NuGet package contained the file in both locations. When referenced by a C# project, only the C# content file was selected by the SDK; the VB.NET file was ignored.
-This was confirmed by inspecting the `project.assets.json`, which included both files in the package metadata but only used the language-appropriate asset.
+The SDK is able to determine the project language by the type of project file: 
+- `.csproj` files are treated as C# projects
+- `.vbproj` files are treated as VB.NET projects
+
+The NuGet package can contain analyzers and content files for multiple languages, and they are sorted into folders such as `contentFiles/cs/` and `contentFiles/vb/`.
+During the restore process, NuGet lists all of the content files into the `project.assets.json` file, regardless of the language. 
+
+In the `project.assets.json` file, each content file entry includes metadata, such as `"buildAction"`, `"codeLanguage"`, `"copyToOutput"`, etc. 
+- The `codeLanguage` property is what enables the SDK to filter and include the files that are relevant to the project's language
+
+For each file, MSBuild checks the `"codeLanguage"` property to determine if it should be included in the build
+- If `"codeLanguage"` matches the project language, the file is included in the build. 
+As a result, only the correct assets for the current project's are compiled, copied, or referenced. 
+
+This is similar to language-specific analyzer selection (`analyzers/dotnet/{language}/`).
+- The SDK determines the project language from the project file type (e.g., `.csproj`, `.vbproj`, `.fsproj`)
+
+Example: 
+- If a package contains `analyzers/dotnet/cs/Analyzer.dll` and `analyzers/dotnet/vb/VBAnalyzer.dll`:
+  - The C# project will only include `Analyzer.dll`
+  - The VB.NET project will only include `VBAnalyzer.dll`
 
 ## Unresolved Questions
 
@@ -205,7 +223,7 @@ This was confirmed by inspecting the `project.assets.json`, which included both 
 
 ## Future Possibilities
 
-This is a feature that is going to be enabled by default for all builds in the future
+This is a feature that is going to be enabled by default for all builds.
 
 Something that would be valuable would be an analysis of NuGet packages that have analyzers, and focusing on analyzers as dependencies. 
 It would also look at the impact of the `IncludeAssets` and `ExcludeAssets` settings. 
@@ -215,6 +233,12 @@ Ideally, this analysis would:
 - Provide data on how many packages (and consumers) would be impacted by a change in default behavior, helping to mitigate surprises or unintended consequences.
 - Affirm the correctness and robustness of the proposed design prior to broad deployment.
 
+Also, provide analysis on source generators as analyzers. Since it is possible for people to depend on source generators in a way that their build will fail without them, there should be data on which ones may fail. 
+
+Additional follow up should also be done in component governance. Currently, packages that exclusively contribute to `Compile` assets are treated as development dependencies.
+There are special case analyzers, such as in the SDK, that should be removed once this feature is implemented. 
+
+We should also consider creating a dedicated design time package graph. This will explicitly resolve and track packages that are meant to run as analyzers or tasks, making the process more accurate and maintainable
 <!-- What future possibilities can you think of that this proposal would help with? -->
 
 ### References
