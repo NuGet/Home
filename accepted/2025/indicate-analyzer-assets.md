@@ -95,7 +95,7 @@ Validate correct behavior with:
 ```xml
 <!-- Library.csproj -->
 <PackageReference Include="MyAnalyzer" Version="1.0.0" 
-                  PrivateAssets="analyzers" />
+                  PrivateAssets="analyzers" /> <!--default value-->
 ```
 
 **Library's project.assets.json:**
@@ -165,9 +165,9 @@ Projects using `PrivateAssets="analyzers"` or `ExcludeAssets="analyzers"` will s
 
 ### Rollout Strategy
 
-1. **Current:** Opt-in via feature flag
-2. **Future:** Enable by default with clear communication
-3. **Later:** Remove feature flag
+The current rollout will be to opt-in for .NET 10.
+For .NET 11, it is going to be opt-in for all frameworks and enabled by default for projects that target .NET 11.
+The last step will be to remove the feature flag. 
 
 
 ## Drawbacks
@@ -235,7 +235,7 @@ Ideally, this analysis would:
 
 Also, provide analysis on source generators as analyzers. Since it is possible for people to depend on source generators in a way that their build will fail without them, there should be data on which ones may fail. 
 
-Additional follow up should also be done in component governance. Currently, packages that exclusively contribute to `Compile` assets are treated as development dependencies.
+Additional follow up should also be done in Component Governance. Currently, packages that exclusively contribute to `Compile` assets are treated as development dependencies.
 There are special case analyzers, such as in the SDK, that should be removed once this feature is implemented. 
 
 We should also consider creating a dedicated design time package graph. This will explicitly resolve and track packages that are meant to run as analyzers or tasks, making the process more accurate and maintainable
