@@ -39,7 +39,7 @@ Options:
   --configfile <path>           Path to a NuGet.config to use.
   --download-only               Download only the .nupkg file without extraction.
   --interactive                 Enables interactive authentication if required.
-  --no-audit                    Skips vulnerability auditing of downloaded packages.
+  --audit <mode>                Set log level for vulnerability report. Mode values: `off`, `warn`, `error`
   --output-directory <path>     Directory where the package will be placed. Defaults to the current working directory.
   --prerelease                  Allows downloading prerelease versions.
   --source <package source>     Specifies the NuGet package source to use.
@@ -64,6 +64,21 @@ Example:
 ```
 
 This layout allows multiple versions of the same package to coexist and makes it easy for scripts or tools to locate the correct version.
+
+#### Audit
+
+By default, this command runs in **audit mode set to `warn`**.
+
+* If a downloaded package is identified as vulnerable, a vulnerability message is written to **stderr**, but the exit code remains **0** (as long as the download itself was successful).
+* `--audit off`: Disables vulnerability auditing.
+* `--audit error`: Writes vulnerability messages to **stderr** and sets the exit code to **1** if any vulnerabilities are found.
+
+#### Exit Codes
+
+The command follows standard exit code conventions:
+
+* **0** – The package was successfully downloaded, or the requested version was already present.
+* **1** – The download failed, or audit mode was set to `error` and vulnerabilities were detected.
 
 #### **Deferred (Not in MVP)**
 
