@@ -42,8 +42,8 @@ Options:
   --audit <mode>                Set log level for vulnerability report. Mode values: `off`, `warn`, `error`
   --output-directory <path>     Directory where the package will be placed. Defaults to the current working directory.
   --prerelease                  Allows downloading prerelease versions.
-  --source <package source>     Specifies the NuGet package source to use.
-  --verbosity <level>           Set the verbosity of the command. Allowed values: quiet, normal, detailed.
+  -s --source <package source>     Specifies the NuGet package source to use.
+  -v --verbosity <level>           Set the verbosity of the command. Allowed values: quiet, normal, detailed.
 ```
 
 ### Default Behavior
