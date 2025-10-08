@@ -37,24 +37,25 @@ Options:
   -?, -h, --help                Show command line help.
   --allow-insecure-connections  Allows downloading from HTTP sources.
   --configfile <path>           Path to a NuGet.config to use.
-  --download-only               Download only the .nupkg file without extraction.
   --interactive                 Enables interactive authentication if required.
-  --audit <mode>                Set log level for vulnerability report. Mode values: `off`, `warn`, `error`
-  --output-directory <path>     Directory where the package will be placed. Defaults to the current working directory.
+  -o, --output <path>           Directory where the package will be placed. Defaults to the current working directory.
   --prerelease                  Allows downloading prerelease versions.
   -s --source <package source>     Specifies the NuGet package source to use.
-  -v --verbosity <level>           Set the verbosity of the command. Allowed values: quiet, normal, detailed.
+  -v --verbosity <level>           Set the verbosity level of the command Allowed values are q[uiet], m[inimal], n[ormal], d[etailed], and diag[nostic].
 ```
 
-### Default Behavior
+## Default Behavior
 
-By default, `dotnet package download`:
+By default, `dotnet package download` behaves differently from the legacy `nuget.exe install` command in several key ways:
 
-* Downloads **only the explicitly requested package** (no dependencies).
-* Places the package in the **current working directory** unless `--output-directory` is specified.
-* Stores each package in its **own folder named after the package ID**, with subfolders for each version.
+| **Aspect**                           | **`dotnet package download`**                                                                     | **`nuget.exe install`**                                                                     | why different|
+| ------------------------------------ | ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |--------------|
+| **Dependency resolution**            | Downloads **only the explicitly requested package** (no transitive dependencies).                 | Downloads the requested package **and all its dependencies** by default.                    |Current discussions on the issue https://github.com/NuGet/Home/issues/12513 don't indicate a need for downloading transitive dependencies. |
+| **Default output location**          | Downloads to the **current working directory** unless `--output` is specified.                    | Also downloads to the **current working directory** unless `-OutputDirectory` is specified. | N/A |
+| **Folder layout**                    | Creates a folder per **package ID**, with **version subfolders** inside (e.g. `Contoso/13.0.3/`). | Creates a folder per **package-version pair** (e.g. `Contoso.13.0.3/`).                     | The new layout allows multiple versions of the same package to coexist while remaining easy to locate. |
+| **Default Version**                  | The latest version is selected if no version is specified                                         | The latest version is selected if no version is specified| N/A |
 
-Example:
+### Example Layout
 
 ```ps1
 <output-directory>/
@@ -63,28 +64,42 @@ Example:
     12.0.3/
 ```
 
-This layout allows multiple versions of the same package to coexist and makes it easy for scripts or tools to locate the correct version.
+This layout allows multiple versions of the same package to coexist while remaining easy to locate: consistent with the **global packages folder** design used by modern .NET tools.
 
-#### Audit
+The design of dotnet package download was guided by feedback captured in [NuGet/Home#12513](https://github.com/NuGet/Home/issues/12513).
+Rather than replicating the full feature set of nuget.exe install, the new command intentionally focuses on simply addressing the specific needs of automation, CI/CD, and scripting scenarios.
 
-By default, this command runs in **audit mode set to `warn`**.
+### Version Resolution
 
-* If a downloaded package is identified as vulnerable, a vulnerability message is written to **stderr**, but the exit code remains **0** (as long as the download itself was successful).
-* `--audit off`: Disables vulnerability auditing.
-* `--audit error`: Writes vulnerability messages to **stderr** and sets the exit code to **1** if any vulnerabilities are found.
+Package versions are specified as part of the `PackageId` argument using the syntax `Package@Version`.
+
+* **Package** represents the name of the package.
+* **Version** represents the exact version number.
+
+Version ranges and floating versions are **not supported**.
+If no version is specified, the command selects the **latest available version** from the configured sources.
+
+When the `--prerelease` option is enabled, pre-release versions are also included when determining the latest version.
+
+### Audit
+
+Audit functionality is **not supported** for the `dotnet package download` command by design.
+
+* **No dependency graph** – The command downloads only explicitly requested packages and does not resolve transitive dependencies. Auditing is most meaningful when hidden or transitive dependencies are involved, which this command does not process
+* **Reliability in restricted environments** – For users that run this command in controlled or offline settings (for example, behind firewalls or without access to NuGet.org) avoiding network calls for vulnerability data ensures the command runs predictably without unexpected warnings or errors.
+* **Typical usage scenarios** – In CI/CD pipelines and automation systems, packages are often sourced from internal or validated feeds rather than NuGet.org, making external vulnerability checks less relevant.
 
 #### Exit Codes
 
 The command follows standard exit code conventions:
 
 * **0** – The package was successfully downloaded, or the requested version was already present.
-* **1** – The download failed, or audit mode was set to `error` and vulnerabilities were detected.
+* **1** – The download failed, network errors, requested package version not found, parsing of the command arguments failed, all other errors during the command operation.
 
 #### **Deferred (Not in MVP)**
 
 * Download a package with its dependencies too
 * `--framework <tfm>` : target framework handling
-* `--no-http-cache` : ignore cached packages
 * `--dependency-version <policy>` : control dependency resolution strategy
 * **Manifest file support** : install multiple packages from a single manifest
 
@@ -96,3 +111,4 @@ The command follows standard exit code conventions:
 ## Prior Art
 
 * **`nuget.exe install`**: legacy but widely used.
+* The `Package@Version` is a design that is supported in dotnet commands like `package add`, `package update`.
