@@ -46,16 +46,19 @@ Options:
 
 ## Default Behavior
 
-By default, `dotnet package download` behaves differently from the legacy `nuget.exe install` command in several key ways:
+By default `dotnet package download` just like `nuget.exe install`:
 
-| **Aspect**                           | **`dotnet package download`**                                                                     | **`nuget.exe install`**                                                                     | why different|
-| ------------------------------------ | ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |--------------|
-| **Dependency resolution**            | Downloads **only the explicitly requested package** (no transitive dependencies).                 | Downloads the requested package **and all its dependencies** by default.                    |Current discussions on the issue https://github.com/NuGet/Home/issues/12513 don't indicate a need for downloading transitive dependencies. |
-| **Default output location**          | Downloads to the **current working directory** unless `--output` is specified.                    | Also downloads to the **current working directory** unless `-OutputDirectory` is specified. | N/A |
-| **Folder layout**                    | Creates a folder per **package ID**, with **version subfolders** inside (e.g. `Contoso/13.0.3/`). | Creates a folder per **package-version pair** (e.g. `Contoso.13.0.3/`).                     | The new layout allows multiple versions of the same package to coexist while remaining easy to locate. |
-| **Default Version**                  | The latest version is selected if no version is specified                                         | The latest version is selected if no version is specified| N/A |
+* Download to the **current working directory** unless an output option (`--output`) is specified.
+* Select the **latest version** of a package if no version is provided.
 
-### Example Layout
+However, they differ in a few key areas:
+
+| **Aspect**                | **`dotnet package download`**                                                               | **`nuget.exe install`**                                                  | Why different                                                                                                                                    |
+| ------------------------- | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Dependency resolution** | Downloads **only the explicitly requested package** (no transitive dependencies).           | Downloads the requested package **and all its dependencies** by default. | Current discussions in [NuGet/Home#12513](https://github.com/NuGet/Home/issues/12513) indicate no clear need for transitive dependency downloads. |
+| **Folder layout**         | Creates a folder per **package ID**, with **version subfolders** (e.g., `Contoso/13.0.3/`). | Creates a folder per **package-version pair** (e.g., `Contoso.13.0.3/`). | The new layout allows multiple versions to coexist cleanly and aligns with the global packages folder structure.                                  |
+
+#### Example Layout
 
 ```ps1
 <output-directory>/
@@ -72,13 +75,17 @@ Rather than replicating the full feature set of nuget.exe install, the new comma
 ### Version Resolution
 
 Package versions are specified as part of the `PackageId` argument using the syntax `Package@Version`.
+You can specify one or more packages in a single command. For example, to download multiple packages:
 
-* **Package** represents the name of the package.
-* **Version** represents the exact version number.
+```bash
+dotnet package download contoso@1.0.0 contoso@2.5.1
+```
+
+* **Package** — the name of the package.
+* **Version** — the exact version number to download.
 
 Version ranges and floating versions are **not supported**.
-If no version is specified, the command selects the **latest available version** from the configured sources.
-
+If no version is specified, the command downloads the **latest available version** from the configured sources.
 When the `--prerelease` option is enabled, pre-release versions are also included when determining the latest version.
 
 ### Audit
@@ -101,7 +108,7 @@ The command follows standard exit code conventions:
 * Download a package with its dependencies too
 * `--framework <tfm>` : target framework handling
 * `--dependency-version <policy>` : control dependency resolution strategy
-* **Manifest file support** : install multiple packages from a single manifest
+* Support floating versions
 
 ## Rationale and alternatives
 
