@@ -96,6 +96,24 @@ Audit functionality is **not supported** for the `dotnet package download` comma
 * **Reliability in restricted environments** – For users that run this command in controlled or offline settings (for example, behind firewalls or without access to NuGet.org) avoiding network calls for vulnerability data ensures the command runs predictably without unexpected warnings or errors.
 * **Typical usage scenarios** – In CI/CD pipelines and automation systems, packages are often sourced from internal or validated feeds rather than NuGet.org, making external vulnerability checks less relevant.
 
+### Source Selection and Package Source Mapping
+
+The `dotnet package download` command supports both **explicit source selection** (`--source`) and **package source mapping** configured in `nuget.config`.
+
+**Source precedence:**
+
+1. **`--source` specified**
+
+   * When `--source <packageSource>` is provided, it **replaces** all sources defined in configuration files.
+   * The value is first resolved as a **named source** from `nuget.config`; if no match is found, it is treated as a **direct URI**.
+   * In this mode, **package source mapping is ignored**, and the command only uses the explicitly provided sources.
+
+2. **No `--source` specified**
+
+   * When no `--source` is provided, the command reads all configured sources from the active `nuget.config`.
+   * If **package source mapping** is enabled, the command uses the mapping rules to determine which source(s) to query for each package ID.
+   * This ensures the correct source is chosen automatically based on patterns defined in the configuration file.
+
 #### Exit Codes
 
 The command follows standard exit code conventions:
