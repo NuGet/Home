@@ -121,12 +121,27 @@ The command follows standard exit code conventions:
 * **0** – The package was successfully downloaded, or the requested version was already present.
 * **1** – The download failed, network errors, requested package version not found, parsing of the command arguments failed, all other errors during the command operation.
 
-#### **Deferred (Not in MVP)**
+#### Supported options in nuget.exe install but not this command
 
-* Download a package with its dependencies too
-* `--framework <tfm>` : target framework handling
-* `--dependency-version <policy>` : control dependency resolution strategy
-* Support floating versions
+The following options are currently supported in `nuget.exe install` but are not supported in the `dotnet package download` command.
+This decision is intentional — the initial implementation focuses on solving the key user scenarios outlined in [#12513](https://github.com/NuGet/Home/issues/12513).
+
+Future iterations may introduce these options based on customer feedback and demand.
+Users are encouraged to share feedback if their workflows depend on any of these arguments.
+
+* `-DependencyVersion`: Not applicable. This command never resolves transitive dependencies.
+* `-DirectDownload`
+* `-DisableParallelProcessing`
+* `-x | -ExcludeVersion`: Not applicable. Packages are stored in id/version/ structure; version-less folders do not apply.
+* `-FallbackSource`
+* `-ForceEnglishOutput`
+* `-Framework`
+* `-NoHttpCache`
+* `-PackageSaveMode`
+* `-RequireConsent`
+* `-SolutionDirectory`
+
+For more information on these options, see the [`nuget.exe install` documentation](https://learn.microsoft.com/en-us/nuget/reference/cli-reference/cli-ref-install).
 
 ## Rationale and alternatives
 
