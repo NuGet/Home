@@ -20,54 +20,44 @@ Pain-points today:
 ### **Functional Explanation**
 
 Add an **"Audit Sources"** table to the "Package Sources" page in NuGet's Visual Studio Options.
+The audit source table will show the same columns as package sources:
+**Warnings/Errors, Enabled, Name, Source, Allow Insecure Connections** (note that mockups may not reflect all columns).
 
 - **Discoverability**: Enable Quick Search (Ctrl+Q) so that searching for "Audit Source" navigates to the Package Sources page in Unified Settings.
 - Up to **Three Tables** can be shown in this order:
   - Package Sources (always shown)
   - Audit Sources (shown when explicitly configured),
   - Machine-wide Package Sources (shown when explicitly configured)
-- New dropdown: **Choose how NuGet Audit retrieves vulnerability data**
-  - Introduce a dropdown control to switch from **"Read vulnerabilities from my package sources"** to **"Configure sources to read vulnerabilities"**
-  - When an audit source is configured, the Audit Sources table appears.
-  - To configure the first audit source, select **"Configure sources to read vulnerabilities"**; this reveals the Audit Sources table.
+- New Checkbox: **Use separate sources for vulnerability audit**
+  - Introduce a Checkbox control that when checked, shows a table for adding Audit Sources.
+  ![Existing package sources Visual Studio Options page shown with a new Checkbox](../../meta/resources/AuditSources-VS/checkbox-audit-sources.png)
+    - When none are configured, the Audit Sources table will be **hidden**.
+  - When one or more audit source is already configured, the Audit Sources table appears by default.
+  - The Checkbox is **disabled** and a message indicates how to go back to using Package Sources:
+      > "Remove all audit sources to revert to using package sources for vulnerability data."
+    - If customers want the ability to switch back from their audit sources to only package sources for Vulnerability data, a future iteration could support this and automatically clear `<auditSources>` after showing a warning Messagebox that can be cancelled.
 
-#### Read vulnerabilities from my package sources
+_Mockup_: Table of Audit Sources shown below Package Sources because Checkbox  option "Use separate sources for vulnerability audit" is selected.
 
-- Default option - if no audit sources exist, this will be the selection.
-- Audit Sources table will be **hidden**.
+![Table of Audit Sources shown below Package Sources because Checkbox  option "Use separate sources for vulnerability audit" is selected](../../meta/resources/AuditSources-VS/audit-sources-visible-table.png)
 
-![Existing package sources Visual Studio Options page shown with a new "Choose how NuGet Audit retrieves vulnerability data" dropdown](../../meta/resources/AuditSources-VS/audit-choose-package-source-page.png)
-
-#### Configure sources to read vulnerabilities
-
-- Audit Sources table will be **shown**.
-- **Pre-selected**  when one or more audit sources are already configured.
-  - The dropdown will be disabled as well since the presence of audit sources takes away the behavior of reading vulnerability data from package sources.
-- **User-selectable** only when no audit sources exist, enabling  a customer to explicitly configure their first `<auditSource>` using the `Add` button.
-
-![New dropdown expanded with both options shown"](../../meta/resources/AuditSources-VS/choose-nuget-audit-dropdown.png)
-
-![Table of Audit Sources shown below Package Sources because Combobox option "Configure sources to read vulnerabilities" is selected](../../meta/resources/AuditSources-VS/audit-sources-visible-table.png)
-
-- Switching the dropdown back to "**Read vulnerabilities from my package sources**" would not be supported in this iteration.
-  - If customers want the ability to switch back from their audit sources to only package sources for Vulnerability data, a future iteration could support this and automatically clear `<auditSources>` after showing a warning messagebox that can be cancelled.
 
 #### Describe Package versus Audit sources
 
 Before each table, introduce descriptive text to reinforce with customers how Package Sources and Audit Sources work together.
 
 - **Package sources**:
-
-  > Configure the sources NuGet will use to for displaying and downloading packages. NuGet Audit will also reference vulnerability data from sources that support it. Alternatively, dedicated Audit Source(s) can be configured below.
+  > Package sources define where NuGet retrieves packages for install, restore, audit, and update operations. [Learn more about package sources](https://learn.microsoft.com/nuget/reference/nuget-config-file#packagesources)
 
 - **Audit sources**:
 
-  > Configure the sources NuGet Audit will use for retrieving Package Vulnerability data. If none are configured, any configured package sources that support Vulnerability data will be used by NuGet Audit.
+  > Audit sources provide vulnerability data during restore with
+out acting as package sources. If no audit sources are configured, NuGet Audit uses package sources and suppresses warning NU1905. [Learn more about audit sources](https://learn.microsoft.com/nuget/reference/nuget-config-file#auditsources)
 
 ### **Technical Explanation**
 
 - Add an array setting titled "Audit Sources" to the "Package Sources" NuGet options page in the Unified Settings registration.json file.
-- Make the "Audit Sources" array setting hidden unless the "Choose how NuGet Audit retrieves vulnerability data" value is "Configure sources to read vulnerabilities".
+- Make the "Audit Sources" array setting hidden unless the "Use separate sources for vulnerability audit" value is `true` (Checked).
 - Use existing NuGet.Configuration APIs to read/write `<auditSources>` in `nuget.config` files.
 
 #### Telemetry
@@ -77,6 +67,7 @@ Before each table, introduce descriptive text to reinforce with customers how Pa
 ## **Drawbacks**
 
 - Potential confusion for package sources that act as audit sources implicitly by having a vulnerability resource.
+The Checkbox is an attempt to make this more clear, and we can measure its impact and feedback from customers.
 
 ## **Rationale and Alternatives**
 
