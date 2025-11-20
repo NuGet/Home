@@ -31,6 +31,10 @@ The audit source table will show the same columns as package sources:
 - New Checkbox: **Use separate sources for vulnerability audit**
   - Introduce a Checkbox control that when checked, shows a table for adding Audit Sources.
   ![Existing package sources Visual Studio Options page shown with a new Checkbox](../../meta/resources/AuditSources-VS/checkbox-audit-sources.png)
+    - At least 1 audit source must be added to persist the effect of this setting.
+    Otherwise, checking the box and closing VS and reopening this setting, the checkbox will now be unchecked since no audit sources are found.
+      - In a future iteration, checking the box may be able to automatically open the Add Audit Source dialog.
+      Unified Settings does not currently have this support.
     - When none are configured, the Audit Sources table will be **hidden**.
   - When one or more audit source is already configured, the Audit Sources table appears by default.
   - The Checkbox is **disabled** and a message indicates how to go back to using Package Sources:
