@@ -12,7 +12,7 @@ This proposal covers the steps that need to be taken to enable that capability.
 ## Motivation
 
 Allowing the same framework to be using multiple times in restore would allow customers to use the same project to generate runtime specific assemblies based on the same target framework.
-It would also allow scenarios such as different builds for VSIXes targeting different Visual Studio versions.
+It would also allow scenarios such as different builds for VSIXes targeting different Visual Studio versions, like for example 17.x and 18.x of Visual Studio.
 
 ## Explanation
 
@@ -90,7 +90,7 @@ Firstly, a single project that creates multiple platform specific assemblies, al
     <TargetFrameworkVersion>v6.0</TargetFrameworkVersion>
     <TargetFrameworkMoniker>.NETCoreApp,Version=v6.0</TargetFrameworkMoniker>
 
-    <DefineConstants>$(DefineConstants);$(TargetFramework)</>
+    <DefineConstants>$(DefineConstants);$(TargetFramework)</DefineConstants>  
     <AssemblyName>$(MSBuildThisFileName).$(TargetFramework)</AssemblyName>
   </PropertyGroup>
 
@@ -104,30 +104,11 @@ In this example, the Visual Studio Extensibility SDK would be responsible for se
 <Project Sdk="Microsoft.VisualStudio.Extensibility.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>vs17.7;vs16.11</TargetFrameworks>
+    <TargetFrameworks>vs18;vs17.14</TargetFrameworks>
   </PropertyGroup>
 
 </Project>
 ```
-
-#### Compatibility
-
-Customers that both restore and build their projects with the `dotnet` CLI or MSBuild should not encounter any issues.
-
-However, many customers have old pipelines that use NuGet.exe to restore, or create new pipelines that continue to use NuGet.exe because we've been unable to spread knowledge to use more modern tooling.
-Typically customers do not update the version of NuGet.exe used as frequently as using newer versions of the .NET SDK or MSBuild.
-When newer versions of NuGet don't change the restore output (files written to the `obj/` directory), then using older versions of NuGet will not cause pipeline failures.
-However, the changed proposed by this document require changes to the assets file, and as a result using an older NuGet.exe with a newer .NET SDK or MSBuild will cause build failures similar to the following.
-
-```console
-C:\Program Files\Microsoft Visual Studio\2022\Preview\Common7\IDE\CommonExtensions\Microsoft\NuGet\NuGet.targets(132,5)
-: error : Invalid restore input. Duplicate frameworks found: 'net472, net472'. Input files: C:\Code\Temp\Aliases\Aliases.csproj. [C:\Code\Temp\Aliases\Aliases.csproj]
-```
-
-Unfortunately this error does not contain a NU code, which would make it easier for customers to find a documentation page explaining the issue and probable fixes.
-Instead, customers who are not aware of this tooling version issue will likely need to search the error message and we have to hope that search engines will direct them to a page that informs them to upgrade to a newer version of NuGet.exe, or ideally switch to `MSBuild -t:restore` or `dotnet restore`.
-
-This problem is not technically unique to this design change, but since assets file changes are uncommon, this feature is significantly more likely to expose this issue than other features.
 
 ### Technical explanation
 
