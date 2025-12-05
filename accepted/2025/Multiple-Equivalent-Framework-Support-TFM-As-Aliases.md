@@ -73,6 +73,8 @@ However, what doesn't currently work is when multiple TargetFramework values res
 #### The proposal
 
 The changes proposed in this document will enable the following hypothetical scenarios.
+Only .NET SDK projects will support aliasing.
+
 Note that projects and SDKs are responsible for setting the `TargetFramework*` and `TargetPlatform*` properties, which NuGet uses as the canonical framework to use for compatibility checks.
 Therefore, the exact `TargetFrameworks` value is not important to NuGet, as it is either the SDK author, or the project owner, to set any value that is reasonable to them.
 
@@ -110,6 +112,8 @@ In this example, the Visual Studio Extensibility SDK would be responsible for se
 </Project>
 ```
 
+Note that as part of this proposal, there are various scenarios where the alias usage in per framework commands will be validated and potentially fixed. This will discovered during the implementation and won't be contained with this design.
+
 ### Technical explanation
 
 There are many changes required to implement this feature.
@@ -122,33 +126,31 @@ There are many changes required to implement this feature.
 1. [Visual Studio Challenges](#visual-studio-challenges)
 
 The changes listed are largely what NuGet needs to implement in code we own, but there will be impacts to other components as well.
-In particular the .NET SDK will need some (hopefully small) changes to be able to use the assets file correctly.
-However, it's likely that other tools, like various Visual Studio components, might have assumptions about TFM uniqueness in the project, which this feature changes.
+In particular the .NET SDK may need some changes to be able to use the assets file correctly.
+Majority of this had fortunately been done in past iterations and the .NET SDK currently depends on are NuGet APIs.
+Other tools, like various Visual Studio components, might have assumptions about TFM uniqueness in the project, which this feature changes.
 Therefore, while the NuGet team works very closely with the .NET SDK team and we will ensure that building projects work, there will increased risk of other features and tools breaking, which would normally not be affected by NuGet changes.
 
 ### Restore output (assets file) changes
 
 In PackageReference, NuGet has a contract with the .NET SDK where NuGet writes the assets file and the .NET SDK consumes it.
 
+However, PackageReference is also supported by non-SDK style projects, which use [dotnet/NuGet.BuildTools](https://github.com/NuGet.BuildTools) which, despite the name, is owned by the non-SDK project system team, not NuGet.
+The changes to the assets file that affect legacy projects will be done in a non-breaking way and as such, changes should not be required there.
+
+TODO NK - PackageSpec in DependencyGraphSpec.
+
+--- For most projects, a v4 won't matter.
+
+TODO NK
+
+New SDK | Old VS => net9.0 and the likes are different from net10.0. Consider MAUI
+New VS | Old SDK =>
+
 This feature will require the following changes to the asset file:
 
 1. [Increment Version Number](#assets-file-version)
 1. [Target Framework Pivots](#target-framework-pivots)
-1. [Add List Lengths](#add-list-lengths)
-
-However, PackageReference is also supported by non-SDK style projects, which use [dotnet/NuGet.BuildTools](https://github.com/NuGet.BuildTools) which, despite the name, is owned by the non-SDK project system team, not NuGet.
-Their implementation parses the JSON file directly, rather than using NuGet.ProjectModel.
-Therefore, if we can implement the assets file changes without breaking changes to the NuGet.ProjectModel APIs, the .NET SDK may "just work" when the newer version of NuGet is inserted into the .NET SDK.
-However, the non-SDK project system will fail.
-This means that we either need to implement NuGet to support reading and writing two different assets file schemas, or we need to synchronize 3 different components (NuGet, .NET SDK, and NuGet.BuildTools) to implement support in the same VS insertion.
-The multi-rep synchronization insertion would have a lot of risk and difficulty, so allowing NuGet.ProjectModel to support multiple versions of the assets file schema seems the better choice.
-
-There are still two ideas for how this can be implemented.
-
-1. Assets file version as a restore input
-
-   NuGet could require read a `RestoreAssetsFileVersion` property on each project, defaulting to 3 when not specified.
-   This allows project systems that have not yet adapted to the new assets file schema to keep working as before.
 
 1. Use the newer assets file automatically when a project multi-targets
 
@@ -178,6 +180,10 @@ There are multiple places in the assets file where the "NuGet Framework" is used
 Imagine a project using `<TargetFramework>production</TargetFramework>`, `<TargetFrameworkMoniker>.NETCoreApp,Version=v8.0</TargetFrameworkMoniker>`, and `<RuntimeIdentifiers>linux-x64</RuntimeIdentifiers>`.
 The following changes will be made to the assets file.
 
+- Relevant changes. Changing this by default could cause problems in "NEW SKD, old VS scenarios, but the minimum supported version of VS will already have this capability" to parse things correctly.
+If V4, then assume alias and match the framework. 
+
+Note that the effective framework itself will not be part of the serialized part, but it'll cleaned up by the reader.
 1. `$/targets`
 
     ```diff
@@ -189,6 +195,8 @@ The following changes will be made to the assets file.
       },
     ```
 
+Somewhat relevant changes  -> The way the .NET SDK uses this is non breaking. It's never parsed since ProjectFileDependencyGroup already uses FrameworkName as a framework, so as long as this value and the targets name are changed, it's good enough.
+
 1. `$/projectFileDependencyGroups`
 
     ```diff
@@ -198,43 +206,46 @@ The following changes will be made to the assets file.
       },
     ```
 
+PackageSpec changes
+
+TODO NK - How do I roll this out?
+Think of it as 2 separate changes.
+
+- Add "framework" to the packageSpec (required), while keeping targetAlias for consistency sake. At a future point where the supported minimum supported .NET SDK has all these changes, targetAlias can be removed.
+- targetAlias and framework => V4 writer, SDK
+- targetAlias -> V3 writer, SDK
+- no targetAlias no framework -> V3 writer, legacy
+
+Use SDKVersion to decide whether use the new writer or the old writer.
+If SDKVersion is older, then use old writer.
+
+- Change the key from framework to alias. In most cases, really all non-alias cases, this is likely to be the same and cause no problems.
+
 1. `$/project/restore/frameworks`
-
-    ```diff
-      "originalTargetFrameworks": [
-    -    "net8.0"
-    +    "production"
-      ],
-    ```
-
-1. `$/project/frameworks`
 
     ```diff
     "frameworks": {
     -  "net8.0": {
     -    "targetAlias": "production",
     +  "production": {
-    +    "targetFramework": "net8.0",
+    +    "framework": "net8.0",
       }
     }
     ```
 
-    Additionally, NuGet was previously using the canonical `TargetFrameworkMoniker` value in the assets file for all target frameworks that are not .NET 5 or later.
-    For example, `.NETFramework,Version=v4.8`.
-    I propose that as part of this schema change we standardize on the "short name" (`net48`) instead.
-    However, implementing this might be non-trivial, in which case it's not worth the effort, even if it's not difficult.
+1. `$/project/frameworks`
 
-#### Add List Lengths
-
-This is not required for this feature, but taking advantage of a breaking change in the JSON schema, we may be able to improve performance.
-When deserialized, many parts of the assets file become some kind of collection, such as a `List<T>` or a `Dictionary<Tkey, Tvalue>`.
-During deserialization, if the collection size is not known, then .NET will create a backing array with a default size, and every time the collection exceeds the current capacity, it will need to double the backing array size and copy the old array data into the new array.
-This is a known cause of performance degradation.
-This is particularly important in large collections, where the resize will happen multiple times, which includes `$/targets/*` and `$/libraries` in the assets file.
-
-I will not enumerate every location that could benefit from a count, I consider that an implementation detail that will absolutely be hidden by the Nuget.ProjectModel APIs.
-But as for some examples, I propose `$/librariesCount` to specify the number of property keys under `$/libraries`.
-`$/targets/tfm1/@count` could be the first property in `$/target/tfm1`, since `@` is an invalid character for a package ID.
+    ```diff
+    "restore": {
+      "frameworks": {
+      -  "net8.0": {
+      -    "targetAlias": "production",
+      +  "production": {
+      +    "framework": "net8.0",
+        }
+      }
+    }
+    ```
 
 ### Components iterating target frameworks
 
@@ -256,7 +267,7 @@ The restore has a lock file has a similar schema to the assets file, so that sch
 Fortunately when Central Package Management and its transitive pinning was introduced we introduced the concept of a PackagesLockFile version successfully.
 We'd just add a version 3.
 
-NuGet would add version 4 of the packages lock file, which will [pivot on the target framework alias, just as assets files will](#target-framework-pivots).
+NuGet would add version 3 of the packages lock file, which will [pivot on the target framework alias, just as assets files will](#target-framework-pivots).
 
 NuGet's intra restore caching is based on the existing of a single framework.
 It is difficult to predict the amount of work that'd be required to implement this correctly, but it'll certainly involve public API changes to NuGet libraries.
@@ -264,8 +275,12 @@ It is difficult to predict the amount of work that'd be required to implement th
 
 ### Pack changes
 
-For the first version of this feature, projects that have more than one `TargetFramework` (inner-build) resolve to the same "NuGet Framework" will result in a pack error, therefore preventing these projects from being packed.
-See [Extending Pack, under Future Possibilities](#extending-pack) for more information.
+There is no intuitive solution to the pack scenario.
+Given a project with multiple versions of the same framework, pack will fail by default.
+
+NuGet will hinge off off IncludeBuildOutput, IncludeContentInPack and SuppressDependenciesWhenPacking to decide to skip packing for a framework, effectively allowing a framework to be completely excluded.
+
+Pack can only succeed when one of the 2 frameworks doesn't have both of the following `IncludeContentInPack == true or IncludeBuildOutput == true or SuppressDependenciesWhenPackaging == false`.
 
 ### Visual Studio challenges
 
@@ -308,10 +323,12 @@ Therefore, this feature is a binary decision to either support or not support th
 <!-- What parts of the proposal need to be resolved before the proposal is stabilized? -->
 <!-- What related issues would you consider out of scope for this proposal but can be addressed in the future? -->
 
+- Disabling pack requires setting 3 properties. Do we want fewer?
+
 ### TargetFramework alias to block `/` character
 
 As previously shown in [the assets file pivots changes](#target-framework-pivots), NuGet uses `tfm/rid` as the property name in the `$/targets` object.
-Therefore, a `TargetFramework` that includes a `/` will cause significant parsing challenges.
+Therefore, a `TargetFramework` that includes a `/` will cause parsing challenges.
 
 However, an alternative to this specific challenge is that the assets file could have more substantial schema change:
 
@@ -356,6 +373,19 @@ Whether impacting the performance of every build is worth occasional benefit in 
 An alternative is we add a `<RestoreVerboseAssetsFile>` property to include it, but otherwise have it off by default for performance reasons.
 Although the .NET SDK already have a cache, so they should only read the assets file when the assets file changes.
 
+#### Add List Lengths
+
+This is not required for this feature, but taking advantage of a breaking change in the JSON schema, we may be able to improve performance.
+When deserialized, many parts of the assets file become some kind of collection, such as a `List<T>` or a `Dictionary<Tkey, Tvalue>`.
+During deserialization, if the collection size is not known, then .NET will create a backing array with a default size, and every time the collection exceeds the current capacity, it will need to double the backing array size and copy the old array data into the new array.
+This is a known cause of performance degradation.
+This is particularly important in large collections, where the resize will happen multiple times, which includes `$/targets/*` and `$/libraries` in the assets file.
+
+I will not enumerate every location that could benefit from a count, I consider that an implementation detail that will absolutely be hidden by the Nuget.ProjectModel APIs.
+But as for some examples, I propose `$/librariesCount` to specify the number of property keys under `$/libraries`.
+`$/targets/tfm1/@count` could be the first property in `$/target/tfm1`, since `@` is an invalid character for a package ID.
+
+
 ### More significant lock file schema changes
 
 I don't want to make the scope of this feature so large that it takes an unreasonably long time to implement.
@@ -366,12 +396,6 @@ Since the lock file contains the package's content hash, and the package's `nusp
 ## Future Possibilities
 
 <!-- What future possibilities can you think of that this proposal would help with? -->
-
-### Extending Pack
-
-It seems feasible that if a single project can target multiple versions of Visual Studio, through a new Visual Studio Extensibility SDK, that someone will also want to create a package that supports multiple versions of Visual Studio.
-
-Designing how this could work is out of scope for this spec, and can be introduced in a different spec.
 
 ### Customizing ProjectReference TargetFramework selection
 
