@@ -403,6 +403,7 @@ There are no other technical alternatives.
 
 - Disabling pack requires setting three properties. Should we aim to reduce this number?
 - Are there any concerns regarding the changes to the [ProjectReference](#project-to-project-references) protocol?
+  - Should the alias matching require the frameworks to be fully equivalent? My instinct is no, since we'd potentially like to allow the test projects to have a newer framework than the libraries.
 
 ### TargetFramework alias to block `/` character
 
