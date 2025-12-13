@@ -157,9 +157,8 @@ Therefore, while the NuGet team works very closely with the .NET SDK team and we
 
 ### Restore output (assets file) changes
 
-In PackageReference, NuGet has a contract with the .NET SDK where NuGet writes the assets file and the .NET SDK consumes it.
-The .NET SDK uses NuGet libraries for the parsing of this file and as such, there'll be no code on the .NET SDK to consume it, but rather all the scenarios can be handled within the different NuGet code.
-
+In PackageReference, NuGet has a contract with the .NET SDK where NuGet writes the assets file and the .NET SDK reads it.
+The .NET SDK uses NuGet libraries to parse this file, and as such, as long as NuGet's APIs don't change, the .NET SDK will not need any code changes.
 PackageReference is also supported by non-SDK style projects, which use [dotnet/NuGet.BuildTools](https://github.com/NuGet.BuildTools) which, despite the name, is owned by the non-SDK project system team, not NuGet.
 The changes to the assets file that affect legacy projects will be done in a non-breaking way and as such, changes should not be required there.
 NuGet will utilize the SDKAnalysisLevel property when it writes out an assets file with breaking changes, ensuring that the .NET SDK will be able to read the assets file for the build.
@@ -227,7 +226,8 @@ The changes being made here can be divided into 2 parts.
 - Additive changes
 - Breaking changes
 
-The additive changes will be an always thing. Every newly serialized PackageSpec will make this change. This should not affect any of the existing scenarios, because at worse the new property is not parsed.
+The additive changes will be an always thing. Every newly serialized PackageSpec will make this change. 
+This should not affect any of the existing scenarios, because at worse the new property is not parsed.
 
 The following 2 changes will be made on the writer side:
 
@@ -310,7 +310,7 @@ From:
 {
   "version": 1,
   "dependencies": {
-    ".NETCoreApp,Version=v10.0": {
+    ".NETCoreApp,Version=v8.0": {
     }
   }
 }
@@ -322,7 +322,7 @@ To:
 {
   "version": 3,
   "dependencies": {
-    "net10.0": {
+    "production": {
     }
   }
 }
