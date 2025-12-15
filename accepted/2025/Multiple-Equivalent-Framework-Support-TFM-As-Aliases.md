@@ -159,7 +159,7 @@ Therefore, while the NuGet team works very closely with the .NET SDK team and we
 
 In PackageReference, NuGet has a contract with the .NET SDK where NuGet writes the assets file and the .NET SDK reads it.
 The .NET SDK uses NuGet libraries to parse this file, and as such, as long as NuGet's APIs don't change, the .NET SDK will not need any code changes.
-PackageReference is also supported by non-SDK style projects, which use [dotnet/NuGet.BuildTools](https://github.com/NuGet.BuildTools) which, despite the name, is owned by the non-SDK project system team, not NuGet.
+PackageReference is also supported by non-SDK style projects, which use [dotnet/NuGet.BuildTasks](https://github.com/dotnet/NuGet.BuildTasks) which, despite the name, is owned by the non-SDK project system team, not NuGet.
 The changes to the assets file that affect legacy projects will be done in a non-breaking way and as such, changes should not be required there.
 NuGet will utilize the SDKAnalysisLevel property when it writes out an assets file with breaking changes, ensuring that the .NET SDK will be able to read the assets file for the build.
 
@@ -423,7 +423,7 @@ Should we consider more significant schema changes in the assets file?
 
 Under `$/libraries`, each package lists every file in the package.
 However, the performance penalty of needing to parse that list every time the assets file is read may be worse than any benefit it provides from avoiding enumerating the filesystem when it is needed.
-The assets file primary purpose is to tell the .NET SDK and dotnet/NuGet.BuildTools what package assets are used by the project, and they don't need or use the `$/libraries` section at all.
+The assets file primary purpose is to tell the .NET SDK and dotnet/NuGet.BuildTasks what package assets are used by the project, and they don't need or use the `$/libraries` section at all.
 While reading the assets file might be a small percentage of the overall build process, if we consider reading the assets file in isolation, there could be a fairly significant performance increase by removing this entire section of the assets file.
 
 `$/projectFileDependencyGroups` appears to be a duplication of the information available in `$/project/frameworks`.
