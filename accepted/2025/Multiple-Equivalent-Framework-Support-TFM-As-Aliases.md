@@ -176,7 +176,7 @@ The current assets file version is 3, and this feature will increment the versio
 By default for non-SDK style projects, we will always use version 3.
 Non-SDK style project only have a single target, so those project types won't see a change.
 
-For simplicity of implementation, whenever SDKAnalysisLevel is set to 10.0.200 or more, NuGet will use the V4 assets file.
+For simplicity of implementation, whenever SDKAnalysisLevel is set to 10.0.300 or more, NuGet will use the V4 assets file.
 Whenever the SDKAnalysisLevel is set to a lower version, then NuGet will use the V3 assets file.
 Scenarios where the .NET SDK is newer of the Visual Studio version are not a concern.
 The same considerations extend to NuGet.exe restore, which will also be dependent on the SDKAnalysisLevel property.
