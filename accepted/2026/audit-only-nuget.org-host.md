@@ -5,25 +5,26 @@
 
 ## Summary
 
-Create a new URL that can be used with NuGet.Config file `<auditSources>`, in networks where www.nuget.org and api.nuget.org are blocked, where this new host contains only the vulnerable package information, nothing else.
+Create a new URL that can be used with the NuGet.Config `<auditSources>` element in networks where www.nuget.org and api.nuget.org are blocked.
+This new host must contain only vulnerability information (no package download, search, registration, or other endpoints).
 
 ## Motivation
 
 Package substitution, or dependency confusion, is a security risk where a package manager is configured to download packages from multiple sources, and a package that is intended to be downloaded from a company's private source is instead downloaded from another source.
 If the package's payload is malicious, it is a vector for remote code execution (RCE) attacks.
-Package Source Mapping is one way to mitigate the risk, and another is to block api.nuget.org and www.nuget.org, so that only company controled package sources may be used.
+Package Source Mapping is one way to mitigate the risk, and another is to block api.nuget.org and www.nuget.org so that only company-controlled package sources may be used.
 Teams using the block approach either need to mirror packages they need from nuget.org onto their private feed, or use a NuGet server that can automate it for them, while still providing the protection they desire.
 
-NuGet also added a feature, NuGet Audit, which will generate warnings during restore, when packages with known vulnerabilities are used.
-To make onboarding onto the feature easy, a `VulnerabilityInfo` resource was added to the V3 service index, so that anyone using https://api.nuget.org/v3/index.json as a package source (which NuGet uses by default when no config file says otherwise) can use NuGet Audit automatically.
+NuGet also added a feature, NuGet Audit, which will generate warnings during restore when packages with known vulnerabilities are used.
+To make onboarding onto the feature easy, a `VulnerabilityInfo` resource was added to the V3 service index, so that anyone using https://api.nuget.org/v3/index.json as a package source (which NuGet uses by default when no configuration file says otherwise) can use NuGet Audit automatically.
 
-The combination of the two mean that companies that block api.nuget.org to mitigate risk of package substituion can no longer use NuGet Audit, unless the NuGet server they use for their private feed also supports it.
+The combination of the two means that companies that block api.nuget.org to mitigate the risk of package substitution can no longer use NuGet Audit, unless the NuGet server they use for their private feed also supports it.
 
 ## Explanation
 
 ### Functional explanation
 
-If audit.nuget.org is chosan as the new hostname, then companies that block nuget.org for package substition reasons, could put audit.nuget.org on their DNS/network allow-list.
+If audit.nuget.org is chosen as the new hostname, then companies that block nuget.org for package substitution reasons could put audit.nuget.org on their DNS/network allow list.
 Then, teams could configure their solution NuGet.Config files as follows:
 
 ```xml
@@ -39,15 +40,15 @@ Then, teams could configure their solution NuGet.Config files as follows:
 </configuration>
 ```
 
-By using a single package source, they delegate the risk of package substituion to the server configration of the package source they've configured
+By using a single package source, they delegate the risk of package substitution to the server configuration of the package source they've configured, and using audit sources allows them to get warnings about vulnerable packages.
 
 ### Technical explanation
 
-The service index on this new hostname should contain only the the `VulnerabilityInfo` resource, and nothing else.
-It's absolutely critical that this host name cannot serve arbitrary binaries, otherwise the host name will not be trusted for the same reason that api.nuget.org gets blocked.
+The service index on this new hostname should contain only the `VulnerabilityInfo` resource, and nothing else.
+It's absolutely critical that this hostname cannot serve arbitrary binaries, otherwise it will not be trusted for the same reason that api.nuget.org gets blocked.
 
 The way that NuGet's server protocol is designed, the service index file contains absolute URLs to individual resources.
-NuGet Audit uses the VulnerabilityInfo resource:
+NuGet Audit uses the `VulnerabilityInfo` resource:
 
 ```json
 {
@@ -72,10 +73,10 @@ Both of these files need the URLs listed to be changed to the new hostname.
 
 ## Drawbacks
 
-This only helps in situations where DNS level blocks are used.
-If the new host name is hosted on the same CDN that api.nuget.org is hosted on, then they're likely to resolve to the same IP address, and therefore an IP level block will block both.
+This only helps in situations where DNS-level blocks are used.
+If the new hostname is hosted on the same CDN that api.nuget.org is hosted on, then they're likely to resolve to the same IP address, and therefore an IP-level block will block both.
 
-However, I think that IP level blocks are less likely than DNS blocks for the following resions:
+However, I think that IP-level blocks are less likely than DNS-level blocks for the following reasons:
 
 - nuget.org does not publish what IP addresses the service is available on ([currently?](https://github.com/NuGet/NuGetGallery/issues/8883))
 - CDNs will resolve the hostname to different IP addresses in different geographic regions
@@ -85,12 +86,12 @@ However, I think that IP level blocks are less likely than DNS blocks for the fo
 ## Rationale and alternatives
 
 NuGet servers can implement the VulnerabilityInfo resource.
-However, at best the NuGet team can contribute to implementations of open source NuGet servers.
-Otherwise we can't do anything more than ask closed source NuGet servers to implement it.
+However, at best the NuGet team can contribute to implementations of open-source NuGet servers.
+Otherwise we can't do anything more than ask closed-source NuGet servers to implement it.
 
-The NuGet client team had a customer report a problem where their 3rd party NuGet server added the VulnerabilityInfo resource, by pointing it to api.nuget.org.
+The NuGet client team had a customer report a problem where their third-party NuGet server added the VulnerabilityInfo resource by pointing it to api.nuget.org.
 This means that NuGet and Visual Studio were having network problems because their package source was directing NuGet to access a URL that was being blocked at their firewall.
-So, even when a 3rd party NuGet server implementation adds the VulnerabilityInfo resource, it might be done in a way that doesn't work for the customer.
+So, even when a third-party NuGet server implementation adds the VulnerabilityInfo resource, it might be done in a way that doesn't work for the customer.
 
 ## Prior Art
 
@@ -104,7 +105,7 @@ However, NPM sends the package graph to the server, rather than downloading an a
 ## Unresolved Questions
 
 Should the https://api.nuget.org/v3/index.json service index use the new hostname for the VulnerabilityInfo resource endpoint?
-That's similar for how search works, search is on a different DNS name than api.nuget.org.
-However, the risk is that companies that deny by default and then put api.nuget.org and the search endpoint on an allow list will start having errors if the new audit hostname is being used before the company DNS allow list is updated.
+That's similar to how search works (search is on a different DNS name than api.nuget.org).
+However, the risk is that companies that deny by default and then put api.nuget.org and the search endpoint on an allow list will start having errors if the new audit hostname is used before the company DNS allow list is updated.
 
 ## Future Possibilities
