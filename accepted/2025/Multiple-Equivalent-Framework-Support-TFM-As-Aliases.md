@@ -409,13 +409,11 @@ There are no other technical alternatives.
 
 As previously shown in [the assets file pivots changes](#target-framework-pivots), NuGet uses `tfm/rid` as the property name in the `$/targets` object.
 Therefore, a `TargetFramework` that includes a `/` will cause parsing challenges.
-NuGet's libraries could attempt to do the split on the last `/` character.
-
-### Other TargetFramework alias naming restrictions
-
-Should we block characters that need to be encoded in JSON files, like `"`, or non-ASCII characters?
-
+NuGet's libraries could attempt to do the split on the last `/` character, but that may lead to ambiguity.
 Since the `TargetFramework` value is used by the .NET SDK as the directory name for build output, should we block invalid characters on Windows file systems? (Linux doesn't prevent any characters, with the possible exception of `/`, since that's used as the directory separator).
+
+Note that in the current iteration, something like `banana/3` is allowed as an alias and it seems to work.
+Adding an error here would be a potential breaking change. It is very unlikely to affect people, but something that would probably need to be documented.
 
 ### More significant assets file schema changes?
 
@@ -425,6 +423,7 @@ Under `$/libraries`, each package lists every file in the package.
 However, the performance penalty of needing to parse that list every time the assets file is read may be worse than any benefit it provides from avoiding enumerating the filesystem when it is needed.
 The assets file primary purpose is to tell the .NET SDK and dotnet/NuGet.BuildTasks what package assets are used by the project, and they don't need or use the `$/libraries` section at all.
 While reading the assets file might be a small percentage of the overall build process, if we consider reading the assets file in isolation, there could be a fairly significant performance increase by removing this entire section of the assets file.
+Another notable thing is that there are known users of the libraries section currently, so this would be a disruptive change.
 
 `$/projectFileDependencyGroups` appears to be a duplication of the information available in `$/project/frameworks`.
 
@@ -461,3 +460,6 @@ Since the lock file contains the package's content hash, and the package's `nusp
 ## Future Possibilities
 
 - [Enable support for building for multiple RIDs, similar to how TargetFrameworks works](https://github.com/dotnet/sdk/issues/9795)
+- Allow for custom matching in the project reference protocol when duplicate frameworks are detected. See discussion in <https://github.com/NuGet/Home/pull/12124#discussion_r2615620013>.
+There are some scenarios, where some further control over the duplicate reference will be useful, especially for scenarios in the runtime repository, such as `net10.0-linux` test project would want to reference a `net10.0-unix` project.
+The potential complexity of the solution here is why it's something that'll be addressed after the MVP.
