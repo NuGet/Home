@@ -404,6 +404,8 @@ There are no other technical alternatives.
 - Disabling pack requires setting three properties. Should we aim to reduce this number?
 - Are there any concerns regarding the changes to the [ProjectReference](#project-to-project-references) protocol?
   - Should the alias matching require the frameworks to be fully equivalent? My instinct is no, since we'd potentially like to allow the test projects to have a newer framework than the libraries.
+- Should target alias based matching be consider when applying AssetTargetFallback as well?
+Example: P1 targets net10.0 with alias apple, P2 targets net472 (apple) and net472 (banana). Should the matching allow net10.0 to match net472 (apple) or should it fail due to ambiguity?
 
 ### TargetFramework alias to block `/` character
 
