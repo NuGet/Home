@@ -1,11 +1,11 @@
 # User-Agent Telemetry Enrichment for NuGet Commands
 
-- Author: [@mruizmares](https://github.com/mruizmares)
+- Author: [@mruizmares](https://github.com/martinrrm)
 - GitHub Issue: https://github.com/NuGet/Client.Engineering/issues/3467
 
 ## Summary
 
-This proposal adds telemetry enrichment to the NuGet User-Agent header for push and restore commands. The enriched User-Agent header includes contextual information about the client environment (GitHub Actions, Azure DevOps) and the current operation (push, restore), enabling better analytics and diagnostics for NuGet server operators.
+This proposal adds telemetry enrichment to the NuGet User-Agent header for push and restore commands. The enriched User-Agent header includes contextual information about the client environment (GitHub Actions, Azure DevOps).
 
 ## Motivation
 
@@ -26,12 +26,12 @@ NuGet Command Line/6.10.0 (Microsoft Windows NT 10.0.22631.0)
 
 **After (running in GitHub Actions, push command):**
 ```
-NuGet Command Line/6.10.0 (Microsoft Windows NT 10.0.22631.0) CI/GitHubActions
+NuGet Command Line/6.10.0 (Microsoft Windows NT 10.0.22631.0; GithubActions)
 ```
 
 The enrichment happens automatically:
 1. **Detection**: NuGet detects if it's running in a known CI/CD environment (GitHub Actions or Azure DevOps) by checking environment variables.
-3. **User-Agent Enrichment**: HTTP requests include this context in the User-Agent header.
+2. **User-Agent Enrichment**: HTTP requests include this context in the User-Agent header.
 
 ### Technical explanation
 
@@ -43,22 +43,31 @@ Detects CI/CD environments from environment variables:
 |-------------|----------|-------|----------|------|
 | GitHub Actions | `GITHUB_ACTIONS` | "true" | "GitHub" | https://docs.github.com/en/actions/reference/workflows-and-actions/variables?versionId=free-pro-team%40latest&productId=actions |
 | Azure DevOps | `TF_BUILD` | "True" | "AzureDevOps" | https://learn.microsoft.com/en-us/azure/devops/pipelines/build/variables?view=azure-devops&tabs=yaml#system-variables |
-
+| AppVeyor | `APPVEYOR` | "True" | "AppVeyor" | https://www.appveyor.com/docs/environment-variables/ |
+| Travis | `TRAVIS` | "True" | "Travis CI" | https://docs.travis-ci.com/user/environment-variables/#default-environment-variables |
+| CircleCI | `CIRCLECI` | "True" | "CircleCI" | https://circleci.com/docs/2.0/env-vars/#built-in-environment-variables |
+| AWS CodeBuild | `CODEBUILD_BUILD_ID` | != '' | AWS CodeBiuld | https://docs.aws.amazon.com/codebuild/latest/userguide/build-env-ref-env-vars.html |
+| Jenkins | `BUILD_ID` AND `BIULD_URL` | != '' AND != '' | Jenkins | https://www.jenkins.io/doc/book/pipeline/jenkinsfile/#using-environment-variable |
+| Google Cloud | `BUILD_ID` AND `PROJECT_ID` | != '' AND != '' | Google Cloud | https://cloud.google.com/build/docs/configuring-builds/substitute-variable-values |
+| TeamCity | `TEAMCITY_VERSION` | != '' | TeamCity | https://www.jetbrains.com/help/teamcity/predefined-build-parameters.html#Server+Build+Properties |
+| JetBrains | `JB_SPACE_API_URL` | != '' | JetBrains | https://www.jetbrains.com/help/space/automation-environment-variables.html#general |
+| CI | `CI` | "True" | "CI" | A general-use flag | |
 
 #### User-Agent Format
 
 The enriched User-Agent follows the format:
 ```
-{base-user-agent} NuGet/{ClientId} CI/{CiClient}
+{base-user-agent} NuGet/{ClientId; CIClient}
 ```
 
 Examples:
-- `NuGet xplat/6.10.0 (Microsoft Windows NT) CI/GitHubActions`
-- `NuGet xplat/6.10.0 (Linux) CI/AzureDevOps`
+- `NuGet xplat/6.10.0 (Microsoft Windows NT; GitHubActions)`
+- `NuGet xplat/6.10.0 (Linux; AzureDevOps)`
+- `NuGet xplat/6.10.0 (Linux; CI)`
 
 ## Drawbacks
 
-1. **Limited CI/CD Coverage**: Only GitHub Actions and Azure DevOps are detected initially. Other CI systems are not detected.
+1. **Limited CI/CD Coverage**: We have to manually update the table if we want to track a new specific CI environment. We are considering the exising CI environments that dotnet sdk is tracking (https://github.com/dotnet/sdk/blob/1b58d7631b1ed3cd26f7fa7415c075f686ae0f1a/src/Cli/dotnet/Telemetry/CIEnvironmentDetectorForTelemetry.cs#L13). Other CI environment will be considered as "CI".
 
 ### Why this design?
 
