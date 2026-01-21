@@ -81,10 +81,10 @@ Aliasing requires all the tooling (.NET SDK, Visual Studio) to be aliasing aware
 In .NET 10.0.100, you would get an error if you tried to create a project with 2 of the same framework.
 If someone tries to target duplicate frameworks using a Visual Studio version that's aliasing aware, but pins a .NET SDK version that is not aliasing aware, an error will be raised indicating that the scenario requires a tooling upgrade.
 
-The changes proposed in this document will enable the following hypothetical scenarios.
-
 Note that projects and SDKs are responsible for setting the `TargetFramework*` and `TargetPlatform*` properties, which NuGet uses as the canonical framework to use for compatibility checks.
-Therefore, the exact `TargetFrameworks` value is not important to NuGet, as it is either the SDK author, or the project owner, to set any value that is reasonable to them.
+Therefore, the exact `TargetFrameworks` value is not important to NuGet, as it is the responsibility of either the SDK author, or the project owner, to set a value that is reasonable to them.
+
+The changes proposed in this document will enable the following hypothetical scenarios.
 
 Firstly, a single project that creates multiple platform specific assemblies, all targeting the same .NET version.
 
@@ -137,7 +137,7 @@ Pack can only succeed when one of the 2 frameworks doesn't have both of the foll
 
 The pack experience likely requires some learning which may not be possible until we see more scenarios utilizing duplicate frameworks.
 
-> Note that as part of this proposal, there may be some scenarios where alias usage in per framework commands will be validated and potentially fixed. This will discovered during the implementation and won't be contained in detail in the current design.
+> Note that as part of this proposal, there may be some scenarios where alias usage in per framework commands will be validated and potentially fixed. This will be discovered during the implementation and won't be contained in detail in the current design.
 
 ### Technical explanation
 
@@ -163,7 +163,7 @@ PackageReference is also supported by non-SDK style projects, which use [dotnet/
 The changes to the assets file that affect legacy projects will be done in a non-breaking way and as such, changes should not be required there.
 NuGet will utilize the SDKAnalysisLevel property when it writes out an assets file with breaking changes, ensuring that the .NET SDK will be able to read the assets file for the build.
 
-The assets file will be updated in a bunch of location to use the alias as a key instead of the target framework, effectively allowing duplicate frameworks.
+The assets file will be updated in a bunch of locations to use the alias as a key instead of the target framework, effectively allowing duplicate frameworks.
 
 The assets file contains a `version` property since it was first created, and is always the first property in the file.
 The current assets file version is 3, and this feature will increment the version to 4.
@@ -188,8 +188,7 @@ There are 3 top level sections where changes will be needed. The `targets`, `pro
 
 Take a project using `<TargetFramework>production</TargetFramework>`, `<TargetFrameworkMoniker>.NETCoreApp,Version=v8.0</TargetFrameworkMoniker>`, and `<RuntimeIdentifiers>linux-x64</RuntimeIdentifiers>`.
 
-Note that the effective framework itself will not be part of the serialized part, but it'll cleaned up by the reader by looking up the target framework based off of the "project" section of the assets file.
-
+Note that the effective framework itself will not be part of the serialized part, but it'll be cleaned up by the reader by looking up the target framework based off of the "project" section of the assets file.
 1. `$/targets`
 
     ```diff
@@ -297,8 +296,8 @@ Some examples are:
 ### Lock file changes
 
 NuGet's "repeatable build" feature adds a package lock file to the project directory.
-The restore has a lock file has a similar schema to the assets file, so that schema would also need to be amended.
-Fortunately when Central Package Management and its transitive pinning was introduced we introduced the concept of a PackagesLockFile version successfully.
+The restore lock file has a similar schema to the assets file, so that schema would also need to be amended.
+Fortunately, when Central Package Management and its transitive pinning was introduced we introduced the concept of a PackagesLockFile version successfully.
 We'd just add a version 3.
 
 NuGet would add version 3 of the packages lock file, which will [pivot on the target framework alias, just as assets files will](#target-framework-pivots).
@@ -404,7 +403,7 @@ There are no other technical alternatives.
 - Disabling pack requires setting three properties. Should we aim to reduce this number?
 - Are there any concerns regarding the changes to the [ProjectReference](#project-to-project-references) protocol?
   - Should the alias matching require the frameworks to be fully equivalent? My instinct is no, since we'd potentially like to allow the test projects to have a newer framework than the libraries.
-- Should target alias based matching be consider when applying AssetTargetFallback as well?
+- Should target alias based matching be considered when applying AssetTargetFallback as well?
 Example: P1 targets net10.0 with alias apple, P2 targets net472 (apple) and net472 (banana). Should the matching allow net10.0 to match net472 (apple) or should it fail due to ambiguity?
 
 ### TargetFramework alias to block `/` character
@@ -415,7 +414,8 @@ NuGet's libraries could attempt to do the split on the last `/` character, but t
 Since the `TargetFramework` value is used by the .NET SDK as the directory name for build output, should we block invalid characters on Windows file systems? (Linux doesn't prevent any characters, with the possible exception of `/`, since that's used as the directory separator).
 
 Note that in the current iteration, something like `banana/3` is allowed as an alias and it seems to work.
-Adding an error here would be a potential breaking change. It is very unlikely to affect people, but something that would probably need to be documented.
+Adding an error here would be a potential breaking change.
+It is very unlikely to affect people, but something that would probably need to be documented.
 
 ### More significant assets file schema changes?
 
