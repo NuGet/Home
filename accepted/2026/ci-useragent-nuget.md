@@ -26,7 +26,7 @@ NuGet Command Line/6.10.0 (Microsoft Windows NT 10.0.22631.0)
 
 **After (running in GitHub Actions, push command):**
 ```
-NuGet Command Line/6.10.0 (Microsoft Windows NT 10.0.22631.0; GithubActions)
+NuGet Command Line/6.10.0 (Microsoft Windows NT 10.0.22631.0; CI: GithubActions)
 ```
 
 The enrichment happens automatically:
@@ -41,8 +41,8 @@ Detects CI/CD environments from environment variables:
 
 | Environment | Variable | Value | ClientId | Info |
 |-------------|----------|-------|----------|------|
-| GitHub Actions | `GITHUB_ACTIONS` | "true" | "GitHub" | https://docs.github.com/en/actions/reference/workflows-and-actions/variables?versionId=free-pro-team%40latest&productId=actions |
-| Azure DevOps | `TF_BUILD` | "True" | "AzureDevOps" | https://learn.microsoft.com/en-us/azure/devops/pipelines/build/variables?view=azure-devops&tabs=yaml#system-variables |
+| GitHub Actions | `GITHUB_ACTIONS` | "true" | "GitHub Actions" | https://docs.github.com/en/actions/reference/workflows-and-actions/variables?versionId=free-pro-team%40latest&productId=actions |
+| Azure DevOps | `TF_BUILD` | "True" | "Azure DevOps" | https://learn.microsoft.com/en-us/azure/devops/pipelines/build/variables?view=azure-devops&tabs=yaml#system-variables |
 | AppVeyor | `APPVEYOR` | "True" | "AppVeyor" | https://www.appveyor.com/docs/environment-variables/ |
 | Travis | `TRAVIS` | "True" | "Travis CI" | https://docs.travis-ci.com/user/environment-variables/#default-environment-variables |
 | CircleCI | `CIRCLECI` | "True" | "CircleCI" | https://circleci.com/docs/2.0/env-vars/#built-in-environment-variables |
@@ -50,20 +50,20 @@ Detects CI/CD environments from environment variables:
 | Jenkins | `BUILD_ID` AND `BIULD_URL` | != '' AND != '' | Jenkins | https://www.jenkins.io/doc/book/pipeline/jenkinsfile/#using-environment-variable |
 | Google Cloud | `BUILD_ID` AND `PROJECT_ID` | != '' AND != '' | Google Cloud | https://cloud.google.com/build/docs/configuring-builds/substitute-variable-values |
 | TeamCity | `TEAMCITY_VERSION` | != '' | TeamCity | https://www.jetbrains.com/help/teamcity/predefined-build-parameters.html#Server+Build+Properties |
-| JetBrains | `JB_SPACE_API_URL` | != '' | JetBrains | https://www.jetbrains.com/help/space/automation-environment-variables.html#general |
+| JetBrains | `JB_SPACE_API_URL` | != '' | JetBrains Space | https://www.jetbrains.com/help/space/automation-environment-variables.html#general |
 | CI | `CI` | "True" | "CI" | A general-use flag | |
 
 #### User-Agent Format
 
 The enriched User-Agent follows the format:
 ```
-{base-user-agent} NuGet/{ClientId; CIClient}
+{base-user-agent} NuGet/{ClientId; CI: ([^\);]+)}
 ```
 
 Examples:
-- `NuGet xplat/6.10.0 (Microsoft Windows NT; GitHubActions)`
-- `NuGet xplat/6.10.0 (Linux; AzureDevOps)`
-- `NuGet xplat/6.10.0 (Linux; CI)`
+- `NuGet xplat/6.10.0 (Microsoft Windows NT; CI: GitHubActions)`
+- `NuGet xplat/6.10.0 (Linux; CI: AzureDevOps)`
+- `NuGet xplat/6.10.0 (Linux; CI: CI)`
 
 ## Drawbacks
 
