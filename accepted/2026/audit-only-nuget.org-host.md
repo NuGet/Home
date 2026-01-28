@@ -12,7 +12,7 @@ This new host must contain only vulnerability information (no package download, 
 
 Package substitution, or dependency confusion, is a security risk where a package manager is configured to download packages from multiple sources, and a package that is intended to be downloaded from a company's private source is instead downloaded from another source.
 If the package's payload is malicious, it is a vector for remote code execution (RCE) attacks.
-Package Source Mapping is one way to mitigate the risk, and another is to block api.nuget.org and www.nuget.org so that only company-controlled package sources may be used.
+As mentioned in NuGet's [best practices for a secure software supply chain documentation](https://learn.microsoft.com/nuget/concepts/security-best-practices), Package Source Mapping and audit sources are built-in ways to mitigate the risk, and another is to block api.nuget.org and www.nuget.org so that only company-controlled package sources may be used.
 Teams using the block approach either need to mirror packages they need from nuget.org onto their private feed, or use a NuGet server that can automate it for them, while still providing the protection they desire.
 
 NuGet also added a feature, NuGet Audit, which will generate warnings during restore when packages with known vulnerabilities are used.
