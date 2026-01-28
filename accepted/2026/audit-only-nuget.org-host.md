@@ -93,6 +93,10 @@ The NuGet client team had a customer report a problem where their third-party Nu
 This means that NuGet and Visual Studio were having network problems because their package source was directing NuGet to access a URL that was being blocked at their firewall.
 So, even when a third-party NuGet server implementation adds the VulnerabilityInfo resource, it might be done in a way that doesn't work for the customer.
 
+Additionally, in some companies, individual developers may have limited influence over which NuGet server the company or team uses.
+If they're mandated to use a specific server that does not provide the VulnerabilityInfo resource to allow NuGet Audit to work, and api.nuget.org is also blocked at the firewall, then there's no path for that developer to use NuGet Audit.
+An audit only host will be easier to get approval to unblock at the firewall than switching the entire company to a new NuGet server, allowing the developer to use it as an `auditSource` in their nuget.config file.
+
 ## Prior Art
 
 Rust's `cargo-audit`, and Python's `pypi` are similar.
@@ -104,8 +108,12 @@ However, NPM sends the package graph to the server, rather than downloading an a
 
 ## Unresolved Questions
 
-Should the https://api.nuget.org/v3/index.json service index use the new hostname for the VulnerabilityInfo resource endpoint?
-That's similar to how search works (search is on a different DNS name than api.nuget.org).
-However, the risk is that companies that deny by default and then put api.nuget.org and the search endpoint on an allow list will start having errors if the new audit hostname is used before the company DNS allow list is updated.
+All questions have been resolved at the time of this spec being merged.
 
 ## Future Possibilities
+
+Some kind of validation that the new hostname only has audit information and not binary files for download.
+However, customer development would be needed to understand how this validation can work.
+Package Source Mapping and Audit Sources already implement NuGet client side protections against downloading arbitrary binaries from unwanted package sources.
+But if a company's security team blocks api.nuget.org at the firewall, this suggests that the security team either don't trust NuGet's client side settings, or want to protect against misconfiguration.
+We need feedback about what type of client side validation will satisfy the security team to unblock the DNS name, while providing value over looking at the URL in a web browser.
