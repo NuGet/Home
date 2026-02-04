@@ -1,11 +1,12 @@
 # User-Agent Telemetry Enrichment for NuGet Commands
 
 - Author: [@mruizmares](https://github.com/martinrrm)
-- GitHub Issue: https://github.com/NuGet/Client.Engineering/issues/3467
+- GitHub Issue: https://github.com/NuGet/Home/issues/14740
 
 ## Summary
 
-This proposal adds telemetry enrichment to the NuGet User-Agent header for push and restore commands. The enriched User-Agent header includes contextual information about the client environment (GitHub Actions, Azure DevOps).
+This proposal adds telemetry to enrich the NuGet User-Agent header for push and restore commands. 
+The User-Agent header includes contextual information about the client environment (GitHub Actions, Azure  DevOps).
 
 ## Motivation
 
@@ -31,6 +32,7 @@ NuGet Command Line/6.10.0 (Microsoft Windows NT 10.0.22631.0; CI: GithubActions)
 
 The enrichment happens automatically:
 1. **Detection**: NuGet detects if it's running in a known CI/CD environment (GitHub Actions or Azure DevOps) by checking environment variables.
+If no CI is detected, the User-Agent header won't have a `CI` information.
 2. **User-Agent Enrichment**: HTTP requests include this context in the User-Agent header.
 
 ### Technical explanation
@@ -51,23 +53,26 @@ Detects CI/CD environments from environment variables:
 | Google Cloud | `BUILD_ID` AND `PROJECT_ID` | != '' AND != '' | Google Cloud | https://cloud.google.com/build/docs/configuring-builds/substitute-variable-values |
 | TeamCity | `TEAMCITY_VERSION` | != '' | TeamCity | https://www.jetbrains.com/help/teamcity/predefined-build-parameters.html#Server+Build+Properties |
 | JetBrains | `JB_SPACE_API_URL` | != '' | JetBrains Space | https://www.jetbrains.com/help/space/automation-environment-variables.html#general |
-| CI | `CI` | "True" | "CI" | A general-use flag | |
+| CI | `CI` | "True" | "other" | A general-use flag | |
 
 #### User-Agent Format
 
 The enriched User-Agent follows the format:
 ```
-{base-user-agent} NuGet/{ClientId; CI: ([^\);]+)}
+{base-user-agent} NuGet/{ClientId; CI: {detected environment}}
 ```
 
 Examples:
 - `NuGet xplat/6.10.0 (Microsoft Windows NT; CI: GitHubActions)`
 - `NuGet xplat/6.10.0 (Linux; CI: AzureDevOps)`
-- `NuGet xplat/6.10.0 (Linux; CI: CI)`
+- `NuGet xplat/6.10.0 (Linux; CI: other)`
 
 ## Drawbacks
 
-1. **Limited CI/CD Coverage**: We have to manually update the table if we want to track a new specific CI environment. We are considering the exising CI environments that dotnet sdk is tracking (https://github.com/dotnet/sdk/blob/1b58d7631b1ed3cd26f7fa7415c075f686ae0f1a/src/Cli/dotnet/Telemetry/CIEnvironmentDetectorForTelemetry.cs#L13). Other CI environment will be considered as "CI".
+1. **Limited CI/CD Coverage**: We have to manually update the table if we want to track a new specific CI 
+environment. 
+We are considering the exising CI environments that [dotnet sdk is tracking](https://github.com/dotnet/sdk/blob/1b58d7631b1ed3cd26f7fa7415c075f686ae0f1a/src/Cli/dotnet/Telemetry/CIEnvironmentDetectorForTelemetry.cs#L13).
+Other CI environment will be considered as "CI".
 
 ### Why this design?
 
