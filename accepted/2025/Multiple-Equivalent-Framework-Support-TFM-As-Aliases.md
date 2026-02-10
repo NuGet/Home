@@ -125,19 +125,27 @@ The technical explanation has [the gory details](#project-to-project-references)
 - Packages lock file will also be extended to support aliasing. The file format will need to be updated, but it's already version and that work should be straightforward. [Packages Lock File technical details](#lock-file-changes).
 - Visual Studio Package Manager UI does not have great support for multi-targeting and no new work is being proposed here. This is a specific flavor of multi-targeting, and as such no difference from the challenges we have today. [Visual Studio challenges](#visual-studio-challenges)
 - dotnet package add, dotnet package update and dotnet package list will all be updated to support per framework operations in case they do not support it already.
+- Block aliases containing path separator characters for the time being.
 
 ### Pack and duplicate frameworks
 
-There is no intuitive solution to the pack scenario.
-Given a project with multiple versions of the same framework, pack will fail by default.
+There is no intuitive solution to the pack scenario. Given a project with multiple versions of the same framework, pack will fail by default in the first iteration.
 
-NuGet will hinge off off IncludeBuildOutput, IncludeContentInPack and SuppressDependenciesWhenPacking to decide to skip packing for a framework, effectively allowing a framework to be completely excluded.
+There are various scenarios where this could be useful.
 
-Pack can only succeed when one of the 2 frameworks doesn't have both of the following `IncludeContentInPack == true or IncludeBuildOutput == true or SuppressDependenciesWhenPackaging == false`.
+- Project building a .NET package for multiple runtimes with API and dependencies represented in runtime-less output.
+- Project building a roslyn analyzer targeting multiple roslyn versions, omitting all dependencies.
 
-The pack experience likely requires some learning which may not be possible until we see more scenarios utilizing duplicate frameworks.
+There are 2 important considerations to enable packing of aliased projects.
 
-> Note that as part of this proposal, there may be some scenarios where alias usage in per framework commands will be validated and potentially fixed. This will be discovered during the implementation and won't be contained in detail in the current design.
+- Dependencies - There is only possible dependency list in the nuspec, so only one alias can be chosen, or the dependencies need to be equivalent.
+- Build output - When a project uses alias for runtimes it's perfectly reasonable to include all aliased frameworks and allow each target to specify it's package path. In this case, asset overlap is probably not allowed, but using all produced assets is event wanted
+
+NuGet will need to hinge off off IncludeBuildOutput, IncludeContentInPack and SuppressDependenciesWhenPacking to decide to skip packing for a framework, effectively allowing a parts of the build to be excluded.
+
+If time permits, the next iteration of pack can succeed when one of the 2 frameworks doesn't have both of the following `IncludeContentInPack == true or IncludeBuildOutput == true or SuppressDependenciesWhenPackaging == false`.
+
+The next iteration may allow a combination, where the dependencies are suppressed for all except 1 alias (or enforced to be equivalent) and allow the build and content output to be included in unique directories.
 
 ### Technical explanation
 
@@ -164,6 +172,7 @@ The changes to the assets file that affect legacy projects will be done in a non
 NuGet will utilize the SDKAnalysisLevel property when it writes out an assets file with breaking changes, ensuring that the .NET SDK will be able to read the assets file for the build.
 
 The assets file will be updated in a bunch of locations to use the alias as a key instead of the target framework, effectively allowing duplicate frameworks.
+
 
 The assets file contains a `version` property since it was first created, and is always the first property in the file.
 The current assets file version is 3, and this feature will increment the version to 4.
@@ -225,13 +234,13 @@ The changes being made here can be divided into 2 parts.
 - Additive changes
 - Breaking changes
 
-The additive changes will be an always thing. Every newly serialized PackageSpec will make this change. 
+The additive changes will be an always thing. Every newly serialized PackageSpec will make this change.
 This should not affect any of the existing scenarios, because at worse the new property is not parsed.
 
 The following 2 changes will be made on the writer side:
 
-- Add "framework" to the packageSpec, while keeping targetAlias for simplicity sake.
-This is an additive change and will be written out for every new package spec for simplicity.
+- Add "framework" to the packageSpec, while keeping targetAlias for implementation simplicity sake.
+This is an additive change and will be written out for every new package spec for implementation simplicity.
 - Change the key from framework to alias. In most cases, really almost all non-alias cases, this is likely to be the same and cause no problems.
 The only default cases where the alias and the effective tfm are different are MAUI and platform scenarios.
 
@@ -265,9 +274,12 @@ The only default cases where the alias and the effective tfm are different are M
   
 Given that there is no version for the package spec at this point, we can do a simple trick to infer the type of PackageSpec to read.
 
-- When reading a framework, if both targetAlias and framework, then this is equivalent to V4 and a .NET SDK scenario
-- If only targetAlias is set, this was a V3 writer and an SDK
-- If there's no targetAlias and no framework, this was a V3 writer and legacy project.
+| Is targetAlias set? | Is framework set? | Type of writer/project |
+|-------------------- | ----------------- | ---------------------- |
+| Yes | Yes | SDK, V4 |
+| Yes | No | SDK, V3 |
+| No | Yes | Classic csproj, V4 |
+| No | No |  Classic csproj, V3 |
 
 There are 3 scenarios where NuGet writes out a package spec.
 
@@ -275,7 +287,7 @@ There are 3 scenarios where NuGet writes out a package spec.
 - DependencyGraphSpec write for unloaded project scenarios
 - PackageSpec written within the assets file in the "project" section.
 
-For simplicity sake, in the first 2 cases, NuGet will write-out a v4 version, regardless of whether we are dealing with an SDK or legacy project.
+For simplicity sake, in the first 2 cases, NuGet will write-out a v4 version, regardless of whether we are dealing with an SDK or legacy project (rows 1 & 3).
 In the dg spec for unloaded project scenario, this may cause a problem in theory if the .NET SDK is newer than the Visual Studio version, but that is unlikely and with the Visual Studio's modern lifecycle changes, at worst, we will have a month where VS is unable to read the package spec from the updated SDK.
 
 The PackageSpec written within the assets file of the project section will be switch between V3 and V4 based on the SDKAnalysisLevel property as previously mentioned.
@@ -345,6 +357,7 @@ Currently `GetReferenceNearestTargetFrameworkTask` is implemented by running NuG
 This feature would extend it to first try nearest match, and if there is more than one matching `TargetFramework`, then look for a `TargetFramework` that has an exact name match in both projects.
 If there are more than one "nearest" framework, but no exact name match, then for the first version of this feature, NuGet will report an error.
 Depending on customer feedback, build customization can be added in the future.
+Note that AssetTargetFallback will not be considered in the first iteration.
 
 Today the nearest selection uses the following algorithm
 
@@ -391,6 +404,10 @@ The new pack scenarios are pretty complex, but the scenario it enables are a goo
 The alternatives to this feature is using multiple projects, which is the current behavior.
 There are no other technical alternatives.
 
+### Consider making the 'pivots' of multitargeting more extensible
+
+Meaning, let a project and/or MSBuild SDK define a list of properties that should be cartesian-product-ed together when doing any kind of 'for-each-able' workflow (build, pack, publish, etc).
+
 ## Prior Art
 
 <!-- What prior art, both good and bad are related to this proposal? -->
@@ -399,12 +416,6 @@ There are no other technical alternatives.
 <!-- Are there any resources that are relevant to this proposal? -->
 
 ## Unresolved Questions
-
-- Disabling pack requires setting three properties. Should we aim to reduce this number?
-- Are there any concerns regarding the changes to the [ProjectReference](#project-to-project-references) protocol?
-  - Should the alias matching require the frameworks to be fully equivalent? My instinct is no, since we'd potentially like to allow the test projects to have a newer framework than the libraries.
-- Should target alias based matching be considered when applying AssetTargetFallback as well?
-Example: P1 targets net10.0 with alias apple, P2 targets net472 (apple) and net472 (banana). Should the matching allow net10.0 to match net472 (apple) or should it fail due to ambiguity?
 
 ### TargetFramework alias to block `/` character
 
