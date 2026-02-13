@@ -1,18 +1,18 @@
-# User-Agent Telemetry Enrichment for NuGet Commands
+# User-Agent CI Telemetry for NuGet Commands
 
 - Author: [@mruizmares](https://github.com/martinrrm)
 - GitHub Issue: https://github.com/NuGet/Home/issues/14740
 
 ## Summary
 
-This proposal adds telemetry to enrich the NuGet User-Agent header for push and restore commands. 
+This proposal adds CI environment to the User-Agent header for push and restore commands.
 The User-Agent header includes contextual information about the client environment (GitHub Actions, Azure  DevOps).
 
 ## Motivation
 
 Currently, NuGet HTTP requests include a basic User-Agent header that identifies the NuGet client version and OS.
 
-By enriching the User-Agent header with CI context information we can a better understanding of CI/CD environment usage and issues.
+By enriching the User-Agent header with CI context information package sources can have a better understanding of CI/CD environment usage and issues.
 
 ## Explanation
 
@@ -32,7 +32,7 @@ NuGet Command Line/6.10.0 (Microsoft Windows NT 10.0.22631.0; CI: GithubActions)
 
 The enrichment happens automatically:
 1. **Detection**: NuGet detects if it's running in a known CI/CD environment (GitHub Actions or Azure DevOps) by checking environment variables.
-If no CI is detected, the User-Agent header won't have a `CI` information.
+If no CI is detected, the User-Agent header won't have `CI` information.
 2. **User-Agent Enrichment**: HTTP requests include this context in the User-Agent header.
 
 ### Technical explanation
@@ -48,11 +48,12 @@ Detects CI/CD environments from environment variables:
 | AppVeyor | `APPVEYOR` | "True" | "AppVeyor" | https://www.appveyor.com/docs/environment-variables/ |
 | Travis | `TRAVIS` | "True" | "Travis CI" | https://docs.travis-ci.com/user/environment-variables/#default-environment-variables |
 | CircleCI | `CIRCLECI` | "True" | "CircleCI" | https://circleci.com/docs/2.0/env-vars/#built-in-environment-variables |
-| AWS CodeBuild | `CODEBUILD_BUILD_ID` | != '' | AWS CodeBiuld | https://docs.aws.amazon.com/codebuild/latest/userguide/build-env-ref-env-vars.html |
-| Jenkins | `BUILD_ID` AND `BIULD_URL` | != '' AND != '' | Jenkins | https://www.jenkins.io/doc/book/pipeline/jenkinsfile/#using-environment-variable |
-| Google Cloud | `BUILD_ID` AND `PROJECT_ID` | != '' AND != '' | Google Cloud | https://cloud.google.com/build/docs/configuring-builds/substitute-variable-values |
-| TeamCity | `TEAMCITY_VERSION` | != '' | TeamCity | https://www.jetbrains.com/help/teamcity/predefined-build-parameters.html#Server+Build+Properties |
-| JetBrains | `JB_SPACE_API_URL` | != '' | JetBrains Space | https://www.jetbrains.com/help/space/automation-environment-variables.html#general |
+| AWS CodeBuild | `CODEBUILD_BUILD_ID` | != '' | "AWS CodeBuild" | https://docs.aws.amazon.com/codebuild/latest/userguide/build-env-ref-env-vars.html |
+| Jenkins | `BUILD_ID` AND `BIULD_URL` | != '' AND != '' | "Jenkins" | https://www.jenkins.io/doc/book/pipeline/jenkinsfile/#using-environment-variable |
+| Google Cloud | `BUILD_ID` AND `PROJECT_ID` | != '' AND != '' | "Google Cloud" | https://cloud.google.com/build/docs/configuring-builds/substitute-variable-values |
+| TeamCity | `TEAMCITY_VERSION` | != '' | "TeamCity" | https://www.jetbrains.com/help/teamcity/predefined-build-parameters.html#Server+Build+Properties |
+| JetBrains | `JB_SPACE_API_URL` | != '' | "JetBrains Space" | https://www.jetbrains.com/help/space/automation-environment-variables.html#general |
+| GitLab CI | `GITLAB_CI` | "true" | "GitLab" | https://docs.gitlab.com/ci/variables/predefined_variables/ |
 | CI | `CI` | "True" | "other" | A general-use flag | |
 
 #### User-Agent Format
@@ -86,5 +87,7 @@ Other CI environment will be considered as "CI".
 ## Unresolved Questions
 
 1. **User Opt-out**: Should there be a way for users to disable the enriched User-Agent? What would the mechanism be (environment variable, config setting)?
+
+Current implemention doesn't add a way for user to opt-out of User-Agent telemetry, this work won't change anything related to this.
 
 ## Future Possibilities
