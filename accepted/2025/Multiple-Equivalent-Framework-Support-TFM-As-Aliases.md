@@ -312,32 +312,56 @@ The restore lock file has a similar schema to the assets file, so that schema wo
 Fortunately, when Central Package Management and its transitive pinning was introduced we introduced the concept of a PackagesLockFile version successfully.
 We'd just add a version 3.
 
-NuGet would add version 3 of the packages lock file, which will [pivot on the target framework alias, just as assets files will](#target-framework-pivots).
-This lock file has a single dependencies section and the key there would be changed to the alias instead.
+Unlike the assets file, the lock file is checked in to source control, so we should not cause the lock file to upgrade unless absolutely necessary.
+As such, the V3 format will only be enabled when there are duplicate frameworks.
 
-From:
+NuGet would add version 3 of the packages lock file, which will [pivot on the target framework alias, just as assets files will](#target-framework-pivots).
+The new format inverts the structure, moving the `alias/rid` to be a top-level property with a nested `framework` property and `dependencies` object.
+
+From (V1/V2):
 
 ```json
 {
   "version": 1,
   "dependencies": {
-    ".NETCoreApp,Version=v8.0": {
+    "net10.0": {
     }
   }
 }
 ```
 
-To:
+To (V3):
 
 ```json
 {
   "version": 3,
-  "dependencies": {
-    "production": {
+  "alias/rid": {
+    "framework": "net10.0",
+    "dependencies": {
     }
   }
 }
 ```
+
+For example, a project with `<TargetFrameworks>production;development</TargetFrameworks>` both resolving to `net10.0` would produce:
+
+```json
+{
+  "version": 3,
+  "production": {
+    "framework": "net10.0",
+    "dependencies": {
+    }
+  },
+  "development": {
+    "framework": "net10.0",
+    "dependencies": {
+    }
+  }
+}
+```
+
+See [Lock file format alternatives](#lock-file-format-alternatives) for a comparison of alternative formats considered.
 
 ### Visual Studio challenges
 
@@ -407,6 +431,113 @@ There are no other technical alternatives.
 ### Consider making the 'pivots' of multitargeting more extensible
 
 Meaning, let a project and/or MSBuild SDK define a list of properties that should be cartesian-product-ed together when doing any kind of 'for-each-able' workflow (build, pack, publish, etc).
+
+### Lock file format alternatives
+
+Several alternative formats were considered for the V3 lock file. Unlike the assets file which is regenerated on each restore, the lock file is checked into source control, making the format choice more consequential for readability and diff-friendliness.
+
+#### Alternative 1: Top-level alias with nested framework (Chosen)
+
+```json
+{
+  "version": 3,
+  "alias/rid": {
+    "framework": "net10.0",
+    "dependencies": {
+    }
+  }
+}
+```
+
+**Pros:**
+
+- Clearly separates each alias as its own top-level section, making diffs cleaner when adding/removing aliases.
+- The framework is explicitly stated, avoiding ambiguity.
+- Reduces nesting depth compared to keeping `dependencies` as a top-level property.
+- Aligns conceptually with alias being the primary pivot.
+
+**Cons:**
+
+- Structural change from V1/V2 format - the `dependencies` property moves from top-level to nested.
+
+#### Alternative 2: Combined alias/framework/rid key under dependencies
+
+```json
+{
+  "version": 3,
+  "dependencies": {
+    "alias/net10.0/rid": {
+    }
+  }
+}
+```
+
+**Pros:**
+
+- Maintains the existing `dependencies` top-level structure from V1/V2.
+- All information (alias, framework, RID) is encoded in a single key.
+
+**Cons:**
+
+- Requires parsing a compound key to extract alias, framework, and RID.
+- Puts an aggressive restriction on path separators in the alias (cannot use `/`).
+- Less readable when there are many aliases.
+
+#### Alternative 3: Nested alias under dependencies with framework/rid key
+
+```json
+{
+  "version": 3,
+  "dependencies": {
+    "alias": {
+      "net10.0/rid": {
+      }
+    }
+  }
+}
+```
+
+**Pros:**
+
+- Maintains the existing `dependencies` top-level structure.
+- Keeps the format similar to the previous lock file (tfm/rid as a key).
+- Clear hierarchical relationship: dependencies → alias → framework/rid → packages.
+
+**Cons:**
+
+- Increases nesting depth, making the file harder to read.
+
+#### Alternative 4: Add framework property to existing structure
+
+```json
+{
+  "version": 3,
+  "dependencies": {
+    "alias": {
+      "@framework": "net10.0"
+    }
+  }
+}
+```
+
+**Pros:**
+
+- Minimal structural change from V1/V2.
+- Uses a special `@framework` property (using `@` since it's an invalid package ID character) to store the framework.
+
+**Cons:**
+
+- Mixes metadata (`@framework`) with package entries at the same level, which is unusual and could be confusing.
+- Requires special handling to distinguish metadata properties from package entries.
+
+#### Recommendation
+
+Alternative 1 (top-level alias with nested framework) is the chosen format because:
+
+1. **Clarity**: The alias is clearly the primary pivot, which aligns with how aliased projects work.
+2. **Explicit framework**: The framework is stored as an explicit property rather than encoded in a key.
+3. **Diff-friendly**: Adding or removing an alias results in clean, self-contained diffs.
+4. **Reduced ambiguity**: No need to parse compound keys or use special characters to distinguish metadata.
 
 ## Prior Art
 
