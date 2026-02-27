@@ -1,0 +1,719 @@
+{
+  "version": "1.0",
+  "tasks": [
+    {
+      "taskType": "trigger",
+      "capabilityId": "IssueResponder",
+      "subCapability": "IssuesOnlyResponder",
+      "version": "1.0",
+      "id": "7TNOSEwEneHUclQPx1k7O",
+      "config": {
+        "conditions": {
+          "operator": "and",
+          "operands": [
+            {
+              "name": "isAction",
+              "parameters": {
+                "action": "opened"
+              }
+            },
+            {
+              "operator": "or",
+              "operands": [
+                {
+                  "name": "isActivitySender",
+                  "parameters": {
+                    "user": "vsfeedback"
+                  }
+                },
+                {
+                  "name": "bodyContains",
+                  "parameters": {
+                    "bodyPattern": "Copied from original issue"
+                  }
+                },
+                {
+                  "name": "bodyContains",
+                  "parameters": {
+                    "bodyPattern": "Issue moved from"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "eventType": "issue",
+        "eventNames": [
+          "issues",
+          "project_card"
+        ],
+        "taskName": "[Manage \"WaitingFor\" labels] [4-1] Tag \"Transferred issue\" if it's transferred from vsfeedback or other github repo.",
+        "actions": [
+          {
+            "name": "addLabel",
+            "parameters": {
+              "label": "Transferred issue"
+            }
+          },
+          {
+            "name": "addLabel",
+            "parameters": {
+              "label": "Triage:Untriaged"
+            }
+          }
+        ]
+      },
+      "disabled": false
+    },
+    {
+      "taskType": "trigger",
+      "capabilityId": "IssueResponder",
+      "subCapability": "IssueCommentResponder",
+      "version": "1.0",
+      "id": "W6eQ_p48WB3AD1_dq-Z-3",
+      "config": {
+        "conditions": {
+          "operator": "and",
+          "operands": [
+            {
+              "name": "isAction",
+              "parameters": {
+                "action": "created"
+              }
+            },
+            {
+              "name": "hasLabel",
+              "parameters": {
+                "label": "WaitingForCustomer"
+              }
+            },
+            {
+              "name": "isOpen",
+              "parameters": {}
+            },
+            {
+              "operator": "or",
+              "operands": [
+                {
+                  "operator": "and",
+                  "operands": [
+                    {
+                      "name": "hasLabel",
+                      "parameters": {
+                        "label": "Transferred issue"
+                      }
+                    },
+                    {
+                      "operator": "not",
+                      "operands": [
+                        {
+                          "name": "activitySenderHasPermissions",
+                          "parameters": {
+                            "permissions": "write"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "isActivitySender",
+                  "parameters": {
+                    "user": {
+                      "type": "author"
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "eventType": "issue",
+        "eventNames": [
+          "issue_comment"
+        ],
+        "taskName": "[Manage \"WaitingFor\" labels] [4-2] Replace tag \"WaitingForCustomer\" with \"WaitingForClientTeam\" when the author comments on an issue. Also remove `Status: No Recent Activity` if it's been set.",
+        "actions": [
+          {
+            "name": "removeLabel",
+            "parameters": {
+              "label": "WaitingForCustomer"
+            }
+          },
+          {
+            "name": "addLabel",
+            "parameters": {
+              "label": "WaitingForClientTeam"
+            }
+          },
+          {
+            "name": "removeLabel",
+            "parameters": {
+              "label": "Status:No recent activity"
+            }
+          }
+        ]
+      },
+      "disabled": false
+    },
+    {
+      "taskType": "trigger",
+      "capabilityId": "IssueResponder",
+      "subCapability": "IssuesOnlyResponder",
+      "version": "1.0",
+      "id": "fTcSwBwqEfDk0jbb_CPDA",
+      "config": {
+        "conditions": {
+          "operator": "and",
+          "operands": [
+            {
+              "name": "isAction",
+              "parameters": {
+                "action": "closed"
+              }
+            },
+            {
+              "operator": "or",
+              "operands": [
+                {
+                  "name": "hasLabel",
+                  "parameters": {
+                    "label": "WaitingForClientTeam"
+                  }
+                },
+                {
+                  "name": "hasLabel",
+                  "parameters": {
+                    "label": "WaitingForCustomer"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "eventType": "issue",
+        "eventNames": [
+          "issues",
+          "project_card"
+        ],
+        "taskName": "[Manage \"WaitingFor\" labels] [4-3] Remove any \"WaitingFor\" label when the issue is closed",
+        "actions": [
+          {
+            "name": "removeLabel",
+            "parameters": {
+              "label": "WaitingForClientTeam"
+            }
+          },
+          {
+            "name": "removeLabel",
+            "parameters": {
+              "label": "WaitingForCustomer"
+            }
+          }
+        ]
+      },
+      "disabled": false
+    },
+    {
+      "taskType": "trigger",
+      "capabilityId": "IssueResponder",
+      "subCapability": "IssueCommentResponder",
+      "version": "1.0",
+      "id": "oq9dlra1RR8DlStn922X9",
+      "config": {
+        "conditions": {
+          "operator": "and",
+          "operands": [
+            {
+              "name": "isAction",
+              "parameters": {
+                "action": "created"
+              }
+            },
+            {
+              "name": "hasLabel",
+              "parameters": {
+                "label": "WaitingForClientTeam"
+              }
+            },
+            {
+              "name": "isOpen",
+              "parameters": {}
+            },
+            {
+              "name": "activitySenderHasPermissions",
+              "parameters": {
+                "permissions": "write"
+              }
+            }
+          ]
+        },
+        "eventType": "issue",
+        "eventNames": [
+          "issue_comment"
+        ],
+        "taskName": "[Manage \"WaitingFor\" labels] [4-4] Replace tag \"WaitingForClientTeam\" with \"WaitingForCustomer\" when client team comments on an issue.",
+        "actions": [
+          {
+            "name": "removeLabel",
+            "parameters": {
+              "label": "WaitingForClientTeam"
+            }
+          },
+          {
+            "name": "addLabel",
+            "parameters": {
+              "label": "WaitingForCustomer"
+            }
+          }
+        ]
+      },
+      "disabled": false
+    },
+    {
+      "taskType": "scheduled",
+      "capabilityId": "ScheduledSearch",
+      "subCapability": "ScheduledSearch",
+      "version": "1.1",
+      "config": {
+        "frequency": [
+          {
+            "weekDay": 0,
+            "hours": [
+              0,
+              3,
+              6,
+              9,
+              12,
+              15,
+              18,
+              21
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 1,
+            "hours": [
+              0,
+              3,
+              6,
+              9,
+              12,
+              15,
+              18,
+              21
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 2,
+            "hours": [
+              0,
+              3,
+              6,
+              9,
+              12,
+              15,
+              18,
+              21
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 3,
+            "hours": [
+              0,
+              3,
+              6,
+              9,
+              12,
+              15,
+              18,
+              21
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 4,
+            "hours": [
+              0,
+              3,
+              6,
+              9,
+              12,
+              15,
+              18,
+              21
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 5,
+            "hours": [
+              0,
+              3,
+              6,
+              9,
+              12,
+              15,
+              18,
+              21
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 6,
+            "hours": [
+              0,
+              3,
+              6,
+              9,
+              12,
+              15,
+              18,
+              21
+            ],
+            "timezoneOffset": -7
+          }
+        ],
+        "searchTerms": [
+          {
+            "name": "noLabel",
+            "parameters": {
+              "label": "Community"
+            }
+          },
+          {
+            "name": "noActivitySince",
+            "parameters": {
+              "days": 30
+            }
+          },
+          {
+            "name": "isPr",
+            "parameters": {}
+          },
+          {
+            "name": "isOpen",
+            "parameters": {}
+          },
+          {
+            "name": "isDraftPr",
+            "parameters": {
+              "value": "false"
+            }
+          },
+          {
+            "name": "hasLabel",
+            "parameters": {
+              "label": "internal-debugging"
+            }
+          }
+        ],
+        "taskName": "[Test: Fernando] [stale NuGet/Home PR] [5-1] Search for PRs with no activity over 30 days and warn. (except community PRs and draft PRs)",
+        "actions": [
+          {
+            "name": "addLabel",
+            "parameters": {
+              "label": "Status:No recent activity"
+            }
+          },
+          {
+            "name": "addReply",
+            "parameters": {
+              "comment": "This PR has been automatically marked as stale because it has no activity for **30 days**. It will be closed if no further activity occurs **within another 15 days of this comment**. If it is closed, you may reopen it anytime when you're ready again, as long as you don't delete the branch."
+            }
+          }
+        ]
+      },
+      "id": "8cza44ws0P_FZ3nEFeFt_"
+    },
+    {
+      "taskType": "trigger",
+      "capabilityId": "IssueResponder",
+      "subCapability": "PullRequestResponder",
+      "version": "1.0",
+      "config": {
+        "conditions": {
+          "operator": "and",
+          "operands": [
+            {
+              "operator": "not",
+              "operands": [
+                {
+                  "name": "isAction",
+                  "parameters": {
+                    "action": "closed"
+                  }
+                }
+              ]
+            },
+            {
+              "name": "hasLabel",
+              "parameters": {
+                "label": "Status:No recent activity"
+              }
+            },
+            {
+              "name": "hasLabel",
+              "parameters": {
+                "label": "internal-debugging"
+              }
+            }
+          ]
+        },
+        "eventType": "pull_request",
+        "eventNames": [
+          "pull_request",
+          "issues",
+          "project_card"
+        ],
+        "taskName": "[Test: Fernando] [stale NuGet/Home PR] [5-2] Remove \"Status:No recent activity\" if there is any activity.",
+        "actions": [
+          {
+            "name": "removeLabel",
+            "parameters": {
+              "label": "Status:No recent activity"
+            }
+          }
+        ]
+      },
+      "id": "O50aJ91lg4Euk1byP0P4B"
+    },
+    {
+      "taskType": "trigger",
+      "capabilityId": "IssueResponder",
+      "subCapability": "PullRequestCommentResponder",
+      "version": "1.0",
+      "config": {
+        "conditions": {
+          "operator": "and",
+          "operands": [
+            {
+              "name": "hasLabel",
+              "parameters": {
+                "label": "Status:No recent activity"
+              }
+            },
+            {
+              "name": "hasLabel",
+              "parameters": {
+                "label": "internal-debugging"
+              }
+            }
+          ]
+        },
+        "eventType": "pull_request",
+        "eventNames": [
+          "issue_comment"
+        ],
+        "taskName": "[Test: Fernando] [stale NuGet/Home PR] [5-3] Remove \"Status:No recent activity\" if there is any comment.",
+        "actions": [
+          {
+            "name": "removeLabel",
+            "parameters": {
+              "label": "Status:No recent activity"
+            }
+          }
+        ]
+      },
+      "id": "5xGS1IuXSvqKTfjrAe4Do"
+    },
+    {
+      "taskType": "trigger",
+      "capabilityId": "IssueResponder",
+      "subCapability": "PullRequestReviewResponder",
+      "version": "1.0",
+      "config": {
+        "conditions": {
+          "operator": "and",
+          "operands": [
+            {
+              "name": "hasLabel",
+              "parameters": {
+                "label": "Status:No recent activity"
+              }
+            },
+            {
+              "name": "hasLabel",
+              "parameters": {
+                "label": "internal-debugging"
+              }
+            }
+          ]
+        },
+        "eventType": "pull_request",
+        "eventNames": [
+          "pull_request_review"
+        ],
+        "taskName": "[Test: Fernando] [stale NuGet/Home PR] [5-4] Remove \"Status:No recent activity\" if there is any reviews.",
+        "actions": [
+          {
+            "name": "removeLabel",
+            "parameters": {
+              "label": "Status:No recent activity"
+            }
+          }
+        ]
+      },
+      "id": "Yp1cStMTC2E90AONRRyhf"
+    },
+    {
+      "taskType": "scheduled",
+      "capabilityId": "ScheduledSearch",
+      "subCapability": "ScheduledSearch",
+      "version": "1.1",
+      "config": {
+        "frequency": [
+          {
+            "weekDay": 0,
+            "hours": [
+              2,
+              5,
+              8,
+              11,
+              14,
+              17,
+              20,
+              23
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 1,
+            "hours": [
+              2,
+              5,
+              8,
+              11,
+              14,
+              17,
+              20,
+              23
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 2,
+            "hours": [
+              2,
+              5,
+              8,
+              11,
+              14,
+              17,
+              20,
+              23
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 3,
+            "hours": [
+              2,
+              5,
+              8,
+              11,
+              14,
+              17,
+              20,
+              23
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 4,
+            "hours": [
+              2,
+              5,
+              8,
+              11,
+              14,
+              17,
+              20,
+              23
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 5,
+            "hours": [
+              2,
+              5,
+              8,
+              11,
+              14,
+              17,
+              20,
+              23
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 6,
+            "hours": [
+              2,
+              5,
+              8,
+              11,
+              14,
+              17,
+              20,
+              23
+            ],
+            "timezoneOffset": -7
+          }
+        ],
+        "searchTerms": [
+          {
+            "name": "isPr",
+            "parameters": {}
+          },
+          {
+            "name": "isOpen",
+            "parameters": {}
+          },
+          {
+            "name": "hasLabel",
+            "parameters": {
+              "label": "Status:No recent activity"
+            }
+          },
+          {
+            "name": "noLabel",
+            "parameters": {
+              "label": "Community"
+            }
+          },
+          {
+            "name": "noActivitySince",
+            "parameters": {
+              "days": 15
+            }
+          },
+          {
+            "name": "isDraftPr",
+            "parameters": {
+              "value": "false"
+            }
+          },
+          {
+            "name": "hasLabel",
+            "parameters": {
+              "label": "internal-debugging"
+            }
+          }
+        ],
+        "taskName": "[Test: Fernando] [stale NuGet/Home PR] [5-5] Close PRs with no activity over 15 days after warn. (excluding community PRs and draft PRs)",
+        "actions": [
+          {
+            "name": "closeIssue",
+            "parameters": {}
+          }
+        ]
+      },
+      "id": "GKPLBJAtUHnvpdhMROqRu"
+    }
+  ],
+  "userGroups": []
+}
