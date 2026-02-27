@@ -51,7 +51,6 @@ jobs:
             updated:<$CUTOFF_DATE \
             reactions:0 \
             -label:\"Status:Inactive\" \
-            -label:\"Status:Excluded from icebox cleanup\" \
             sort:updated-asc"
           echo "🔎 Search query: $SEARCH_QUERY"
 
