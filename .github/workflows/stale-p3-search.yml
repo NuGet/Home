@@ -41,6 +41,17 @@ jobs:
           echo "REPO: $REPO"
           echo ""
 
+          # Validate numeric inputs
+          if ! [[ "$BATCH_SIZE" =~ ^[0-9]+$ ]]; then
+            echo "❌ Error: batch_size must be a positive integer, got: '$BATCH_SIZE'"
+            exit 1
+          fi
+
+          if ! [[ "$INACTIVITY_DAYS" =~ ^[0-9]+$ ]]; then
+            echo "❌ Error: inactivity_days must be a positive integer, got: '$INACTIVITY_DAYS'"
+            exit 1
+          fi
+
           CUTOFF_DATE=$(date -d "$INACTIVITY_DAYS days ago" -u +%Y-%m-%d)
           echo "⏰ Cutoff date: $CUTOFF_DATE"
           marked=0
