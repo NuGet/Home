@@ -363,6 +363,107 @@ For example, a project with `<TargetFrameworks>production;development</TargetFra
 
 See [Lock file format alternatives](#lock-file-format-alternatives) for a comparison of alternative formats considered.
 
+### dotnet list package
+
+#### Background
+
+`dotnet list package` has 2 different outputs, a console format and a --format json, which is versioned at 1.
+
+```console
+Project 'temp' has the following package references
+   [net10.0]:
+   Top-level Package                   Requested   Resolved
+   > Microsoft.Extensions.Logging      7.0.0       7.0.0
+
+   [net9.0]:
+   Top-level Package                   Requested   Resolved
+   > Microsoft.Extensions.Logging      7.0.0       7.0.0
+```
+
+```json
+{
+  "version": 1,
+  "parameters": "",
+  "projects": [
+    {
+      "path": "E:/Code/Temp/temp/temp.csproj",
+      "frameworks": [
+        {
+          "framework": "net10.0",
+          "topLevelPackages": [
+            {
+              "id": "Microsoft.Extensions.Logging",
+              "requestedVersion": "7.0.0",
+              "resolvedVersion": "7.0.0"
+            }
+          ]
+        },
+        {
+          "framework": "net9.0",
+          "topLevelPackages": [
+            {
+              "id": "Microsoft.Extensions.Logging",
+              "requestedVersion": "7.0.0",
+              "resolvedVersion": "7.0.0"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+```
+
+The term `framework` refers to the actual framework. In 10.0.200, dotnet list package doesn't even work if the framework value is not the effective name. This is tracked by <https://github.com/nuget/home/issues/14339> and it basically means list package does not work for frameworks like `<TargetFrameworks>net9.0;net9.0-windows</TargetFrameworks>`, and it fails with an error `Unable to read a package reference from the project <path>`.
+
+A final consideration is that the aliasing feature is dual inserted into 10.x and 11.x versions of the .NET SDK, namely 10.0.3xx and 11.0.1xx, which drives some of the proposed output.
+
+For the purposes of this analysis into list package output, we different between `TargetFramework` property and the `effective target framework` refers to the actual target framework, for example TargetFramework=net10.0-windows, effective target framework = net10.0-windows7.0.
+
+#### dotnet list package output
+
+The console output is more acceptable to change even in a minor SDK version (such as 10.0.300), compared to the json format, which because it's version, also doesn't necessarily carry a risk, but it's a matter of choice.
+
+Console output options:
+
+| Option | Changes | Details | Considerations |
+| ------ | ------- | ------- | -------------- |
+| 1 | Change key from TargetFramework to effective target framework. | The effective framework is being removed | Breaking changes for parsers, but given that it doesn't work at all for aliased frameworks today, this is net equivalent to no breaking change |
+| 2 | Add TargetFramework in addition to effective target framework. | The TargetFramework value is being added as a way to dedup | Breaking changes for parsers, but that's why --format json exists. Probably redundant in most cases. We could try to be intelligent about not printing a duplicate one when we don't have an equivalent framework in the alias. |
+| 3 | Option 1 or Option 2, with 11.x as default, but 10.x doesn't change | This is really just a breaking change aware way of doing things. | I think this is likely unnecessary, because 10.0.200 is already broken even if the TargetFramework is something like netstandard20. |
+
+Proposal - given that we are already broken for aliased frameworks, I think 10.x and 11.x SDK can have the same output.
+At this point, my proposal is 1, because for 2, there's no obvious best UX, and given that we're broken for aliased frameworks, all aliased framework users will be seeing a new output, so we can wait for them to provide feedback.
+
+Json output options:
+
+Given that the list of "inner builds" in the output is an array, we only really need to focus on the content of the following json object:
+
+```json
+        {
+          "framework": "net9.0",
+          "topLevelPackages": [
+            {
+              "id": "Microsoft.Extensions.Logging",
+              "requestedVersion": "7.0.0",
+              "resolvedVersion": "7.0.0"
+            }
+          ]
+        }
+```
+
+The output is versioned, and we need to provide 2 property, one that is the TargetFramework and one that's the effective target framework.
+The actual name is under consideration in all these options.
+
+| Option | Changes | Details | Considerations |
+| ------ | ------- | ------- | -------------- |
+| 1 | Add `targetFramework` property. Change the schema version to 2. When needed in .NET 10, default in .NET 11. | The new property allows for disambiguation in aliasing scenarios. | Should the name be something else? Does the schema version even matter? |
+| 2 | Add `targetFramework` property. Keep the schema version at 1. Add the new property immediately. | The new property allows for disambiguation in aliasing scenarios. | Should the name be something else? This is an additive change and as such, it's non-breaking. |
+| 3 | Add `effectiveTargetFramework` property. Make `framework` mean the TargetFramework property. Change the schema version to 2. When needed in .NET 10, default in .NET 11. | The new property allows for disambiguation in aliasing scenarios. This is a bit of breaking change, but it does make it align to the value of the --framework option in list package, update package, etc. | Probably the most correct thing. |
+
+Proposal - I think the option being the most correct is 3. It aligns with the --framework option to all other commands.
+This does carry the most risk for anyone implementing the parsing to accidentally get it wrong, but I think the alignment among different long term carries the most value.
+
 ### Visual Studio challenges
 
 Currently the PM UI does not have any support for multi targeting.
