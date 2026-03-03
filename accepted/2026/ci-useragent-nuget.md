@@ -84,10 +84,8 @@ Other CI environment will be considered as "CI".
 
 ### Alternatives considered
 
+1. **User Opt-out Mechanism**: We considered adding a way for users to disable the enriched User-Agent (e.g., via an environment variable or config setting). However, since the current implementation doesn't provide a way for users to opt out of User-Agent telemetry, and this work doesn't change anything related to that, we decided not to introduce a new opt-out mechanism at this time.
+
 ## Unresolved Questions
-
-1. **User Opt-out**: Should there be a way for users to disable the enriched User-Agent? What would the mechanism be (environment variable, config setting)?
-
-Current implemention doesn't add a way for user to opt-out of User-Agent telemetry, this work won't change anything related to this.
 
 ## Future Possibilities
