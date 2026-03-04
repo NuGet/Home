@@ -192,7 +192,7 @@ in NuGet:
   embedding a timestamp. Nuget has the concept of a contnet hash, that can
   mitigate this somewhat, by comparing the contents of two packages.  A command
   to show a package's content hash is available starting in .NET 10.0.100:
-  0`dotnet nuget verify`.
+  `dotnet nuget verify`.
 
 ## Rationale and alternatives
 
