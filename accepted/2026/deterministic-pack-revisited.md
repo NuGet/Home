@@ -99,6 +99,11 @@ in NuGet:
 
      `nuget pack packageA.nuspec -Deterministic`
 
+   - For `PackageBuilder` API:
+
+     There is no change in the `NuGet.Packaging.PackageBuilder` API. It already
+     contains support for this via the `deterministic` constructor.
+
 2. Enabling introduces slight risk
 
    Some things improve deterministic-ness. However, they violate assumptions
@@ -135,6 +140,19 @@ in NuGet:
      Use the `-DeterministicTimestamp {DATE_TIME}` argument. For example:
 
      `nuget pack packageA.nuspec -DeterministicTimestamp $(date --rfc-3339=seconds)`
+
+   - For `PackageBuilder` API:
+
+     There's a new property:
+
+     ```
+     public string DeterministicTimestamp
+     {
+         init { ... }
+     }
+     ```
+
+     This will accept a string-ified version of `{DATE_TIME}`.
 
    `DeterministicTimestamp` must be either a full date/time string
    specified in the RFC3339 format, or a single number indicating the
@@ -193,6 +211,10 @@ in NuGet:
   mitigate this somewhat, by comparing the contents of two packages.  A command
   to show a package's content hash is available starting in .NET 10.0.100:
   `dotnet nuget verify`.
+
+- This doesn't auto-enable `DeterministicTimestamp` fallback handling in users
+  of the `PackageBuilder` API. Users of that will need to explicitly specify
+  the timestamp and re-implement handling of `SOURCE_DATE_EPOCH`.
 
 ## Rationale and alternatives
 
