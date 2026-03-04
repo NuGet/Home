@@ -1,6 +1,6 @@
-# Deterministic Pack
+# Deterministic Pack Revisited
 
-- Author Name [omajid](https://github.com/omajid)
+- Author: [omajid](https://github.com/omajid)
 - GitHub Issue: [#8601](https://github.com/NuGet/Home/issues/8601)
 
 ## Summary
@@ -38,7 +38,7 @@ This is also one of the pieces needed to make the .NET SDK build itself
 deterministic and reproducible. For more details, see
 https://github.com/dotnet/source-build/issues/4963
 
-Note: this proposal uses "deterministic" and "reproducible" and interchangeably
+Note: this proposal uses "deterministic" and "reproducible" interchangeably
 as synonyms. .NET uses the term deterministic. The wider ecosystem uses
 reproducible too.
 
@@ -46,6 +46,8 @@ For more information on deterministic and reproducible builds, see:
 
 - https://en.wikipedia.org/wiki/Reproducible_builds
 - https://reproducible-builds.org/
+- [Deterministic builds in Roslyn](https://blog.paranoidcoding.org/2016/04/05/deterministic-builds-in-roslyn.html)
+- [DotNet.ReproducibleBuilds](https://github.com/dotnet/reproducible-builds)
 - New SDL requirement: Enable deterministic builds (https://github.com/dotnet/arcade/issues/15910)
 
 ## Explanation
@@ -58,9 +60,6 @@ non-deterministic to being deterministic in package contents, and optionally to
 being bit-by-bit deterministic.
 
 ### Functional explanation
-
-<!-- Explain the proposal as if it were already implemented and you're teaching it to another person. -->
-<!-- Introduce new concepts, functional designs with real life examples, and low-fidelity mockups or  pseudocode to show how this proposal would look. -->
 
 From an implementation point of view there are 3 levels to deterministic-ness
 in NuGet:
@@ -94,11 +93,11 @@ in NuGet:
      This is already the default for recent versions of .NET, at least as far
      as .NET Core 3.0.
 
-   - For `nuget`:
+   - For `NuGet.exe`:
 
      Use the `-Deterministic` argument. For example:
 
-     `pack packageA.nuspec -Deterministic`
+     `nuget pack packageA.nuspec -Deterministic`
 
 2. Enabling introduces slight risk
 
@@ -131,7 +130,7 @@ in NuGet:
      (eg, from environment variable), then `DeterministicTimestamp` is set to
      the value of `SOURCE_DATE_EPOCH`.
 
-   - For `nuget`:
+   - For `NuGet.exe:
 
      Use the `-DeterministicTimestamp {DATE_TIME}` argument. For example:
 
@@ -142,8 +141,6 @@ in NuGet:
    number of seconds since the unix epoch (`Jan 1 1970, 00:00:00 UTC`).
 
 ### Technical explanation
-
-<!-- Explain the proposal in sufficient detail with implementation details, interaction models, and clarification of corner cases. -->
 
 - `Deterministic` is a boolean. When `Deterministic` is set to true, a single
   deterministic time is used as the file modification time for all the files
@@ -180,21 +177,24 @@ in NuGet:
 - We enabled this in the past with fixed 1980-based timestamps. Customers
   reported deployments failing. Their tools used the time to determine whether
   a file was newer, which returned bad results with fixed timestamps. For more
-  details see [#3388](https://github.com/dotnet/core/issues/3388). To mitigate
-  this, this proposal uses real wall-clock-based-timestamps by default, and
-  allows developers to override it.
+  details see [dotnet/core#3388](https://github.com/dotnet/core/issues/3388).
+  To mitigate this, this proposal uses real wall-clock-based-timestamps by
+  default, and allows developers to override the timestamp.
 
 - This feature makes the code more complex.
 
 - The implicit use of `SOURCE_DATE_EPOCH` as an environment variable can lead
-  to action-at-a-distance issues and it's not immediately obvious how this
-  variable is used.
+  to action-at-a-distance issues. To mitigate this, we will reading this
+  variable using msbuild which should make the variable's usage and value
+  available through the binlog.
+
+- Package signing breaks the possibility of bit-by-bit reproducibility, due to
+  embedding a timestamp. Nuget has the concept of a contnet hash, that can
+  mitigate this somewhat, by comparing the contents of two packages.  A command
+  to show a package's content hash is available starting in .NET 10.0.100:
+  0`dotnet nuget verify`.
 
 ## Rationale and alternatives
-
-<!-- Why is this the best design compared to other designs? -->
-<!-- What other designs have been considered and why weren't they chosen? -->
-<!-- What is the impact of not doing this? -->
 
 - We considered making what is now called `DeterministicTimestamp`
   automatically infer the timestamp of the last commit in the source repository
@@ -203,12 +203,11 @@ in NuGet:
 
 - We considered making `DeterministicTimestamp` the default, but it is risky.
 
-## Prior Art
+- As an alternative, we can simply not implement this. This would make .NET's
+  security story and positioning weaker than many other programming language
+  stacks.
 
-<!-- What prior art, both good and bad are related to this proposal? -->
-<!-- Do other features exist in other ecosystems and what experience have their community had? -->
-<!-- What lessons from other communities can we learn from? -->
-<!-- Are there any resources that are relevant to this proposal? -->
+## Prior Art
 
 - Deterministic builds were enabled in NuGet.Client in the past (see the
   [spec](https://github.com/NuGet/Home/wiki/%5BSpec%5D-Deterministic-Pack)) and
@@ -222,21 +221,19 @@ in NuGet:
 - There is an effort to make the entire .NET SDK build end to end
   deterministic: https://github.com/dotnet/source-build/issues/4963
 
+- Some Linux and \*nix distributions actively test all their distribution
+  packages for reproduciblity and share the live status:
+  https://reproducible-builds.org/citests/
+
 - Some Linux distributions like Fedora expect all distro-packages, including
-  .NET, to be deterministic:
+  .NET, to be deterministic. This proposal will support that.
   - https://fedoraproject.org/wiki/Changes/Package_builds_are_expected_to_be_reproducible
 
 ## Unresolved Questions
 
-<!-- What parts of the proposal do you expect to resolve before this gets accepted? -->
-<!-- What parts of the proposal need to be resolved before the proposal is stabilized? -->
-<!-- What related issues would you consider out of scope for this proposal but can be addressed in the future? -->
-
 - Is `DeterministicTimestamp` the best name?
 
 ## Future Possibilities
-
-<!-- What future possibilities can you think of that this proposal would help with? -->
 
 - With `Deterministic=true` by default, support for `Deterministic=false` could
   be fully dropped, and the code paths simplified
