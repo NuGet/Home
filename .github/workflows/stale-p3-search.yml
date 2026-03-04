@@ -56,21 +56,20 @@ jobs:
           echo "⏰ Cutoff date: $CUTOFF_DATE"
           marked=0
 
-          SEARCH_QUERY="is:issue \
-            is:open \
-            label:\"Priority:3\" \
-            updated:<$CUTOFF_DATE \
-            reactions:0 \
-            -label:\"Status:Inactive\" \
-            sort:updated-asc"
-          echo "🔎 Search query: $SEARCH_QUERY"
+          echo "🔎 Searching for Priority:3 issues with reactions:0, updated before $CUTOFF_DATE, without Status:Inactive"
 
           issues=$(gh search issues \
             --repo "$REPO" \
             --limit "$BATCH_SIZE" \
             --json number \
             --jq '.[].number' \
-            "$SEARCH_QUERY")
+            -- \
+            is:open \
+            label:Priority:3 \
+            -label:Status:Inactive \
+            reactions:0 \
+            updated:\<$CUTOFF_DATE \
+            sort:updated-asc)
 
           if [ -z "$issues" ]; then
             echo "✅ No eligible P3 issues found."
