@@ -135,7 +135,7 @@ in NuGet:
      (eg, from environment variable), then `DeterministicTimestamp` is set to
      the value of `SOURCE_DATE_EPOCH`.
 
-   - For `NuGet.exe:
+   - For `NuGet.exe`:
 
      Use the `-DeterministicTimestamp {DATE_TIME}` argument. For example:
 
