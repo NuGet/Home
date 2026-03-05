@@ -207,7 +207,7 @@ in NuGet:
   available through the binlog.
 
 - Package signing breaks the possibility of bit-by-bit reproducibility, due to
-  embedding a timestamp. Nuget has the concept of a contnet hash, that can
+  embedding a timestamp. NuGet has the concept of a content hash, that can
   mitigate this somewhat, by comparing the contents of two packages.  A command
   to show a package's content hash is available starting in .NET 10.0.100:
   `dotnet nuget verify`.
