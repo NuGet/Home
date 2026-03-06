@@ -1,0 +1,107 @@
+id: 
+name: GitOps.WaitingForCustomer
+description: GitOps.WaitingForCustomer
+owner: 
+resource: repository
+disabled: false
+where: 
+configuration:
+  resourceManagementConfiguration:
+    scheduledSearches:
+      description: '[50-10] Mark WaitingForCustomer issues with no activity over 14 days as stale'
+      frequencies:
+      - daily:
+          time: 6:0
+      filters:
+      - hasLabel:
+          label: WaitingForCustomer
+      - noActivitySince:
+          days: 14
+      - isIssue
+      - isOpen
+      - isNotLabeledWith:
+          label: Status:No recent activity
+      actions:
+      - addLabel:
+          label: Status:No recent activity
+      - addReply:
+          reply: This issue has been automatically marked as stale because we have not received a response in 14 days. It will be closed if no further activity occurs within another 14 days of this comment.
+      description: '[50-20] Close stale WaitingForCustomer issues with no activity after 14 days'
+      frequencies:
+      - daily:
+          time: 6:0
+      filters:
+      - hasLabel:
+          label: WaitingForCustomer
+      - hasLabel:
+          label: Status:No recent activity
+      - noActivitySince:
+          days: 14
+      - isIssue
+      - isOpen
+      actions:
+      - closeIssue
+      - removeLabel:
+          label: Status:No recent activity
+      - addLabel:
+          label: Resolution:NeedMoreInfo
+    eventResponderTasks:
+    - if:
+      - payloadType: Issue_Comment
+      - isAction:
+          action: Created
+      - hasLabel:
+          label: WaitingForCustomer
+      - isOpen
+      - or:
+        - and:
+          - hasLabel:
+              label: Transferred issue
+          - not:
+              activitySenderHasPermission:
+                permission: Write
+        - isActivitySender:
+            issueAuthor: True
+      then:
+      - removeLabel:
+          label: WaitingForCustomer
+      - addLabel:
+          label: WaitingForClientTeam
+      - removeLabel:
+          label: Status:No recent activity
+      description: '[50-30] Replace "WaitingForCustomer" with "WaitingForClientTeam" when the author comments'
+    - if:
+      - payloadType: Issues
+      - isAction:
+          action: Closed
+      - or:
+        - hasLabel:
+            label: WaitingForClientTeam
+        - hasLabel:
+            label: WaitingForCustomer
+      then:
+      - removeLabel:
+          label: WaitingForClientTeam
+      - removeLabel:
+          label: WaitingForCustomer
+      description: '[50-40] Remove "WaitingFor" labels when issue is closed'
+    - if:
+      - payloadType: Issue_Comment
+      - isAction:
+          action: Created
+      - hasLabel:
+          label: WaitingForClientTeam
+      - isOpen
+      - or:
+        - activitySenderHasPermission:
+            permission: Write
+        - activitySenderHasPermission:
+            permission: Admin
+      then:
+      - removeLabel:
+          label: WaitingForClientTeam
+      - addLabel:
+          label: WaitingForCustomer
+      description: '[50-50] Replace "WaitingForClientTeam" with "WaitingForCustomer" when client team comments'
+onFailure: 
+onSuccess: 

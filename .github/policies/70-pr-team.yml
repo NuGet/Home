@@ -1,0 +1,69 @@
+id: 
+name: GitOps.StaleTeamPRs
+description: GitOps.StaleTeamPRs
+owner: 
+resource: repository
+disabled: false
+where: 
+configuration:
+  resourceManagementConfiguration:
+    scheduledSearches:
+      description: '[70-10] Search for team PRs with no activity over 30 days and warn'
+      frequencies:
+      - hourly:
+          hour: 3
+      filters:
+      - noActivitySince:
+          days: 30
+      - isPullRequest
+      - isOpen
+      - isNotDraftPullRequest
+      - isNotLabeledWith:
+          label: Community
+      - isNotLabeledWith:
+          label: Status:No recent activity
+      actions:
+      - addLabel:
+          label: Status:No recent activity
+      - addReply:
+          reply: This PR has been automatically marked as stale because it has no activity for **30 days**. It will be closed if no further activity occurs **within another 15 days** of this comment, unless it has a "Status:Do not auto close" label. If it is closed, you may reopen it anytime when you're ready again, as long as you don't delete the branch.
+      description: '[70-20] Close team PRs with no activity over 15 days after warn'
+      frequencies:
+      - hourly:
+          hour: 3
+      filters:
+      - isPullRequest
+      - isOpen
+      - hasLabel:
+          label: Status:No recent activity
+      - isNotLabeledWith:
+          label: Community
+      - noActivitySince:
+          days: 15
+      - isNotLabeledWith:
+          label: Status:Do not auto close
+      actions:
+      - closeIssue
+    eventResponderTasks:
+    - if:
+      - payloadType: Pull_Request
+      - not:
+          isAction:
+            action: Closed
+      - hasLabel:
+          label: Status:No recent activity
+      then:
+      - removeLabel:
+          label: Status:No recent activity
+      description: '[70-30] Remove "Status:No recent activity" on PR activity'
+    - if:
+      - payloadType: Issue_Comment
+      - isPullRequest
+      - hasLabel:
+          label: Status:No recent activity
+      then:
+      - removeLabel:
+          label: Status:No recent activity
+      description: '[70-40] Remove "Status:No recent activity" on PR comment'
+onFailure: 
+onSuccess: 

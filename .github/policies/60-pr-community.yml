@@ -1,0 +1,93 @@
+id: 
+name: GitOps.CommunityPRs
+description: GitOps.CommunityPRs
+owner: 
+resource: repository
+disabled: false
+where: 
+configuration:
+  resourceManagementConfiguration:
+    scheduledSearches:
+      description: '[60-10] Search for community PRs with no activity over 30 days and warn'
+      frequencies:
+      - hourly:
+          hour: 12
+      filters:
+      - hasLabel:
+          label: Community
+      - noActivitySince:
+          days: 30
+      - isPullRequest
+      - isOpen
+      - isNotLabeledWith:
+          label: Status:No recent activity
+      actions:
+      - addLabel:
+          label: Status:No recent activity
+      - addReply:
+          reply: This PR has been automatically marked as stale because it has no activity for **30 days**. It will be closed if no further activity occurs **within another 330 days** of this comment. If it is closed, you may reopen it anytime when you're ready again, as long as you don't delete the branch.
+      description: '[60-20] Close community PRs with no activity over 330 days after warn'
+      frequencies:
+      - hourly:
+          hour: 12
+      filters:
+      - isPullRequest
+      - isOpen
+      - hasLabel:
+          label: Status:No recent activity
+      - hasLabel:
+          label: Community
+      - noActivitySince:
+          days: 330
+      - isNotLabeledWith:
+          label: Status:Do not auto close
+      actions:
+      - closeIssue
+    eventResponderTasks:
+    - if:
+      - payloadType: Pull_Request
+      - or:
+        - isAction:
+            action: Opened
+        - isAction:
+            action: Reopened
+      - activitySenderHasPermission:
+          permission: Read
+      - not:
+          isActivitySender:
+            user: 'nuget-client '
+            issueAuthor: False
+      - not:
+          hasLabel:
+            label: Community
+      then:
+      - addLabel:
+          label: Community
+      description: '[60-30] Label community PRs'
+    - if:
+      - payloadType: Pull_Request
+      - not:
+          isAction:
+            action: Closed
+      - hasLabel:
+          label: Status:No recent activity
+      - hasLabel:
+          label: Community
+      then:
+      - removeLabel:
+          label: Status:No recent activity
+      description: '[60-40] Remove "Status:No recent activity" on PR activity'
+    - if:
+      - payloadType: Issue_Comment
+      - isPullRequest
+      - hasLabel:
+          label: Status:No recent activity
+      - hasLabel:
+          label: Community
+      then:
+      - removeLabel:
+          label: Status:No recent activity
+      description: '[60-50] Remove "Status:No recent activity" on PR comment'
+
+onFailure: 
+onSuccess: 

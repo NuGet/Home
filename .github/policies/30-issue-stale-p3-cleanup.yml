@@ -1,0 +1,67 @@
+id: 
+name: GitOps.StaleP3Cleanup
+description: GitOps.StaleP3Cleanup
+owner: 
+resource: repository
+disabled: false
+where: 
+configuration:
+  resourceManagementConfiguration:
+    scheduledSearches:
+      description: '[30-10] Mark inactive issues as icebox cleanup candidates and warn'
+      frequencies:
+      - hourly:
+          hour: 4
+      filters:
+      - isOpen
+      - isIssue
+      - hasLabel:
+          label: Status:Inactive
+      - isNotLabeledWith:
+          label: Status:Excluded from icebox cleanup
+      - isNotLabeledWith:
+          label: Triage:NeedsTriageDiscussion
+      - isNotLabeledWith:
+          label: Icebox cleanup candidate
+      actions:
+      - addLabel:
+          label: Icebox cleanup candidate
+      - addReply:
+          reply: >
+            Due to lack of recent activity, this issue has been marked as a candidate for icebox cleanup. It will be closed if no further activity occurs within 14 more days. Any new comment (by anyone, not necessarily the author) will add a `Triage:NeedsTriageDiscussion` label and lead to a triaging process.
+
+            This process is part of the experimental [Stale icebox issues cleanup](https://github.com/NuGet/Home/issues/12113) we are currently trialing. Please share any feedback you might have in the linked issue.
+      description: '[30-20] Close icebox cleanup candidates with no activity after 14 days'
+      frequencies:
+      - hourly:
+          hour: 4
+      filters:
+      - isOpen
+      - isIssue
+      - hasLabel:
+          label: Icebox cleanup candidate
+      - isNotLabeledWith:
+          label: Triage:NeedsTriageDiscussion
+      - noActivitySince:
+          days: 14
+      actions:
+      - addReply:
+          reply: 'This issue will now be closed since it had been marked Icebox cleanup candidate, but received no further activity in the past 14 days. '
+      - closeIssue
+    eventResponderTasks:
+    - if:
+      - payloadType: Issue_Comment
+      - isOpen
+      - isAction:
+          action: Created
+      - hasLabel:
+          label: Icebox cleanup candidate
+      - not:
+          hasLabel:
+            label: Triage:NeedsTriageDiscussion
+      then:
+      - addLabel:
+          label: Triage:NeedsTriageDiscussion
+      description: '[30-30] Add "Triage:NeedsTriageDiscussion" when icebox cleanup candidate receives a comment'
+onFailure: 
+onSuccess: 

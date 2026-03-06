@@ -1,0 +1,32 @@
+id: 
+name: GitOps.TransferredIssueTriage
+description: GitOps.TransferredIssueTriage
+owner: 
+resource: repository
+disabled: false
+where: 
+configuration:
+  resourceManagementConfiguration:
+    eventResponderTasks:
+    - if:
+      - payloadType: Issues
+      - isAction:
+          action: Opened
+      - or:
+        - isActivitySender:
+            user: vsfeedback
+            issueAuthor: False
+        - bodyContains:
+            pattern: Copied from original issue
+            isRegex: False
+        - bodyContains:
+            pattern: Issue moved from
+            isRegex: False
+      then:
+      - addLabel:
+          label: Transferred issue
+      - addLabel:
+          label: Triage:Untriaged
+      description: '[40-10] Tag transferred issues from vsfeedback or other repos'
+onFailure: 
+onSuccess: 
