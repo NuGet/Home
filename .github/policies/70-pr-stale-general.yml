@@ -65,5 +65,15 @@ configuration:
       - removeLabel:
           label: Status:No recent activity
       description: '[70-40] Remove "Status:No recent activity" on PR comment'
+    - if:
+      - payloadType: Pull_Request_Review
+      - hasLabel:
+          label: Status:No recent activity
+      - hasLabel:
+          label: Community
+      then:
+      - removeLabel:
+          label: Status:No recent activity
+    description: '[70-50] Remove "Status:No recent activity" on PR reviews'
 onFailure: 
 onSuccess: 
