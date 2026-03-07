@@ -1,6 +1,6 @@
 id: 
-name: GitOps.StaleTeamPRs
-description: GitOps.StaleTeamPRs
+name: GitOps.StalePRsGeneral
+description: GitOps.StalePRsGeneral
 owner: 
 resource: repository
 disabled: false
@@ -45,7 +45,8 @@ configuration:
       actions:
       - closeIssue
     eventResponderTasks:
-    - if:
+    - description: '[70-30] Remove "Status:No recent activity" on PR activity'
+      if:
       - payloadType: Pull_Request
       - not:
           isAction:
@@ -55,8 +56,8 @@ configuration:
       then:
       - removeLabel:
           label: Status:No recent activity
-      description: '[70-30] Remove "Status:No recent activity" on PR activity'
-    - if:
+    - description: '[70-40] Remove "Status:No recent activity" on PR comment'
+      if:
       - payloadType: Issue_Comment
       - isPullRequest
       - hasLabel:
@@ -64,8 +65,8 @@ configuration:
       then:
       - removeLabel:
           label: Status:No recent activity
-      description: '[70-40] Remove "Status:No recent activity" on PR comment'
-    - if:
+    - description: '[70-50] Remove "Status:No recent activity" on PR reviews'
+      if:
       - payloadType: Pull_Request_Review
       - hasLabel:
           label: Status:No recent activity
@@ -74,6 +75,5 @@ configuration:
       then:
       - removeLabel:
           label: Status:No recent activity
-    description: '[70-50] Remove "Status:No recent activity" on PR reviews'
 onFailure: 
 onSuccess: 

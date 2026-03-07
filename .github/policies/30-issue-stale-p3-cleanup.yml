@@ -49,7 +49,8 @@ configuration:
           reply: 'This issue will now be closed since it had been marked Icebox cleanup candidate, but received no further activity in the past 14 days. '
       - closeIssue
     eventResponderTasks:
-    - if:
+    - description: '[30-30] Add "Triage:NeedsTriageDiscussion" when icebox cleanup candidate receives a comment'
+      if:
       - payloadType: Issue_Comment
       - isOpen
       - isAction:
@@ -62,6 +63,5 @@ configuration:
       then:
       - addLabel:
           label: Triage:NeedsTriageDiscussion
-      description: '[30-30] Add "Triage:NeedsTriageDiscussion" when icebox cleanup candidate receives a comment'
 onFailure: 
 onSuccess: 

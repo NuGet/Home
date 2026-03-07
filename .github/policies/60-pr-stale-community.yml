@@ -1,6 +1,6 @@
 id: 
-name: GitOps.CommunityPRs
-description: GitOps.CommunityPRs
+name: GitOps.StalePRsCommunity
+description: GitOps.StalePRsCommunity
 owner: 
 resource: repository
 disabled: false
@@ -44,7 +44,8 @@ configuration:
       actions:
       - closeIssue
     eventResponderTasks:
-    - if:
+    - description: '[60-30] Label community PRs'
+      if:
       - payloadType: Pull_Request
       - or:
         - isAction:
@@ -63,6 +64,5 @@ configuration:
       then:
       - addLabel:
           label: Community
-      description: '[60-30] Label community PRs'
 onFailure: 
 onSuccess: 

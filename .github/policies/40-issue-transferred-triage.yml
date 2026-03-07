@@ -8,7 +8,8 @@ where:
 configuration:
   resourceManagementConfiguration:
     eventResponderTasks:
-    - if:
+    - description: '[40-10] Tag transferred issues from vsfeedback or other repos'
+      if:
       - payloadType: Issues
       - isAction:
           action: Opened
@@ -27,6 +28,5 @@ configuration:
           label: Transferred issue
       - addLabel:
           label: Triage:Untriaged
-      description: '[40-10] Tag transferred issues from vsfeedback or other repos'
 onFailure: 
 onSuccess: 

@@ -46,7 +46,8 @@ configuration:
       - addLabel:
           label: Resolution:NeedMoreInfo
     eventResponderTasks:
-    - if:
+    - description: '[50-30] Replace "WaitingForCustomer" with "WaitingForClientTeam" when the author comments'
+      if:
       - payloadType: Issue_Comment
       - isAction:
           action: Created
@@ -69,8 +70,8 @@ configuration:
           label: WaitingForClientTeam
       - removeLabel:
           label: Status:No recent activity
-      description: '[50-30] Replace "WaitingForCustomer" with "WaitingForClientTeam" when the author comments'
-    - if:
+    - description: '[50-40] Remove "WaitingFor" labels when issue is closed'
+      if:
       - payloadType: Issues
       - isAction:
           action: Closed
@@ -84,8 +85,8 @@ configuration:
           label: WaitingForClientTeam
       - removeLabel:
           label: WaitingForCustomer
-      description: '[50-40] Remove "WaitingFor" labels when issue is closed'
-    - if:
+    - description: '[50-50] Replace "WaitingForClientTeam" with "WaitingForCustomer" when client team comments'
+      if:
       - payloadType: Issue_Comment
       - isAction:
           action: Created
@@ -102,6 +103,5 @@ configuration:
           label: WaitingForClientTeam
       - addLabel:
           label: WaitingForCustomer
-      description: '[50-50] Replace "WaitingForClientTeam" with "WaitingForCustomer" when client team comments'
 onFailure: 
 onSuccess: 

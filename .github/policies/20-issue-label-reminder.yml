@@ -51,7 +51,8 @@ configuration:
       - addLabel:
           label: missing-required-type
     eventResponderTasks:
-    - if:
+    - description: '[20-20] Remove "missing-required-type" if it has Type label'
+      if:
       - payloadType: Issues
       - isAction:
           action: Labeled
@@ -85,8 +86,8 @@ configuration:
       then:
       - removeLabel:
           label: missing-required-type
-      description: '[20-20] Remove "missing-required-type" if it has Type label'
-    - if:
+    - description: '[20-30] Remind NuGet Client member (issue author) to add Type label'
+      if:
       - payloadType: Issues
       - not:
           hasLabel:
@@ -137,8 +138,8 @@ configuration:
           reply: '@${issueAuthor} Issue is missing Type label, remember to add a [Type label](https://github.com/NuGet/Client.Engineering/blob/main/designs/nuget-issues-approach.md#issue-type)'
       - addLabel:
           label: missing-required-type
-      description: '[20-30] Remind NuGet Client member (issue author) to add Type label'
-    - if:
+    - description: '[20-40] Remind NuGet Client member (issue assignee) to add Type label'
+      if:
       - payloadType: Issues
       - and:
         - not:
@@ -192,6 +193,5 @@ configuration:
           reply: ${assignees} Issue is missing Type label, remember to add a [Type label](https://github.com/NuGet/Client.Engineering/blob/main/designs/nuget-issues-approach.md#issue-type)
       - addLabel:
           label: missing-required-type
-      description: '[20-40] Remind NuGet Client member (issue assignee) to add Type label'
 onFailure: 
 onSuccess: 
