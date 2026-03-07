@@ -64,30 +64,5 @@ configuration:
       - addLabel:
           label: Community
       description: '[60-30] Label community PRs'
-    - if:
-      - payloadType: Pull_Request
-      - not:
-          isAction:
-            action: Closed
-      - hasLabel:
-          label: Status:No recent activity
-      - hasLabel:
-          label: Community
-      then:
-      - removeLabel:
-          label: Status:No recent activity
-      description: '[60-40] Remove "Status:No recent activity" on PR activity'
-    - if:
-      - payloadType: Issue_Comment
-      - isPullRequest
-      - hasLabel:
-          label: Status:No recent activity
-      - hasLabel:
-          label: Community
-      then:
-      - removeLabel:
-          label: Status:No recent activity
-      description: '[60-50] Remove "Status:No recent activity" on PR comment'
-
 onFailure: 
 onSuccess: 
