@@ -8,7 +8,7 @@ where:
 configuration:
   resourceManagementConfiguration:
     scheduledSearches:
-      description: '[20-10] Remind HotSeat to add Type label'
+    - description: '[20-10] Remind HotSeat to add Type label'
       frequencies:
       - daily:
           time: 12:0

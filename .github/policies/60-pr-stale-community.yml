@@ -8,7 +8,7 @@ where:
 configuration:
   resourceManagementConfiguration:
     scheduledSearches:
-      description: '[60-10] Search for community PRs with no activity over 30 days and warn'
+    - description: '[60-10] Search for community PRs with no activity over 30 days and warn'
       frequencies:
       - hourly:
           hour: 12
@@ -26,7 +26,7 @@ configuration:
           label: Status:No recent activity
       - addReply:
           reply: This PR has been automatically marked as stale because it has no activity for **30 days**. It will be closed if no further activity occurs **within another 330 days** of this comment. If it is closed, you may reopen it anytime when you're ready again, as long as you don't delete the branch.
-      description: '[60-20] Close community PRs with no activity over 330 days after warn'
+    - description: '[60-20] Close community PRs with no activity over 330 days after warn'
       frequencies:
       - hourly:
           hour: 12
