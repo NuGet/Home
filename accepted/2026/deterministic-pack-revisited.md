@@ -256,10 +256,6 @@ in NuGet:
   .NET, to be deterministic. This proposal will support that.
   - https://fedoraproject.org/wiki/Changes/Package_builds_are_expected_to_be_reproducible
 
-## Unresolved Questions
-
-- Is `DeterministicTimestamp` the best name?
-
 ## Future Possibilities
 
 - With `Deterministic=true` by default, support for `Deterministic=false` could
