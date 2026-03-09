@@ -1,6 +1,6 @@
 # Deterministic Pack Revisited
 
-- Author: [omajid](https://github.com/omajid)
+- Author Name: [omajid](https://github.com/omajid)
 - GitHub Issue: [#8601](https://github.com/NuGet/Home/issues/8601)
 
 ## Summary
@@ -74,7 +74,8 @@ in NuGet:
 1. Can be enabled or made the default with low risk
 
    This includes the names of some files, which are otherwise random and based
-   on a GUID. The names will now be based on a hash of the file contents.
+   on a GUID. The names will now be based on a hash that's going to be
+   deterministic.
 
    This is tied to the `Deterministic` property. Use it like this:
 
@@ -101,8 +102,9 @@ in NuGet:
 
    - For `PackageBuilder` API:
 
-     There is no change in the `NuGet.Packaging.PackageBuilder` API. It already
-     contains support for this via the `deterministic` constructor.
+     There is no change in the `NuGet.Packaging.PackageBuilder` API for
+     enabling deterministic mode. It already contains support for this via the
+     `bool deterministic` constructor parameter.
 
 2. Enabling introduces slight risk
 
@@ -154,9 +156,10 @@ in NuGet:
 
      This will accept a string-ified version of `{DATE_TIME}`.
 
-   `DeterministicTimestamp` must be either a full date/time string
-   specified in the RFC3339 format, or a single number indicating the
-   number of seconds since the unix epoch (`Jan 1 1970, 00:00:00 UTC`).
+   `DeterministicTimestamp` must be either a full date/time string specified in
+   the RFC3339 format, or a single number indicating the number of seconds
+   since the unix epoch (`Jan 1 1970, 00:00:00 UTC`). The behaviour is
+   unspecified if the value can not be parsed.
 
 ### Technical explanation
 
@@ -167,17 +170,18 @@ in NuGet:
 
 - `DeterministicTimestamp` must be either a full date/time string specified in
   the RFC3339 format, or a single number indicating the number of seconds since
-  the unix epoch.
+  the unix epoch (which is `Jan 1 1970, 00:00:00 UTC`).
 
   If `Deterministic=false`, then `DeterministicTimestamp` is ignored.
 
-  If `DeterministicTimestamp` is not set but `SOURCE_DATE_EPOCH` is set,
-  `DeterministicTimestamp` will use that value.
+- In an msbuild context using the `PackTask`, if `DeterministicTimestamp` is
+  not set but `SOURCE_DATE_EPOCH` is set, `DeterministicTimestamp` will use
+  that value.
 
   If neither `DeterministicTimestamp` nor `SOURCE_DATE_EPOCH` is set, but
   `Deterministic=true` then the current UTC time is used.
 
-  In other words, the precedence is:
+  In other words, when using the `PackTask` the precedence is:
 
   1. Value of `DeterministicTimestamp`
   2. Value of `SOURCE_DATE_EPOCH`
@@ -188,7 +192,8 @@ in NuGet:
   https://reproducible-builds.org/docs/source-date-epoch/
 
 - The value of `DeterministicTimestamp` and `SOURCE_DATE_EPOCH` must be in the
-  range of valid ZIP archive file modification date and times.
+  range of valid ZIP archive file modification date and times. If this is
+  violated, zip-creation code will throw exceptions.
 
 ## Drawbacks
 
@@ -207,8 +212,8 @@ in NuGet:
   available through the binlog.
 
 - Package signing breaks the possibility of bit-by-bit reproducibility, due to
-  embedding a timestamp. NuGet has the concept of a content hash, that can
-  mitigate this somewhat, by comparing the contents of two packages.  A command
+  embedding a timestamp. Nuget has the concept of a content hash, which can
+  mitigate this somewhat, by comparing the contents of two packages. A command
   to show a package's content hash is available starting in .NET 10.0.100:
   `dotnet nuget verify`.
 
