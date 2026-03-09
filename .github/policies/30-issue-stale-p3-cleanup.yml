@@ -63,5 +63,24 @@ configuration:
       then:
       - addLabel:
           label: Triage:NeedsTriageDiscussion
+    - description: '[30-40] Remove "Icebox cleanup candidate" on issue activity'
+      if:
+      - payloadType: Issues
+      - not:
+          isAction:
+            action: Closed
+      - hasLabel:
+          label: Icebox cleanup candidate
+      then:
+      - removeLabel:
+          label: Icebox cleanup candidate
+    - description: '[30-50] Remove "Icebox cleanup candidate" on issue comment'
+      if:
+      - payloadType: Issue_Comment
+      - hasLabel:
+          label: Icebox cleanup candidate
+      then:
+      - removeLabel:
+          label: Icebox cleanup candidate
 onFailure: 
 onSuccess: 
