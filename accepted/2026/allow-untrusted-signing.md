@@ -166,13 +166,13 @@ Without this change, any environment that cannot install root CA certificates in
 
 - **signtool.exe `/r` flag**: Microsoft's Authenticode signing tool has long supported signing without requiring the root CA in a trusted store, via the `/r` (root subject name) parameter.
 - **NuGet's existing self-signed certificate handling**: `CertificateChainUtility.GetChainStatusFlags` already treats `UntrustedRoot` as a warning for self-issued certificates. This proposal extends that same mechanism.
-- **NuGet verify `--allow-untrusted-root`**: The `nuget verify` command already has an [`--allow-untrusted-root`](https://learn.microsoft.com/en-us/nuget/reference/cli-reference/cli-ref-verify) flag that allows verification of packages signed by certificates with untrusted roots. This proposal brings the same concept to the `sign` side.
+- **NuGet `allowUntrustedRoot` in `nuget.config`**: NuGet's [`trustedSigners` configuration](https://learn.microsoft.com/en-us/nuget/reference/nuget-config-file#trustedsigners-section) already supports an `allowUntrustedRoot` attribute on `<certificate>` elements. When set to `true`, it allows a trusted signer's certificate to chain to an untrusted root during signature verification. This proposal brings the same concept to the `sign` side as a CLI flag.
 - **CoseSignTool `X509ChainTrustValidator`**: Microsoft's [CoseSignTool](https://github.com/microsoft/CoseSignTool) uses `CustomRootTrust` with `CustomTrustStore` for similar scenarios, but requires .NET 5+.
 
 ## Unresolved Questions
 
 - **Warning message verbosity**: Should the warning logged when `UntrustedRoot` is encountered include remediation guidance (e.g., "consider installing the root CA certificate to suppress this warning")?
-- **Interaction with `nuget verify`**: The existing `--allow-untrusted-root` flag on `nuget verify` serves a similar purpose for the verification side. Should these be documented together as a pair?
+- **Interaction with `nuget verify`**: The existing `allowUntrustedRoot` attribute on `<certificate>` elements in the [`trustedSigners` section of `nuget.config`](https://learn.microsoft.com/en-us/nuget/reference/nuget-config-file#trustedsigners-section) serves a similar purpose for the verification side. Should the new `--allow-untrusted-signing` flag and the existing config-level `allowUntrustedRoot` be documented together as complementary features?
 
 ## Future Possibilities
 
