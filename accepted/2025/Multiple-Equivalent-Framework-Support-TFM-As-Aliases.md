@@ -457,12 +457,12 @@ The actual name is under consideration in all these options.
 
 | Option | Changes | Details | Considerations |
 | ------ | ------- | ------- | -------------- |
-| 1 | Add `targetFramework` property. Change the schema version to 2. When needed in .NET 10, default in .NET 11. | The new property allows for disambiguation in aliasing scenarios. | Should the name be something else? Does the schema version even matter? |
-| 2 | Add `targetFramework` property. Keep the schema version at 1. Add the new property immediately. | The new property allows for disambiguation in aliasing scenarios. | Should the name be something else? This is an additive change and as such, it's non-breaking. |
+| 1 | Change key from TargetFramework to effective target framework. | The effective framework is never specified | Breaking changes for parsers, but given that it doesn't work at all for aliased frameworks today, this is net equivalent to no breaking change |
+| 2 | Add `targetFramework` property. Change the schema version to 2. When needed in .NET 10, default in .NET 11. | The new property allows for disambiguation in aliasing scenarios. | Should the name be something else? Does the schema version even matter? |
+| 3 | Add `targetFramework` property. Keep the schema version at 1. Add the new property immediately. | The new property allows for disambiguation in aliasing scenarios. | Should the name be something else? This is an additive change and as such, it's non-breaking. |
 | 3 | Add `effectiveTargetFramework` property. Make `framework` mean the TargetFramework property. Change the schema version to 2. When needed in .NET 10, default in .NET 11. | The new property allows for disambiguation in aliasing scenarios. This is a bit of breaking change, but it does make it align to the value of the --framework option in list package, update package, etc. | Probably the most correct thing. |
 
-Proposal - I think the option being the most correct is 3. It aligns with the --framework option to all other commands.
-This does carry the most risk for anyone implementing the parsing to accidentally get it wrong, but I think the alignment among different long term carries the most value.
+When we don't have a multi-targeted framework, this will be a change, but in that case the breaking change is minor. Given that aliased scenarios are broken, going with 1 is the pragmatic choice.
 
 ### Visual Studio challenges
 
