@@ -67,6 +67,8 @@ configuration:
       if:
       - payloadType: Issue_Comment
       - isOpen
+      - isAction:
+          action: Created
       - hasLabel:
           label: Icebox cleanup candidate
       then:
