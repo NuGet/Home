@@ -78,7 +78,7 @@ in NuGet:
 1. New: Enable more determinism by default
 
    This includes using a single timestamp for all files added to the archive.
-   Currently, this also includes the making the names of psmdcp files
+   Currently, this also includes making the names of psmdcp files
    deterministic, which are otherwise random and based on a GUID.
 
    In the future this might affect more things that are safe to enable by
