@@ -1,11 +1,11 @@
-# Add --allow-untrusted-signing flag to NuGet sign commands
+# Add --allow-untrusted-root flag to NuGet sign commands
 
 - [@elantiguamsft](https://github.com/elantiguamsft)
 - [NuGet/NuGet.Client#7201](https://github.com/NuGet/NuGet.Client/pull/7201)
 
 ## Summary
 
-Add a new `--allow-untrusted-signing` flag to `nuget sign` and `dotnet nuget sign` that allows signing NuGet packages with certificates whose root CA is not installed in a trusted root certificate store. When this flag is set, the `UntrustedRoot` X509 chain status is treated as a warning instead of a fatal error. The certificate chain is still fully built and validated for structural correctness.
+Add a new `--allow-untrusted-root` flag to `nuget sign` and `dotnet nuget sign` that allows signing NuGet packages with certificates whose root CA is not installed in a trusted root certificate store. When this flag is set, the `UntrustedRoot` X509 chain status is treated as a warning instead of a fatal error. The certificate chain is still fully built and validated for structural correctness.
 
 ## Motivation
 
@@ -28,7 +28,7 @@ NuGet's `sign` command is the only commonly used signing tool that cannot sign w
 
 ### Functional explanation
 
-When you need to sign a NuGet package with a certificate whose root CA is not installed in your machine's trusted root certificate store, you can now use the `--allow-untrusted-signing` flag:
+When you need to sign a NuGet package with a certificate whose root CA is not installed in your machine's trusted root certificate store, you can now use the `--allow-untrusted-root` flag:
 
 **dotnet CLI:**
 ```bash
@@ -36,7 +36,7 @@ dotnet nuget sign MyPackage.nupkg \
   --certificate-fingerprint <SHA256-fingerprint> \
   --certificate-store-name My \
   --timestamper http://timestamp.example.com \
-  --allow-untrusted-signing
+  --allow-untrusted-root
 ```
 
 **nuget.exe (classic):**
@@ -45,7 +45,7 @@ nuget sign MyPackage.nupkg \
   -CertificateFingerprint <SHA256-fingerprint> \
   -CertificateStoreName My \
   -Timestamper http://timestamp.example.com \
-  -AllowUntrustedSigning
+  -AllowUntrustedRoot
 ```
 
 When this flag is provided:
@@ -57,7 +57,7 @@ If the flag is **not** provided, behavior is unchanged — `UntrustedRoot` remai
 
 **Example scenario:**
 
-A build system downloads a code signing certificate from Azure Key Vault. The certificate chains up to an internal corporate root CA. The root CA certificate is available in the certificate chain but is not installed in `LocalMachine\Root` or `CurrentUser\Root`. Previously, `nuget sign` would fail with error NU3018. With `--allow-untrusted-signing`, the signing succeeds and a warning is logged indicating the root is untrusted.
+A build system downloads a code signing certificate from Azure Key Vault. The certificate chains up to an internal corporate root CA. The root CA certificate is available in the certificate chain but is not installed in `LocalMachine\Root` or `CurrentUser\Root`. Previously, `nuget sign` would fail with error NU3018. With `--allow-untrusted-root`, the signing succeeds and a warning is logged indicating the root is untrusted.
 
 ### Technical explanation
 
@@ -129,7 +129,7 @@ NuGet.Commands.SignArgs.AllowUntrustedRoot.set → void
 ## Drawbacks
 
 - **Reduced trust verification at sign time**: By allowing untrusted roots, the signer no longer guarantees that the signing certificate chains to a known, trusted root CA. However, this is a **sign-time** concern only — NuGet package **verification** (`nuget verify`) independently validates the certificate chain against the consumer's trusted root store. The signed package still contains the full certificate chain, so verification is unaffected.
-- **Opt-in flag could be misused**: Users might use `--allow-untrusted-signing` without understanding the implications. This is mitigated by:
+- **Opt-in flag could be misused**: Users might use `--allow-untrusted-root` without understanding the implications. This is mitigated by:
   - The flag name clearly communicates the security trade-off ("untrusted")
   - The default remains `false` — existing behavior is fully preserved
   - A warning is logged when UntrustedRoot status is encountered
@@ -172,10 +172,10 @@ Without this change, any environment that cannot install root CA certificates in
 ## Unresolved Questions
 
 - **Warning message verbosity**: Should the warning logged when `UntrustedRoot` is encountered include remediation guidance (e.g., "consider installing the root CA certificate to suppress this warning")?
-- **Interaction with `nuget verify`**: The existing `allowUntrustedRoot` attribute on `<certificate>` elements in the [`trustedSigners` section of `nuget.config`](https://learn.microsoft.com/en-us/nuget/reference/nuget-config-file#trustedsigners-section) serves a similar purpose for the verification side. Should the new `--allow-untrusted-signing` flag and the existing config-level `allowUntrustedRoot` be documented together as complementary features?
+- **Interaction with `nuget verify`**: The existing `allowUntrustedRoot` attribute on `<certificate>` elements in the [`trustedSigners` section of `nuget.config`](https://learn.microsoft.com/en-us/nuget/reference/nuget-config-file#trustedsigners-section) serves a similar purpose for the verification side. Should the new `--allow-untrusted-root` flag and the existing config-level `allowUntrustedRoot` be documented together as complementary features?
 
 ## Future Possibilities
 
-- **Default behavior change**: If enterprise adoption shows that `--allow-untrusted-signing` is used in the vast majority of signing scenarios, a future proposal could consider changing the default behavior or adding a NuGet.config-level setting.
-- **NuGet.config integration**: A `<config><add key="allowUntrustedSigning" value="true" /></config>` setting could make this persistent across commands without requiring the flag every time.
+- **Default behavior change**: If enterprise adoption shows that `--allow-untrusted-root` is used in the vast majority of signing scenarios, a future proposal could consider changing the default behavior or adding a NuGet.config-level setting.
+- **NuGet.config integration**: A `<config><add key="allowUntrustedRoot" value="true" /></config>` setting could make this persistent across commands without requiring the flag every time.
 - **Certificate chain logging improvements**: With the untrusted root warning in place, NuGet could provide richer chain diagnostics (e.g., logging the full chain, identifying which root was found but untrusted).
