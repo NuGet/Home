@@ -5,16 +5,18 @@
 
 ## Summary
 
-Make NuGet packaging deterministic by default by respecting the existing
-`Deterministic` property.
+Make NuGet packaging more deterministic by default. NuGet will start respecting
+the existing `Deterministic` property, which already defaults to `true`.
 
 Optionally, support making NuGet packages bit-by-bit deterministic and
 reproducible through the new `DeterministicTimestamp` property.
 
+This is targeted for .NET 11.
+
 ## Motivation
 
-Deterministic packages provide a very nice set of security
-advantages to a piece of software:
+Deterministic packages provide a very nice set of security advantages to a
+piece of software:
 
 - Security and verification: It becomes possible to detect and deal with a
   whole new class of attacks in the supply chain - including on build servers.
@@ -57,8 +59,8 @@ Abstractly, being deterministic or reproducible simply means the same inputs
 produces the same outputs.
 
 This proposal is for moving packages built by NuGet.Client from being
-non-deterministic to being deterministic in package contents, and optionally to
-being bit-by-bit deterministic.
+non-deterministic to being deterministic in package contents by default, and
+optionally to being bit-by-bit deterministic.
 
 ### Functional explanation
 
@@ -68,17 +70,18 @@ in NuGet:
 0. Always enabled and already the default.
 
    Some things that help make nuget packages more deterministic are already
-   enabled and the default, and can't be turned off. For example order of files
-   in the nuget package archive is already fully deterministic
+   enabled and the default in already-released versions of NuGet.Client. Some
+   can't be turned off. For example, the order of files within the nuget
+   package archive is already fully deterministic
    ([NuGet.Client#6963](https://github.com/NuGet/NuGet.Client/pull/6963)).
 
-1. Can be enabled or made the default with low risk
+1. New: Enable more determinism by default
 
-   This includes the names of some files, which are otherwise random and based
-   on a GUID. The names will now be based on a hash that's going to be
+   This includes the names of psmdcp files, which are otherwise random and
+   based on a GUID. The names will now be based on a hash that's going to be
    deterministic.
 
-   This is tied to the `Deterministic` property. Use it like this:
+   This is tied to the existing `Deterministic` property. Use it like this:
 
    - For `dotnet pack`:
 
@@ -86,14 +89,17 @@ in NuGet:
 
      `dotnet pack /p:Deterministic=true`
 
+     This property is already the set to true in recent versions of .NET, at
+     least as far as .NET Core 3.0.
+
    - For msbuild project files:
 
      Use the property `Deterministic`. For example:
 
      `<Deterministic>true</Deterministic>`
 
-     This is already the default for recent versions of .NET, at least as far
-     as .NET Core 3.0.
+     This is property is already set to true in recent versions of .NET, at
+     least as far as .NET Core 3.0.
 
    - For `NuGet.exe`:
 
@@ -107,15 +113,15 @@ in NuGet:
      enabling deterministic mode. It already contains support for this via the
      `bool deterministic` constructor parameter.
 
-2. Enabling introduces slight risk
+2. New: Optionally enable things that introduces slight risk
 
    Some things improve deterministic-ness. However, they violate assumptions
-   that other/external tools may rely on as contracts. There's a risk
-   that changes in this bucket can break tools and users.
+   that other/external tools may rely on as contracts. There's a risk that
+   changes in this bucket can break tools and users.
 
    The only known instance of this is embedded timestamps in the zip metadata
    in the nuget archives. This is controlled via the new (optional)
-   `DeterministicTimestamp` property.  Use it like this:
+   `DeterministicTimestamp` property. Use it like this:
 
    - For `dotnet pack`:
 
@@ -174,9 +180,9 @@ in NuGet:
 - This feature makes the code more complex.
 
 - The implicit use of `SOURCE_DATE_EPOCH` as an environment variable can lead
-  to action-at-a-distance issues. To mitigate this, we will reading this
-  variable using msbuild which should make the variable's usage and value
-  available through the binlog.
+  to action-at-a-distance issues. To mitigate this, we will read this variable
+  using msbuild which should make the variable's usage and value available
+  through the binlog.
 
 - Package signing breaks the possibility of bit-by-bit reproducibility, due to
   embedding a timestamp. Nuget has the concept of a content hash, which can
