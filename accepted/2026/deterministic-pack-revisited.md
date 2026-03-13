@@ -77,9 +77,12 @@ in NuGet:
 
 1. New: Enable more determinism by default
 
-   This includes the names of psmdcp files, which are otherwise random and
-   based on a GUID. The names will now be based on a hash that's going to be
-   deterministic.
+   This includes using a single timestamp for all files added to the archive.
+   Currently, this also includes the making the names of psmdcp files
+   deterministic, which are otherwise random and based on a GUID.
+
+   In the future this might affect more things that are safe to enable by
+   default.
 
    This is tied to the existing `Deterministic` property. Use it like this:
 
@@ -107,11 +110,15 @@ in NuGet:
 
      `nuget pack packageA.nuspec -Deterministic`
 
+     The `-Deterministic` flag is **not** the default.
+
    - For `PackageBuilder` API:
 
-     There is no change in the `NuGet.Packaging.PackageBuilder` API for
-     enabling deterministic mode. It already contains support for this via the
-     `bool deterministic` constructor parameter.
+     There is a **behavioural change** in the `NuGet.Packaging.PackageBuilder`
+     API: not explicitly setting `deterministic` value in the constructor will
+     use a default of `true` now. There is no change to the API itself: it
+     already contains support for the `bool deterministic` constructor
+     parameter.
 
 2. New: Optionally enable things that introduces slight risk
 
@@ -161,7 +168,8 @@ in NuGet:
      }
      ```
 
-     This will accept a string-ified version of `{DATE_TIME}`.
+     This will accept a string-ified version of `{DATE_TIME}`. If
+     `Deterministic` is explicitly set to `false`, this will have not be used.
 
    `DeterministicTimestamp` must be either a full date/time string specified in
    the RFC3339 format, or a single number indicating the number of seconds
@@ -201,8 +209,6 @@ in NuGet:
   through a change in sourcelink. This was deemed as too much code to maintain
   for a small benefit: https://github.com/dotnet/sourcelink/pull/1552.
 
-- We considered making `DeterministicTimestamp` the default, but it is risky.
-
 - As an alternative, we can simply not implement this. This would make .NET's
   security story and positioning weaker than many other programming language
   stacks.
@@ -232,6 +238,6 @@ in NuGet:
 ## Future Possibilities
 
 - With `Deterministic=true` by default, support for `Deterministic=false` could
-  be fully dropped, and the code paths simplified
+  be fully dropped, and the code paths simplified.
 
 - Should turning off `Deterministic=true` produce warnings or errors?
