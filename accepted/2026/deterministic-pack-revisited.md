@@ -29,7 +29,7 @@ piece of software:
   binaries match for compliance reasons.
 
 Users are already trying to make packages deterministic on their own; providing
-a first class feature will make it easier for them and everyone else to adapt
+a first-class feature will make it easier for them and everyone else to adopt
 this too.
 
 Bit-by-bit reproducible nuget packages are more important than they might
