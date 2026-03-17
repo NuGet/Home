@@ -77,8 +77,11 @@ in NuGet:
 
 1. New: Enable more determinism by default
 
-   This includes using a single timestamp for all files added to the archive.
-   Currently, this also includes making the names of psmdcp files
+   This includes using a single timestamp, based on the current wall clock
+   time, for all files added to the archive. See the `DeterministicTimestamp`
+   property below on how to override the timestamp.
+
+   Currently, this also includes the making the names of psmdcp files
    deterministic, which are otherwise random and based on a GUID.
 
    In the future this might affect more things that are safe to enable by
@@ -92,8 +95,8 @@ in NuGet:
 
      `dotnet pack /p:Deterministic=true`
 
-     This property is already the set to true in recent versions of .NET, at
-     least as far as .NET Core 3.0.
+     This property is already the set to `true` in recent versions of .NET, at
+     least as far back as .NET Core 3.0.
 
    - For msbuild project files:
 
@@ -101,7 +104,7 @@ in NuGet:
 
      `<Deterministic>true</Deterministic>`
 
-     This is property is already set to true in recent versions of .NET, at
+     This is property is already set to `true` in recent versions of .NET, at
      least as far as .NET Core 3.0.
 
    - For `NuGet.exe`:
@@ -114,11 +117,11 @@ in NuGet:
 
    - For `PackageBuilder` API:
 
-     There is a **behavioural change** in the `NuGet.Packaging.PackageBuilder`
-     API: not explicitly setting `deterministic` value in the constructor will
-     use a default of `true` now. There is no change to the API itself: it
-     already contains support for the `bool deterministic` constructor
-     parameter.
+     There is a **behavioral change** in the `NuGet.Packaging.PackageBuilder`
+     API: not explicitly setting the `deterministic` parameter in the
+     constructor will use a default of `true` now. There is no change to the
+     API itself: it already contains support for the `bool deterministic`
+     constructor parameter.
 
 2. New: Optionally enable things that introduces slight risk
 
@@ -169,12 +172,12 @@ in NuGet:
      ```
 
      This will accept a string-ified version of `{DATE_TIME}`. If
-     `Deterministic` is explicitly set to `false`, this will have not be used.
+     `Deterministic` is explicitly set to `false`, this will not be used.
 
    `DeterministicTimestamp` must be either a full date/time string specified in
-   the RFC3339 format, or a single number indicating the number of seconds
-   since the unix epoch (`Jan 1 1970, 00:00:00 UTC`). The behaviour is
-   unspecified if the value can not be parsed.
+   the [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339) format, or a single
+   number indicating the number of seconds since the unix epoch (`Jan 1 1970,
+   00:00:00 UTC`). The behaviour is unspecified if the value can not be parsed.
 
 ## Drawbacks
 
