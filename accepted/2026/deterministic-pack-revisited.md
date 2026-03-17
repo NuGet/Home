@@ -81,7 +81,7 @@ in NuGet:
    time, for all files added to the archive. See the `DeterministicTimestamp`
    property below on how to override the timestamp.
 
-   Currently, this also includes the making the names of psmdcp files
+   Currently, this also includes making the names of psmdcp files
    deterministic, which are otherwise random and based on a GUID.
 
    In the future this might affect more things that are safe to enable by
@@ -95,7 +95,7 @@ in NuGet:
 
      `dotnet pack /p:Deterministic=true`
 
-     This property is already the set to `true` in recent versions of .NET, at
+     This property is already set to `true` in recent versions of .NET, at
      least as far back as .NET Core 3.0.
 
    - For msbuild project files:
