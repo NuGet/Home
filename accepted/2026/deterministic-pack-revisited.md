@@ -79,7 +79,8 @@ in NuGet:
 
    This includes using a single timestamp, based on the current wall clock
    time, for all files added to the archive. See the `DeterministicTimestamp`
-   property below on how to override the timestamp.
+   property below on how to override the timestamp, or how to opt out of this
+   behaviour.
 
    Currently, this also includes making the names of psmdcp files
    deterministic, which are otherwise random and based on a GUID.
@@ -174,10 +175,17 @@ in NuGet:
      This will accept a string-ified version of `{DATE_TIME}`. If
      `Deterministic` is explicitly set to `false`, this will not be used.
 
-   `DeterministicTimestamp` must be either a full date/time string specified in
-   the [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339) format, or a single
-   number indicating the number of seconds since the unix epoch (`Jan 1 1970,
-   00:00:00 UTC`). The behaviour is unspecified if the value can not be parsed.
+   `DeterministicTimestamp` must be one of:
+
+     - The literal string `true` to indicate using `DateTime.UtcNow` as the
+       timestamp for all files added to the archive.
+     - The literal string `false` to use the original file modification times.
+     - A full date/time string specified in the [RFC
+       3339](https://www.rfc-editor.org/rfc/rfc3339) format
+     - A a single number indicating the number of seconds since the unix epoch
+       (`Jan 1 1970, 00:00:00 UTC`).
+
+   The default value of `DeterministicTimestamp` is `true`.
 
 ## Drawbacks
 
