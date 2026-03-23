@@ -28,7 +28,7 @@ configuration:
           label: Icebox cleanup candidate
       - addReply:
           reply: >
-            Due to lack of recent activity, this issue has been marked as a candidate for icebox cleanup. It will be closed if no further activity occurs within 14 more days. Any new comment (by anyone, not necessarily the author) will add a `Triage:NeedsTriageDiscussion` label and lead to a triaging process.
+            Due to lack of recent activity, this issue has been marked as a candidate for icebox cleanup. It will be closed if no further activity occurs within 14 more days. If the issue receives enough upvotes, it will be flagged with `Triage:NeedsTriageDiscussion` for team review.
 
             This process is part of the experimental [Stale icebox issues cleanup](https://github.com/NuGet/Home/issues/12113) we are currently trialing. Please share any feedback you might have in the linked issue.
     - description: '[30-20] Close icebox cleanup candidates with no activity after 14 days'
