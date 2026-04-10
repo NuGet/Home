@@ -25,7 +25,7 @@ configuration:
       - addLabel:
           label: Status:No recent activity
       - addReply:
-          reply: This issue has been automatically marked as stale because we have not received a response in 14 days. It will be closed if no further activity occurs within another 14 days of this comment.
+          reply: This issue has been automatically marked as stale because we have not received a response in 14 days. It will be closed if no further activity **by the issue author** occurs within another 14 days of this comment.
     - description: '[50-20] Close stale WaitingForCustomer issues with no activity after 14 days'
       frequencies:
       - daily:
