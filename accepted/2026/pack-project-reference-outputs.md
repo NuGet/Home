@@ -44,6 +44,8 @@ For this opted-in reference:
 - Symbols are included consistently with existing `IncludeSymbols` behavior.
 - The default package location follows the existing pack convention for build output, for example `lib/<tfm>/Implementation.dll`.
 
+If a bundled project references another project, the default behavior should be to include the project-reference closure under the opted-in project. This is required for runtime correctness in common "private implementation assembly" scenarios. The package author opts in at the first redistributed edge; NuGet then follows the restored project graph from that edge so the package contains the implementation assemblies needed by that bundled project.
+
 The package author may override the destination with `PackagePath`:
 
 ```xml
@@ -53,9 +55,9 @@ The package author may override the destination with `PackagePath`:
   PackagePath="analyzers/dotnet/cs" />
 ```
 
-When `PackagePath` is specified, NuGet places the referenced project's outputs under that path. The package author is responsible for choosing a path that is meaningful for the package type. For normal library assemblies, omitting `PackagePath` is preferred so outputs remain under the target framework's `lib` folder.
+When `PackagePath` is specified, NuGet places the referenced project's outputs under that path instead of under `BuildOutputTargetFolder` and the target framework folder. The package author is responsible for choosing a path that is meaningful for the package type. For normal library assemblies, omitting `PackagePath` is preferred so outputs remain under the target framework's `lib` folder.
 
-For multi-targeting projects, pack applies the behavior per target framework. A project reference that only applies to a subset of target frameworks is bundled only for those frameworks.
+For multi-targeting projects, pack applies the behavior per target framework. A project reference that only applies to a subset of target frameworks is bundled only for those frameworks. The feature is also controlled by existing pack switches: if `IncludeBuildOutput=false`, bundled project build outputs are not added to the package.
 
 ### Technical explanation
 
@@ -75,15 +77,18 @@ This metadata must flow through the existing restore entry points:
 
 At pack time, NuGet reads the assets file to identify the project references that opted in to bundling. It then collects build outputs through the existing pack output group targets, using the target framework from the restore graph and avoiding a rebuild of project references during output collection.
 
-Dependency generation changes only for opted-in project references. The bundled project itself is suppressed as a nuspec dependency. Package dependencies reachable through the bundled project are promoted into the parent package dependency group so package consumers still restore required external packages.
+Dependency generation changes only for opted-in project references. The bundled project itself is suppressed as a nuspec dependency. Package dependencies reachable through the bundled project are promoted into the parent package dependency group so package consumers still restore required external packages. Project dependencies reachable through the bundled project are traversed so their package dependencies are promoted too.
 
 The initial implementation should be conservative about the packaging surface:
 
 - Include build outputs that existing pack output groups already understand.
+- Include debug symbols through the existing debug symbol output groups when symbols are requested.
 - Do not include arbitrary content, source, native assets, or runtime-specific assets from referenced projects unless a follow-up design explicitly defines those behaviors.
 - Do not change nuspec pack.
 - Do not change `nuget.exe pack -IncludeReferencedProjects`.
 - Do not change the default handling of project references.
+
+The current implementation shape uses two assets-file reads during pack: one to collect all project references for the existing package-version lookup, and one to collect the subset of project references whose outputs should be packed. The packed project-reference items carry `TargetFramework`, `BuildProjectReferences=false`, and, when specified, the requested package path.
 
 ## Drawbacks
 
@@ -93,17 +98,21 @@ The feature can encourage package authors to avoid creating proper packages for 
 
 The feature also makes pack more complex because restore metadata, assets-file serialization, dependency generation, and output collection all need to agree on the same project-reference metadata.
 
+Promoting dependencies from bundled projects can also change the apparent dependency graph of the parent package. This is desirable when it preserves runtime dependencies, but it may surprise authors if a private project has package references they did not expect to expose to package consumers.
+
 ## Rationale and alternatives
 
 The design uses per-reference opt-in because the current default is safer and well established. Automatically bundling all non-packable projects, or all projects without `PackageId`, would be more convenient for some repositories but could redistribute assemblies without a clear author decision.
 
 `Pack="true"` is reused because pack already uses `Pack` metadata on other MSBuild items to mean "include this item in the package." Reusing the existing term is more discoverable than adding a new metadata name such as `IncludeOutputDll`, and it leaves room for package layout to be controlled by `PackagePath`.
 
-`PackagePath` is reused because it already controls where packed items land in the package. A new metadata name such as `PackageRoot` would be narrower, but it would create a separate concept for project references without clear benefit.
+`PackagePath` is reused because it already controls where packed items land in the package. A new metadata name such as `PackageRoot` would be narrower, but it would create a separate concept for project references without clear benefit. For project-reference outputs, `PackagePath` is intentionally treated as a single destination for the referenced project's output files rather than as the multi-destination content-file syntax.
 
 An alternative is to require users to keep using `TargetsForTfmSpecificBuildOutput` and custom MSBuild targets. That avoids a product change, but it leaves users to manually copy assemblies, handle symbols, and replicate package dependencies from referenced projects. The long-running issue shows that these workarounds are common and easy to get wrong.
 
 Another alternative is to revive a single switch equivalent to `IncludeReferencedProjects`. That is simpler to explain, but it is too broad for SDK-style pack because it does not force authors to identify which references are intended to be redistributed.
+
+Another alternative is to require `Pack="true"` on every project-reference edge that should be bundled. That gives the author more control over redistribution, but it is easier to produce broken packages because the first bundled project may depend on another project whose assembly is required at runtime. Following the restored project-reference closure from an explicitly opted-in edge better matches the runtime shape of the bundled implementation.
 
 ## Prior Art
 
@@ -114,10 +123,9 @@ Another alternative is to revive a single switch equivalent to `IncludeReference
 
 ## Unresolved Questions
 
-- Should a `Pack="true"` reference include only the directly referenced project output, or the project-reference closure under that project? Including the closure is usually required for runtime correctness, but explicit opt-in on every bundled edge may better prevent accidental redistribution.
 - Should NuGet warn when an opted-in project reference points to a project that is itself packable or has a `PackageId`, since that may indicate the project should remain a package dependency?
-- Should `PackagePath` support the same multi-path semantics that content items support, or should project reference outputs allow only one destination?
-- Should package dependencies promoted from bundled projects preserve all include/exclude/private asset metadata, or should pack define a narrower dependency projection for bundled projects?
+- Should transitive bundled project outputs inherit the root opted-in reference's `PackagePath`, or should only the directly opted-in project's outputs use that override? Inheriting the path is simple, but may be wrong for mixed asset types.
+- Should package dependencies promoted from bundled projects preserve all include/exclude/private asset metadata, or should pack define a narrower dependency projection for bundled projects? The current implementation promotes package dependencies with include/exclude information from the lock file and does not preserve a private-assets suppress-parent value.
 - Should pack emit a warning when two bundled project outputs resolve to the same package path, beyond the existing duplicate file warning?
 - Should this feature require any new package authoring guidance about licensing and redistribution of referenced project outputs?
 
