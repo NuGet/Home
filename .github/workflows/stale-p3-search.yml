@@ -35,7 +35,7 @@ jobs:
     steps:
       - name: Mark stale P3 issues as inactive
         run: |
-          echo "🔍 Finding Priority:3 issues with fewest reactions and no activity in $INACTIVITY_DAYS+ days..."
+          echo "🔍 Finding Priority:3 issues with <5 upvotes and no activity in $INACTIVITY_DAYS+ days..."
           echo "📦 Batch size: $BATCH_SIZE"
           echo "🧪 Dry run: $DRY_RUN"
           echo "REPO: $REPO"
@@ -56,7 +56,7 @@ jobs:
           echo "⏰ Cutoff date: $CUTOFF_DATE"
           marked=0
 
-          echo "🔎 Searching for Priority:3 issues sorted by fewest reactions, last updated before $CUTOFF_DATE, without Status:Inactive"
+          echo "🔎 Searching for Priority:3 issues with <5 reactions, last updated before $CUTOFF_DATE, without Status:Inactive"
 
           issues=$(gh search issues \
             --repo "$REPO" \
@@ -67,6 +67,7 @@ jobs:
             is:open \
             label:Priority:3 \
             -label:Status:Inactive \
+            reactions:\<5 \
             updated:\<$CUTOFF_DATE \
             sort:reactions-asc)
 
