@@ -33,13 +33,20 @@ This is done to avoid a breaking change.
 
 #### File Structure
 
+All `.dll` files under `analyzers/` are tracked, at any depth, excluding satellite `.resources.dll` assemblies. This mirrors the SDK's analyzer discovery, so the assets file does not assume a fixed folder layout.
+
 |Pattern|Description|
 |---|---|
-|`analyzers/dotnet/{language}/{name}.dll`|Language-specific analyzers|
+|`analyzers/**/{name}.dll`|Any analyzer assembly, at any depth under `analyzers/`|
+|`analyzers/dotnet/{language}/{name}.dll`|Language-specific analyzer (`cs`, `vb`, `fs`)|
+|`analyzers/dotnet/{compilerApiVersion}/{language}/{name}.dll`|Analyzer for a specific compiler API version (`roslynX.Y`)|
+
+The `{language}` and `{compilerApiVersion}` segments are optional and may appear at any depth. NuGet derives `codeLanguage` and `compilerApiVersion` metadata from them (see the example below) so the SDK can select the applicable analyzers, the same way `codeLanguage` is used for content files. Analyzers with no language segment get a `codeLanguage` of `any`, and `compilerApiVersion` is omitted when the path has no `roslynX.Y` segment. Excluded analyzers (for example via `PrivateAssets`) are written as a bare `analyzers/.../_._` placeholder with no metadata.
 
 Examples: 
 - `analyzers/dotnet/cs/MyAnalyzer.dll` (C# analyzer)
 - `analyzers/dotnet/vb/MyAnalyzer.dll` (VB.NET analyzer)
+- `analyzers/dotnet/roslyn4.0/cs/MyAnalyzer.dll` (C# analyzer for Roslyn 4.0+)
 
 **NuGet Changes**
 
@@ -51,6 +58,7 @@ Examples:
 Update SDK asset resolution logic (e.g., ResolvePackageAssets.cs) to:
 - Read analyzer assets directly from the "analyzers" group in "targets", instead of scanning all files in "libraries".
 - Only load analyzers that are listed in this group.
+- Select the applicable analyzers from the group using the `codeLanguage` and `compilerApiVersion` metadata (the group lists analyzers for all languages and compiler versions), mirroring how `codeLanguage` selects content files. When several analyzers apply to the same language, the SDK picks the highest applicable compiler API version.
 - When `<RestoreEnableAnalyzerAssets>` is set to true, the SDK will only use the analyzer group that is in the assets file to determine which analyzers to include. 
 - If the analyzers group is missing from the assets file and the feature flag is enabled, the SDK won't fall back to legacy scanning. 
 - If the feature flag is not set or is false, the SDK will use the legacy scanning behavior to discover analyzers and preserve compatibility. 
@@ -59,13 +67,19 @@ Update SDK asset resolution logic (e.g., ResolvePackageAssets.cs) to:
 ```json
 "version": 4,
 "targets": {
-  ".NETCoreApp,Version=v8.0": {
+  ".NETCoreApp,Version=v11.0": {
     "My.Analyzer.Package/1.0.0": {
       "type": "package",
       "compile": { ... },
       "runtime": { ... },
       "analyzers": {
-        "analyzers/dotnet/cs/MyAnalyzer.dll": {}
+        "analyzers/dotnet/cs/MyAnalyzer.dll": {
+          "codeLanguage": "cs"
+        },
+        "analyzers/dotnet/roslyn4.0/cs/MyAnalyzer.dll": {
+          "codeLanguage": "cs",
+          "compilerApiVersion": "roslyn4.0"
+        }
       }
     }
   }
@@ -103,7 +117,9 @@ Validate correct behavior with:
 "MyAnalyzer/1.0.0": {
   "type": "package",
   "analyzers": {
-    "analyzers/dotnet/cs/MyAnalyzer.dll": {}
+    "analyzers/dotnet/cs/MyAnalyzer.dll": {
+      "codeLanguage": "cs"
+    }
   }
 }
 ```
@@ -138,9 +154,9 @@ Project A -> Project B -> Package C (with analyzers)
 
 ### No Breaking Changes Initially 
 
-For projects using the latest TFM, this feature will be enabled by default. 
+Initially this feature is opt-in and is only honored for projects targeting .NET 11 or greater; on earlier target frameworks the property is ignored. Enabling it by default for the latest TFM is a later step in the rollout. 
 
-Otherwise, this feature is going to be opt-in via `<RestoreEnableAnalyzerAssets>true</RestoreEnableAnalyzerAssets>`, so existing projects will not be affected until they explicitly enable it.
+The opt-in is via `<RestoreEnableAnalyzerAssets>true</RestoreEnableAnalyzerAssets>`, so existing projects will not be affected until they explicitly enable it on a supported target framework.
 
 ### When Enabled by Default
 
@@ -165,8 +181,8 @@ Projects using `PrivateAssets="analyzers"` or `ExcludeAssets="analyzers"` will s
 
 ### Rollout Strategy
 
-The current rollout will be to opt-in for .NET 10.
-For .NET 11, it is going to be opt-in for all frameworks and enabled by default for projects that target .NET 11.
+The initial rollout is opt-in via `<RestoreEnableAnalyzerAssets>true</RestoreEnableAnalyzerAssets>`, and the opt-in is only available for projects targeting .NET 11 or greater; on earlier target frameworks it is ignored.
+The next step is to enable it by default for projects that target .NET 11 or greater, while remaining opt-in elsewhere.
 The last step will be to remove the feature flag. 
 
 
