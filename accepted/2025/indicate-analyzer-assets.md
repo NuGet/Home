@@ -6,8 +6,10 @@
 
 ## Summary
 
-`project.assets.json` does not currently indicate which analyzers are active, and analyzers are added even when `PrivateAssets` or `ExcludeAssets` should prevent this.
-This leads to analyzers being included in projects, which is not the expected behavior, especially when defaults for private/excluded assets are not respected
+`project.assets.json` does not currently record which analyzers a package contributes.
+Because that information is missing, the .NET SDK has to work around the gap by scanning each package's files to discover analyzers itself.
+That workaround has no knowledge of asset filtering, so analyzers are applied to the project's compilation even when `PrivateAssets` or `ExcludeAssets` should exclude them.
+Surfacing analyzer assets in `project.assets.json` closes this gap and gives the SDK the information it needs to decide which analyzers to apply.
 
 ## Motivation
 
@@ -33,15 +35,22 @@ This is done to avoid a breaking change.
 
 #### File Structure
 
-All `.dll` files under `analyzers/` are tracked, at any depth, excluding satellite `.resources.dll` assemblies. This mirrors the SDK's analyzer discovery, so the assets file does not assume a fixed folder layout.
+All `.dll` files under `analyzers/` are tracked, at any depth, excluding satellite `.resources.dll` assemblies.
+This mirrors the SDK's analyzer discovery, so the assets file does not assume a fixed folder layout.
 
-|Pattern|Description|
+NuGet decides whether a file is an analyzer purely from the `analyzers/` prefix and the `.dll` extension.
+The remaining path segments are not used to decide whether a file is tracked, so every matching analyzer is listed regardless of its language or compiler version.
+NuGet inspects the optional language and compiler-version segments only to derive selection metadata:
+
+|Path segment|Metadata derived|
 |---|---|
-|`analyzers/**/{name}.dll`|Any analyzer assembly, at any depth under `analyzers/`|
-|`analyzers/dotnet/{language}/{name}.dll`|Language-specific analyzer (`cs`, `vb`, `fs`)|
-|`analyzers/dotnet/{compilerApiVersion}/{language}/{name}.dll`|Analyzer for a specific compiler API version (`roslynX.Y`)|
+|A `cs`, `vb`, or `fs` segment (e.g. `analyzers/dotnet/cs/{name}.dll`)|`codeLanguage`; defaults to `any` when no language segment is present|
+|A `roslynX.Y` segment (e.g. `analyzers/dotnet/roslyn4.0/cs/{name}.dll`)|`compilerApiVersion`; omitted when no such segment is present|
 
-The `{language}` and `{compilerApiVersion}` segments are optional and may appear at any depth. NuGet derives `codeLanguage` and `compilerApiVersion` metadata from them (see the example below) so the SDK can select the applicable analyzers, the same way `codeLanguage` is used for content files. Analyzers with no language segment get a `codeLanguage` of `any`, and `compilerApiVersion` is omitted when the path has no `roslynX.Y` segment. Excluded analyzers (for example via `PrivateAssets`) are written as a bare `analyzers/.../_._` placeholder with no metadata.
+The `{language}` and `{compilerApiVersion}` segments are optional and may appear at any depth.
+The SDK uses this metadata to select which analyzers to apply, the same way `codeLanguage` is used for content files.
+Because all analyzers are listed, an `analyzers/dotnet/fs/MyAnalyzer.dll` entry still appears for a C# project, but the SDK does not apply it since its `codeLanguage` is `fs`.
+Excluded analyzers (for example via `PrivateAssets` or `ExcludeAssets`) are written as a `analyzers/.../_._` placeholder with no metadata.
 
 Examples: 
 - `analyzers/dotnet/cs/MyAnalyzer.dll` (C# analyzer)
@@ -85,13 +94,6 @@ Update SDK asset resolution logic (e.g., ResolvePackageAssets.cs) to:
   }
 }
 ``` 
-
-#### Testing
-
-Validate correct behavior with:
-- Analyzer packages with and without exclusion flags.
-- Multi-targeted packages (ensure correct analyzer/TFM pairing).
-- Projects with the feature flag enabled, confirming that included/excluded analyzers match expectations.
 
 ## Private Assets and Transitive Behavior
 
@@ -139,7 +141,16 @@ Validate correct behavior with:
 <PackageReference Include="LibraryWithAnalyzers" Version="1.0.0" 
                   ExcludeAssets="analyzers" />
 ```
-Result: App's project.assets.json will not contain analyzer entries for LibraryWithAnalyzers
+**App's project.assets.json:**
+```json
+"LibraryWithAnalyzers/1.0.0": {
+  "type": "package",
+  "analyzers": {
+    "analyzers/dotnet/cs/_._": {}
+  }
+}
+```
+The excluded analyzers are written as a `_._` placeholder, consistent with how other excluded asset groups (such as `compile` and `runtime`) are represented.
 
 ### How Transitivity Works
 
