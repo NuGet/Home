@@ -77,6 +77,7 @@ The pack warning and the nuget.org push block are complementary, not alternative
 
 ## Unresolved Questions
 
+- **How does this get rolled out in msbuild.exe /t:pack for non-SDK projects. Visual Studio doesn't have a major version where the switch could be easily introduced.** The need for this is there given that customers won't be able to nuget.org.
 - **Patch back to .NET 10.0.400 / 10.0.100.** Given the nuget.org push block is already in effect, should we patch the warning into the .NET 10.0.400 SDK to reach more customers sooner? Should we also patch .NET 10.0.100 to reach Linux customers earlier in the rollout?
 - **Which .NET SDK band makes the warning an error?** The current plan is .NET 12 (one major after the warning ships in .NET 10/11), but the exact `SdkAnalysisLevel` value and band need to be confirmed with the .NET SDK team.
 
