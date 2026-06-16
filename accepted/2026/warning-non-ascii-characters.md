@@ -82,6 +82,8 @@ The pack warning and the nuget.org push block are complementary, not alternative
 
 ## Future Possibilities
 
-- **Restore time non-ASCII character validation**
+- **Restore time validation non-ASCII character validation**
+    - Is there a real user demand for this type of validation. With nuget.org providing the no collision guarantee, the need isn't there since nuget.org is the only true public feed. The rest of feeds would likely be controlled by the consumers.
+    - Should that validation be a warning or an error? A warning is more expensive to technically implement and may add some perf cost. An error is relatively straightforward.  
 - **Promote to error in .NET 12.** Once telemetry shows the warning is being seen and acted on, promote `NU5052` from warning to error under a higher `SdkAnalysisLevel`.
 - **Surface in Visual Studio pack UI.** A more prominent in-IDE prompt when authoring a new package project with a non-ASCII ID.
