@@ -1,13 +1,13 @@
-# ***Warn when creating packages with non-ASCII characters in the package ID***
+# ***Warn when creating packages with that do not adhere to the restricted set of characters in the package ID***
 
 - Nikolche Kolev <https://github.com/nkolev92>
 - [Pack Warning when Package ID doesn't meet the standards](https://github.com/NuGet/Home/issues/14949)
 
 ## Summary
 
-Raise a NuGet pack warning when the package ID being authored contains characters outside of the ASCII range.
+Raise a NuGet pack warning when the package ID being authored does not adhere to the new restricted set of allowed characters.
 The warning is opt-out via `NoWarn`, framework agnostic, and applies to both the MSBuild `Pack` target (`dotnet pack` / `msbuild /t:Pack`) and `nuget.exe pack`.
-This is the client-side companion to the nuget.org change that blocks new pushes with non-ASCII package IDs.
+This is the client-side companion to the nuget.org change that blocks new pushes with package IDs that do not adhere to the restricted set of characters.
 See [Strengthening NuGet Security with Package ID Standards](https://github.com/NuGet/Announcements/issues/75).
 
 ## Motivation
@@ -24,10 +24,10 @@ See [Strengthening NuGet Security with Package ID Standards](https://github.com/
 
 ### Functional explanation
 
-When a user runs `dotnet pack` (or any other entry point that invokes the NuGet `Pack` task) on a project whose effective package ID contains characters outside the ASCII range, NuGet emits a warning:
+When a user runs `dotnet pack` (or any other entry point that invokes the NuGet `Pack` task) on a project whose effective package ID contains characters outside the restricted set, NuGet emits a warning:
 
 ```text
-warning NU5052: The package ID 'Contöso.Utilities' contains non-ASCII characters. Non-ASCII characters in package IDs are not allowed and will become an error in a future release. Consider renaming the package to use ASCII characters only.
+warning NU5052: The package ID 'Contöso.Utilities' does not adhere to the restricted set of characters allowed in package IDs. Rename the package to use only characters from the restricted set.
 ```
 
 The warning:
@@ -45,11 +45,11 @@ The warning is enabled by default gated by `SdkAnalysisLevel`:
 
 | Package ID | Warns? | Notes |
 |------------|--------|-------|
-| `Contoso.Utilities` | No | All ASCII. |
-| `Contöso.Utilities` | Yes | `ö` is outside ASCII. |
-| `Contoso.Ütil` | Yes | `Ü` is outside ASCII. |
+| `Contoso.Utilities` | No | All characters are in the restricted set. |
+| `Contöso.Utilities` | Yes | `ö` is outside the restricted set. |
+| `Contoso.Ütil` | Yes | `Ü` is outside the restricted set. |
 | `Сontoso.Utilities` (Cyrillic `С`) | Yes | Homoglyph. |
-| `My.Package-1.0` | No | Hyphen and digits are ASCII. |
+| `My.Package-1.0` | No | All characters are in the restricted set. |
 
 The check applies only to the **package ID**.
 
@@ -77,14 +77,14 @@ The pack warning and the nuget.org push block are complementary, not alternative
 
 ## Unresolved Questions
 
-- **How does this get rolled out in msbuild.exe /t:pack for non-SDK projects. Visual Studio doesn't have a major version where the switch could be easily introduced.** The need for this is there given that customers won't be able to nuget.org.
+- **How does this get rolled out in msbuild.exe /t:pack for non-SDK projects. Visual Studio no longer releases [side by side](https://learn.microsoft.com/en-us/visualstudio/releases/2026/release-rhythm), so it'll just be rolled out each year.
 - **Patch back to .NET 10.0.400 / 10.0.100.** Given the nuget.org push block is already in effect, should we patch the warning into the .NET 10.0.400 SDK to reach more customers sooner? Should we also patch .NET 10.0.100 to reach Linux customers earlier in the rollout?
 - **Which .NET SDK band makes the warning an error?** The current plan is .NET 12 (one major after the warning ships in .NET 10/11), but the exact `SdkAnalysisLevel` value and band need to be confirmed with the .NET SDK team.
 
 ## Future Possibilities
 
-- **Restore time validation non-ASCII character validation**
+- **Restore time validation for the restricted set of characters**
     - Is there a real user demand for this type of validation. With nuget.org providing the no collision guarantee, the need isn't there since nuget.org is the only true public feed. The rest of feeds would likely be controlled by the consumers.
     - Should that validation be a warning or an error? A warning is more expensive to technically implement and may add some perf cost. An error is relatively straightforward.  
 - **Promote to error in .NET 12.** Once telemetry shows the warning is being seen and acted on, promote `NU5052` from warning to error under a higher `SdkAnalysisLevel`.
-- **Surface in Visual Studio pack UI.** A more prominent in-IDE prompt when authoring a new package project with a non-ASCII ID.
+- **Surface in Visual Studio pack UI.** A more prominent in-IDE prompt when authoring a new package project with an ID that does not adhere to the restricted set.
