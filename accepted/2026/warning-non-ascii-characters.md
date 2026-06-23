@@ -1,13 +1,13 @@
-# ***Warn when creating packages with that do not adhere to the restricted set of characters in the package ID***
+# ***Warn when creating packages with package IDs that do not adhere to the allowed set of characters***
 
 - Nikolche Kolev <https://github.com/nkolev92>
 - [Pack Warning when Package ID doesn't meet the standards](https://github.com/NuGet/Home/issues/14949)
 
 ## Summary
 
-Raise a NuGet pack warning when the package ID being authored does not adhere to the new restricted set of allowed characters.
+Raise a NuGet pack warning when the package ID being authored does not adhere to the new allowed set of characters.
 The warning is opt-out via `NoWarn`, framework agnostic, and applies to both the MSBuild `Pack` target (`dotnet pack` / `msbuild /t:Pack`) and `nuget.exe pack`.
-This is the client-side companion to the nuget.org change that blocks new pushes with package IDs that do not adhere to the restricted set of characters.
+This is the client-side companion to the nuget.org change that blocks new pushes with package IDs that do not adhere to the allowed set of characters.
 See [Strengthening NuGet Security with Package ID Standards](https://github.com/NuGet/Announcements/issues/75).
 
 ## Motivation
@@ -24,10 +24,10 @@ See [Strengthening NuGet Security with Package ID Standards](https://github.com/
 
 ### Functional explanation
 
-When a user runs `dotnet pack` (or any other entry point that invokes the NuGet `Pack` task) on a project whose effective package ID contains characters outside the restricted set, NuGet emits a warning:
+When a user runs `dotnet pack` (or any other entry point that invokes the NuGet `Pack` task) on a project whose effective package ID contains characters outside the allowed set, NuGet emits a warning:
 
 ```text
-warning NU5052: The package ID 'Contöso.Utilities' does not adhere to the restricted set of characters allowed in package IDs. Rename the package to use only characters from the restricted set.
+warning NU5052: The package ID 'Contöso.Utilities' is invalid. Package IDs must start with a letter, digit, or underscore, and contain only ASCII letters, digits, dots (.), dashes (-), and underscores (_), with no consecutive dots or dashes.
 ```
 
 The warning:
@@ -45,11 +45,11 @@ The warning is enabled by default gated by `SdkAnalysisLevel`:
 
 | Package ID | Warns? | Notes |
 |------------|--------|-------|
-| `Contoso.Utilities` | No | All characters are in the restricted set. |
-| `Contöso.Utilities` | Yes | `ö` is outside the restricted set. |
-| `Contoso.Ütil` | Yes | `Ü` is outside the restricted set. |
+| `Contoso.Utilities` | No | All characters are in the allowed set. |
+| `Contöso.Utilities` | Yes | `ö` is outside the allowed set. |
+| `Contoso.Ütil` | Yes | `Ü` is outside the allowed set. |
 | `Сontoso.Utilities` (Cyrillic `С`) | Yes | Homoglyph. |
-| `My.Package-1.0` | No | All characters are in the restricted set. |
+| `My.Package-1.0` | No | All characters are in the allowed set. |
 
 The check applies only to the **package ID**.
 
@@ -83,8 +83,8 @@ The pack warning and the nuget.org push block are complementary, not alternative
 
 ## Future Possibilities
 
-- **Restore time validation for the restricted set of characters**
+- **Restore time validation for the allowed set of characters**
     - Is there a real user demand for this type of validation. With nuget.org providing the no collision guarantee, the need isn't there since nuget.org is the only true public feed. The rest of feeds would likely be controlled by the consumers.
     - Should that validation be a warning or an error? A warning is more expensive to technically implement and may add some perf cost. An error is relatively straightforward.  
 - **Promote to error in .NET 12.** Once telemetry shows the warning is being seen and acted on, promote `NU5052` from warning to error under a higher `SdkAnalysisLevel`.
-- **Surface in Visual Studio pack UI.** A more prominent in-IDE prompt when authoring a new package project with an ID that does not adhere to the restricted set.
+- **Surface in Visual Studio pack UI.** A more prominent in-IDE prompt when authoring a new package project with an ID that does not adhere to the allowed set.
