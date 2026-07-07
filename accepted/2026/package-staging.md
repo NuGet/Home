@@ -120,6 +120,133 @@ Groups are deleted after a successful publish since they have served their purpo
 - Max 1000 packages per group
 - Max 5000 ungrouped staged packages per owner
 
+#### CLI commands
+
+All commands discover the staging endpoint via the `PackageStaging/1.0.0` resource type in the service index. Sources that do not advertise this resource return an error indicating staging is not supported.
+
+All commands support `--format json` for machine-readable output.
+
+**`dotnet nuget stage push`**
+
+Push a package to staging. The package goes through validation and transitions to Staged on success.
+
+```
+dotnet nuget stage push <PACKAGE_PATH> [options]
+
+Arguments:
+  PACKAGE_PATH    Path to the .nupkg file to stage.
+
+Options:
+  -s, --source <SOURCE>     The package source to use. Defaults to nuget.org.
+  -k, --api-key <KEY>       The API key for the source. Not recommended; use Trusted Publishing instead.
+  --group <GROUP_ID>        Add the package to a staging group. The group must already exist.
+  --format <FORMAT>         Output format: text (default) or json.
+```
+
+Examples:
+```
+dotnet nuget stage push MyPackage.1.0.0.nupkg
+dotnet nuget stage push MyPackage.1.0.0.nupkg --group my-release
+```
+
+**`dotnet nuget stage list`**
+
+List staged packages for the authenticated user.
+
+```
+dotnet nuget stage list [options]
+
+Options:
+  -s, --source <SOURCE>     The package source to use. Defaults to nuget.org.
+  -k, --api-key <KEY>       The API key for the source.
+  --group <GROUP_ID>        Filter to packages in a specific group.
+  --format <FORMAT>         Output format: text (default) or json.
+```
+
+Example output:
+```
+Staged Packages (3 packages)
+
+Package ID                                Version              Group            Status     Expires
+Microsoft.Extensions.Logging              10.0.0-preview.4     my-release       Ready      Jul 10, 2026
+Microsoft.Extensions.DependencyInjection  10.0.0-preview.4     my-release       Ready      Jul 10, 2026
+Contoso.Utilities                         3.1.0                (ungrouped)      Validating Jul 8, 2026
+```
+
+**`dotnet nuget stage delete`**
+
+Delete a staged package. Fails if the package is currently validating.
+
+```
+dotnet nuget stage delete <PACKAGE_ID> <VERSION> [options]
+
+Arguments:
+  PACKAGE_ID      The package ID to delete.
+  VERSION         The package version to delete.
+
+Options:
+  -s, --source <SOURCE>     The package source to use. Defaults to nuget.org.
+  -k, --api-key <KEY>       The API key for the source.
+  --no-confirm              Skip the confirmation prompt.
+  --format <FORMAT>         Output format: text (default) or json.
+```
+
+**`dotnet nuget stage group create`**
+
+Create a new staging group.
+
+```
+dotnet nuget stage group create <GROUP_ID> [options]
+
+Arguments:
+  GROUP_ID        The group identifier. Lowercase letters, numbers, and dashes only.
+
+Options:
+  -s, --source <SOURCE>     The package source to use. Defaults to nuget.org.
+  -k, --api-key <KEY>       The API key for the source.
+  --name <DISPLAY_NAME>     Optional display name for the group. Defaults to the group ID.
+  --format <FORMAT>         Output format: text (default) or json.
+```
+
+**`dotnet nuget stage group list`**
+
+List staging groups for the authenticated user.
+
+```
+dotnet nuget stage group list [options]
+
+Options:
+  -s, --source <SOURCE>     The package source to use. Defaults to nuget.org.
+  -k, --api-key <KEY>       The API key for the source.
+  --format <FORMAT>         Output format: text (default) or json.
+```
+
+Example output:
+```
+Staging Groups (2 groups)
+
+Group ID           Name                Packages   Status      Expires
+my-release         My Release          2 ready    Ready       Jul 10, 2026
+hotfix-june        June Hotfix         0          Empty       Jul 1, 2026
+```
+
+**`dotnet nuget stage group delete`**
+
+Delete a staging group and all its staged packages. Fails if any package in the group is currently validating.
+
+```
+dotnet nuget stage group delete <GROUP_ID> [options]
+
+Arguments:
+  GROUP_ID        The group identifier to delete.
+
+Options:
+  -s, --source <SOURCE>     The package source to use. Defaults to nuget.org.
+  -k, --api-key <KEY>       The API key for the source.
+  --no-confirm              Skip the confirmation prompt.
+  --format <FORMAT>         Output format: text (default) or json.
+```
+
 ## Drawbacks
 
 - **Publish is not automatable.** Requiring Gallery UI login means publishing cannot be scripted or run from CI/CD. This is intentional for security but adds a manual step to release workflows. Someone has to log in and click "Publish" on release day.
