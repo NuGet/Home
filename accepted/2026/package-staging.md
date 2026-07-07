@@ -35,6 +35,15 @@ Today, the time from push to all packages being restorable includes validation p
 
 #### Staging a package
 
+```mermaid
+flowchart LR
+    Push["Stage Push"] --> Validation
+    Validation -->|success| Staged
+    Validation -->|failure| FailedValidation
+    Staged -->|publish via Gallery| Available
+    Available --> V3["V3 Pipeline"]
+```
+
 Authors push packages to nuget.org using a new staging endpoint. The CLI command looks like:
 
 ```
@@ -89,6 +98,15 @@ The nuget.org Manage Packages page adds two new sections:
 #### Visibility and expiration
 
 Staged packages are not visible to anyone except the package owner. They do not appear in search results, package pages, restore operations, or any V3 API responses.
+
+| Consumer | Staged package visible? |
+| -------- | ---------------------- |
+| dotnet restore | No |
+| nuget.org search | No |
+| nuget.org package page (public) | No |
+| nuget.org package management (owner) | Yes |
+| V3 flat container / registration / catalog | No |
+| API package metadata | No |
 
 Staged packages that are never published are automatically cleaned up after 30 days. This is longer than npm's 72-hour expiration because some release cycles are monthly, and teams may stage packages 2 to 3 weeks before release.
 
