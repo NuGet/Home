@@ -85,23 +85,6 @@ configuration:
           label: WaitingForClientTeam
       - removeLabel:
           label: WaitingForCustomer
-    - description: '[50-50] Replace "WaitingForClientTeam" with "WaitingForCustomer" when client team comments'
-      if:
-      - payloadType: Issue_Comment
-      - isAction:
-          action: Created
-      - hasLabel:
-          label: WaitingForClientTeam
-      - isOpen
-      - or:
-        - activitySenderHasPermission:
-            permission: Write
-        - activitySenderHasPermission:
-            permission: Admin
-      then:
-      - removeLabel:
-          label: WaitingForClientTeam
-      - addLabel:
-          label: WaitingForCustomer
+
 onFailure: 
 onSuccess: 
