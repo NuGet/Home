@@ -50,6 +50,46 @@ configuration:
           reply: Issue is missing Type label, remember to add a [Type label](https://github.com/NuGet/Client.Engineering/blob/main/designs/nuget-issues-approach.md#issue-type)
       - addLabel:
           label: missing-required-type
+    - description: '[20-30] Remind NuGet Client member (issue author) to add Type label'
+      frequencies:
+      - daily:
+          time: 12:0
+      filters:
+      - isOpen
+      - isIssue
+      - isNotLabeledWith:
+          label: Type:Spec
+      - isNotLabeledWith:
+          label: Type:Test
+      - isNotLabeledWith:
+          label: Type:Feature
+      - isNotLabeledWith:
+          label: Type:Docs
+      - isNotLabeledWith:
+          label: Type:DCR
+      - isNotLabeledWith:
+          label: Type:Bug
+      - isNotLabeledWith:
+          label: Type:DeveloperDocs
+      - isNotLabeledWith:
+          label: Type:DataAnalysis
+      - isNotLabeledWith:
+          label: Type:Learning
+      - isNotLabeledWith:
+          label: Type:Tracking
+      - isNotLabeledWith:
+          label: Type:Engineering
+      - isNotLabeledWith:
+          label: Type:BreakingChange
+      - isNotLabeledWith:
+          label: missing-required-type
+      - isNotLabeledWith:
+          label: Epic
+      actions:
+      - addReply:
+          reply: '@${issueAuthor} Issue is missing Type label, remember to add a [Type label](https://github.com/NuGet/Client.Engineering/blob/main/designs/nuget-issues-approach.md#issue-type)'
+      - addLabel:
+          label: missing-required-type
     eventResponderTasks:
     - description: '[20-20] Remove "missing-required-type" if it has Type label'
       if:
