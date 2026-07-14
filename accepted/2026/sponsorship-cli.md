@@ -32,7 +32,7 @@ Combining sponsorship into an existing report flag would blur `--sponsor`'s info
 
 - **Package consumers** get a way to discover, from the command line, which of their dependencies are seeking sponsorship — without having to visit nuget.org for every package individually.
 - **Package authors** who've already added sponsorship links to their packages get more visibility for those links, since consumers can now see them as part of a workflow they already use (`dotnet list package`), not just on the package's web page.
-- **Repository/org admins** get transparency into which of their organization's dependencies have funding needs, which can support internal conversations about sponsoring critical open-source dependencies. 
+- **Repository/org admins** have an easier way to see sponsorship status alongside the other package information they already manage day-to-day (versions, licenses, vulnerabilities).
 
 ## Explanation
 
