@@ -215,7 +215,7 @@ dotnet nuget stage push MyPackage.1.0.0.nupkg --group my-release --unlist
 
 **`dotnet nuget stage list`**
 
-List staged packages for the authenticated user.
+List staged packages for the authenticated user by group.
 
 ```
 dotnet nuget stage list [options]
