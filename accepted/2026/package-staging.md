@@ -52,7 +52,7 @@ Authors push packages to nuget.org using a new staging endpoint. The CLI command
 dotnet nuget stage push MyPackage.1.0.0.nupkg
 ```
 
-The package goes through the same validation pipeline as a normal push: malware scanning, author signature checks, certificate revocation checks, and repository co-signing. The difference is what happens after validation succeeds. Instead of becoming publicly available, the package enters a "staged" state. It is not restorable, not searchable, and not visible on nuget.org to anyone except the package owner.
+The package goes through the same validation pipeline as a normal push: malware scanning, author signature checks, certificate revocation checks, and repository co-signing. The difference is what happens after validation succeeds. Instead of becoming publicly available, the package enters a "staged" state. It is not visible on nuget.org to anyone except the package owner and it is not searchable or restorable by anyone including the owner.
 
 If validation fails, the author is notified the same way as a normal push failure. They can fix the issue and re-push. Since this happens days or weeks before release, there is no time pressure.
 
