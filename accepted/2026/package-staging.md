@@ -29,7 +29,7 @@ Staging lets authors push packages days or weeks early. Validation runs during t
 
 ### Publish latency
 
-Today, the time from push to all packages being restorable includes validation plus the V3 pipeline (catalog, flat container, registration, search). For 2000 packages, total time was about 2 hours during the March 2026 Patch Tuesday. By removing validation from the critical path, the only remaining cost is the V3 pipeline, which should bring the total time from promotion to restorable down significantly.
+Today, the time from push to all packages being restorable includes validation plus the V3 pipeline (catalog, flat container, registration, search). For large pushes of 2000+ packages, total time was about 2 hours during the March 2026 Patch Tuesday. Recent work has brought V3 ingestion for that volume down from about 1 hour to around 5 minutes. By removing validation from the critical path, the only remaining cost is the V3 pipeline, which should bring total time from promotion to restorable down from 2 hours to around 5 minutes for properly staged and validated packages.
 
 ## Explanation
 
