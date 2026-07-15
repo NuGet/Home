@@ -15,6 +15,8 @@ This builds on the [2024 Release Staging and Deprecation proposal](../2024/relea
 
 If a CI/CD pipeline is compromised or credentials leak, an attacker can push malicious packages to nuget.org today. Staging introduces a separation between pushing and promoting. CI/CD can only stage packages. A human must log into nuget.org and complete a step-up 2FA challenge to promote them. Even if an attacker compromises a build pipeline, they can only stage invisible packages that never reach consumers.
 
+Staging is entirely opt-in. The existing `dotnet nuget push` command and push API continue to work exactly as they do today, including for older SDK versions. Staging uses a separate endpoint (`dotnet nuget stage push`) that is only available in newer SDKs. The two paths are independent.
+
 ### Security embargo timing
 
 .NET security releases are coordinated with public disclosure of vulnerabilities. The team cannot push packages before 10 AM Pacific because early availability would give attackers time to analyze changes and derive exploits before users can patch. But validation takes 40 to 60 minutes after push, so the packages are not available until well after disclosure. This creates a window where the vulnerability is publicly known but the fix is not yet restorable.
