@@ -32,7 +32,7 @@ We close issues for the following reasons:
 We close issues with the help of a bot that responds to a particular comment or to assigning a label with adding a pre-canned comment to the issue and closing the issue.
 
 ### Requesting Information
-If an issue misses information that we need to understand the issue, we assign the `WaitingForCustomer` label. We usually manually add the `WaitingForCustomer` label at first, then bot will switch between the `WaitingForCustomer` and `WaitingForClientTeam` labels automatically when there is a new comment.
+If an issue misses information that we need to understand the issue, we assign the `WaitingForCustomer` label. We manually add the `WaitingForCustomer` label. When the issue author comments, the bot will automatically switch from `WaitingForCustomer` to `WaitingForClientTeam`. When we need to request more information again, we manually add the `WaitingForCustomer` label.
 
 The bot is monitoring all issues labeled `WaitingForCustomer`. If we don't receive the needed information within 14 days, the bot will add a `no recent activity` label and a comment. After another 14 days without any comment from the author, the bot closes the issue and add `Resolution:NeedMoreInfo` label.
 
