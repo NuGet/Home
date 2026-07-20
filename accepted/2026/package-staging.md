@@ -191,6 +191,20 @@ All commands discover the staging endpoint via the `PackageStaging/1.0.0` resour
 
 All commands support `--format json` for machine-readable output. Authentication is via API key (`-k`) or Trusted Publishing (OIDC).
 
+```
+dotnet nuget stage
+  push <PACKAGE_PATH>                  Stage a package
+  list [<ID> <VERSION>]                List staged packages or get detail
+  delete <ID> <VERSION>                Delete a staged package
+  group
+    create <GROUP_ID>                  Create a staging group
+    list [<GROUP_ID>]                  List groups or get group detail
+    update <GROUP_ID>                  Update group display name
+    delete <GROUP_ID>                  Delete a group
+    add <GROUP_ID> <ID> <VERSION>      Add a package to a group
+    remove <GROUP_ID> <ID> <VERSION>   Remove a package from a group
+```
+
 **`dotnet nuget stage push`**
 
 Push a package to staging. The package goes through validation and transitions to Staged on success.
@@ -217,30 +231,18 @@ dotnet nuget stage push MyPackage.1.0.0.nupkg --group my-release --unlist
 
 **`dotnet nuget stage list`**
 
-List staged packages for the authenticated user by group.
+List staged packages for the authenticated user. When a package ID and version are provided, returns detail for that specific package.
 
 ```
-dotnet nuget stage list [options]
+dotnet nuget stage list [<PACKAGE_ID> <VERSION>] [options]
+
+Arguments:
+  PACKAGE_ID      (Optional) The package ID to get detail for.
+  VERSION         (Optional) The package version.
 
 Options:
   -s, --source <SOURCE>     The package source to use. Defaults to nuget.org.
   --group <GROUP_ID>        Filter to packages in a specific group.
-  --format <FORMAT>         Output format: text (default) or json.
-```
-
-**`dotnet nuget stage status`**
-
-Get the status of a specific staged package.
-
-```
-dotnet nuget stage status <PACKAGE_ID> <VERSION> [options]
-
-Arguments:
-  PACKAGE_ID      The package ID.
-  VERSION         The package version.
-
-Options:
-  -s, --source <SOURCE>     The package source to use. Defaults to nuget.org.
   --format <FORMAT>         Output format: text (default) or json.
 ```
 
@@ -280,10 +282,13 @@ Options:
 
 **`dotnet nuget stage group list`**
 
-List staging groups for the authenticated user.
+List staging groups for the authenticated user. When a group ID is provided, returns group detail including all packages and their statuses.
 
 ```
-dotnet nuget stage group list [options]
+dotnet nuget stage group list [<GROUP_ID>] [options]
+
+Arguments:
+  GROUP_ID        (Optional) The group identifier to get detail for.
 
 Options:
   -s, --source <SOURCE>     The package source to use. Defaults to nuget.org.
