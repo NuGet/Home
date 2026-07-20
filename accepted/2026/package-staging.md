@@ -73,7 +73,7 @@ The Upload page also supports staging via a Publishing Mode option:
 
 Validation results go stale over time. Malware signature databases update daily and certificate revocation status can change. A package that passed validation weeks ago may no longer be clean.
 
-After a configurable staleness window (default: a few days), the package transitions to a "Stale" state in the UI. Stale packages cannot be promoted until the owner triggers revalidation. Only external-state checks rerun: certificate revocation and malware scanning. Content-only checks (signature structure, package format) are skipped since the bytes have not changed.
+After a configurable staleness window (default: 7 days), the package transitions to a "Stale" state in the UI. Stale packages cannot be promoted until the owner triggers revalidation. Only external-state checks rerun: certificate revocation and malware scanning. Content-only checks (signature structure, package format) are skipped since the bytes have not changed.
 
 Owners receive email notifications when packages go stale.
 
@@ -154,7 +154,7 @@ Staged packages are not visible to anyone except the package owner. They do not 
 
 Staged packages are not restorable by anyone, including the owner. There is no authenticated restore path against staged content. Owners who need to verify that an interdependent package set restores correctly before promoting should use their own private feed or a local feed for integration testing, then stage to nuget.org once satisfied.
 
-Staged packages that are never promoted are automatically cleaned up after a configurable TTL (default: a few days, extended for teams with longer release cycles). Owners receive email notifications before expiration and when packages are deleted.
+Staged packages that are never promoted are automatically cleaned up after a configurable TTL (default: 30 days). Owners receive email notifications before expiration and when packages are deleted.
 
 For grouped packages, the TTL is on the group, not individual packages. It resets whenever a new package is pushed to the group. When the TTL expires, the entire group and all its packages are deleted.
 
