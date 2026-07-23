@@ -1,4 +1,4 @@
-# ***Package update cooldown***
+# ***Package update cooldown V1***
 
 - Author: [zivkan](https://github.com/zivkan/)
 - GitHub Issue: [Home#14657](https://github.com/NuGet/Home/issues/14657)
@@ -6,7 +6,7 @@
 ## Summary
 
 Allow automated and assisted package version updates to be delayed by a cooldown period.
-This will allow Visual Studio and `dotnet package update` to pre-select a version that was published before the specified cooldown period.
+This will allow Visual Studio, `dotnet package update`, and `dotnet package list --outdated` to pre-select or report versions that were published at least the configured cooldown period ago.
 
 The initial version will not do any cooldown checks during restore.
 For justification, please see the [cooldown during restore section](#cooldown-during-restore).
@@ -23,6 +23,10 @@ In the context of .NET, this means a cooldown will be most valuable for nuget.or
 ## Explanation
 
 ### Functional explanation
+
+These are the proposed behaviors for the first version of package cooldowns that will ship.
+There are [some future ideas listed](#future-possibilities), and others not written in this document.
+But, this section contains the first set of features we would like to work on.
 
 #### Defining the cooldown
 
@@ -45,57 +49,40 @@ This makes the cooldown feature entirely opt-in at this time.
 
 #### Updating package versions
 
-The following actions will need to be updated to support cooldown:
+The following actions will need to be updated to support cooldown.
+This list is not intended to be a prescriptive explanation of how exactly the feature should work, only that changes will be needed to take package age into account.
 
 - `dotnet package update`
 
-The command will need to check the publish age exceeds the configured value in all the scenarios where it chooses a version.
+This command has several options, some of which will choose a version on the user's behalf.
 
-When a package source is configured for a cooldown, but the feed doesn't return `published` metadata, a warning will be written to stderr, and the highest version will be used.
+- `dotnet package list`
+
+Cooldown is probably only relevant when using the `--outdated` option.
+In addition to notifying when updates that have passed the cooldown period are available, it should warn when a package already resolved is in cooldown, to help detect accidental upgrades, or validate after manually editing MSBuild files.
 
 - Visual Studio Package Manager UI
 
-There are several places that Visual Studio's Package Manager UI (PMUI) will need changes to take cooldowns into account.
-
 1. Quick install button on the package list.
-   - The button should install the highest version that meets the minimum age constraint.
-1. Versions dropdown and install button on the package details page.
-   - In situations where the versions dropdown currently selects the highest version, it should be changed to the highest version not in the cooldown period.
-   - The versions dropdown should have a "(cooldown)" marker on each version still in the cooldown period, similar to "(vulnerable)" or "(deprecated)" for relevant packages.
+1. Details page's version drop down list pre-selected version.
+1. Details page's version drop down list indication which are still on cooldown, similar to "(vulnerable)" or "(deprecated)" for relevant packages.
+1. Details page "publish date" line.
 1. Multiple package updates on the Update tab.
-   - When choosing the highest version of each package to update to, it should take cooldown into account.
 1. Update tab package count
-   - The package count overlay on the Update tab text should show the number of packages that are older than the cooldown date.
 
-In addition the package details page shows the package publish date.
-When the date is within the cooldown period, it should show a warning icon, similar to vulnerable or deprecated packages, with a tooltip explaining it's due to the cooldown.
+However, there are complexities that will need to be addressed before or during implementation:
 
-All of the above is hopefully clear when the package source dropdown has a single source selected.
-However, when the "(All)" item is selected, then everything becomes more difficult.
-If Package Source Mapping is used to make each package only available from a single source, then most people will hopefully agree on what the expected behavior is.
-But when a package can come from multiple sources, and the sources don't agree with what the package's publish date was, or the sources have different cooldown settings, then it becomes ambiguous what the expectation should be.
-
-Excluding the multiple-sources complexity, on the Installed, Update and Consolidate tabs, NuGet already downloads package metadata via the registration resource, so all these features should be easy to implement.
-
-However, on the Browse tab, NuGet gets the package list from the feed's search resource, which does not have a `published` property.
-Therefore, when a package source has a cooldown enabled, the quick install button will be disabled, requiring users to select the package and use the package details panel to install via the versions dropdown list and install button.
-The quick install button should have a hover tooltip saying to use the package details panel because of the cooldown feature.
-
-When a package source has cooldown enabled, but the package metadata (registration) resource does not provide `published` metadata, a warning should be displayed.
-Location to be determined.
-
-All of these features should only occur when the package source dropdown has a package source with cooldown selected, or the "(All)" source is selected and at least one of the sources has cooldown enabled.
+1. PM UI has a "Package sources" drop down where all sources can be considered, or just a single source.
+1. PM UI doesn't always take package source mapping into account.
+1. The NuGet protocol only provides `published` metadata of package metadata (registration) resources (used by installed, update, consolidate tabs), not the package search resource (used by the browse tab)
 
 - Visual Studio Package Manager Console
 
-The `Update-Package` command should take cooldown into account when not provided with a specific version number.
-
-If the feed does not provide `published` metadata, a warning will be output, and the highest version will be selected.
+The `Update-Package` command should have equivalent behavior to the `dotnet package update` command, where possible.
 
 - NuGet MCP Server
 
-The NuGet MCP server has tools to fix vulnerable packages and update packages.
-These will need to be updated to support cooldown as well.
+The NuGet MCP server has tools to fix vulnerable packages and update packages that will need to take cooldown into account.
 
 #### Changes to restore
 
@@ -107,8 +94,9 @@ Please see the [cooldown during restore section](#cooldown-during-restore) for m
 
 ### Technical explanation
 
-This feature does not propose any changes to the NuGet protocol.
-This means companies using private feeds may be able to keep using their existing feeds, as long as the feed already returns `published` metadata on the package metadata (registration) resource.
+This feature does not propose any changes to the NuGet protocol at this time.
+The [package metadata resource](https://learn.microsoft.com/en-us/nuget/api/registration-base-url-resource) contains an optional `published` field.
+If a NuGet.Config file is using package sources that do not provide `published` metadata, then NuGet can't do cooldown calculations and should provide warning messages.
 
 NuGet.Protocol already populates the `Published` property for local file feeds using the file's last modified timestamp.
 So, cooldown on file feeds will work, but customers are responsible for setting the last modified time carefully.
@@ -121,49 +109,72 @@ NuGet can only make decisions as good as the data it receives.
 The way NuGet clients can get a package version's publishing date from a server is from the package metadata (registration) resource, in an optional `published` field.
 Since the field is optional, feeds that don't provide a `published` property can't be cooled down.
 
-Hopefully this should be a minor inconvenience, because developers are most likely to want to delay packages from nuget.org only, and not company internal feeds, or potentially packages from 3rd party vendors via paid feeds.
-However, it could be a problem for internal feeds that host packages sourced from nuget.org.
-There are two common ways for feeds to source packages from nuget.org, "up-sourcing" and "re-publishing".
+Additionally, there are companies and teams that do not use nuget.org directly, and instead use a private feed where nuget.org packages are copied to for internal consumption.
+There are generally two approaches, "up-sourcing" and "re-publishing".
 
 Feeds that have automatic up-sourcing conceptually act similarly to a caching HTTP proxy.
 NuGet asks the feed what versions of the package it has, the feed aggregates the list of versions it already has with what nuget.org has (via its own request to nuget.org), then returns the de-duplicated list to NuGet.
-If the feed changes the publish date to the date that it was added to the feed, NuGet will be unable to perform cooldown accurately.
+The feed should retain nuget.org's original publishing date, not the date that the package was first copied/used.
 
 Feeds that re-publish nuget.org packages are ones that don't intrinsically know that packages came from nuget.org.
 Instead someone, or some other automated process, downloads the package from nuget.org and then pushes the package to the feed.
 In this case, the best case is that the feed lists the publish date as when the package was pushed to the feed.
 But if this is days or weeks after the package was originally published to nuget.org, then from the developer's point of view, NuGet might not behave in the way they expect.
+It is recommended that the publishing process take cooldown into account, and teams using this feed should not configure NuGet to use cooldowns, since the source only gets the package once the desired time period has passed.
 
 ### Delayed security fixes
 
 By using a single cooldown value for all packages in a feed, it means that packages with a known security vulnerability will be delayed just as packages without a known vulnerability.
-When the fixed package version is legitimate, then fixing the project also gets delayed which exposes the application to risk for a longer time.
+When the fixed package version is legitimate, then fixing the project also gets delayed, which exposes the application to risk for a longer time.
 
 However, cooldown is intended to reduce risk of supply chain security attacks by waiting for malicious packages to be discovered and removed before upgrading.
 If a malicious actor can publish a new version of a package, they might also be able to publish a security advisory on older versions of the package, as a form of social engineering to trick victims into upgrading.
 
 Therefore there's a balance between taking new versions to fix known security vulnerabilities and waiting for security experts to vet new packages for malicious code.
+This is a decision that individuals will need to make.
+NuGet will not contain defaults that choose between NuGetAudit warnings or violating cooldown periods for you.
 
 ### Hierarchical nuget.config settings
 
 NuGet accumulates settings from multiple nuget.config files, and if the "closest" file does not have a `<clear />` element in the `<packageSources>` section, then package sources from multiple files can be used.
 Typically this shows up as nuget.org being added in the user-profile nuget.config, and company internal feeds being added in a solution directory nuget.config file.
 If the user-profile nuget.config is edited to set a cooldown period, this will affect all solutions on the computer (well, that user account on that computer), which may be unintended.
-The NuGet team has documented a recommendation that all repos commit a nuget.config where `<clear />` is the first element in the package sources section, to ensure the package sources are deterministic.
+The NuGet team has [documented a recommendation](https://learn.microsoft.com/nuget/concepts/security-best-practices#nuget-configuration) that all repos commit a nuget.config where `<clear />` is the first element in the package sources section, to ensure the package sources are deterministic.
 
 ## Rationale and alternatives
 
 ### Alternate options to define the cooldown period
 
-The cooldown value goes on the package source because cooldown is naturally per-feed, and NuGet.Config aligns better with per-feed settings.
-There is no existing per-source MSBuild configuration, so attempting to define cooldown via MSBuild would be bigger in scope.
+Since the proposal is that cooldown is configurable per source, putting the setting in NuGet.Config is a natural fit as that's where sources are usually configured.
+While PackageReference allows package sources to be defined in MSBuild, it only allows a semicolon delimited list of URLs and local paths.
+There's no existing way to define metadata on MSBuild defined sources (sources are an MSBuild property, not items).
 
-- **Global cooldown** — not chosen. We have per-feed cooldown anyway; a separate global knob just adds configuration points for little benefit (setting the same value on each source already covers it).
-- **Per-package cooldown** — not chosen. Not enough benefit for the added complexity.
+A single global cooldown setting was not chosen because we believe that wanting a cooldown for nuget.org packages and not for company internal packages will be a common configuration.
+Most repositories do not have a large number of package sources, so it should not be a burden to duplicate the cooldown setting for multiple sources.
+
+The ability to configure different cooldown settings per package, or per prefix, similar to [Package Source Mapping](https://learn.microsoft.com/nuget/consume-packages/package-source-mapping) is an interesting discussion.
+A number of people may wish to reduce or even disable cooldown for Microsoft owned `System.*` or `Microsoft.*` packages.
+However, Microsoft employees are not immune to having their credentials stolen.
+Microsoft employees might also be targeted by attackers as high value targets, given that Microsoft owned packages are widely used by .NET developers.
+On the other hand, [nuget.org policies reduce the risk of unsigned packages being published](#2-publishing-packages).
+But depending on the specifics of the security incident, the attacker might get access to disable the certificate settings for a nuget.org account, or get access to the CI system to sign the package.
+The overall risk is going to be a personal opinion.
+
+In addition, per-package cooldown settings will increase the complexity of managing a nuget.config file.
+Hopefully only by a small amount if it has a `pattern="*"` style option.
+But Package Source Mapping configs can get quite large if not using `pattern="*"`, and every package prefix is listed individually, for example if internal company packages are not prefixed with the company name, and therefore `pattern="*"` is used for internal packages, rather than packages coming from nuget.org.
+If per-package cooldown uses the same design, then the config file could become similarly difficult to manage.
+
+So, for the first version of cooldown in NuGet, the proposal is per-source settings only, and we'll gather customer feedback on per-package settings.
 
 ### Cooldown during restore
 
-Checking cooldown during restore was not chosen due to performance prototyping suggesting it would be infeasible to maintain restore performance.
+There are two areas where cooldown could be taken into account during restore.
+The first is warning when a package in the graph is using a version that should still be in cooldown.
+The second is selecting the package version when using floating versions.
+
+Checking cooldown during restore was not chosen due to performance prototyping suggesting it would be infeasible to maintain restore performance without protocol changes, which would delay the implementation of package upgrade scenarios.
+This will mean customers who hand edit MSBuild XML and run restore will not get benefit from the cooldown feature initially.
 
 |Repository|baseline|prototype|delta|
 |--|--|--|--|
@@ -172,16 +183,15 @@ Checking cooldown during restore was not chosen due to performance prototyping s
 |[NuGet.Client](https://github.com/NuGet/NuGet.Client)|22.63s|65.87s|+191.1%|
 |[Roslyn](https://github.com/dotnet/roslyn)|40.96s|90.71s|+121.5%|
 
-Investigating and prototyping changes to the protocol in order to enable cooldown checks during restore will slow down delivery of the other features proposed in this spec.
-So, if cooldown checks during restore are going to be implemented, it can be done as a follow up after the initial release.
-This will mean customers who hand edit MSBuild XML and run restore will not get benefit from this feature initially.
-
 See more details in the [restore prototype details section](#restore-prototype).
 
-Other options include changing floating versions to choose a version not in cooldown, and this will limit perf regressions to solutions that use both floating versions and cooldowns (turn off either, and performance would be unaffected).
-Using a lockfile would further limit the performance impact to restores where the lockfile is modified, so "locked-mode" restores will continue to maintain current performance.
-However, multiple people in the first round of reviews of this feature spec said (either explicitly, or implicitly) that they expect warnings if any package in the graph is newer than the cooldown period.
-So, there's risk of confusion if floating versions use cooldown for version selection, but no warnings if an explicit version or a transitive package is younger than the cooldown period.
+This proposal also recommends blocking restore when cooldown is enabled and at least one package in the project uses floating versions.
+Since cooldown is a new feature that must be opt-in, this would not be considered a breaking change.
+While a [lock file](https://learn.microsoft.com/nuget/consume-packages/package-references-in-project-files#locking-dependencies), will make restore repeatable and therefore wouldn't need each version's published date in order to select a version, the issue becomes how to update the lock file to a version that's not in cooldown.
+Unless a "force evaluate" restore prevents new packages from being used in the lock file until the cooldown period passes, it doesn't solve the problem.
+This could catch out some developers who would not expect this behavior.
+Additionally, using floating versions with a lock file has fairly similar outcomes to not using floating versions, since committing version changes to source control will be needed either way.
+Therefore, for the first version of package cooldown in NuGet, blocking floating versions seems acceptable and can be improved in a future version of .NET.
 
 ### Packages with known vulnerabilities
 
@@ -221,15 +231,45 @@ The trade-off is that a fixed date must be advanced manually over time, whereas 
 
 ## Future Possibilities
 
-Warn during restore about packages still within the cooldown period.
+There are many potential ways this feature could be extended in the future.
+Some may just need time, others may need customer feedback to show interest.
 
-If per-package or per-prefix cooldown configuration turns out to be valuable, it could be added.
-
-If customers tend to use cooldown on internal feeds in addition to nuget.org, then a "global cooldown" setting could be introduced, so it's not necessary to duplicate the same value on multiple package feeds.
-
-Some kind of "skip cooldown" option could be added to `dotnet package update` and PMC's `Update-Package` commands.
+- Warn during restore about packages still within the cooldown period.
+- Per-package or per-prefix cooldown, for example extending package source mapping syntax.
+- Some kind of "skip cooldown" option could be added to `dotnet package update` and PMC's `Update-Package` commands.
 
 ## Appendix
+
+### NuGet ecosystem comparison
+
+#### 1. Upgrading packages
+
+In many programming language ecosystems, both projects and packages can instruct the package manager to use the latest patch version (using [SemVer2 semantics](https://semver.org)).
+The exact syntax changes between ecosystems, but something like `^1.2.3` often means "the highest compatible version greater than or equal to `1.2.3` and less than `2.0.0`".
+
+NuGet has floating versions, represented by syntax `1.2.*`, but importantly this is only possible on projects.
+If a project using floating versions is packed, the floating version gets resolved to the specific version used during the build, and that becomes the package's dependency, for example `1.2.5`.
+During a restore, NuGet will search for that specific package version, and if it's not found, it will raise a warning, which can be treated as an error to break the build.
+However, since NuGet packs the resolved version as the dependency version, packages with dependencies where the exact version does not exist is very uncommon.
+When a transitive package has a known vulnerability, customers need to add the package as a directly referenced package to control the version and upgrade it to a fixed version.
+
+Therefore, NuGet's risk of automatically updating to new versions of a package is limited to customers who choose to use floating versions, and the risk is further limited to direct package references, not transitive packages.
+While other package managers introduced lock files (partially) to enable repeatable builds, NuGet was designed as repeatable from the beginning.
+This makes NuGet less susceptible to this specific form of supply chain attacks, because upgrading package versions is an explicit action that needs to be taken in most cases, rather than something the package manager does by default.
+
+#### 2. Publishing packages
+
+NuGet has the concept of [signed packages](https://learn.microsoft.com/nuget/reference/signed-packages-reference).
+When a nuget.org account has one or more certificates registered, nuget.org no longer allows unsigned packages to be pushed by that account.
+Therefore, even if an attacker obtains a nuget.org API key, an account that forces author-signed packages will prevent the attacker from pushing new versions of a package without being signed by that certificate (either unsigned packages, or signed by the wrong certificate).
+
+This does not eliminate the risk of attackers publishing new versions of packages.
+For example, the CI infrastructure might be compromised, or the package owner might not author-sign their packages, and therefore not have a certificate registered in their account.
+However, in cases where the nuget.org account does have registered certificates, it makes an API key insufficient to publish packages.
+
+This knowledge actually makes per-package/prefix cooldown more compelling, because if a customer trusts that Microsoft owned packages must be signed, then they might be willing to have a shorter cooldown, or skip the cooldown, for Microsoft owned packages.
+This is particularly true if most NuGet Audit warnings are from Microsoft owned packages, allowing the customers to confidently upgrade those packages sooner than packages owned by other companies or people.
+But it's important to remember that reduced risk is not the same as zero risk.
 
 ### Restore prototype
 
