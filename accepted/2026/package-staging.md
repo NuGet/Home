@@ -5,7 +5,7 @@
 
 ## Summary
 
-Package staging lets authors push packages to nuget.org ahead of time, run them through full validation (malware scanning, signing), and promote them later with a single action through the Gallery UI. Staged packages are invisible to consumers until promoted. Promotion requires a step-up two-factor authentication challenge (TOTP or WebAuthn) at the moment of action, providing a proof of presence check.
+Package staging lets authors push packages to nuget.org ahead of time, run them through full validation (malware scanning, signing), and promote them later with a single action through the Gallery UI. Staged packages are invisible to consumers until promoted. Promotion requires that the user is logged into nuget.org with two-factor authentication enabled on their account.
 
 This builds on the [2024 Release Staging and Deprecation proposal](../2024/release-staging-and-deprecation.md) with a narrower scope focused on staging and promotion, informed by direct feedback from the .NET release team and security requirements around supply chain protection.
 
@@ -13,7 +13,7 @@ This builds on the [2024 Release Staging and Deprecation proposal](../2024/relea
 
 ### Supply chain protection
 
-If a CI/CD pipeline is compromised or credentials leak, an attacker can push malicious packages to nuget.org today. Staging introduces a separation between pushing and promoting. CI/CD can only stage packages. A human must log into nuget.org and complete a step-up 2FA challenge to promote them. Even if an attacker compromises a build pipeline, they can only stage invisible packages that never reach consumers.
+If a CI/CD pipeline is compromised or credentials leak, an attacker can push malicious packages to nuget.org today. Staging introduces a separation between pushing and promoting. CI/CD can only stage packages. A human must log into nuget.org with 2FA enabled to promote them. Even if an attacker compromises a build pipeline, they can only stage invisible packages that never reach consumers.
 
 Staging is entirely opt-in. The existing `dotnet nuget push` command and push API continue to work exactly as they do today, including for older SDK versions. Staging uses a separate endpoint (`dotnet nuget stage push`) that is only available in newer SDKs. The two paths are independent.
 
@@ -42,8 +42,6 @@ flowchart LR
     Push["Stage Push"] --> Validation
     Validation -->|success| Staged
     Validation -->|failure| FailedValidation
-    Staged -->|stale after N days| Stale
-    Stale -->|revalidate| Validation
     Staged -->|promote via Gallery| Available
     Available --> V3["V3 Pipeline"]
 ```
@@ -56,7 +54,7 @@ If validation fails, the author is notified the same way as a normal push failur
 
 Re-pushing the same content is a no-op (safe for CI/CD retries). Pushing different content for the same ID and version replaces the staged package, re-runs validation, and resets the expiration timer. Replacing a grouped package keeps its group membership.
 
-Symbol packages (`.snupkg`) can also be staged. The parent `.nupkg` must already be staged or validating. Symbol validation and ingestion are deferred until promotion.
+Symbol packages (`.snupkg`) can also be staged. The parent `.nupkg` must already be staged or validating. Symbol validation runs at stage time so failures are caught early. Symbol ingestion is deferred until promotion so symbols are not publicly available before the parent package.
 
 Staging the first version of a new package ID reserves the ID permanently, same as a normal push. If that staged version is later deleted or expires, the ID remains reserved.
 
@@ -64,14 +62,6 @@ The Upload page also supports staging via a Publishing Mode option:
 
 ![Upload Package - Publishing Mode](images/upload-package.png)
 *Figure 1. Upload Package page with Publishing Mode selector.*
-
-#### Revalidation
-
-Validation results go stale over time. Malware signature databases update daily and certificate revocation status can change. A package that passed validation weeks ago may no longer be clean.
-
-After a configurable staleness window (default: 7 days), the package transitions to a "Stale" state in the UI. Stale packages cannot be promoted until the owner triggers revalidation. Only external-state checks rerun: certificate revocation and malware scanning. Content-only checks (signature structure, package format) are skipped since the bytes have not changed.
-
-Owners receive email notifications when packages go stale.
 
 #### Staging groups
 
@@ -98,19 +88,19 @@ Group display names can be edited after creation. Group IDs are immutable.
 
 ##### Group detail
 
-The group detail view shows every package in the group along with its current validation status. Owners can revalidate stale or failed packages, edit the group display name, and promote the entire group when all packages are ready.
+The group detail view shows every package in the group along with its current validation status. Owners can edit the group display name and promote the entire group when all packages are ready.
 
 ![Staging Group Detail](images/staging-groups.png)
 
-*Figure 3. Staging group detail view with validation status, revalidation controls, and group metadata.*
+*Figure 3. Staging group detail view with validation status and group metadata.*
 
 #### Promotion
 
 Promotion is only available through the nuget.org Gallery UI. There is no API endpoint for promoting staged packages. This is intentional.
 
-When a user clicks "Promote" on a staged package or group, the Gallery presents a step-up 2FA challenge (TOTP code entry or WebAuthn/passkey tap). This is not the session-level 2FA from login; it is a fresh challenge at the moment of action, similar to npm's publish confirmation and GitHub's sudo mode. The challenge result is valid for 5 minutes, so promoting multiple packages in quick succession does not require repeated challenges.
+When a user clicks "Promote" on a staged package or group, the user must be logged into nuget.org with two-factor authentication enabled on their account.
 
-For groups, the owner promotes the entire group at once. If any package in the group is still validating, failed validation, or stale, the group cannot be promoted until the issue is resolved.
+For groups, the owner promotes the entire group at once. If any package in the group is still validating or failed validation, the group cannot be promoted until the issue is resolved.
 
 After promotion, the packages enter the normal V3 pipeline and become restorable through the standard process. The public "published" timestamp is set at promotion time, not at stage time.
 
@@ -166,7 +156,6 @@ Deprecation, unlisting, and other metadata edits are not available while a packa
 - Email when a package or group is promoted
 - Email 7 days before expiration
 - Email when a group or package is deleted due to expiration
-- Email when packages go stale and need revalidation
 
 All notifications are aggregated into a single digest per owner per event. A group promotion with 2000 packages sends one email, not 2000.
 
@@ -179,31 +168,25 @@ Staging push and delete operations share the same quota budget as normal push/un
 - Max 20 staging groups per owner
 - Max 1000 packages per group
 - Configurable total staged packages per owner (default and elevated tiers available)
-- Configurable TTL and staleness window per owner
+- Configurable TTL per owner
 
 ## Drawbacks
 
-- **Promotion is not automatable.** Requiring Gallery UI login with step-up 2FA means promotion cannot be scripted or run from CI/CD. This is intentional for security but adds a manual step to release workflows. Someone has to log in and complete a 2FA challenge on release day.
+- **Promotion is not automatable.** Requiring Gallery UI login with 2FA means promotion cannot be scripted or run from CI/CD. This is intentional for security but adds a manual step to release workflows. Someone has to log in on release day.
 
 - **No atomic promotion.** We are not guaranteeing that all packages in a group become restorable at the exact same instant. The V3 pipeline processes packages in batches and there will be a small window (minutes) where some packages are available and others are not. This is the same behavior that exists today when packages trickle through validation. Package authors who need strict ordering should manage dependency sequencing on their side. NuGet restore retries with backoff will naturally resolve transient "not found" errors within minutes.
 
-- **New concepts for users.** Staging, groups, revalidation, and the two-step push/promote workflow add complexity to the NuGet experience. Most package authors who push one or two packages at a time may not need or use this feature.
-
-- **Revalidation adds friction.** If packages sit staged for a while, owners must revalidate before promoting. This is an intentional security tradeoff: accepting a small amount of friction to ensure validation results are fresh at promotion time.
+- **New concepts for users.** Staging, groups, and the two-step push/promote workflow add complexity to the NuGet experience. Most package authors who push one or two packages at a time may not need or use this feature.
 
 ## Rationale and alternatives
 
 ### Why Gallery-only promotion
 
-The core security insight is that CI/CD systems are attack surfaces. API keys can leak. OIDC-configured GitHub Actions can be compromised. If an attacker gains the ability to push packages, they can push malicious packages today. Staging with Gallery-only promotion creates a hard boundary: even with full CI/CD compromise, the attacker can only create invisible staged packages. A human with step-up 2FA must approve promotion.
-
-### Why step-up 2FA at promotion
-
-Session-level 2FA (at login) is not sufficient. If someone walks away from their laptop, or if an attacker has browser session access, they could promote without re-authenticating. The step-up challenge at the moment of promotion ensures proof of presence at the exact time of action, not just at session start. This follows the same pattern as npm's publish confirmation and GitHub's sudo mode.
+The core security insight is that CI/CD systems are attack surfaces. API keys can leak. OIDC-configured GitHub Actions can be compromised. If an attacker gains the ability to push packages, they can push malicious packages today. Staging with Gallery-only promotion creates a hard boundary: even with full CI/CD compromise, the attacker can only create invisible staged packages. A human logged in with 2FA must approve promotion.
 
 ### Why not scheduled promotion
 
-Automatically promoting at a specific date/time was considered but rejected for the initial release. Scheduled promotion would bypass the proof of presence requirement. It also introduces complexity around time zones, failure handling, and what happens if the schedule fires during an outage. Teams can achieve a similar result by staging ahead of time and manually promoting when ready.
+Automatically promoting at a specific date/time was considered but rejected for the initial release. Scheduled promotion would bypass the human-in-the-loop requirement. It also introduces complexity around time zones, failure handling, and what happens if the schedule fires during an outage. Teams can achieve a similar result by staging ahead of time and manually promoting when ready.
 
 ## Prior Art
 
@@ -212,7 +195,7 @@ Automatically promoting at a specific date/time was considered but rejected for 
 
 ## Future Possibilities
 
-- **Proof of presence for CLI.** If nuget.org adds step-up 2FA support for CLI operations in the future, promotion could be extended to the CLI with a real-time authentication challenge.
-- **Mandatory staging for high-impact packages.** The 2FA-at-promote gate only protects packages that opt into staging. A future enhancement could require staging for packages above a download threshold or allow owners to mark a package ID as "staging required."
+- **Step-up 2FA at promotion.** A future enhancement could require a fresh 2FA challenge at the moment of promotion (similar to npm's publish confirmation and GitHub's sudo mode), providing stronger proof of presence beyond the login session.
+- **Mandatory staging for high-impact packages.** The login-2FA gate only protects packages that opt into staging. A future enhancement could require staging for packages above a download threshold or allow owners to mark a package ID as "staging required."
 - **Authenticated pre-promote restore.** Allow owners to test-restore a staged group before promoting, verifying that interdependent packages resolve correctly as a set.
 - **Two-person approval.** Require two distinct identities to approve a promotion before it proceeds, providing defense-in-depth against single-account compromise.
