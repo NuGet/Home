@@ -7,147 +7,29 @@
 
 Add sponsorship reporting to the NuGet CLI for installed packages.
 
-The command surface has two potential commands:
+The command surface will be presented as `dotnet package list --sponsor`
 
-- Candidate A: extend `dotnet package list` with `--sponsor` (also available through the legacy alias `dotnet list package --sponsor`)
-- Candidate B: add a new `dotnet package sponsor` subcommand
-
-Both candidates reuse the same metadata-fetch and rendering pipeline, with:
+It will reuse the same metadata-fetch and rendering pipeline, with:
 
 - A `Sponsor` column in console output
 - A `sponsorshipUrls` array in JSON output
 
 ## Explanation
 
-### Functional explanation
-
-Both command candidates produce the same sponsorship data:
-
-```bash
-# Candidate A
-dotnet package list --sponsor
-
-# Candidate B
-dotnet package sponsor
-```
-
-The target project or solution remains positional for either candidate.
-
-Console and JSON entry points stay parallel:
-
-```bash
-# Console
-dotnet package list --sponsor
-dotnet package sponsor
-
-# JSON
-dotnet package list --sponsor --format json
-dotnet package sponsor --format json
-```
-
-**Zero sponsors**
-
-```text
-Top-level Package        Sponsor
-> Contoso.Tools          (none)
-```
-
-```json
-{
-  "id": "Contoso.Tools",
-  "sponsorshipUrls": []
-}
-```
-
-**Source does not provide sponsorship data**
-
-```text
-Top-level Package        Sponsor
-> Contoso.Tools          (none)
-
-Source 'X' does not provide sponsorship data
-```
-
-**One sponsor**
-
-```text
-Top-level Package        Sponsor
-> Contoso.Tools          https://github.com/sponsors/username
-```
-
-```json
-{
-  "id": "Contoso.Tools",
-  "sponsorshipUrls": [
-    "https://github.com/sponsors/username"
-  ]
-}
-```
-
-**Ten sponsors** (matching NuGet.org's current policy cap)
-
-```text
-Top-level Package        Sponsor
-> Contoso.Utility        https://patreon.com/user
-                         https://patreon.com/user2
-                         https://opencollective.com/user
-                         https://opencollective.com/user2
-                         https://opencollective.com/user3
-                         https://github.com/sponsors/user
-                         https://github.com/sponsors/user2
-                         https://ko-fi.com/123
-                         https://ko-fi.com/456
-                         https://ko-fi.com/789
-```
-
-```json
-{
-  "id": "Contoso.Utility",
-  "sponsorshipUrls": [
-    "https://patreon.com/user",
-    "https://patreon.com/user2",
-    "https://opencollective.com/user",
-    "https://opencollective.com/user2",
-    "https://opencollective.com/user3",
-    "https://github.com/sponsors/user",
-    "https://github.com/sponsors/user2",
-    "https://ko-fi.com/123",
-    "https://ko-fi.com/456",
-    "https://ko-fi.com/789"
-  ]
-}
-```
-
-Packages with no sponsorship data display `(none)` in console output and `[]` in JSON.
-
 ### Technical explanation
 
-Both command candidates share one sponsor-report model and one metadata pipeline.
+`dotnet package list --sponsor` extends the exsisting list-package report pipeline with a new report type. 
 
-- Candidate A extends `ListPackageCommand` with a new report flag.
-- Candidate B registers `dotnet package sponsor` but still routes into the same metadata-fetch, model, and renderer internals.
+Planned updates:
 
-Planned code updates:
-
-- `ListPackageCommand.cs`
-  - Candidate A: add `--sponsor`, extend mutual-exclusion validation, and map the flag to `ReportType.Sponsor` in `GetReportType`.
-  - Candidate B: map the new command to the same sponsor report mode before invoking the existing downstream pipeline.
-- `ReportType.cs` and `ListPackageArgs.cs`
-  - Add `ReportType.Sponsor` and carry it through list-package arguments.
-- `ListPackageCommandRunner.cs`
-  - Fetch sponsorship metadata through the same source-metadata path used by other report types.
-  - Update `UpdatePackagesWithSourceMetadata` so overwrite logic triggers when sponsorship data exists; otherwise fetched `SponsorshipUrls` can be dropped before rendering.
-  - Add per-package failure isolation inside `ThrottledForEachAsync` so one metadata failure surfaces as `(error)` / `problems` without aborting the report.
-- `ListReportPackage.cs`
-  - Add `SponsorshipUrls`, following existing constructor/overload patterns used by vulnerability and deprecation data.
-- `ProjectPackagesPrintUtility.cs`
-  - Update `GetFrameworkPackageMetadata` to populate sponsorship data conditionally.
-- `ListPackageConsoleRenderer.cs`
-  - Render `Sponsor`, `(none)`, and `(error)`, along with aligned continuation lines for multiple URLs.
-- `ListPackageJsonRenderer.cs`
-  - Emit ordered `sponsorshipUrls` and include non-fatal fetch issues in `problems` while preserving package entries.
-- `RegistrationIndex.cs` and `PackageMetadataResourceV3.cs`
-  - Propagate `sponsorshipUrls` from registration index payloads to metadata objects consumed by the list pipeline.
+- Extend `dotnet package list` command to support sponsorship reporting through `--sponsor` flag.
+- Extend list package report types and argument handling to support sponsorship data.
+- Retrieve sponsorship metadata as part of the existing package metadata collection pipeline.
+- Ensure sponsorship information is preserved throughout package metadata processing and report generation.
+- Add sponsorship status and sponsorship URL support to package reporting models. 
+- Display sponsorship information and sponsorship-related status messages in console output
+- Populate sponsorship data for framework packages during report generation.
+- Propagate sponsorship URLs from V3 registration metadata through the package metadata layer.
 
 #### Data assumptions
 
@@ -155,6 +37,30 @@ Planned code updates:
 - Missing, `null`, or empty values all mean no sponsorship data.
 - Console output uses `(none)`; JSON output uses `[]`.
 - Multiple URLs preserve server order and show as extra rows directly under the previous sponsorship link. 
+- At this time, there is a maximum of 10 URLs shown. 
+This is due to nuget.orgs current policy cap; client will not be validating urls, it will only show what the server provides. 
+
+**Example Registration Index:**
+
+```json
+{ 
+  "@id": "https://api.nuget.org/v3/registration5-gz-semver2/Contoso/index.json",
+  "@type": [
+    "catalog:CatalogRoot", 
+    "PackageRegistration", 
+    "catalog:Permalink"
+  ],
+  "commitId": "afa91af1-9505-41b8-ad75-eab8e613db14",
+  "commitTimeStamp": "2026-04-10T00:15:25.1492389+00:00",
+  "count": 2,
+  // ** Start of proposal ** //
+  "sponsorshipUrls": [
+    "https://sponsordomain/sponsors/user"
+  ]
+  // ** End of proposal ** //
+  // ... additional information
+}  
+```
 
 #### Source transport dependency and client abstraction
 
@@ -163,22 +69,16 @@ This document defines client behavior only when that data is available.
 
 #### Testing strategy
 
-- `DotnetListPackageTests.cs`
-  - Add command-surface tests for zero, one, and ten sponsors.
-  - Verify `(none)`, single inline URL, continuation-line alignment, and `Sponsor` column behavior with transitive packages.
-- `DotnetListPackageTests.cs`
-  - Add JSON-path variants that verify `sponsorshipUrls: []`, one-element arrays, and ten-element arrays in preserved order.
-- `ListPackageCommandRunnerTests.cs`
-  - Verify sponsorship metadata triggers `UpdatePackagesWithSourceMetadata` overwrite behavior.
-  - Verify one package metadata failure remains isolated and does not fail the full report (exit code remains 0 once isolation behavior lands).
-- `ProjectPackagesPrintUtilityTests.cs`
-  - Add unit tests for sponsor-only logic in `GetFrameworkPackageMetadata`.
-- List-package model tests
-  - Cover `ListReportPackage` sponsorship constructor/property wiring.
-- `XplatListPackageJsonRendererTests.cs`
-  - Validate zero/one/many sponsor URLs and `problems` output for non-fatal metadata fetch failures.
-- Multi-source coverage
-  - Add sponsorship scenarios where one source fails and another succeeds, confirming partial results with warnings.
+- Validate command output for packages with no sponsorship information, a single sponsorship URL, and multiple sponsorship URLs.
+- Verify sponsorship rendering behavior in console output, including URL formatting, line wrapping/alignment, and interactions with transitive package views.
+- Verify JSON output for empty, single, and multiple sponsorship URL scenarios while preserving URL order.
+- Validate sponsorship metadata is correctly applied during package metadata enrichment.
+- Verify sponsorship metadata retrieval failures are isolated to individual packages and do not fail the overall command.
+- Validate sponsorship metadata population for framework package scenarios.
+- Verify sponsorship data is correctly propagated through package reporting models.
+- Validate JSON output includes sponsorship metadata, status information, and non-fatal metadata retrieval issues.
+- Verify partial-result scenarios where sponsorship metadata retrieval succeeds for some package sources and fails for others.
+- Validate warning and error reporting for non-fatal sponsorship metadata retrieval failures.
 
 #### Extending to NuGet.exe
 
@@ -199,11 +99,6 @@ That is a real dependency and should be treated as a follow-on extension.
 
 ## Rationale and alternatives
 
-| Dimension | `dotnet package list --sponsor` | `dotnet package sponsor` |
-|---|---|---|
-| Pros | Aligns with existing list report flags (`--deprecated`, `--outdated`, `--vulnerable`) and established user workflow; no new command registration. | Improves discoverability; gives sponsorship a dedicated, tab-completable verb. |
-| Cons | Adds another mutually exclusive flag to an already busy command surface; not visible unless users already check `dotnet package list -h`. | Adds a new command entry point even though execution reuses list-package internals; creates two paths to identical data. |
-| Implementation cost | Lowest: one new flag, one new `ReportType` value, and an extended mutex-count check in `ListPackageCommand.GetReportType`. | Medium: new command registration in `Program.cs`, a routing shim into `ListPackageCommandRunner`, and duplicate console/JSON coverage. |
 
 ## Prior Art
 
@@ -215,11 +110,7 @@ That is a real dependency and should be treated as a follow-on extension.
 
 ## Unresolved Questions
 
-1. Which command surface ships: `dotnet package list --sponsor` or `dotnet package sponsor`?
-2. Should `--include-transitive` be supported?
-For example, if package A depends on package B, should sponsorship data for package B also be shown?
-3. Should the command special-case NuGet.org by default?
-If not, users must continue to explicitly set `--source` when they want NuGet.org sponsorship data.
+none at this time
 
 ## Future Possibilities
 
