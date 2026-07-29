@@ -30,27 +30,113 @@ But, this section contains the first set of features we would like to work on.
 
 #### Defining the cooldown
 
-The cooldown is defined in the nuget.config file via a new `minPublishAgeHours` attribute on package sources.
-When a source does not have a `minPublishAgeHours` value, it is considered zero, which allows packages to be used immediately.
+Cooldown will extend Package Source Mapping.
+See the [rationale on why cooldown is being tied to Package Source Mapping](#why-require-package-source-mapping).
 
-```xml
-<packageSources>
-  <add key="nuget.org" value="https://api.nuget.org/v3/index.json" minPublishAgeHours="72" />
-  <add key="internal" value="https://contoso.example/nuget/v3/index.json" />
-</packageSources>
+The existing PSM `<packageSource>` element will be extended to allow one or more `<group>` elements, which in turn will contain one or more `<package pattern="..." />` elements.
+Package patterns can continue to be defined directly under `<packageSource>`, or they can be defined inside a `<group>` when they need a different cooldown value.
+Both the `<packageSource>` and `<group>` elements have an optional `minPublishAgeHours` attribute to define the cooldown for the `<package>` elements within.
+If both the `<packageSource>` and `<group>` elements have the `minPublishAgeHours` attribute, the value on the `<group>` is used for any child `<package>` elements.
+If the `<packageSource>` element does not have a `minPublishAgeHours` attribute, it is equivalent to the value 0, which means no cooldown, packages can be upgraded as soon as they are published.
+If the `<group>` element does not have a `minPublishAgeHours` attribute, then it inherits the `<packageSource>` value for cooldown, in order to leave `<group>` open for extension in the future.
+It is invalid to have the same pattern more than once within a single `<packageSource>`.
+Negative values for `minPublishAgeHours` are invalid.
+
+Here are some scenarios and sample config files.
+The diff syntax is used to highlight changes introduced by cooldown.
+
+- All packages on nuget.org on a 3 day cooldown, all internal Contoso.* packages do not have a cooldown.
+
+```diff
+ <configuration>
+   <packageSources>
+     <clear />
+     <add key="nuget.org" value="https://api.nuget.org/v3/index.json" />
+     <add key="contoso" value="https://contoso.test/packages/" />
+   </packageSources>
+   <packageSourceMapping>
+-    <packageSource key="nuget.org">
++    <packageSource key="nuget.org" minPublishAgeHours="72">
+       <package pattern="*" />
+     </packageSource>
+     <packageSource key="contoso">
+       <package pattern="Contoso.*" />
+     </packageSource>
+   </packageSourceMapping>
+ </configuration>
 ```
 
-Visual Studio's Package Sources option page should provide a way to enter the value.
-Similarly, `dotnet nuget [add|update] source` commands should add a `--min-publish-age-hours` option.
+- Packages from nuget.org are on a 3 day cooldown, except `Microsoft.*` and `System.*` packages, which are on a 1 day cooldown, but the `Fabrikam` package has a 7 day cooldown.
 
-NuGet creates a default NuGet.Config file in the user-settings directory when it does not exist, with nuget.org added automatically as a package source.
-It will not add a cooldown automatically.
-This makes the cooldown feature entirely opt-in at this time.
+```diff
+ <configuration>
+   <packageSources>
+     <clear />
+     <add key="nuget.org" value="https://api.nuget.org/v3/index.json" />
+   </packageSources>
+   <packageSourceMapping>
+-    <packageSource key="nuget.org">
++    <packageSource key="nuget.org" minPublishAgeHours="72">
+       <package pattern="*" />
++      <group minPublishAgeHours="24">
+         <package pattern="Microsoft.*" />
+         <package pattern="System.*" />
++      </group>
++      <group minPublishAgeHours="168">
+         <package pattern="Fabrikam" />
++      </group>
+     </packageSource>
+   </packageSourceMapping>
+ </configuration>
+```
+
+- The package `Fabrikam` is available on two sources, with different cooldowns depending on the source.
+
+This is an edge case that is not recommended, it's just a consequence of the proposal's design.
+The recommended usage is to use Package Source Mapping to limit the package to a single source.
+Read ahead to the [updating package versions section](#updating-package-versions) to understand how NuGet will choose package versions when there are different cooldowns for different sources.
+
+```diff
+<configuration>
+  <packageSources>
+    <clear />
+    <add key="nuget.org" value="https://api.nuget.org/v3/index.json" />
+    <add key="contoso" value="https://contoso.test/packages/" />
+  </packageSources>
+  <packageSourceMapping>
+-   <packageSource key="nuget.org">
++   <packageSource key="nuget.org" minPublishAgeHours="72">
+      <package pattern="*" />
+      <package pattern="Fabrikam" />
+    </packageSource>
+    <packageSource key="contoso">
+      <package pattern="Contoso.*" />
++     <group minPublishAgeHours="48">
+        <package pattern="Fabrikam" />
++     </group>
+    </packageSource>
+  </packageSourceMapping>
+</configuration>
+```
+
+When NuGet runs on a machine with no [user-scoped NuGet.config file](https://learn.microsoft.com/nuget/consume-packages/configuring-nuget-behavior#config-file-locations-and-uses), it creates a default config file with api.nuget.org as a package source.
+This default nuget.config file does not have any other settings, so no Package Source Mapping enabled by default.
+The default config will not change for this cooldown feature.
+This makes the cooldown feature entirely opt-in on initial release.
 
 #### Updating package versions
 
-The following actions will need to be updated to support cooldown.
-This list is not intended to be a prescriptive explanation of how exactly the feature should work, only that changes will be needed to take package age into account.
+All tooling is expected to be aligned, but the details will be dependent on the specific tool.
+
+- When choosing a version (either for installation, or default selection in a version list), choose the highest version whose publish age is greater than the value configured.
+- When displaying a list of versions, show an indicator for which versions are still in the cooldown period.
+- When enumerating packages with available updates, exclude packages which only have versions that are younger than the minimum publish age.
+- When the minimum publish age is configured to a non-zero value, but the package source does not provide the publish date for at least one version of the package, display a warning that the cooldown configuration cannot be honored.
+- When a package is allowed to be restored from more than one source, consider each source independently, and a version is eligible for upgrade if any one source considers it eligible.
+
+#### Tooling changes
+
+The following actions/gestures will need to be updated to support cooldown.
 
 - `dotnet package update`
 
@@ -61,20 +147,26 @@ This command has several options, some of which will choose a version on the use
 Cooldown is probably only relevant when using the `--outdated` option.
 In addition to notifying when updates that have passed the cooldown period are available, it should warn when a package already resolved is in cooldown, to help detect accidental upgrades, or validate after manually editing MSBuild files.
 
+- `dotnet package search`
+
+The `--exact-match` option tells the search command to list all the versions of a package, in which case the packages in cooldown should be marked as such.
+Without the `--exact-match` option, the search command uses the [search resource](https://learn.microsoft.com/nuget/api/search-query-service-resource), which does not have a query filter for publish age, or provide the publish date in the package metadata.
+Therefore, `dotnet package search` without `--exact-match` will not be affected by cooldown for the initial version, and can be discussed in a new NuGet/Home issue after the first version is finished, as it will require protocol changes and decisions on behavior when the package source doesn't implement the updated protocol.
+
 - Visual Studio Package Manager UI
 
 1. Quick install button on the package list.
-1. Details page's version drop down list pre-selected version.
-1. Details page's version drop down list indication which are still on cooldown, similar to "(vulnerable)" or "(deprecated)" for relevant packages.
+1. Details page's version dropdown list pre-selected version.
+1. Details page's version dropdown list indication of which versions are still on cooldown, similar to "(vulnerable)" or "(deprecated)" for relevant packages.
 1. Details page "publish date" line.
 1. Multiple package updates on the Update tab.
 1. Update tab package count
 
 However, there are complexities that will need to be addressed before or during implementation:
 
-1. PM UI has a "Package sources" drop down where all sources can be considered, or just a single source.
+1. PM UI has a "Package sources" dropdown where all sources can be considered, or just a single source.
 1. PM UI doesn't always take package source mapping into account.
-1. The NuGet protocol only provides `published` metadata of package metadata (registration) resources (used by installed, update, consolidate tabs), not the package search resource (used by the browse tab)
+1. The NuGet protocol only provides `published` metadata in package metadata (registration) resources (used by installed, update, consolidate tabs), not the package search resource (used by the browse tab)
 
 - Visual Studio Package Manager Console
 
@@ -96,7 +188,7 @@ Please see the [cooldown during restore section](#cooldown-during-restore) for m
 
 This feature does not propose any changes to the NuGet protocol at this time.
 The [package metadata resource](https://learn.microsoft.com/en-us/nuget/api/registration-base-url-resource) contains an optional `published` field.
-If a NuGet.Config file is using package sources that do not provide `published` metadata, then NuGet can't do cooldown calculations and should provide warning messages.
+If a nuget.config file is using package sources that do not provide `published` metadata, then NuGet can't do cooldown calculations and should provide warning messages.
 
 NuGet.Protocol already populates the `Published` property for local file feeds using the file's last modified timestamp.
 So, cooldown on file feeds will work, but customers are responsible for setting the last modified time carefully.
@@ -143,29 +235,47 @@ The NuGet team has [documented a recommendation](https://learn.microsoft.com/nug
 
 ## Rationale and alternatives
 
+### Why require Package Source Mapping
+
+There are three primary reasons why cooldown is being proposed to extend Package Source Mapping (PSM), forcing customers to onboard onto PSM if they're not using it already.
+
+1. Per-package or per-prefix values
+
+   Initial feedback suggests that different cooldowns for different packages will be a popular request.
+   Additionally, most other ecosystems have some kind of exception list (see [prior art](#prior-art)).
+   Allowing different cooldown values per-package or per-prefix provides more flexibility than a single global cooldown and an exception list that skip cooldown checks, while allowing developers to use the zero value to disable cooldown for those packages.
+
+1. Constraints due to protocol design
+
+   As mentioned elsewhere, the only place NuGet's protocol provides the publish date metadata is in a resource that lists it as being optional.
+   NuGet's docs [lists around 20 different options for hosting private feeds](https://learn.microsoft.com/nuget/hosting-packages/overview).
+   It's not feasible to test them all to determine which support publish date metadata and which ones do not, in order to understand how common it is that feeds don't provide the publish date.
+   Similarly, changing the protocol to make the publish date mandatory and breaking feeds that are no longer compliant with the protocol could be counter-productive by preventing uptake of the cooldown feature.
+
+   Therefore, NuGet's cooldown feature needs to handle situations where a package's publish date is not always available.
+   It's most likely that all packages on a feed either have or don't have a publish date, rather than only a subset of packages having publish dates.
+   So, attaching the cooldown to specific package sources makes it clear that there are behavior differences between package sources.
+
+1. Both features are aligned with supply chain security
+
+   Developers wanting to use cooldown are hopefully doing so out of a desire to secure their supply chain, rather than simply following a check-list of mandatory company policies.
+   In such a case, it's likely that Package Source Mapping is aligned with that desire of securing their supply chain, so using both would be acceptable or even desirable.
+
+While there are likely certain developers who have constraints or preferences that make onboarding onto PSM infeasible, there is no perfect solution for everybody.
+This design is proposed as being the best for most scenarios and that other designs may have more significant drawbacks or limitations.
+
 ### Alternate options to define the cooldown period
 
-Since the proposal is that cooldown is configurable per source, putting the setting in NuGet.Config is a natural fit as that's where sources are usually configured.
+Since the proposal is that cooldown is configurable per source, putting the setting in nuget.config is a natural fit as that's where sources are usually configured.
 While PackageReference allows package sources to be defined in MSBuild, it only allows a semicolon delimited list of URLs and local paths.
 There's no existing way to define metadata on MSBuild defined sources (sources are an MSBuild property, not items).
 
 A single global cooldown setting was not chosen because we believe that wanting a cooldown for nuget.org packages and not for company internal packages will be a common configuration.
+Additionally, most other ecosystem package managers with a cooldown feature also have some kind of exclude option.
 Most repositories do not have a large number of package sources, so it should not be a burden to duplicate the cooldown setting for multiple sources.
 
-The ability to configure different cooldown settings per package, or per prefix, similar to [Package Source Mapping](https://learn.microsoft.com/nuget/consume-packages/package-source-mapping) is an interesting discussion.
-A number of people may wish to reduce or even disable cooldown for Microsoft owned `System.*` or `Microsoft.*` packages.
-However, Microsoft employees are not immune to having their credentials stolen.
-Microsoft employees might also be targeted by attackers as high value targets, given that Microsoft owned packages are widely used by .NET developers.
-On the other hand, [nuget.org policies reduce the risk of unsigned packages being published](#2-publishing-packages).
-But depending on the specifics of the security incident, the attacker might get access to disable the certificate settings for a nuget.org account, or get access to the CI system to sign the package.
-The overall risk is going to be a personal opinion.
-
-In addition, per-package cooldown settings will increase the complexity of managing a nuget.config file.
-Hopefully only by a small amount if it has a `pattern="*"` style option.
-But Package Source Mapping configs can get quite large if not using `pattern="*"`, and every package prefix is listed individually, for example if internal company packages are not prefixed with the company name, and therefore `pattern="*"` is used for internal packages, rather than packages coming from nuget.org.
-If per-package cooldown uses the same design, then the config file could become similarly difficult to manage.
-
-So, for the first version of cooldown in NuGet, the proposal is per-source settings only, and we'll gather customer feedback on per-package settings.
+Attaching the cooldown to the `<packageSources>` (not the Package Source Mapping sub-element, but the one that defines the source in the first place) was considered.
+But there was significant feedback that not all packages should use the same cooldown value.
 
 ### Cooldown during restore
 
@@ -197,7 +307,7 @@ Therefore, for the first version of package cooldown in NuGet, blocking floating
 
 If a project is already referencing a package that now has a known vulnerability, it may be important to upgrade the package sooner to reduce the time that project may be vulnerable to publicly disclosed bugs.
 On the other hand, there are instances of developer machines being compromised and credentials or tokens being stolen.
-If the attacker can steal both a nuget.org push token, as well as a suitable github token, the attacker might be able to create a GitHub security advisory, which will then automatically become a NuGetAudit warning within hours.
+If the attacker can steal both a nuget.org push token, as well as a suitable GitHub token, the attacker might be able to create a GitHub security advisory, which will then automatically become a NuGetAudit warning within hours.
 For this reason, it's not necessarily safer to update a package with a known vulnerability than updating a package without.
 Different developers will have different opinions on whether to upgrade.
 As long as there's a way for them to upgrade when they decide that upgrading is more important than waiting for the cooldown, their objectives can be met.
@@ -210,33 +320,28 @@ You can use MSBuild conditions to choose when to keep it as an error, or when to
 Similar "minimum age" / "cooldown" mechanisms exist in other ecosystems and are good precedent for units, defaults, and handling sources without publish timestamps:
 
 - **npm** — `min-release-age` in `.npmrc` (in days), added in npm v11.10.0, delays installing newly published versions.
+  npm also supports `min-release-age-exclude`, where package names or minimatch globs such as `@myorg/*` can be exempt from the age filter.
+  Exempting a package only exempts that package, not its dependencies, unless those dependencies also match an exclude pattern.
 - **Cargo (Rust)** — [RFC 3923](https://github.com/rust-lang/rfcs/pull/3923) adds `registry.global-min-publish-age` (e.g. `"14 days"`) plus a per-registry `registries.<name>.min-publish-age` override, closely mirroring the per-feed model here.
-   Versions already in `Cargo.lock` are exempt, and an env var can bypass the age for urgent fixes.
+  Versions already in `Cargo.lock` are exempt.
+  `CARGO_RESOLVER_INCOMPATIBLE_PUBLISH_AGE=allow` can temporarily bypass the age check for urgent fixes, for example with `cargo update --precise`.
+  Cargo considered package-name exclude lists, but deferred them because per-registry configuration covers trusted sources and the env var plus `--precise` covers urgent one-off updates.
 - **Dependabot** — a cooldown option to delay dependency update PRs.
+  It supports exception-style configuration with `include` and `exclude` lists, and can configure different cooldowns for major, minor, and patch updates.
+  Cooldown applies to version updates, not security updates.
 - **Renovate** — `minimumReleaseAge` holds back update PRs until a release reaches a configured age.
+  Renovate uses `packageRules` for exceptions, allowing selected package names, patterns, datasources, or update types to use a different `minimumReleaseAge`, including `0 days`.
 
 ### A different approach: pinning to a fixed date
 
 Python's [uv](https://docs.astral.sh/uv/) takes a different approach with its `exclude-newer` setting (and the per-package `exclude-newer-package` variant).
 Rather than a rolling age relative to "now", it limits resolution to versions published before a fixed date or timestamp (e.g. `2026-01-01`).
 This was designed primarily for reproducible resolutions ("resolve the graph as it existed on date X") rather than as a security cooldown, though it can be used to hold back new versions.
+The per-package variant provides a package-specific exception mechanism, but only by setting a different fixed cutoff date for that package.
 The trade-off is that a fixed date must be advanced manually over time, whereas a rolling age like the one proposed here keeps moving forward automatically.
 
 ## Unresolved Questions
 
-- **PM UI warning location.** When a source with cooldown enabled doesn't have `published` metadata, where should a warning be displayed?
-- **Warning or error when feed does not provide published metadata.** Warning seems appropriate for restore, but should PMC and `dotnet package update` warn or fail?
-- **Block updates to versions still in cooldown.** If someone uses `dotnet package update` or `Update-Package`, explicitly specify a version number, should we silently allow the update, warn but succeed, or fail the command?
-- **PM UI and the (All) package source.** All of the PM UI features become ambiguous when the package source dropdown has the "(All)" item selected, and the package is available in more than one source with different cooldown periods and/or different feeds report the same version published at a different date or time.
-
-## Future Possibilities
-
-There are many potential ways this feature could be extended in the future.
-Some may just need time, others may need customer feedback to show interest.
-
-- Warn during restore about packages still within the cooldown period.
-- Per-package or per-prefix cooldown, for example extending package source mapping syntax.
-- Some kind of "skip cooldown" option could be added to `dotnet package update` and PMC's `Update-Package` commands.
 
 ## Appendix
 
