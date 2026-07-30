@@ -180,7 +180,7 @@ If sponsorshipUrls is absent, the client treats sponsorship information as unava
 
 ## Rationale and Alternatives
 
-Why `dotnet package list --sponsor`? Why not `dotnet package sponsor`?
+Why `dotnet package list --sponsor`? Why not `dotnet package sponsor` or `dotnet package fund`?
 
 ```bash
 dotnet package sponsor
@@ -192,6 +192,11 @@ Benefits considered:
 - Clear intent and discoverability
 - Provides room for future sponsorship-focused experiences. 
 - Naturally supports interactive workflows if introduced in future implementations. 
+
+Rationale: 
+- For V1, the idea is to expose which packages have sponsorship information, similar to how `--vulnerable` exposes which packages have vulnerabilites. 
+- Discoverability will happen when using `dotnet package list -help` when looking for the `--sponsor` flag
+- Introducing sponsorships through a flag similar to other reporting patterns can allow us to analyze the feature and how it is used, before creating a dedicated command. 
 
 **Selected Approach** 
 
@@ -208,26 +213,12 @@ Rationale:
 
 The current proposal focuses on displaying sponsorship information rather than providing sponsorship-specific actions. 
 
-1. **Command alternatives**
-   - New `dotnet package fund` verb: mirrors `npm fund` naming, kept as an alternative naming option to `dotnet package sponsor`
-
-2. **Display alternatives**
-   - JSON-only output: inconsistent with existing report UX that consumers already expect from `dotnet list package`. 
-   **`--format json`** will be supported.
-
-3. **Restore-time messaging**
-   - Restore is a noise-sensitive surface run on every build; an explicit, per-invocation command keeps this information fully opt-in without polluting the default build/restore loop.
-
-4. **Bake sponsorship into package metadata**
-   - `npm fund` has precedent for this; the `funding` field lives directly in package metadata.
-   - npm's own guidance suggests keeping funding links at the package or author level.
-   - Doing the same for NuGet could be noisy for the CLI, and stale sponsorship information would be problematic.
 
 **Impact of not doing this:** Sponsorship links remain visible only on the nuget.org website. There would be no way for the CLI, PM UI, or other client tooling to programmatically surface which dependencies are seeking sponsorship, limiting discoverability for package authors relying on this signal for funding.
 
-## Prior Art
+## Prior Art/Related
 
-- **[2023 community proposal](https://github.com/NuGet/Home/blob/sponsor-link/proposed/2023/sponsor-link.md)**: Initial community proposal for the overall idea — introduced the `--sponsor` flag concept, sponsor metadata authors could set, a Visual Studio UI link, and an opt-in restore-time summary message.
+- [**Companion server spec**](https://devdiv.visualstudio.com/DevDiv/_git/NuGet.Services/pullrequest/763096?_a=files&iteration=2&base=1): Proposes implementation for supporting PackageID level metadata in the Registration API.
 - **[`npm fund`](https://docs.npmjs.com/cli/v10/commands/npm-fund/)**: `npm fund` provides precedent for this pattern. The `funding` field lives in package metadata, and npm's guidance suggests keeping funding links at the package or author level. 
 npm notes that funding information can be noisy in the CLI and stale information could be problematic.
 - **[Gallery UI Sponsorship Implementation](https://github.com/NuGet/Engineering/blob/prabora-needs-sponsorship-feature/Server.Specs/2025/NeedsSponsorship.md)**: companion server-side proposal for surfacing sponsorship needs directly in the nuget.org Gallery UI; relevant precedent/parallel effort for surfacing the same underlying sponsorship data.
