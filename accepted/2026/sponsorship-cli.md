@@ -213,6 +213,26 @@ Rationale:
 
 The current proposal focuses on displaying sponsorship information rather than providing sponsorship-specific actions. 
 
+### PMUI Integration
+
+Endpoint Registartion: 
+
+| Scenario | Endpoint |
+|--------|--------|
+| Browse/Search | Search |
+| Install/Update/Details | Registration |
+
+**Justification for Registration API** 
+
+While using the Search API would be a easier technical implementation, installed-package workflows retrieve metadata through the Registration API. 
+Having sponsorship information published through the Registration API would allow that data available without requiring additonal endpoint lookups.
+
+Additionally, the command `dotnet package list` looks at packages that are installed and relies on Registration metadata. 
+Using the Search API would require a second retrieval path, while publishing sponsorships through Registration allows the command to retrieve sponsorship data alongside existing package metadata using the same data flow. 
+
+
+
+
 
 **Impact of not doing this:** Sponsorship links remain visible only on the nuget.org website. There would be no way for the CLI, PM UI, or other client tooling to programmatically surface which dependencies are seeking sponsorship, limiting discoverability for package authors relying on this signal for funding.
 
@@ -253,12 +273,12 @@ Package authors specify funding information directly in their package metadata u
 {
   "funding": {
     "type": "individual",
-    "url": "http://example.com/donate"
+    "url": "http://example/donate"
   },
 
   "funding": {
     "type": "patreon",
-    "url": "https://www.patreon.com/my-account"
+    "url": "https://domain/my-account"
   },
 }
 ```
@@ -276,11 +296,11 @@ After running `npm fund`, they receive this output:
 
 ```text
 my-project
-├── https://github.com/sponsors/expressjs
+├── https://domain/sponsors/user
 │   └── express@4.21.2
-├── https://opencollective.com/babel
+├── https://domain/user
 │   └── @babel/core@7.28.0
-└── https://github.com/sponsors/sindresorhus
+└── https://domain/sponsors/user
     └── p-limit@7.1.1
 ```
 
@@ -322,7 +342,7 @@ Report-style experience aligned with existing commands.
 
 ## Why not mirror npm exactly?
 
-1. Sponsorship information is treated as package metadata that's exposed by a package source instead of stored directly.
+1. Sponsorship information needs to be queried from the package source, rather than embedded within the package. 
 2. Sponsorship discovery follows existing NuGet resolution behavior 
 3. Restore output remains unchanged to avoid additional noise.
 Users explicitly opt into sponsorship discovery instead of receiving sponsorship messaging during restore operations. 
