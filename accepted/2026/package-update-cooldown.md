@@ -68,8 +68,8 @@ All tooling is expected to be aligned, but the details will be dependent on the 
 - When choosing a version (either for installation, or default selection in a version list), choose the highest version where the package was published longer ago than the configured min publish age.
 - When displaying a list of versions, show an indicator for which versions are still in the cooldown period.
 - When enumerating packages with available updates, exclude packages which only have versions that are younger than the minimum publish age.
-- When the minimum publish age is configured to a non-zero value, but the package source does not provide the publish date for at least one version of the package, display a warning.
-   Versions without a publish date are considered eligible for updates.
+- When the minimum publish age is configured to a non-zero value, but the package source does not provide the publish date for at least one version of the package, display an error.
+   Update commands should not modify the project until the configuration error is resolved.
 - When a package is allowed to be restored from more than one source, consider each source independently, and a version is eligible for upgrade if any one source considers it eligible.
 
 #### Tooling changes
@@ -148,9 +148,8 @@ The feed should retain nuget.org's original publishing date, not the date that t
 
 Feeds that re-publish nuget.org packages are ones that don't intrinsically know that packages came from nuget.org.
 Instead someone, or some other automated process, downloads the package from nuget.org and then pushes the package to the feed.
-In this case, the best case is that the feed lists the publish date as when the package was pushed to the feed.
-But if this is days or weeks after the package was originally published to nuget.org, then from the developer's point of view, NuGet might not behave in the way they expect.
-It is recommended that the publishing process take cooldown into account, and teams using this feed should not configure NuGet to use cooldowns, since the source only gets the package once the desired time period has passed.
+In this case, we recommend the re-publish process implement their own cooldown logic and expose versions that satisfy the organization's requirements.
+Then additional cooldown on the NuGet client side would be redundant and not needed.
 
 ### Delayed security fixes
 
@@ -163,6 +162,9 @@ If a malicious actor can publish a new version of a package, they might also be 
 Therefore there's a balance between taking new versions to fix known security vulnerabilities and waiting for security experts to vet new packages for malicious code.
 This is a decision that individuals will need to make.
 NuGet will not contain defaults that choose between NuGetAudit warnings or violating cooldown periods for you.
+
+External (to NuGet) tooling that perform automated updates, such as Dependabot, have their own configuration independent of NuGet (or other package manager) implementation of cooldown.
+Therefore, they may have settings that can be configured, or opinionated behavior that may align with an organization's preferences.
 
 ### Hierarchical nuget.config settings
 
