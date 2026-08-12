@@ -34,7 +34,7 @@ When a source does not have a `minPublishAgeHours` value, it is considered zero,
 The value must be an unsigned integer (zero or higher).
 All other values will cause config file loading failures.
 
-In addition, a new `<minPublishAgeExceptions>` section, which accepts `<add pattern="{package or prefix}" />` children can be used to exclude certain packages and prefixes from cooldown.
+In addition, a new `<minPublishAgeExceptions>` section, which accepts `<package pattern="{package or prefix}" />` children can be used to exclude certain packages and prefixes from cooldown.
 The pattern syntax will be identical to [package source mapping](https://learn.microsoft.com/nuget/consume-packages/package-source-mapping#package-pattern-syntax).
 
 In the following example, diff syntax is used to highlight the proposed changes.
@@ -47,8 +47,8 @@ In the following example, diff syntax is used to highlight the proposed changes.
      <add key="internal" value="https://contoso.test/nuget/v3/index.json" />
    </packageSources>
 +  <minPublishAgeExceptions>
-+    <add pattern="System.*" />
-+    <add pattern="Fabrikam.WebApi.Client" />
++    <package pattern="System.*" />
++    <package pattern="Fabrikam.WebApi.Client" />
 +  </minPublishAgeExceptions>
  </configuration>
 ```
