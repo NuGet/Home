@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.nuget.org/cli/stage/v1/push.schema.json",
+  "title": "dotnet nuget stage push JSON output",
+  "allOf": [
+    { "$ref": "envelope.schema.json" },
+    {
+      "properties": {
+        "command": { "const": "push" },
+        "result": {
+          "type": "object",
+          "required": ["staged"],
+          "properties": {
+            "staged": { "type": "boolean" }
+          },
+          "additionalProperties": false
+        }
+      }
+    }
+  ]
+}
