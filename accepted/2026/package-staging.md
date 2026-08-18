@@ -169,9 +169,7 @@ Staging push and delete operations share the same quota budget as normal push/un
 
 #### Limits
 
-- Max 20 staging groups per owner
-- Max 1000 packages per group
-- Configurable total staged packages per owner (default and elevated tiers available)
+- Configurable total staged artifacts per owner (default: 350), with elevated limits for large publishers
 - Configurable TTL per owner
 
 ## Drawbacks
