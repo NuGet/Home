@@ -20,32 +20,56 @@ It will reuse the same metadata-fetch and rendering pipeline, with:
 
 When a user runs `dotnet package list --sponsor`, the CLI will examine the projects/solutions packages and retrieve sponsorship links from nuget.org. 
 The results are then grouped by project and displayed in the console, and optionally in JSON format. 
-Packages that have multiple links are returned in the order received by nuget.org
+Packages that have multiple links are returned in the order received by nuget.org.
 
 The current proposal will receive sponsorship information from nuget.org. 
 The new `metadata` and `sponsorshipUrls` property (shown in technical explanation) do not automatically propagate in other sources, resulting in those sources not receiving sponsorship information.   
 
-Sponsorship information is currently queried from nuget.org
-In debug builds only, the environment variable `NUGET_SPONSOR_ENDPOINT_OVERRIDE` can be configured to https://apidev.nugettest.org/v3/index.json (for DEV) and https://apiint.nugettest.org/v3/index.json (INT).
+Sponsorship information is currently queried from nuget.org.
 The command resolves packages from NuGet configuration and --source. 
-Packages that do not contain sponsorship links or sources that don't support sponsorship data will be omitted from the report. 
+Because nuget.org is hardcoded in this proposal, sponsorship information that cannot be retrieved from either a source or a package that does not have sponsorship information will be treated the same. 
 
-The console will display:
+When nuget.org is a configured source or is specified with `--source` and no installed packages provide sponsorship data, the console will display: 
 
 ```text
 There are no sponsorship details found at https://api.nuget.org/v3/index.json
 ```
 
-When nuget.org is not configured as a source and the command is used, the console will display a message:
+```json
+{
+  "version": 1,
+  "parameters": "--sponsor",
+  "problems": [
+  {
+    "level": "warning",
+    "text": "There are no sponsorship details found at https://api.nuget.org/v3/index.json"
+  }
+]
+}
+```
+
+When nuget.org is not configured as a source and is not specified using '--source`, the console will display a message:
 
 ```text
 For sponsorship details, configure nuget.org as a package source, or allow access to nuget.org by specifying `--source https://api.nuget.org/v3/index.json`
 ```
-The JSON output will include an empty `sponsorablePackages` array for those projects.
+
+```json
+{
+  "version": 1,
+  "parameters": "--sponsor",
+  "problems": [
+  {
+    "level": "warning",
+    "text": "There are no sponsorship details found at https://api.nuget.org/v3/index.json"
+  }
+]
+}
+```
 
 The default console output will add a `Sponsor` column. 
 The first URL will appear besides the package ID and each additional URL appears below the previous one. 
-When using `--format json`, those same packages are returned in JSON format, identified by `sponsorablePackages` and with links stored in each package's `urls` array. 
+
 
 `dotnet package list --sponsor` output: 
 
@@ -54,7 +78,9 @@ Top-level Package        Sponsor
 > Contoso.Tools          https://github.com/sponsors/username
 > Contoso.Utility        https://github.com/sponsors/username
                          https://domain.com/sponsor
+
 ```
+When using `--format json`, those same packages are returned in JSON format, identified by `sponsorablePackages` and with links stored in each package's `urls` array. 
 
 `dotnet package list --sponsor --format json` output: 
 
@@ -91,7 +117,10 @@ Top-level Package        Sponsor
 **Package Source Mapping and using `--source`**
 
 The proposed implementation does not apply Package Source Mapping (PSM).
-When PSM is configured, the command will not make sponsorship metadata requests unless nuget.org is stated using `--source https://api.nuget.org/v3/index.json`.
+When PSM is configured, the command will error unless nuget.org is stated using `--source https://api.nuget.org/v3/index.json`.
+
+**Testing Strategy**
+In debug builds only, the environment variable `NUGET_SPONSOR_ENDPOINT_OVERRIDE` can be configured to https://apidev.nugettest.org/v3/index.json (for DEV) and https://apiint.nugettest.org/v3/index.json (INT).
 
 ### Technical explanation
 
@@ -125,8 +154,8 @@ Planned updates:
   "commitId": "afa91af1-9505-41b8-ad75-eab8e613db14",
   "commitTimeStamp": "2026-04-10T00:15:25.1492389+00:00",
   "count": 2,
+   // ** Start of proposal ** //
   "metadata":
-    // ** Start of proposal ** //
     "sponsorshipUrls": [
       "https://github.com/sponsors/contoso"
       ]
@@ -137,7 +166,6 @@ Planned updates:
 #### Source transport dependency and client abstraction
 
 This proposal assumes the CLI consumes sponsorship data from the Registration API.
-Missing or empty `sponsorshipUrls` use the empty-result behavior.
 
 #### Testing strategy
 
@@ -149,12 +177,13 @@ Missing or empty `sponsorshipUrls` use the empty-result behavior.
 
 ## Drawbacks
 
-
+- Currently only implemented by nuget.org, which means that customers using other package sources will not see sponsorship information, even if those packages have sponsorship links on nuget.org.
+- Package Source Mapping is not enabled on this feature, so users are required to use https://api.nuget.org/index.json for sponsorship information. 
 
 ## Rationale and alternatives
 
-`dotnet package list --sponsor` keeps sponsorship as a read-only package metadata report alongside `--deprecated`, `--vulnerable`, and `--outdated`. 
-A dedicated `dotnet package sponsor` command was considered, but this experience reports information and does not perform a sponsorship action.
+The rationale for using `dotnet package list --sponsor` keeps sponsorship as a read-only package metadata report alongside `--deprecated`, `--vulnerable`, and `--outdated`. 
+A dedicated `dotnet package sponsor` command was considered, but after considering other report-type flags, we want to remain consistent for the first implemenation of the feature. 
 A dedicated command can be reconsidered if interactive sponsorship workflows are added later.
 
 ## Prior Art
@@ -164,8 +193,6 @@ A dedicated command can be reconsidered if interactive sponsorship workflows are
 - Existing report-style CLI surfaces: `--deprecated`, `--vulnerable`, `--outdated`
 
 ## Unresolved Questions
-
-If future versions support multiple sponsorship sources, how should results be merged, and how should “no sponsorship URLs” be distinguished from “source does not support sponsorship”?
 
 ## Future Possibilities
 
