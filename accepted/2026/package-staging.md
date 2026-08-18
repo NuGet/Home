@@ -41,7 +41,7 @@ Today, the time from push to all packages being restorable includes validation p
 flowchart LR
     Push["Stage Push"] --> Validation
     Validation -->|success| Ready
-    Validation -->|failure| FailedValidation
+    Validation -->|failure| ValidationFailed["Validation failed"]
     Ready -->|promote via Gallery| Available
     Available --> V3["V3 Pipeline"]
 ```
