@@ -106,6 +106,8 @@ For groups, the owner promotes the entire group at once. If any package in the g
 
 Promotion runs asynchronously, and owners can refresh the page to view progress. Group members are processed independently, so a group may partially succeed; failed items remain visible for correction.
 
+The Gallery keeps an owner-visible history of package and group promotions, including their outcomes.
+
 After promotion, the packages enter the normal V3 pipeline and become restorable through the standard process. The public "published" timestamp is set at promotion time, not at stage time.
 
 The package detail page shows staged packages to the owner with validation status, promote, download (for inspection), replace, and delete actions.
