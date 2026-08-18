@@ -50,7 +50,7 @@ Authors push packages to nuget.org using a new staging endpoint. The staging API
 
 The package goes through the same validation pipeline as a normal push: malware scanning, author signature checks, certificate revocation checks, and repository co-signing. The difference is what happens after validation succeeds. Instead of becoming publicly available, the package becomes ready for promotion. It is not visible on nuget.org to anyone except the package owner and it is not searchable or restorable by anyone including the owner.
 
-If validation fails, the author is notified the same way as a normal push failure. They can fix the issue and re-push. Since this happens days or weeks before release, there is no time pressure.
+If validation fails, the author is notified and can fix the issue and stage a replacement. Since this happens days or weeks before release, there is no time pressure.
 
 Re-pushing the same content is a no-op (safe for CI/CD retries). Pushing different content for the same ID and version replaces the staged package, re-runs validation, and resets the expiration timer. Replacing a grouped package keeps its group membership.
 
