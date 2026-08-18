@@ -56,7 +56,7 @@ Re-pushing the same content is a no-op (safe for CI/CD retries). Pushing differe
 
 Symbol packages (`.snupkg`) can also be staged when their parent package is staged or already available. If a staged parent is not yet ready, symbol validation waits until it is. Symbol ingestion remains deferred until promotion.
 
-Staging reserves the package ID and version just like a normal push, and deleting or expiring the staged package does not make either available for reuse.
+Staging reserves the package ID and version just like a normal push. A package version originally created through staging may be staged again if it is deleted or expires before promotion. A version created by normal push or previously promoted cannot be reactivated through staging.
 
 The Upload page also supports staging via a Publishing Mode option:
 
