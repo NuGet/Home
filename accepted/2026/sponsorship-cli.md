@@ -56,10 +56,10 @@ When a user runs `dotnet package list --sponsor`, output is grouped by project a
 ```text
 Top-level Package        Sponsor
 > Contoso.Tools          https://github.com/sponsors/username
-> Contoso.Utility        https://github.com/sponsors/username
-                         https://domain.com/sponsor
+> Contoso.Utility        https://domain.com/sponsor
+                         
 ```
-**Ten Sponsorship Links** (matching NuGet.org's current policy cap)
+**Ten Sponsorship Links** (matching nuget.org's current policy cap)
 
 ```text
 Top-level Package        Sponsor
@@ -76,7 +76,7 @@ Top-level Package        Sponsor
 ```
 
 Sponsorship information is applied to the Package ID rather than the version of a package, which is why they are listed once per package. 
-When a package has multiple sponsorship links, the CLI will display the links in the order returned by NuGet.org.
+When a package has multiple sponsorship links, the CLI will display the links in the order returned by nuget.org.
 
 Both top-level and transitive packages will be included by default when using `--sponsor`. 
 This behavior will be documented in the command's help description. 
@@ -113,31 +113,45 @@ The command also supports `dotnet package list --sponsor --format json`, and wil
 }
 ```
 
-**Packages with no Sponsorship Links**
+**Source that doesn't support sponsorships/Packages without sponsorship links**
 
-`dotnet package list --sponsor`: 
+Because nuget.org is hardcoded in this proposal, sponsorship information that cannot be retrieved from either a source or a package that does not have sponsorship information will be treated the same. 
+
+When nuget.org is a configured source or is specified with `--source` and no installed packages provide sponsorship data, the console will display: 
 
 ```text
-Project 'Contoso.App' has no packages with sponsorship links
+There are no sponsorship details found at https://api.nuget.org/v3/index.json
 ```
-
-The JSON output would include an empty `sponsorablePackages` array: 
-
-`dotnet package list --sponsor --format json`:
 
 ```json
 {
   "version": 1,
   "parameters": "--sponsor",
-  "sources": [
-    "https://api.nuget.org/v3/index.json"
-  ],
-  "projects": [
-    {
-      "path": "/path/to/Contoso.App.csproj",
-      "sponsorablePackages": []
-    }
-  ]
+  "problems": [
+  {
+    "level": "warning",
+    "text": "There are no sponsorship details found at https://api.nuget.org/v3/index.json"
+  }
+]
+}
+```
+
+When nuget.org is not configured as a source and is not specified using '--source`, the console will display a message:
+
+```text
+For sponsorship details, configure nuget.org as a package source, or allow access to nuget.org by specifying `--source https://api.nuget.org/v3/index.json`
+```
+
+```json
+{
+  "version": 1,
+  "parameters": "--sponsor",
+  "problems": [
+  {
+    "level": "warning",
+    "text": "There are no sponsorship details found at https://api.nuget.org/v3/index.json"
+  }
+]
 }
 ```
 
@@ -146,31 +160,22 @@ The JSON output would include an empty `sponsorablePackages` array:
 For the initial implementation of this feature, nuget.org will be the only source used to retrieve sponsorship information. 
 While the design for the server is intended to be extensible to other feeds, we don't know when or if other feeds will implement sponsorship, so to not complicate logic in client, multi-feeds won't be merged. 
 
-When Package Source Mapping is enabled, nuget.org is queried for packages that are mapped to nuget.org. 
-Packages that are mapped to other sources will be skipped. 
-If no packages are checked due to them not being mapped to nuget.org, there will be a message displayed in the CLI: 
+The proposed implementation does not apply Package Source Mapping (PSM).
+When PSM is configured, the command will not make sponsorship metadata requests unless nuget.org is stated using `--source https://api.nuget.org/v3/index.json`.
 
-```text
-No packages are mapped to a source that supports sponsorship information.
-```
-
-| NuGet.org configured | Other sources configured | PSM enabled | `--source` | Behavior |
-|---|---|---|---|---|
-| ❌ | - | ❌ | Not provided | No sponsorship lookup occurs. The CLI reports that no supported sponsorship source is configured. |
-| ✅ | - | ❌ | Not provided | All top-level and transitive package IDs are queried against NuGet.org. Other sources are ignored. |
-| ✅ | - | ✅ | Not provided | All top-level and transitive package IDs are queried against NuGet.org. PSM is supported, but doesn't filter sponsorship requests |
-| ❌ | ✅ | ✅ | Not provided | No sponsorship lookup occurs because no packages are mapped to a supported sponsorship source. |
-| - | - | - | NuGet.org | All package IDs are queried against the specified source. |
-| - | ✅ | - | Non-NuGet.org source | The CLI reports that the source does not support sponsorship reporting in V1. |
-
-
+| Scenario | Who this represents | Behavior |
+|---|---|---|
+| **NuGet.org only enabled; no PSM** | A developer using the default public NuGet ecosystem. | Query NuGet.org for every package ID. |
+| **NuGet.org and other sources enabled; no PSM** | A developer or organization using NuGet.org with private or third-party feeds. | Query only NuGet.org for every package ID. Ignore other sources and do not merge results. |
+| **NuGet.org not configured; no PSM** | A developer or organization using only private or third-party feeds. | Perform no lookup unless NuGet.org is explicitly supplied using `--source https://api.nuget.org/v3/index.json`. |
+| **NuGet.org not configured; PSM enabled** | An organization mapping package IDs to private or third-party feeds. | PSM is not applied. Perform no lookup unless NuGet.org is explicitly supplied using `--source https://api.nuget.org/v3/index.json`; then query NuGet.org for every package ID. |
 
 ### Technical Explanation
 
-The CLI will retrieve sponsorship information through the Registration API, similar to how other package metadata is passed to the CLI. 
+The CLI will retrieve sponsorship information through the Registration API, similar to how other package metadata is passed to the CLI (PackageID level Metadata in Registration Spec)[https://github.com/NuGet/Home/issues/15038]. 
 The difference is that sponsorship information will be scoped by PackageID-only, whereas other metadata is scoped by its PackageID + version. 
 
-A successful Nuget.org response with one or more URLs (maximum 10 URLs per server enforcement) will appear in the report, while packages with no sponsorship URLs will be absent. 
+A successful nuget.org response with one or more URLs (maximum 10 URLs per server enforcement) will appear in the report, while packages with no sponsorship URLs will be absent. 
 
 The client will display the URLs exactly how nuget.org returns them.
 There is no validation, ranking, or prioritization done on the client side. 
@@ -191,9 +196,10 @@ A package source will indicate sponsorship support through a sponsorshipUrls fie
   "commitTimeStamp": "2026-04-10T00:15:25.1492389+00:00",
   "count": 2,
   // ** Start of proposal ** //
-  "sponsorshipUrls": [
-    "https://github.com/sponsors/contoso"
-    ]
+  "metadata":
+    "sponsorshipUrls": [
+      "https://github.com/sponsors/contoso"
+      ]
   // ** End of proposal **//
 }
 ```
@@ -203,11 +209,11 @@ A package source will indicate sponsorship support through a sponsorshipUrls fie
 - **Multiple sponsorship URLs:** The CLI displays sponsorship URLs in the order received from the package source.
 - **Empty state:** When a project has no sponsorable packages, display a per-project message indicating none were found.
 
-A detailed implementation proposal can be found [here](https://github.com/NuGet/Home/blob/2974a40664a05cedda0f33ab6fb9ca40692153f0/accepted/2026/sponsorship-CLI-Spec.md).
+A detailed implementation proposal can be found [here](https://github.com/NuGet/Home/blob/dev-kalebfika-sponsorTechSpec/accepted/2026/sponsorship-CLI-Spec.md).
 
 ## Drawbacks
-
-- **Nuget.org-only support**
+- Currently only implemented by nuget.org, which means that customers using other package sources will not see sponsorship information, even if those packages have sponsorship links on nuget.org.
+- Package Source Mapping is not enabled on this feature, so users are required to use https://api.nuget.org/index.json for sponsorship information. 
 
 ## Rationale and Alternatives
 
@@ -226,7 +232,7 @@ If sponsorship grows into a bigger feature, a dedicated command could be revisit
 
 ## Prior Art/Related
 
-- [**Package sponsorships on Nuget.org**](https://learn.microsoft.com/en-us/nuget/nuget-org/package-sponsorship-on-nuget-org): Packages can already be set on Nuget.org.
+- [**Package sponsorships on nuget.org**](https://learn.microsoft.com/en-us/nuget/nuget-org/package-sponsorship-on-nuget-org): Packages can already be set on nuget.org.
 - [**Companion server spec**](https://devdiv.visualstudio.com/DevDiv/_git/NuGet.Services/pullrequest/763096?_a=files&iteration=2&base=1): Proposes implementation for supporting PackageID level metadata in the Registration API (internal link).
 - **[`npm fund`](https://docs.npmjs.com/cli/v10/commands/npm-fund/)**: `npm fund` provides precedent for this pattern. The `funding` field lives in package metadata, and npm's guidance suggests keeping funding links at the package or author level. 
 npm notes that funding information can be noisy in the CLI and stale information could be problematic.
@@ -314,7 +320,7 @@ dotnet package list --sponsor
 
 Report-style experience aligned with existing commands.
 
-## Why not mirror npm exactly?
+**Why not mirror npm exactly?**
 
 1. Sponsorship information needs to be queried from the package source, rather than embedded within the package. 
 2. Sponsorship discovery follows existing NuGet resolution behavior 
