@@ -59,7 +59,8 @@ Similarly, `dotnet nuget [add|update] source` commands should add a `--min-publi
 [NuGet loads multiple nuget.config files](https://learn.microsoft.com/nuget/consume-packages/configuring-nuget-behavior) and merges their settings to come up with a final configuration to use.
 The `minPublishAgeHours` attribute on package sources uses the same behavior as `protocolVersion` and `allowInsecureConnections`, which is when a config file re-adds the same key, all the attributes from previous config files are discarded.
 When multiple nuget.config files define the `<minPublishAgeExceptions>` section, each config file in the hierarchy will replace the exceptions from previous config files.
-An explicit `<clear />` is not required, similar to how a closer config automatically replaces a Package Source Mapping entry with the same source key.
+This means that exceptions from other configs can't be extended, like package and audit sources, only replaced, just like Package Source Mapping package sources.
+To clear the exception list, an empty `<minPublishAgeExceptions />` element is used.
 
 #### Updating package versions
 
@@ -234,6 +235,43 @@ So, whether the personal preference is to wait for the cooldown period to pass, 
 
 If `TreatWarningsAsErrors` is being used, consider using `WarningsNotAsErrors` to prevent NuGetAudit from blocking all work when a new vulnerability is disclosed and the fixed version is still in cooldown.
 You can use MSBuild conditions to choose when to keep it as an error, or when to leave it as a warning, for example [if you use a separate pipeline to validate NuGetAudit success](https://learn.microsoft.com/nuget/concepts/auditing-packages#separating-errors-from-warnings-with-a-dedicated-auditing-pipeline).
+
+### Clearing minPublishAgeExceptions
+
+NuGet reads multiple config files and merges the contents into a single virtual settings.
+For package and audit sources, it's necessary to explicitly use `<clear />` to remove sources from lower priority config files (or sources defined before the clear in the same file).
+For Package Source Mapping (PSM), the same behavior exists for defining package sources.
+However, within a PSM package source, where package patterns are defined, if a package source of the same key is defined, the package patterns defined replace any values from lower priority config files.
+This means that the following two XML snippets are semantically equivalent:
+
+```xml
+<packageSourceMapping>
+  <packageSource key="contoso">
+    <package pattern="contoso.*">
+  </packageSource>
+</packageSourceMapping>
+
+<packageSourceMapping>
+  <packageSource key="contoso">
+    <clear />
+    <package pattern="contoso.*">
+  </packageSource>
+</packageSourceMapping>
+```
+
+However, PSM `packageSource` elements aren't allowed to be empty, so if the goal is to clear the package patterns from lower priority config files, then the `<clear />` is necessary.
+PSM package sources are also the only location in NuGet.config where the order of the `<clear />` is not important (will not clear items defined in the same file, before the clear itself).
+
+So, nuget.config files already not consistent with respect to `<clear />` across all different parts of the schema.
+The [Package Source Mapping (PSM) spec](../2021/PackageSourceMapping.md) doesn't define whether this was intentional or an implementation bug.
+But PSM was implemented years ago, so changing it to become consistent would be a breaking change in a feature related to supply chain security, so unlikely to change.
+
+In the context of this cooldown feature, the decision comes down to what would be least confusing for customers.
+Questions we don't have answers to include how many customers understand NuGet's config inheritance, and the importance to use `<clear />` to avoid being affected by machine state?
+Is PSM `packageSource` behavior where the `<clear />` is ignored when at least one package pattern is defined clear or confusing?
+
+Given that cooldown is a tool to improve supply chain security, and given the prior art of PSM package sources ignoring `<clear />` elements (when at least one pattern is defined), this proposal is recommending that inheritance does not happen, to reduce risk of unintended nuget.config files adding cooldown exceptions.
+I think the PSM package source example above where the `<clear />` element doesn't change behavior is confusing to customers, so unlike PSM package sources, no `<clear />` child element is being proposed, so clearing all prior exceptions is an empty `<minPublishAgeExceptions />` element.
 
 ## Prior Art
 
