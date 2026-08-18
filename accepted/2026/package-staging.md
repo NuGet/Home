@@ -156,12 +156,12 @@ Deprecation, unlisting, and other metadata edits are not available while a packa
 
 #### Notifications
 
-- Email when a package is staged (alerts owners to unexpected staging from a leaked credential)
-- Email when a package or group is promoted
-- Email 7 days before expiration
-- Email when a group or package is deleted due to expiration
+- Email when a package or symbol package is staged, alerting owners to unexpected credential use
+- Email when validation fails or takes unusually long
+- One summary when an individual or group promotion completes
+- Email before staged content expires
 
-All notifications are aggregated into a single digest per owner per event. A group promotion with 2000 packages sends one email, not 2000.
+Group promotion results are summarized rather than emailed separately for every package.
 
 #### Rate limits
 
