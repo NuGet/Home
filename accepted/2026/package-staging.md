@@ -67,6 +67,8 @@ The Upload page also supports staging via a Publishing Mode option:
 
 Packages can optionally be organized into staging groups. A group is a named collection of staged packages owned by a user or organization.
 
+Packages and symbol packages belong to separate staging groups and are promoted independently. Symbol failures do not block package promotion.
+
 ```
 dotnet nuget stage group create my-release --name "My Release"
 dotnet nuget stage push MyPackage.1.0.0.nupkg --group my-release
