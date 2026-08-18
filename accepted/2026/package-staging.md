@@ -162,6 +162,7 @@ Deprecation, unlisting, and other metadata edits are not available while a packa
 - Email when validation fails or takes unusually long
 - One summary when an individual or group promotion completes
 - Email before staged content expires
+- Email when staged content is deleted after expiration
 
 Group promotion results are summarized rather than emailed separately for every package.
 
