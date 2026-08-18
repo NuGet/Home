@@ -104,6 +104,8 @@ When a user clicks "Promote" on a staged package or group, the user must be logg
 
 For groups, the owner promotes the entire group at once. If any package in the group is still validating or failed validation, the group cannot be promoted until the issue is resolved.
 
+Promotion runs asynchronously, and owners can refresh the page to view progress. Group members are processed independently, so a group may partially succeed; failed items remain visible for correction.
+
 After promotion, the packages enter the normal V3 pipeline and become restorable through the standard process. The public "published" timestamp is set at promotion time, not at stage time.
 
 The package detail page shows staged packages to the owner with validation status, promote, download (for inspection), replace, and delete actions.
