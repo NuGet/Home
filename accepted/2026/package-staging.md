@@ -54,7 +54,7 @@ If validation fails, the author is notified the same way as a normal push failur
 
 Re-pushing the same content is a no-op (safe for CI/CD retries). Pushing different content for the same ID and version replaces the staged package, re-runs validation, and resets the expiration timer. Replacing a grouped package keeps its group membership.
 
-Symbol packages (`.snupkg`) can also be staged. The parent `.nupkg` must already be staged or validating. Symbol validation runs at stage time so failures are caught early. Symbol ingestion is deferred until promotion so symbols are not publicly available before the parent package.
+Symbol packages (`.snupkg`) can also be staged when their parent package is staged or already available. If a staged parent is not yet ready, symbol validation waits until it is. Symbol ingestion remains deferred until promotion.
 
 Staging reserves the package ID and version just like a normal push, and deleting or expiring the staged package does not make either available for reuse.
 
