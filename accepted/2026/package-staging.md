@@ -40,15 +40,15 @@ Today, the time from push to all packages being restorable includes validation p
 ```mermaid
 flowchart LR
     Push["Stage Push"] --> Validation
-    Validation -->|success| Staged
+    Validation -->|success| Ready
     Validation -->|failure| FailedValidation
-    Staged -->|promote via Gallery| Available
+    Ready -->|promote via Gallery| Available
     Available --> V3["V3 Pipeline"]
 ```
 
 Authors push packages to nuget.org using a new staging endpoint. The staging API is advertised as a `PackageStaging/1.0.0` resource type in the service index. Sources that do not advertise this resource do not support staging.
 
-The package goes through the same validation pipeline as a normal push: malware scanning, author signature checks, certificate revocation checks, and repository co-signing. The difference is what happens after validation succeeds. Instead of becoming publicly available, the package enters a "staged" state. It is not visible on nuget.org to anyone except the package owner and it is not searchable or restorable by anyone including the owner.
+The package goes through the same validation pipeline as a normal push: malware scanning, author signature checks, certificate revocation checks, and repository co-signing. The difference is what happens after validation succeeds. Instead of becoming publicly available, the package becomes ready for promotion. It is not visible on nuget.org to anyone except the package owner and it is not searchable or restorable by anyone including the owner.
 
 If validation fails, the author is notified the same way as a normal push failure. They can fix the issue and re-push. Since this happens days or weeks before release, there is no time pressure.
 
