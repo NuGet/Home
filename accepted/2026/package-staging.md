@@ -123,7 +123,7 @@ The package detail page shows staged packages to the owner with validation statu
 
 *Figure 5. API key management showing the new "Stage packages" scope.*
 
-Trusted Publishing configurations support a "Restrict to staging only" scope. When configured with this scope, a GitHub Actions workflow (or other supported CI/CD provider) can stage packages but cannot push directly to the public feed. This is enforced in both directions: the staging endpoints accept staging-only credentials, and the normal push endpoint rejects them with 403.
+Trusted Publishing configurations support a "Restrict to staging only" constraint. Unlike the API key scope above, this constraint narrows a Trusted Publishing policy. Credentials issued under a constrained policy can stage packages but cannot push directly to the public feed. This is enforced in both directions: the staging endpoints accept staging-only credentials, and the normal push endpoint rejects them with 403.
 
 ![Trusted Publishing - Restrict to staging only](images/trusted-publishing-staging.png)
 
