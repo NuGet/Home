@@ -5,7 +5,7 @@
 
 ## Summary
 
-Package staging lets authors push packages to nuget.org ahead of time, run them through full validation (malware scanning, signing), and promote them later with a single action through the Gallery UI. Staged packages are invisible to consumers until promoted. Promotion requires that the user is logged into nuget.org with two-factor authentication enabled on their account.
+Package staging lets authors push packages to nuget.org ahead of time, run them through full validation (malware scanning, signing), and promote them later with a single action through the Gallery UI. Staged packages are invisible to consumers until promoted. Promotion is only available for users with two-factor authentication enabled.
 
 This builds on the [2024 Release Staging and Deprecation proposal](../2024/release-staging-and-deprecation.md) with a narrower scope focused on staging and promotion, informed by direct feedback from the .NET release team and security requirements around supply chain protection.
 
