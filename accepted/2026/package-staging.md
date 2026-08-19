@@ -25,7 +25,7 @@ Staging eliminates this gap. Packages are pre-validated and sitting in a staged 
 
 ### Pre-validation
 
-The .NET team pushes 2000+ packages to nuget.org every Patch Tuesday. Validation (malware scanning, certificate checks, repository co-signing) takes 40 to 60 minutes for that volume. If a package fails validation, the team discovers it on release day and has to rebuild, re-sign, and re-push during a tight embargo window.
+The .NET team pushes 2000+ packages to nuget.org every Patch Tuesday. Validation (malware scanning, certificate checks, repository co-signing) takes 40 to 60 minutes for that volume. If a package fails validation, the team discovers it on release day and has to rebuild, re-sign, and re-push, delaying the release of the patches but not the disclosure. Delay can create a 0-day opportunity.
 
 Staging lets authors push packages days or weeks early. Validation runs during that window. Failures are caught and fixed before release day, not during it.
 
