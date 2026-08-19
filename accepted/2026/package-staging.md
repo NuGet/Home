@@ -21,7 +21,7 @@ Staging is entirely opt-in. The existing `dotnet nuget push` command and push AP
 
 .NET security releases are coordinated with public disclosure of vulnerabilities. The team cannot push packages before 10 AM Pacific because early availability would give attackers time to analyze changes and derive exploits before users can patch. But validation takes 40 to 60 minutes after push, so the packages are not available until well after disclosure. This creates a window where the vulnerability is publicly known but the fix is not yet restorable.
 
-Staging eliminates this gap. Packages are pre-validated and sitting in a staged state. At the coordinated disclosure time, promotion makes them available without waiting for validation.
+Packages are validated ahead of time and held in staging. At the coordinated disclosure time, promotion makes them available without waiting for validation.
 
 ### Pre-validation
 
