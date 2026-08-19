@@ -259,7 +259,8 @@ This means that the following two XML snippets are semantically equivalent:
 </packageSourceMapping>
 ```
 
-However, PSM `packageSource` elements aren't allowed to be empty, so if the goal is to clear the package patterns from lower priority config files, then the `<clear />` is necessary.
+However, PSM `packageSource` elements aren't allowed to be empty.
+While it's recommended to put a `<clear/>` as a direct child of the `<packageSourceMapping>` element and re-add all the mappings for all sources, if for some reason someone wanted to clear just one PSM package source's mapping, then the `<clear />` is necessary.
 PSM package sources are also the only location in NuGet.config where the order of the `<clear />` is not important (will not clear items defined in the same file, before the clear itself).
 
 So, nuget.config files already not consistent with respect to `<clear />` across all different parts of the schema.
