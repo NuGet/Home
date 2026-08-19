@@ -67,6 +67,12 @@ The Upload page also supports staging via a Publishing Mode option:
 
 Packages can optionally be organized into staging groups. A group is a named collection of staged packages owned by a user or organization.
 
+Package registration ownership and staging ownership are related but distinct. A package registration can have multiple owners, while each staged package and staging group has one staging owner: the user or organization on whose behalf the content was staged. The staging owner is determined from the credential or Gallery context rather than supplied as an arbitrary value by the caller.
+
+Every package in a group must have been staged on behalf of the group's staging owner. For example, if Package1 is owned by A and B and Package2 is owned by B and C, they can share a group owned by B only when both packages are staged on behalf of B. A package staged on behalf of A or C cannot be added to that group.
+
+Users authorized to push packages on behalf of the staging owner can manage and promote that owner's staged content. Being another co-owner of the package registration does not by itself grant access to content staged for a different owner. Promotion rechecks that the staging owner still owns every package registration in the group and that the user is still authorized to act for that owner.
+
 Packages and symbol packages belong to separate staging groups and are promoted independently. Symbol failures do not block package promotion.
 
 ```
