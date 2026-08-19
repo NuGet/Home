@@ -13,7 +13,7 @@ This builds on the [2024 Release Staging and Deprecation proposal](../2024/relea
 
 ### Supply chain protection
 
-If a CI/CD pipeline is compromised or credentials leak, an attacker can push malicious packages to nuget.org today. Staging introduces a separation between pushing and promoting. CI/CD can only stage packages. A human must log into nuget.org with 2FA enabled to promote them. Even if an attacker compromises a build pipeline, they can only stage invisible packages that never reach consumers.
+Authors can configure CI/CD with an API key scoped only to package staging. This key can upload staged packages but cannot publish through the normal push endpoint. Promotion requires a user with 2FA enabled. If the pipeline or its staging-only key is compromised, an attacker can upload only packages that remain invisible to consumers until promoted.
 
 Staging is entirely opt-in. The existing `dotnet nuget push` command and push API continue to work exactly as they do today, including for older SDK versions. Staging uses a separate endpoint that newer SDKs may expose through commands such as `dotnet nuget stage push`. The exact command names and syntax shown in this proposal are illustrative and not final.
 
