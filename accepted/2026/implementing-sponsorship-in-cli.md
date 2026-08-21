@@ -18,29 +18,44 @@ It will reuse the same metadata-fetch and rendering pipeline, with:
 
 ### Functional Explanation
 
-When a user runs `dotnet package list --sponsor`, the CLI will examine the projects' or solutions' packages and retrieve sponsorship links from the selected package sources. 
+When a user runs `dotnet package list --sponsor`, the CLI will examine the projects' or solutions' packages and retrieve sponsorship links from the selected package sources.
 The results are then grouped by the source that provided the sponsorship details.
-For packages returned from a source, URLs preserve the order returned by that source. 
+For packages returned from a source, URLs preserve the order returned by that source.
 
-Sponsorship details are read from the proposed `sponsorshipUrls` property within `metadata` in each source's Registration response. 
-Each selected source will contribute the sponsorship details that reflect its own Registration API; the client does not assume that the property propagates through upstream sources. 
+Sponsorship details are read from the proposed `sponsorshipUrls` property within `metadata` in each source's Registration response.
+Each selected source will contribute the sponsorship details that reflect its own Registration API; the client does not assume that the property propagates through upstream sources.
+
+A package source advertises sponsorship support through a new version of the Registration resource.
+The exact Registration version will be finalized with the server implementation.
+
+```json
+{
+  "@id": "https://api.nuget.org/v3/registration5-semver1/",
+  "@type": "RegistrationsBaseUrl/<NEW_VERSION>",
+  "comment": "Base URL of Azure storage where NuGet package registration info is stored. This base URL does not include SemVer 2.0.0 packages."
+}
+```
 
 The command selects enabled package sources from NuGet configuration.
-When a source is specified using `--source <SOURCE>`, only that source is selected. 
-Currently, sponsorship information is available to the client through nuget.org.
-If/when other sources implement a sponsorship field in their Registration index, that sponsorship information will also show in the client.
+When a source is specified using `--source <SOURCE>`, only that source is queried for sponsorship information.
 A successful Registration response with a missing or empty `sponsorshipUrls` field is treated as a successful empty result.
 
 Console output includes only sources that return one or more sponsorship URLs.
-If none of the selected sources return sponsorship details for a project, the CLI displays: 
+If none of the selected sources return sponsorship details for a project, the CLI displays:
 
 ```text
 //sample response
-No sponsorship details were returned using the following package sources: 
+No sponsorship details were returned using the following package sources:
   https://api.example.org/v3/index.json
-  https://packages.contoso.com/v3/index.json
 
 Consider specifying another package source with `--source <SOURCE>`.
+```
+
+A source that does not support sponsorships will have a separate message:
+
+```text
+These sources do not provide sponsorship support:
+  https://packages.contoso.com/v3/index.json
 ```
 
 The JSON output includes every selected source for each project. 
@@ -59,7 +74,7 @@ For sources that return no sponsorship details, the `sponsorablePackages` field 
     {
       "project": "/path/to/Contoso.App.csproj",
       "level": "warning",
-      "text": "No sponsorship details were returned by https://packages.contoso.com/v3/index.json"
+      "text": "This source does not provide sponsorship support: https://packages.contoso.com/v3/index.json"
     }
   ],
   "projects": [
@@ -80,12 +95,12 @@ For sources that return no sponsorship details, the `sponsorablePackages` field 
 }
 ```
 
-The default console output will add a `Sponsor` column. 
-Within the `Sponsor` column, each source that returns a sponsorship URL is identified using a `Source:` label, followed by the sponsorship links. 
-URLs preserve the order returned by each source. 
-Sources that return no sponsorship URLs are omitted from the CLI output. 
+The default console output will add a `Sponsor` column.
+Within the `Sponsor` column, each source that returns a sponsorship URL is identified using a `Source:` label, followed by the sponsorship links.
+URLs preserve the order returned by each source.
+Sources that return no sponsorship URLs are omitted from the CLI output.
 
-`dotnet package list --sponsor` output: 
+`dotnet package list --sponsor` output:
 
 ```text
 Top-level Package        Sponsor
@@ -99,10 +114,10 @@ Top-level Package        Sponsor
 ```
 
 When using `--format json`, those same packages are returned in JSON format, grouped first by their project and then by their source.
-Each source contains its `sponsorablePackages`. 
-Sources that return no sponsorship details are still present in the JSON, but left empty with a warning. 
+Each source contains its `sponsorablePackages`.
+Sources that return no sponsorship details are still present in the JSON but are left empty with a warning.
 
-`dotnet package list --sponsor --format json` output: 
+`dotnet package list --sponsor --format json` output:
 
 ```json
 {
@@ -159,56 +174,69 @@ Sources that return no sponsorship details are still present in the JSON, but le
 
 **Package Source Mapping and using `--source`**
 
-Registration requests may disclose package IDs to package sources; therefore, sponsorship reporting will honor Package Source Mapping (PSM). 
-When PSM is disabled, each package is queried against each selected source. 
-When PSM is enabled, the client queries only sources that are selected for the command and mapped to that package. 
-Sources that are specified with `--source` replace the configured source selection, but they will not bypass PSM. 
-If there is a package not mapped to any selected source, the package is not queried and the console will output a warning: 
+Registration requests may disclose package IDs to package sources; therefore, sponsorship reporting will honor Package Source Mapping (PSM).
+When PSM is disabled, each package is queried against all configured sources.
+When PSM is enabled, the client queries only sources that are mapped to that package.
+
+The command displays an informational message when using the command with PSM enabled:
 
 ```text
-Package `Contoso.Private` was not queried for sponsorship details because none of the selected package sources match its Package Source Mapping.
+Package Source Mapping is enabled. Sponsorship details will be requested from sources mapped to packages.
 ```
 
-A mapped source that is successfully queried but returns an empty `sponsorshipUrls` property produces the same empty-source behavior present in the JSON above. 
-This includes sources that do not propagate sponsorship metadata from an upstream source. 
+Users will encounter an error if PSM is combined with `--source`.
+The command stops before making any sponsorship requests, and the CLI will produce an error message:
+
+```text
+Package Source Mapping is enabled and cannot be combined with `--source` for sponsorship reporting.
+```
+
+PSM is intended to ensure each package is accessed only through package sources that are explicitly mapped in a user's configuration.
+Using `--source` replaces the configured source selection and could select a source that is not represented by those mappings.
+Instead of bypassing or ignoring PSM, the command fails before making any requests.
+A user must add the desired source and package mappings to NuGet configuration or use a configuration without PSM.
+
+A mapped source that is successfully queried but returns an empty `sponsorshipUrls` property produces the same empty-source behavior present in the JSON above.
+This includes sources that do not propagate sponsorship metadata from an upstream source.
 
 ### Technical explanation
 
-`dotnet package list --sponsor` extends the existing package-list report pipeline with a new report type. 
+`dotnet package list --sponsor` extends the existing package-list report pipeline with a new report type.
 
 Planned updates:
 
 - Add `--sponsor` handling in `ListPackageCommand`, `ListPackageArgs`, and `ReportType`, executed through `ListPackageCommandRunner`.
-- Load PSM from the nuget settings used by the command.
-  - For each package ID, `ListPackageCommandRunner` queries only the selected sources whose configured source name matches that package's source mappings. 
-- Add `RegistrationIndexMetadata` for the optional root `metadata` object. 
+- Load PSM from the NuGet settings used by the command.
+  - For each package ID, `ListPackageCommandRunner` queries only the selected sources whose configured source name matches that package's source mappings.
+- Add `RegistrationIndexMetadata` for the optional root `metadata` object.
   - The first property is the ordered `sponsorshipUrls` string collection.
   - Add optional `metadata` property to `RegistrationIndex`.
 - Expose root index metadata through a new `RegistrationResourceV3`.
   - Future package-level properties added to the root `metadata` object can use the same abstraction.
 - Add sponsorship-specific query path in `ListPackageCommandRunner`.
-  - Query each `(source, package id)` pair once and retain the source with the ordered sponsorship URLs. 
-- Extend `ListPackageProjectModel` to retain each source and its query results. 
+  - Query each `(source, package ID)` pair once and retain the source with the ordered sponsorship URLs.
+- Extend `ListPackageProjectModel` to retain each source and its query results.
   - Extend `ListReportPackage` with grouped sponsorship details.
 - Render console sponsorship output through `ListPackageConsoleRenderer` and `ProjectPackagesPrintUtility`.
 - Render JSON sponsorship output through `ListPackageJsonRenderer`.
 
 #### Data assumptions
 
-- Proposed contract is an optional array of strings on the packages Registration index root exposed as an ordered `IReadOnlyList<string>`.
-- Only packages with one or more sponsorship URLs are included. 
+- Proposed contract is an optional array of strings on the package's Registration index root exposed as an ordered `IReadOnlyList<string>`.
+- Sources that support sponsorships will need to have an updated Registration resource version.
+- Only packages with one or more sponsorship URLs are included.
 - URLs preserve the order that is returned by a selected source in both the console and JSON.
-- The client will not validate URLs; it will only show what the server provides. 
-  - For example, nuget.org currently enforces a maximum of 10 URLs per package, which will be the maximum number of links shown in the CLI output for packages that come from nuget.org.
+- The client will not validate URLs; it will only show what the server provides.
+  - For example, nuget.org currently enforces a maximum of 10 URLs per package, which will be the maximum number of links shown in the CLI output for package's that come from nuget.org.
 
 **Example Registration Index:**
 
 ```json
-{ 
+{
   "@id": "https://api.nuget.org/v3/registration5-gz-semver2/contoso.webapi.client/index.json",
   "@type": [
-    "catalog:CatalogRoot", 
-    "PackageRegistration", 
+    "catalog:CatalogRoot",
+    "PackageRegistration",
     "catalog:Permalink"
   ],
   "commitId": "afa91af1-9505-41b8-ad75-eab8e613db14",
@@ -218,7 +246,7 @@ Planned updates:
   "metadata": {
     "sponsorshipUrls": [
       "https://github.com/sponsors/contoso"
-      ]
+    ]
     // ** End of proposal ** //
   }
 }
@@ -227,10 +255,10 @@ Planned updates:
 #### Sponsorship Data Source
 
 This proposal assumes the CLI consumes sponsorship data from the Registration API.
-It also depends on each selected package source exposing sponsorship details through the `metadata.sponsorshipUrls` property at the root of its package Registration index. 
+It also depends on each selected package source exposing sponsorship details through the `metadata.sponsorshipUrls` property at the root of its package Registration index.
 
-Root Registration metadata is exposed through `RegistrationResourceV3`, allowing future package-level properties added to the root `metadata` object to use that same abstraction. 
-A source that does not expose Registration or has authentication, network, or protocol failures uses the same list-package failure behavior. 
+Root Registration metadata is exposed through `RegistrationResourceV3`, allowing future package-level properties added to the root `metadata` object to use that same abstraction.
+A source that does not expose Registration or has authentication, network, or protocol failures uses the same list-package failure behavior.
 
 #### Testing strategy
 
@@ -242,15 +270,14 @@ A source that does not expose Registration or has authentication, network, or pr
 
 ## Drawbacks
 
-- At this time, nuget.org is the only source that supports sponsorship details in the Registration index root. 
-  - Other sources will produce empty results until they implement the same properties. 
-  - Sponsorship details from an upstream source are not shown unless that source exposes those details through its own Registration response. 
-- PSM and an explicit `--source` can intentionally exclude sources that may contain sponsorship details.
+- At this time, nuget.org is the only source that supports sponsorship details in the Registration index root.
+  - Other sources will produce a message saying that source does not support sponsorship reporting.
+  - Sponsorship details from an upstream source are not shown unless that source exposes those details through its own Registration response.
 
 ## Rationale and alternatives
 
-Using `dotnet package list --sponsor` keeps sponsorship as a read-only package metadata report alongside `--deprecated`, `--vulnerable`, and `--outdated`. 
-A dedicated `dotnet package sponsor` command was considered, but after considering other report-type flags, we want to remain consistent for the first implementation of the feature. 
+Using `dotnet package list --sponsor` keeps sponsorship as a read-only package metadata report alongside `--deprecated`, `--vulnerable`, and `--outdated`.
+A dedicated `dotnet package sponsor` command was considered, but after considering other report-type flags, we want to remain consistent for the first implementation of the feature.
 A dedicated command can be reconsidered if interactive sponsorship workflows are added later.
 
 ## Prior Art
@@ -260,6 +287,8 @@ A dedicated command can be reconsidered if interactive sponsorship workflows are
 - Existing report-style CLI surfaces: `--deprecated`, `--vulnerable`, `--outdated`
 
 ## Unresolved Questions
+
+None at this time.
 
 ## Future Possibilities
 
