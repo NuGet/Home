@@ -22,6 +22,7 @@ Publishing package ID-level metadata at the Registration index root provides one
 - Keep package ID-level data separate from existing Search metadata.
 - Maintain compatibility with clients that do not recognize the optional package ID-level metadata.
 - Ensure package ID-level metadata is included in Registration reflow, backfill, replication, and failover processes.
+- Differentiate unsupported sources from missing sponsorship links
 
 ## Non-Goals
 
@@ -32,7 +33,23 @@ Publishing package ID-level metadata at the Registration index root provides one
 
 ### Functional explanation
 
-This proposal extends the existing `RegistrationBaseUrl`.
+Support for `metadata.sponsorshipUrls` is advertised through a new versioned Registration resource type in the service index.
+The exact version name remains to be selected and is represented here as `RegistrationsBaseUrl/{NEW_VERSION}`.
+
+A source that supports this contract advertises both its existing Registration resource type and the metadata-capable type:
+
+```json
+{
+  "@id": "https://api.nuget.org/v3/registration5-gz-semver2/",
+  "@type": "RegistrationsBaseUrl/3.6.0"
+},
+{
+  "@id": "https://api.nuget.org/v3/registration5-gz-semver2/",
+  "@type": "RegistrationsBaseUrl/{NEW_VERSION}"
+}
+```
+
+This proposal extends the existing `RegistratiosBaseUrl`.
 Package ID-level metadata will be published as an optional `metadata` object at the root of the Registration index.
 
 **Example addition of metadata information**
@@ -66,6 +83,10 @@ Package ID-level metadata will be published as an optional `metadata` object at 
 }
 ```
 
+Sponsorships are used as an example of package ID-level metadata. 
+At this time, sponsorship information is the first ID-level metadata being introduced into the Registration API. 
+Future additions of optional package ID-level metadata can be added to the `metadata` object in the Registration index root, and can potentially be surfaced in the CLI as well. 
+
 **Behavior**
 
 - The `metadata` object is optional and written once per package ID on the Registration index root.
@@ -73,6 +94,8 @@ Package ID-level metadata will be published as an optional `metadata` object at 
 - Rewrites must preserve package ID-level metadata when version-level metadata changes.
 - Metadata must participate in the same publication, replication, reflow, backfill, and recovery processes as version-level metadata.
 - Network, authentication, and protocol failures remain errors and are not represented as empty metadata.
+- An unsupported source is identified by its Registration resource version
+  - If a source does not have the updated `RegistrationBaseUrl/<NEW_VERSION>`, it is identified as unsupported
 
 ### Technical explanation
 
