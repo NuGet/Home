@@ -2,6 +2,7 @@
 
 - Author: [@kalebfik](https://github.com/kalebfik)
 - GitHub Issue: [NuGet/NuGetGallery#10703](https://github.com/NuGet/NuGetGallery/issues/10703)
+- [Accompanying Funcational Spec](https://github.com/NuGet/Home/blob/dev-kalebfika-sponsorCliSpec/accepted/2026/sponsorship-cli.md)
 
 ## Summary
 
@@ -24,17 +25,6 @@ For packages returned from a source, URLs preserve the order returned by that so
 
 Sponsorship details are read from the proposed `sponsorshipUrls` property within `metadata` in each source's Registration response.
 Each selected source will contribute the sponsorship details that reflect its own Registration API; the client does not assume that the property propagates through upstream sources.
-
-A package source advertises sponsorship support through a new version of the Registration resource.
-The exact Registration version will be finalized with the server implementation.
-
-```json
-{
-  "@id": "https://api.nuget.org/v3/registration5-semver1/",
-  "@type": "RegistrationsBaseUrl/<NEW_VERSION>",
-  "comment": "Base URL of Azure storage where NuGet package registration info is stored. This base URL does not include SemVer 2.0.0 packages."
-}
-```
 
 The command selects enabled package sources from NuGet configuration.
 When a source is specified using `--source <SOURCE>`, only that source is queried for sponsorship information.
@@ -190,11 +180,6 @@ The command stops before making any sponsorship requests, and the CLI will produ
 ```text
 Package Source Mapping is enabled and cannot be combined with `--source` for sponsorship reporting.
 ```
-
-PSM is intended to ensure each package is accessed only through package sources that are explicitly mapped in a user's configuration.
-Using `--source` replaces the configured source selection and could select a source that is not represented by those mappings.
-Instead of bypassing or ignoring PSM, the command fails before making any requests.
-A user must add the desired source and package mappings to NuGet configuration or use a configuration without PSM.
 
 A mapped source that is successfully queried but returns an empty `sponsorshipUrls` property produces the same empty-source behavior present in the JSON above.
 This includes sources that do not propagate sponsorship metadata from an upstream source.
