@@ -2,7 +2,7 @@
 
 - Author: [@kalebfik](https://github.com/kalebfik)
 - GitHub Issue: [10703](https://github.com/NuGet/NuGetGallery/issues/10703)
-- [Accompanying Technical Implentation Spec](https://github.com/NuGet/Home/blob/dev-kalebfika-sponsorCliSpec/accepted/2026/sponsorship-cli.md)
+- [Accompanying Technical Implentation Spec](https://github.com/NuGet/Home/blob/dev-kalebfika-sponsorTechSpec/accepted/2026/implementing-sponsorship-in-cli.md)
 
 ## Summary
 
