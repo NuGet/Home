@@ -2,14 +2,15 @@
 
 # NuGet MCP Server
 
-Contains an [Model Context Protocol](https://modelcontextprotocol.io/introduction) (MCP) server for NuGet, enabling advanced tooling and automation scenarios for NuGet package management.
+Contains a [Model Context Protocol](https://modelcontextprotocol.io/introduction) (MCP) server for NuGet, enabling advanced tooling and automation scenarios for NuGet package management.
 See the [official NuGet MCP documentation](https://learn.microsoft.com/nuget/concepts/nuget-mcp-server) for the latest information.
 
 ## Capabilities
 
-- Uses your configured NuGet feeds to get real time information about packages.
-- Provides the ability to update packages with known vulnerabilities, including transitive dependencies.
-- Provides advanced tooling for updating packages which provides the best updates based on a projects unique package graph and target frameworks.
+- Uses your configured NuGet feeds to get real-time information about packages.
+- Provides conservative remediation planning for packages with known vulnerabilities, including transitive dependencies.
+- Provides package upgrade planning based on a project's package graph and target frameworks.
+- Reviews your repository's NuGet supply-chain posture (Central Package Management, NuGet Audit, Package Source Mapping, and `NuGet.Config` validity) and recommends hardening steps.
 
 ## Requirements
 
@@ -99,7 +100,7 @@ If you'd like to use a specific version of the MCP server, you can specify it wi
 }
 ```
 
-When configured this way, you will need to update the version as new release become available.
+When configured this way, you will need to update the version as new releases become available.
 
 See [File locations for automatic discovery of MCP configuration](https://learn.microsoft.com/visualstudio/ide/mcp-servers?view=vs-2022#file-locations-for-automatic-discovery-of-mcp-configuration) for more information on the location of the appropriate `mcp.json` for you.
 
@@ -139,7 +140,7 @@ If you'd like to use a specific version of the MCP server, you can specify it wi
 }
 ```
 
-When configured this way, you will need to update the version as new release become available.
+When configured this way, you will need to update the version as new releases become available.
 
 See [MCP configuration in VS Code](https://code.visualstudio.com/docs/copilot/chat/mcp-servers#_add-an-mcp-server) for more information on the location of the appropriate `mcp.json` for you.
 
@@ -208,11 +209,12 @@ jobs:
 ```
 
 ## Currently Supported Tools
-- `get-nuget-solver`: Fix all your package vulnerable version by updating your packages (direct and transitive) to the best compatible non-vulnerable version.
-- `get-nuget-solver-latest-versions`: Fix all your package vulnerable version by updating your packages (direct and transitive) to the latest compatible non-vulnerable version.
-- `get-latest-package-version`: Gets the latest version of a NuGet package.
-- `get-package-readme`: Gets the README for a NuGet package and returns it as markdown.
-- `update-package`: Updates installed packages to the specified version if compatible with the project configuration. It will also install/update packages needed to complete the operation.
+- `fix_vulnerable_packages`: Fixes known security vulnerabilities in NuGet dependencies by computing the smallest safe version changes.
+- `upgrade_packages_to_latest`: Upgrades NuGet packages to the latest compatible versions available from configured package sources.
+- `get_latest_package_version`: Returns the latest version of a NuGet package.
+- `get_package_context`: Returns the `AGENTS.md` context for a NuGet package when available; otherwise returns the package README.
+- `update_package_version`: Updates one or more NuGet packages to exact target versions while keeping the dependency graph compatible.
+- `review_supply_chain_security`: Reviews and recommends hardening steps for your repository's NuGet supply‑chain posture (eg, Central Package Management, NuGet Audit, Package Source Mapping, and NuGet.Config validation).
 
 ## Data Collection
 The software may collect information about you and your use of the software and send it to Microsoft. Microsoft may use this information to provide services and improve our products and services. You may turn off the telemetry as described in the repository. There are also some features in the software that may enable you and Microsoft to collect data from users of your applications. If you use these features, you must comply with applicable law, including providing appropriate notices to users of your applications together with a copy of Microsoft's [privacy statement](https://www.microsoft.com/privacy/privacystatement). You can learn more about data collection and use in the help documentation and our privacy statement. Your use of the software operates as your consent to these practices.
@@ -221,7 +223,7 @@ The software may collect information about you and your use of the software and 
 Telemetry collection is on by default to help improve the product. This can be disabled, see [Disabling All Telemetry](#disabling-telemetry-only) section below for more details.
 
 #### Disabling Telemetry Only
-To disable Microsoft telemetry collection, set the environment variable `DOTNET_CLI_TELEMETRY_OPTOUT` to `false` or `1`:
+To disable Microsoft telemetry collection, set the environment variable `DOTNET_CLI_TELEMETRY_OPTOUT` to `true` or `1`:
 
 ```bash
 export DOTNET_CLI_TELEMETRY_OPTOUT=true
