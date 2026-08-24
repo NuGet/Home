@@ -2,7 +2,7 @@
 
 - Author: [@kalebfik](https://github.com/kalebfik)
 - GitHub Issue: [10703](https://github.com/NuGet/NuGetGallery/issues/10703)
-- [Accompanying Technical Implentation Spec](https://github.com/NuGet/Home/blob/dev-kalebfika-sponsorTechSpec/accepted/2026/implementing-sponsorship-in-cli.md)
+- [Accompanying Technical Implementation Spec](https://github.com/NuGet/Home/blob/dev-kalebfika-sponsorTechSpec/accepted/2026/implementing-sponsorship-in-cli.md)
 
 ## Summary
 
@@ -57,11 +57,11 @@ When a user runs `dotnet package list --sponsor`, output is grouped by project a
 `dotnet package list --sponsor` output:
 
 ```text
-//sample response
+// sample response
 Top-level Package        Sponsor
 > Contoso.Tools          Source: https://api.example.org/v3/index.json
                            https://github.com/sponsors/contoso
-
+Transitive Package
 > Contoso.Utility        Source: https://api.example.org/v3/index.json
                            https://github.com/sponsors/contoso
                          Source: https://www.myget.org/F/contoso/api/v3/index.json
@@ -80,36 +80,53 @@ The command also supports `dotnet package list --sponsor --format json` and will
 {
   "version": 1,
   "parameters": "--sponsor --format json",
-  "projects": [
+  "sources": [
+    "https://api.example.org/v3/index.json",
+    "https://www.myget.org/F/contoso/api/v3/index.json"
+  ],
+  "packages": [
     {
-      "path": "/path/to/Contoso.App.csproj",
-      "sources": [
+      "id": "Contoso.Tools",
+      "projects": [
         {
-          "source": "https://api.example.org/v3/index.json",
-          "sponsorablePackages": [
-            {
-              "id": "Contoso.Tools",
-              "urls": [
-                "https://github.com/sponsors/contoso"
-              ]
-            },
-            {
-              "id": "Contoso.Utility",
-              "urls": [
-                "https://github.com/sponsors/contoso"
-              ]
-            }
+          "path": "/path/to/Contoso.App.csproj",
+          "relationship": "topLevel"
+        }
+      ],
+      "sponsorships": [
+        {
+          "sources": [
+            "https://api.example.org/v3/index.json"
+          ],
+          "urls": [
+            "https://github.com/sponsors/contoso"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "Contoso.Utility",
+      "projects": [
+        {
+          "path": "/path/to/Contoso.App.csproj",
+          "relationship": "transitive"
+        }
+      ],
+      "sponsorships": [
+        {
+          "sources": [
+            "https://api.example.org/v3/index.json"
+          ],
+          "urls": [
+            "https://github.com/sponsors/contoso"
           ]
         },
         {
-          "source": "https://www.myget.org/F/contoso/api/v3/index.json",
-          "sponsorablePackages": [
-            {
-              "id": "Contoso.Utility",
-              "urls": [
-                "https://buymeacoffee.com/contoso"
-              ]
-            }
+          "sources": [
+            "https://www.myget.org/F/contoso/api/v3/index.json"
+          ],
+          "urls": [
+            "https://buymeacoffee.com/contoso"
           ]
         }
       ]
@@ -117,6 +134,10 @@ The command also supports `dotnet package list --sponsor --format json` and will
   ]
 }
 ```
+
+Each package source is listed once, with the projects where it is used and its top-level or transitive relationships recorded.
+If multiple sources return the same ordered URL list, the JSON represents the list once and includes all sources in the same `sponsorships` entry.
+If multiple sources return different URL lists, they are represented in separate `sponsorships` entries.
 
 **No Sponsorship Details Returned**
 
@@ -128,11 +149,11 @@ Console output includes only sources that return one or more sponsorship URLs.
 If none of the selected sources return sponsorship details for a project, the CLI displays:
 
 ```text
-//sample response
+// sample response
 No sponsorship details were returned using the following package sources:
   https://api.example.org/v3/index.json
 
-Consider specifying another package source with `--source <SOURCE>`.
+Consider specifying an additional package source that provides sponsorship metadata, for example: `--source https://api.nuget.org/v3/index.json`.
 ```
 
 A source that does not support sponsorships will have a separate message:
@@ -142,40 +163,29 @@ These sources do not provide sponsorship support:
   https://packages.contoso.com/v3/index.json
 ```
 
-The JSON output includes every selected source for each project.
-For sources that return no sponsorship details, the `sponsorablePackages` field remains empty, as follows:
+The JSON output includes every selected source in the top-level `sources` list, which includes supported and unsupported sources, along with local sources.
+Only packages that have at least one sponsorship URL will appear in `packages`.
+For an empty report, `packages` is empty, and `problems` contains one warning per empty or unsupported source.
 
 ```json
 {
   "version": 1,
   "parameters": "--sponsor --format json",
+  "sources": [
+    "https://api.example.org/v3/index.json",
+    "C:/Program Files (x86)/Microsoft SDKs/NuGetPackages/"
+  ],
   "problems": [
     {
-      "project": "/path/to/Contoso.App.csproj",
       "level": "warning",
-      "text": "No sponsorship details were returned by https://api.example.org/v3/index.json"
+      "text": "There are no sponsorship details found at https://api.example.org/v3/index.json"
     },
     {
-      "project": "/path/to/Contoso.App.csproj",
       "level": "warning",
-      "text": "This source does not provide sponsorship support: https://packages.contoso.com/v3/index.json"
+      "text": "This source does not provide sponsorship support: C:/Program Files (x86)/Microsoft SDKs/NuGetPackages/"
     }
   ],
-  "projects": [
-    {
-      "path": "/path/to/Contoso.App.csproj",
-      "sources": [
-        {
-          "source": "https://api.example.org/v3/index.json",
-          "sponsorablePackages": []
-        },
-        {
-          "source": "https://packages.contoso.com/v3/index.json",
-          "sponsorablePackages": []
-        }
-      ]
-    }
-  ]
+  "packages": []
 }
 ```
 
@@ -290,7 +300,7 @@ If sponsorship grows into a bigger feature, a dedicated command could be revisit
 
 ## Prior Art/Related
 
-- [**Package sponsorships on nuget.org**](https://learn.microsoft.com/en-us/nuget/nuget-org/package-sponsorship-on-nuget-org): Packages can already be set on nuget.org.
+- [**Package sponsorships on nuget.org**](https://learn.microsoft.com/en-us/nuget/nuget-org/package-sponsorship-on-nuget-org): Package sponsorships can already be configured on nuget.org.
 - [**Companion server spec**](https://devdiv.visualstudio.com/DevDiv/_git/NuGet.Services/pullrequest/763096?_a=files&iteration=2&base=1): Proposes implementation for supporting package ID-level metadata in the Registration API (internal link).
 - **[`npm fund`](https://docs.npmjs.com/cli/v10/commands/npm-fund/)**: `npm fund` provides precedent for this pattern. The `funding` field lives in package metadata, and npm's guidance suggests keeping funding links at the package or author level.
   npm notes that funding information can be noisy in the CLI and that stale information could be problematic.
@@ -316,7 +326,7 @@ None at this time.
 
 ### npm Fund Comparison
 
-NPM provides a dedicated `npm fund` command that helps developers discover funding opportunities for packages they depend on.
+npm provides a dedicated `npm fund` command that helps developers discover funding opportunities for packages they depend on.
 Package authors specify funding information directly in their package metadata using the `funding` field.
 
 ```json
@@ -362,7 +372,7 @@ my-project
 
 **Comparison with Proposed Approach**
 
-NPM: Funding information is directly embedded in package metadata and distributed throughout the npm ecosystem.
+npm: Funding information is directly embedded in package metadata and distributed throughout the npm ecosystem.
 
 ```bash
 npm fund
