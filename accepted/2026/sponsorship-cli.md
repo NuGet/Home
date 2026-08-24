@@ -160,7 +160,7 @@ A source that does not support sponsorships will have a separate message:
 
 ```text
 These sources do not provide sponsorship support:
-  https://packages.contoso.com/v3/index.json
+  C:/Program Files (x86)/Microsoft SDKs/NuGetPackages/
 ```
 
 The JSON output includes every selected source in the top-level `sources` list, which includes supported and unsupported sources, along with local sources.
