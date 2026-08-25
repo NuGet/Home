@@ -32,14 +32,14 @@ configuration:
       - hourly:
           hour: 3
       filters:
+      - noActivitySince:
+          days: 15
       - isPullRequest
       - isOpen
       - hasLabel:
           label: Status:No recent activity
       - isNotLabeledWith:
           label: Community
-      - noActivitySince:
-          days: 15
       - isNotLabeledWith:
           label: Status:Do not auto close
       actions:
