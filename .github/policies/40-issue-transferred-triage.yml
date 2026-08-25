@@ -1,6 +1,6 @@
 id: 
 name: GitOps.TransferredIssueTriage
-description: GitOps.TransferredIssueTriage
+description: Tags and triages issues that have been transferred from other repositories.
 owner: 
 resource: repository
 disabled: false

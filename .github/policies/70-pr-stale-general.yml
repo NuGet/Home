@@ -1,6 +1,6 @@
 id: 
 name: GitOps.StalePRsGeneral
-description: GitOps.StalePRsGeneral
+description: Stale PR management with general rules for all PRs, and some team-only rules.
 owner: 
 resource: repository
 disabled: false
