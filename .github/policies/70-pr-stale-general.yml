@@ -70,8 +70,6 @@ configuration:
       - payloadType: Pull_Request_Review
       - hasLabel:
           label: Status:No recent activity
-      - hasLabel:
-          label: Community
       then:
       - removeLabel:
           label: Status:No recent activity
