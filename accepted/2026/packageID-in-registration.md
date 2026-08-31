@@ -13,32 +13,32 @@ The metadata is published once in an optional `metadata` object at the root of t
 The Registration API is currently scoped by version.
 Certain metadata, such as sponsorship information, applies to a package ID independently of any one package version.
 Adding package ID-level metadata through the existing version-scoped model would require any metadata changes to fan out to every version of a package, producing a catalog leaf and registration updates for each version.
-Publishing package ID-level metadata at the Registration index root provides one place where ID-specific information is stored, with one catalog event per change rather than multiple catalog leaves being written for each change.
+Publishing package ID-level metadata at the Registration index provides one place where ID-specific information is stored, with one catalog event per change rather than multiple catalog leaves being written for each change.
 
 ## Goals
 
-- Support optional package ID-level metadata in the Registration index root.
+- Support optional package ID-level metadata in the Registration index.
 - Publish and persist package ID-level changes once per package ID rather than per version.
 - Keep package ID-level data separate from existing Search metadata.
 - Maintain compatibility with clients that do not recognize the optional package ID-level metadata.
 - Ensure package ID-level metadata is included in Registration reflow, backfill, replication, and failover processes.
-- Differentiate unsupported sources from missing sponsorship links
+- Differentiate unsupported sources from missing sponsorship links.
 
 ## Non-Goals
 
-- Client-side consumption UX (changes to client side functionality or user experience).
+- Client-side consumption UX.
 - Changes to authorization or validation of data.
 
 ## Explanation
 
-### Functional explanation
+### Functional Explanation
 
 Support for `metadata.sponsorshipUrls` is advertised through a new versioned Registration resource type in the service index.
 The exact version name remains to be selected and is represented here as `RegistrationsBaseUrl/{NEW_VERSION}`.
 
 A source that supports this contract advertises both its existing Registration resource type and the metadata-capable type:
 
-```json
+```jsonc
 {
   "@id": "https://api.nuget.org/v3/registration5-gz-semver2/",
   "@type": "RegistrationsBaseUrl/3.6.0"
@@ -49,7 +49,7 @@ A source that supports this contract advertises both its existing Registration r
 }
 ```
 
-This proposal extends the existing `RegistratiosBaseUrl`.
+This proposal extends the existing `RegistrationsBaseUrl`.
 Package ID-level metadata will be published as an optional `metadata` object at the root of the Registration index.
 
 **Example addition of metadata information**
@@ -72,20 +72,20 @@ Package ID-level metadata will be published as an optional `metadata` object at 
   ],
   "commitId": "afa91af1-9505-41b8-ad75-eab8e613db14",
   "commitTimeStamp": "2026-04-10T00:15:25.1492389+00:00",
-  "count": 2,
+  "count": 1,
   // ** Start of proposal ** //
   "metadata": {
     "sponsorshipUrls": [
       "https://github.com/sponsors/contoso"
     ]
   }
-  // ** End of proposal **//
+  // ** End of proposal ** //
 }
 ```
 
-Sponsorships are used as an example of package ID-level metadata. 
-At this time, sponsorship information is the first ID-level metadata being introduced into the Registration API. 
-Future additions of optional package ID-level metadata can be added to the `metadata` object in the Registration index root, and can potentially be surfaced in the CLI as well. 
+Sponsorships are used as an example of package ID-level metadata.
+At this time, sponsorship information is the first ID-level metadata introduced into the Registration API.
+Future optional package ID-level metadata can be added to the `metadata` object in the Registration index root and potentially surfaced in the CLI as well.
 
 **Behavior**
 
@@ -94,10 +94,10 @@ Future additions of optional package ID-level metadata can be added to the `meta
 - Rewrites must preserve package ID-level metadata when version-level metadata changes.
 - Metadata must participate in the same publication, replication, reflow, backfill, and recovery processes as version-level metadata.
 - Network, authentication, and protocol failures remain errors and are not represented as empty metadata.
-- An unsupported source is identified by its Registration resource version
-  - If a source does not have the updated `RegistrationBaseUrl/<NEW_VERSION>`, it is identified as unsupported
+- An unsupported source is identified by its Registration resource version.
+  - If a source does not have the updated `RegistrationsBaseUrl/{NEW_VERSION}`, it is identified as unsupported.
 
-### Technical explanation
+### Technical Explanation
 
 A detailed technical explanation can be found here: [Technical implementation for adding package ID-level metadata to Registration](https://devdiv.visualstudio.com/DevDiv/_git/NuGet.Services?version=GBkalebfik-sponsorshipV3-spec&path=/docs/specs/2026/SponsorshipV3Spec.md&_a=preview) (internal).
 
@@ -105,7 +105,7 @@ A detailed technical explanation can be found here: [Technical implementation fo
 
 - Third-party feeds need to implement the optional Registration root contract to publish their own package ID-level metadata.
 
-## Rationale and alternatives
+## Rationale and Alternatives
 
 The following client access patterns inform where package ID-level metadata should be published:
 
@@ -119,19 +119,17 @@ The following client access patterns inform where package ID-level metadata shou
 Registration aligns with client experiences that request metadata for a known package ID.
 For `dotnet package list`, its existing metadata report modes already query Registration for installed package IDs, so sponsorship can extend that path rather than introduce a Search or full-dataset lookup.
 
-### Alternative considered: Publish through the Search endpoint
+### Alternative Considered: Publish Through the Search Endpoint
 
 One alternative is to add package ID-level metadata to `SearchDocument` and the Azure Search index schema.
 Initial Search index builds would populate the field, and later changes could be handled by a new subcommand modeled on the existing package-owner update path.
 This would reuse the existing Search publication pipeline, avoid a new package ID-level catalog leaf type, and make the metadata available to discovery experiences such as Package Manager UI Browse.
 
-This alternative was not selected mainly because it would add optional and infrequently consumed data to the high-frequency Search path.
+Registration is a better fit for the initial installed-package scenarios.
+Package Manager UI installed-package experiences and existing `dotnet package list` metadata reports already use Registration for network metadata, so a Search-only design would require an additional client lookup.
 The field would be retrieved, serialized, and transferred with applicable Search results even when the client does not use it.
 
-Registration is also a better fit for the initial installed-package scenarios.
-Package Manager UI installed-package experiences and existing `dotnet package list` metadata reports already use Registration for network metadata, so a Search-only design would require an additional client lookup.
-
-### Alternative considered: Publish a vulnerability-style dataset
+### Alternative Considered: Publish a Vulnerability-Style Dataset
 
 Another alternative is to add a standalone V3 service-index resource and publication job containing package ID-level metadata for the entire source, modeled on the vulnerability-data resource.
 Clients would download the dataset and build a local package ID lookup instead of requesting one Registration index per package ID.
@@ -143,15 +141,13 @@ Every participating client would download and maintain metadata for the full sou
 A separate full-source resource is justified for vulnerability data because that data is safety-critical and must be broadly available to restore and audit workflows.
 Sponsorship information is optional, non-blocking display metadata.
 
-### Comparing the approaches
+### Comparing the Approaches
 
 | | Registration | Search | Vulnerability-style dataset |
 | --- | --- | --- | --- |
-| **Implementation cost** | Add the package ID-level catalog lane, collector cursor, typed root model, and recovery support; no new service-index resource | Extend the Search schema, full-build seeding, and auxiliary update pipeline; can avoid a new catalog leaf type | Add a new V3 resource type, publication job, monitoring, and client resource implementation |
+| **Implementation cost** | Extend catalog and registration processing for ID-level metadata, collector cursor, typed root model, and recovery support; no new service-index resource | Extend the Search schema, full-build seeding, and auxiliary update pipeline; can avoid a new catalog leaf type | Add a new V3 resource type, publication job, monitoring, and client resource implementation |
 | **Client fit** | Matches known and installed package workflows, including existing `dotnet package list` metadata reports | Matches discovery workflows such as Package Manager UI Browse | Matches clients that need to evaluate most or all packages from a source |
 | **Network shape** | Cached request per relevant package ID and source; can require many requests for large solutions | Adds the field to applicable Search results on a frequently used, non-disk-cached query path | One cacheable dataset, but clients download metadata for the entire source |
-| **Pros** | Fetches only requested IDs; reuses existing known-package client paths | Reuses the Search pipeline; can avoid a new catalog type | Explicit support signal; no per-ID disclosure; efficient repeated local lookups |
-| **Cons** | Requires a new ID-level Registration publication lane; unsupported and empty sources are indistinguishable | Repeated optional payload cost; installed clients need another lookup | Disproportionate whole-source transfer and new protocol surface for optional display metadata |
 
 ## Unresolved Questions
 
