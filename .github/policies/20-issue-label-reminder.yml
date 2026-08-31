@@ -1,6 +1,6 @@
 id: 
 name: GitOps.LabelReminder
-description: GitOps.LabelReminder
+description: Reminds issue authors and assignees to add labels such as Type label, if missing.
 owner: 
 resource: repository
 disabled: false

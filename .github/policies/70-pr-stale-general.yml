@@ -1,6 +1,6 @@
 id: 
 name: GitOps.StalePRsGeneral
-description: GitOps.StalePRsGeneral
+description: Stale PR management with general rules for all PRs, and some team-only rules.
 owner: 
 resource: repository
 disabled: false
@@ -32,14 +32,14 @@ configuration:
       - hourly:
           hour: 3
       filters:
+      - noActivitySince:
+          days: 15
       - isPullRequest
       - isOpen
       - hasLabel:
           label: Status:No recent activity
       - isNotLabeledWith:
           label: Community
-      - noActivitySince:
-          days: 15
       - isNotLabeledWith:
           label: Status:Do not auto close
       actions:
@@ -70,8 +70,6 @@ configuration:
       - payloadType: Pull_Request_Review
       - hasLabel:
           label: Status:No recent activity
-      - hasLabel:
-          label: Community
       then:
       - removeLabel:
           label: Status:No recent activity

@@ -1,6 +1,6 @@
 id: 
 name: GitOps.StalePRsCommunity
-description: GitOps.StalePRsCommunity
+description: Stale PR management for PRs from the Community.
 owner: 
 resource: repository
 disabled: false

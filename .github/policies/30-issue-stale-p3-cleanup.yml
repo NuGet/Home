@@ -1,6 +1,6 @@
 id: 
 name: GitOps.StaleP3Cleanup
-description: GitOps.StaleP3Cleanup
+description: Cleans up stale P3 issues by marking them as icebox cleanup candidates and eventually closing them if no further activity occurs.
 owner: 
 resource: repository
 disabled: false
