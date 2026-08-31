@@ -23,12 +23,8 @@ When a user runs `dotnet package list --sponsor`, the CLI will examine the packa
 The results are then grouped by the source that provided the sponsorship details.
 For packages returned from a source, URLs preserve the order returned by that source.
 
-Sponsorship details are read from the proposed `sponsorshipUrls` property within `metadata` in each source's Registration response.
-Each selected source will contribute the sponsorship details that reflect its own Registration API; the client does not assume that the property propagates through upstream sources.
-
 The command selects enabled package sources from NuGet configuration.
 When a source is specified using `--source <SOURCE>`, only that source is queried for sponsorship information.
-A successful Registration response with a missing or empty `sponsorshipUrls` field is treated as a successful empty result.
 
 Console output includes only sources that return one or more sponsorship URLs.
 If none of the selected sources return sponsorship details for a project, the CLI displays:
@@ -83,6 +79,7 @@ Sources that return no sponsorship URLs are omitted from the CLI output.
 
 ```text
 // sample response
+Project 'Contso.App' has the following sponsorable packages
 Top-level Package        Sponsor
 > Contoso.Tools          Source: https://api.example.org/v3/index.json
                            https://github.com/sponsors/contoso
