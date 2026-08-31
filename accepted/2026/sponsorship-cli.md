@@ -58,7 +58,7 @@ When a user runs `dotnet package list --sponsor`, output is grouped by project a
 
 ```text
 // sample response
-Project 'Contso.App' has the following sponsorable packages
+Project 'Contoso.App' has the following sponsorable packages
 Top-level Package        Sponsor
 > Contoso.Tools          Source: https://api.example.org/v3/index.json
                            https://github.com/sponsors/contoso
@@ -70,7 +70,7 @@ Transitive Package
 ```
 
 Sponsorship information is applied to the package ID rather than the version of a package.
-Therefore, sponsorship information remains the same for a package regardless of what version package is published, as long as those links have not been changed.
+Therefore, sponsorship information remains the same for a package regardless of which package version is published, as long as those links have not changed.
 When a package has multiple sponsorship links, the CLI will display the links in the order returned by nuget.org.
 
 Both top-level and transitive packages will be included by default when using `--sponsor`.
@@ -148,6 +148,7 @@ When a source is specified using `--source <SOURCE>`, only that source is querie
 A successful Registration response with a missing or empty `sponsorshipUrls` field is treated as a successful empty result.
 
 Console output includes only sources that return one or more sponsorship URLs.
+`https://api.nuget.org/v3/index.json` will be recommended when it is not part of the user's configured sources.
 If none of the selected sources return sponsorship details for a project, the CLI displays:
 
 ```text
@@ -199,7 +200,7 @@ The exact Registration version will be finalized with the server implementation.
 ```json
 {
   "@id": "https://api.nuget.org/v3/registration5-semver1/",
-  "@type": "RegistrationsBaseUrl/<NEW_VERSION>",
+  "@type": "RegistrationsBaseUrl/{NEW_VERSION}",
   "comment": "Base URL of Azure storage where NuGet package registration info is stored. This base URL does not include SemVer 2.0.0 packages."
 }
 ```
@@ -239,7 +240,7 @@ This includes sources that do not propagate sponsorship metadata from an upstrea
 
 ### Technical Explanation
 
-The CLI will retrieve sponsorship information through the Registration API, similar to how other package metadata is passed to the CLI ([package ID-level metadata in the Registration API](https://github.com/NuGet/Home/issues/15038)).
+The CLI will retrieve sponsorship information through the Registration API, similar to how other package metadata is passed to the CLI.
 The difference is that sponsorship information will be scoped by package ID only, whereas other metadata is scoped by package ID and version.
 
 A successful nuget.org response with one or more URLs will appear in the report, while packages with no sponsorship URLs will be absent.
@@ -268,7 +269,7 @@ A package source will indicate sponsorship support through a `metadata.sponsorsh
       "https://github.com/sponsors/contoso"
     ]
   }
-  // ** End of proposal **//
+  // ** End of proposal ** //
 }
 ```
 
@@ -277,8 +278,6 @@ A package source will indicate sponsorship support through a `metadata.sponsorsh
 - **Multiple sponsorship URLs:** The CLI displays sponsorship URLs in the order received from the package source.
 - **nuget.org URL limit:** nuget.org currently enforces a maximum of 10 URLs per package.
 - **Empty state:** A missing, null, or empty `sponsorshipUrls` value is treated as a successful empty result.
-
-A detailed implementation proposal can be found [here](https://github.com/NuGet/Home/blob/dev-kalebfika-sponsorTechSpec/accepted/2026/sponsorship-CLI-Spec.md).
 
 ## Drawbacks
 
@@ -306,7 +305,6 @@ If sponsorship grows into a bigger feature, a dedicated command could be revisit
 - [**Companion server spec**](https://devdiv.visualstudio.com/DevDiv/_git/NuGet.Services/pullrequest/763096?_a=files&iteration=2&base=1): Proposes implementation for supporting package ID-level metadata in the Registration API (internal link).
 - **[`npm fund`](https://docs.npmjs.com/cli/v10/commands/npm-fund/)**: `npm fund` provides precedent for this pattern. The `funding` field lives in package metadata, and npm's guidance suggests keeping funding links at the package or author level.
   npm notes that funding information can be noisy in the CLI and that stale information could be problematic.
-- **[Gallery UI Sponsorship Implementation](https://github.com/NuGet/Engineering/blob/prabora-needs-sponsorship-feature/Server.Specs/2025/NeedsSponsorship.md)**: companion server-side proposal for surfacing sponsorship needs directly in the nuget.org Gallery UI; relevant precedent/parallel effort for surfacing the same underlying sponsorship data.
 - **`--deprecated`/`--vulnerable`**: precedent for opt-in report-style information that consumers already use and understand, informing this proposal's output/UX conventions.
 - **PM UI's existing project/license/report-abuse links**: precedent for Phase 2 — PM UI already shows package-supplied links to consumers using an established, low-risk pattern.
 - **[`nuget/home#14739`](https://github.com/nuget/home/issues/14739)**: Open issue for a PM UI sponsorship button.
