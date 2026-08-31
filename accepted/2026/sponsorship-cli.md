@@ -58,6 +58,7 @@ When a user runs `dotnet package list --sponsor`, output is grouped by project a
 
 ```text
 // sample response
+Project 'Contso.App' has the following sponsorable packages
 Top-level Package        Sponsor
 > Contoso.Tools          Source: https://api.example.org/v3/index.json
                            https://github.com/sponsors/contoso
@@ -68,7 +69,8 @@ Transitive Package
                            https://buymeacoffee.com/contoso
 ```
 
-Sponsorship information is applied to the package ID rather than the version of a package, which is why packages are listed once per package ID.
+Sponsorship information is applied to the package ID rather than the version of a package.
+Therefore, sponsorship information remains the same for a package regardless of what version package is published, as long as those links have not been changed.
 When a package has multiple sponsorship links, the CLI will display the links in the order returned by nuget.org.
 
 Both top-level and transitive packages will be included by default when using `--sponsor`.
