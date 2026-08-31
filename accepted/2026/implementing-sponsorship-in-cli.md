@@ -2,7 +2,7 @@
 
 - Author: [@kalebfik](https://github.com/kalebfik)
 - GitHub Issue: [NuGet/NuGetGallery#10703](https://github.com/NuGet/NuGetGallery/issues/10703)
-- [Accompanying Functional Spec](https://github.com/NuGet/Home/blob/accepted/2026/sponsorship-cli.md)
+- [Accompanying Functional Spec](https://github.com/NuGet/Home/blob/dev/accepted/2026/sponsorship-cli.md)
 
 ## Summary
 
