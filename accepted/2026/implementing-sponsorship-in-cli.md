@@ -2,7 +2,7 @@
 
 - Author: [@kalebfik](https://github.com/kalebfik)
 - GitHub Issue: [NuGet/NuGetGallery#10703](https://github.com/NuGet/NuGetGallery/issues/10703)
-- [Accompanying Functional Spec](https://github.com/NuGet/Home/blob/dev-kalebfika-sponsorCliSpec/accepted/2026/sponsorship-cli.md)
+- [Accompanying Functional Spec](https://github.com/NuGet/Home/blob/accepted/2026/sponsorship-cli.md)
 
 ## Summary
 
@@ -27,12 +27,13 @@ The command selects enabled package sources from NuGet configuration.
 When a source is specified using `--source <SOURCE>`, only that source is queried for sponsorship information.
 
 Console output includes only sources that return one or more sponsorship URLs.
+`https://api.nuget.org/v3/index.json` will be recommended when it is not part of the user's configured sources.
 If none of the selected sources return sponsorship details for a project, the CLI displays:
 
 ```text
 // sample response
 No sponsorship details were returned using the following package sources:
-  https://api.example.org/v3/index.json
+  https://api.source.org/v3/index.json
 
 Consider specifying an additional package source that provides sponsorship metadata, for example: `--source https://api.nuget.org/v3/index.json`.
 ```
@@ -79,7 +80,7 @@ Sources that return no sponsorship URLs are omitted from the CLI output.
 
 ```text
 // sample response
-Project 'Contso.App' has the following sponsorable packages
+Project 'Contoso.App' has the following sponsorable packages
 Top-level Package        Sponsor
 > Contoso.Tools          Source: https://api.example.org/v3/index.json
                            https://github.com/sponsors/contoso
@@ -154,7 +155,7 @@ The command also supports `dotnet package list --sponsor --format json` and will
 }
 ```
 
-**Package Source Mapping and using `--source`**
+**Package Source Mapping and `--source`**
 
 Registration requests may disclose package IDs to package sources; therefore, sponsorship reporting will honor Package Source Mapping (PSM).
 When PSM is disabled, each package is queried against all configured sources.
