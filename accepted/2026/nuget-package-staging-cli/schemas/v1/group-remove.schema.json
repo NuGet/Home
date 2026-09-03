@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.nuget.org/cli/stage/v1/group-remove.schema.json",
+  "title": "dotnet nuget stage group remove JSON output",
+  "allOf": [
+    { "$ref": "envelope.schema.json" },
+    {
+      "properties": {
+        "command": { "const": "group remove" },
+        "result": {
+          "type": "object",
+          "required": ["removed"],
+          "properties": {
+            "removed": { "type": "boolean" }
+          },
+          "additionalProperties": false
+        }
+      }
+    }
+  ]
+}

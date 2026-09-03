@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.nuget.org/cli/stage/v1/group-list.schema.json",
+  "title": "dotnet nuget stage group list JSON output",
+  "allOf": [
+    { "$ref": "envelope.schema.json" },
+    {
+      "properties": {
+        "command": { "const": "group list" },
+        "result": {
+          "type": "object",
+          "required": ["groups"],
+          "properties": {
+            "groups": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["id", "name", "owner", "created", "expires", "packageCount"],
+                "properties": {
+                  "id": { "type": "string" },
+                  "name": { "type": "string" },
+                  "owner": { "type": "string" },
+                  "created": { "type": "string", "format": "date-time" },
+                  "expires": { "type": "string", "format": "date-time" },
+                  "packageCount": { "type": "integer", "minimum": 0 }
+                },
+                "additionalProperties": false
+              }
+            }
+          },
+          "additionalProperties": false
+        }
+      }
+    }
+  ]
+}

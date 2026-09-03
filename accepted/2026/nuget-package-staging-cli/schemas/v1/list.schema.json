@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.nuget.org/cli/stage/v1/list.schema.json",
+  "title": "dotnet nuget stage list JSON output",
+  "allOf": [
+    { "$ref": "envelope.schema.json" },
+    {
+      "properties": {
+        "command": { "const": "list" },
+        "result": {
+          "type": "object",
+          "required": ["packages"],
+          "properties": {
+            "packages": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["id", "version"],
+                "properties": {
+                  "id": { "type": "string" },
+                  "version": { "type": "string" }
+                },
+                "additionalProperties": false
+              }
+            }
+          },
+          "additionalProperties": false
+        }
+      }
+    }
+  ]
+}

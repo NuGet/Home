@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.nuget.org/cli/stage/v1/view.schema.json",
+  "title": "dotnet nuget stage view JSON output",
+  "allOf": [
+    { "$ref": "envelope.schema.json" },
+    {
+      "properties": {
+        "command": { "const": "view" },
+        "result": {
+          "oneOf": [
+            {
+              "type": "object",
+              "maxProperties": 0,
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": ["status", "created", "group", "snupkg"],
+              "properties": {
+                "status": { "const": "validating" },
+                "created": { "type": "string", "format": "date-time" },
+                "group": { "type": ["string", "null"] },
+                "snupkg": {
+                  "type": ["string", "null"],
+                  "enum": ["validating", "staged", "failed", null]
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": ["status", "created", "group", "validatedAt", "snupkg"],
+              "properties": {
+                "status": { "const": "staged" },
+                "created": { "type": "string", "format": "date-time" },
+                "group": { "type": ["string", "null"] },
+                "validatedAt": { "type": "string", "format": "date-time" },
+                "snupkg": {
+                  "type": ["string", "null"],
+                  "enum": ["validating", "staged", "failed", null]
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": ["status", "created", "errors", "snupkg"],
+              "properties": {
+                "status": { "const": "failed" },
+                "created": { "type": "string", "format": "date-time" },
+                "errors": { "type": "array" },
+                "snupkg": {
+                  "type": ["string", "null"],
+                  "enum": ["validating", "staged", "failed", null]
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

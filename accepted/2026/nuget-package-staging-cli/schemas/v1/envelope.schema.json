@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.nuget.org/cli/stage/v1/envelope.schema.json",
+  "title": "NuGet package staging CLI JSON envelope",
+  "type": "object",
+  "required": ["version", "command", "result", "problems"],
+  "properties": {
+    "version": { "const": 1 },
+    "command": { "type": "string", "minLength": 1 },
+    "result": { "type": "object" },
+    "problems": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["text", "problemType"],
+        "properties": {
+          "text": { "type": "string" },
+          "problemType": {
+            "type": "string",
+            "enum": ["Warning", "Error"]
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.nuget.org/cli/stage/v1/group-create.schema.json",
+  "title": "dotnet nuget stage group create JSON output",
+  "allOf": [
+    { "$ref": "envelope.schema.json" },
+    {
+      "properties": {
+        "command": { "const": "group create" },
+        "result": {
+          "type": "object",
+          "required": ["created"],
+          "properties": {
+            "created": { "type": "boolean" }
+          },
+          "additionalProperties": false
+        }
+      }
+    }
+  ]
+}
