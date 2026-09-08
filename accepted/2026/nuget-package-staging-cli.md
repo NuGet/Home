@@ -28,16 +28,16 @@ The feature introduces a separate command family:
 
 ```text
 dotnet nuget stage
-|-- push <PACKAGE_PATH> [--group <GROUP_ID>] [--no-symbols]
-|-- list [--group <GROUP_ID> | --ungrouped]
-|-- view <PACKAGE_ID@VERSION>
-|-- delete <PACKAGE_ID@VERSION> [--symbols-only]
+|-- push <PACKAGE_PATH> [--group <GROUP_ID>]
+|-- list [--kind <package|symbols>]
+|-- view <PACKAGE_ID@VERSION> [--kind <package|symbols>]
+|-- delete <PACKAGE_ID@VERSION> [--kind <package|symbols>]
 `-- group
-    |-- create <GROUP_ID> [--name <DISPLAY_NAME>]
-    |-- list
-    |-- add <GROUP_ID> <PACKAGE_ID@VERSION>
-    |-- remove <GROUP_ID> <PACKAGE_ID@VERSION>
-    `-- delete <GROUP_ID>
+    |-- create <GROUP_ID> [--name <DISPLAY_NAME>] [--kind <package|symbols>]
+    |-- list [--kind <package|symbols>]
+    |-- add <GROUP_ID> <PACKAGE_ID@VERSION> [--kind <package|symbols>]
+    |-- remove <GROUP_ID> <PACKAGE_ID@VERSION> [--kind <package|symbols>]
+    `-- delete <GROUP_ID> [--kind <package|symbols>]
 ```
 
 #### Common options
@@ -78,27 +78,35 @@ The CLI warns when this option is used.
 **Synopsis**
 
 ```text
-dotnet nuget stage push <PACKAGE_PATH> [--group <GROUP_ID>] [--no-symbols]
+dotnet nuget stage push <PACKAGE_PATH> [--group <GROUP_ID>]
 ```
 
 **Options**
 
-- **`--group <GROUP_ID>`** uploads the package directly into the specified group.
-- **`--no-symbols`** prevents upload of a matching sibling `.snupkg`.
+- **`--group <GROUP_ID>`** uploads the artifact directly into the specified package or symbol group based on the file extension.
 
-`dotnet nuget stage push` uploads one `.nupkg` to private staging.
+`dotnet nuget stage push` uploads one `.nupkg` or `.snupkg` to private staging.
 It returns when the server accepts the upload and does not wait for validation to finish.
-If a matching sibling `.snupkg` exists, the CLI uploads it with the package unless `--no-symbols` is specified.
-Symbol discovery reuses the existing `dotnet nuget push` behavior.
+Each invocation uploads exactly one artifact.
+The file extension selects the package or symbol staging endpoint.
 
 ```console
 dotnet nuget stage push artifacts/Contoso.1.0.0.nupkg
 ```
 
-A package can be uploaded directly into a group:
+Symbols can be uploaded directly:
+
+```console
+dotnet nuget stage push artifacts/Contoso.1.0.0.snupkg
+```
+
+An artifact can be uploaded directly into a group of the corresponding kind:
 
 ```console
 dotnet nuget stage push artifacts/Contoso.1.0.0.nupkg \
+  --group august-release
+
+dotnet nuget stage push artifacts/Contoso.1.0.0.snupkg \
   --group august-release
 ```
 
@@ -107,41 +115,39 @@ dotnet nuget stage push artifacts/Contoso.1.0.0.nupkg \
 **Synopsis**
 
 ```text
-dotnet nuget stage list [--group <GROUP_ID> | --ungrouped]
+dotnet nuget stage list [--kind <package|symbols>]
 ```
 
 **Options**
 
-- **`--group <GROUP_ID>`** limits the result to packages in the specified group.
-- **`--ungrouped`** limits the result to packages that are not in a group.
+- **`--kind <package|symbols>`** selects packages or symbols and defaults to `package`.
 
-`dotnet nuget stage list` returns the complete package inventory visible to the supplied API key.
-Each entry contains the package ID and version.
-The command automatically follows all server continuation tokens before producing a successful result.
+`dotnet nuget stage list` returns the complete artifact inventory for the selected kind visible to the supplied API key.
+Each entry contains the artifact ID and version.
+The command automatically requests every page before producing a successful result.
 
 ```console
 dotnet nuget stage list
-dotnet nuget stage list --group august-release
-dotnet nuget stage list --ungrouped
+dotnet nuget stage list --kind symbols
 ```
 
-`--group` and `--ungrouped` are mutually exclusive.
 Group summaries are available separately through `dotnet nuget stage group list`.
-Each group summary contains group metadata and a package count, but not package membership.
-Use `stage list --group <GROUP_ID>` to list a group's packages.
+Each group summary contains group metadata and an artifact count, but not membership.
 
 ##### **`stage view`**
 
 **Synopsis**
 
 ```text
-dotnet nuget stage view <PACKAGE_ID@VERSION>
+dotnet nuget stage view <PACKAGE_ID@VERSION> [--kind <package|symbols>]
 ```
 
-`dotnet nuget stage view` displays the detailed server-provided state for one package:
+`--kind` defaults to `package`.
+`dotnet nuget stage view` displays the detailed server-provided state for one artifact:
 
 ```console
 dotnet nuget stage view Contoso@1.0.0
+dotnet nuget stage view Contoso@1.0.0 --kind symbols
 ```
 
 ##### **`stage delete`**
@@ -149,19 +155,19 @@ dotnet nuget stage view Contoso@1.0.0
 **Synopsis**
 
 ```text
-dotnet nuget stage delete <PACKAGE_ID@VERSION> [--symbols-only]
+dotnet nuget stage delete <PACKAGE_ID@VERSION> [--kind <package|symbols>]
 ```
 
 **Options**
 
-- **`--symbols-only`** deletes only the symbols while leaving the parent package staged.
+- **`--kind <package|symbols>`** selects the artifact kind and defaults to `package`.
 
 Staged content can be deleted by identity.
 Symbols can be deleted independently while leaving the parent package staged:
 
 ```console
 dotnet nuget stage delete Contoso@1.0.0
-dotnet nuget stage delete Contoso@1.0.0 --symbols-only
+dotnet nuget stage delete Contoso@1.0.0 --kind symbols
 ```
 
 Package, symbol, and group deletion do not prompt for confirmation.
@@ -172,15 +178,19 @@ Authentication and authorization are enforced by the server.
 **Synopsis**
 
 ```text
-dotnet nuget stage group create <GROUP_ID> [--name <DISPLAY_NAME>]
+dotnet nuget stage group create <GROUP_ID> [--name <DISPLAY_NAME>] [--kind <package|symbols>]
 ```
 
 **Options**
 
 - **`--name <DISPLAY_NAME>`** assigns a human-readable display name to the group.
+- **`--kind <package|symbols>`** selects the group kind and defaults to `package`.
 
 Groups use a user-selected, immutable ID for commands and API routes.
-The valid ID syntax, including characters, casing, length, normalization, uniqueness, and reserved values, must be agreed with the NuGet server team before implementation.
+Package and symbol groups are independent.
+The same group ID may exist once for each kind.
+The CLI requires a non-empty group ID and URL-escapes it.
+The server validates group ID syntax, normalization, uniqueness, and reserved values.
 
 ```console
 dotnet nuget stage group create august-release \
@@ -192,23 +202,26 @@ dotnet nuget stage group create august-release \
 **Synopsis**
 
 ```text
-dotnet nuget stage group list
+dotnet nuget stage group list [--kind <package|symbols>]
 ```
 
-`dotnet nuget stage group list` returns group summaries containing group metadata and a package count, but not package membership.
+`--kind` defaults to `package`.
+`dotnet nuget stage group list` returns summaries for the selected group kind without membership details.
 
 ##### **`stage group add`**
 
 **Synopsis**
 
 ```text
-dotnet nuget stage group add <GROUP_ID> <PACKAGE_ID@VERSION>
+dotnet nuget stage group add <GROUP_ID> <PACKAGE_ID@VERSION> [--kind <package|symbols>]
 ```
 
-An existing staged package can be added to a group:
+`--kind` defaults to `package`.
+An existing staged artifact can be added or moved to a group:
 
 ```console
 dotnet nuget stage group add august-release Contoso@1.0.0
+dotnet nuget stage group add august-release Contoso@1.0.0 --kind symbols
 ```
 
 ##### **`stage group remove`**
@@ -216,13 +229,15 @@ dotnet nuget stage group add august-release Contoso@1.0.0
 **Synopsis**
 
 ```text
-dotnet nuget stage group remove <GROUP_ID> <PACKAGE_ID@VERSION>
+dotnet nuget stage group remove <GROUP_ID> <PACKAGE_ID@VERSION> [--kind <package|symbols>]
 ```
 
-`group remove` requests removal of a package's membership from a group:
+`--kind` defaults to `package`.
+`group remove` removes an artifact from the selected group:
 
 ```console
 dotnet nuget stage group remove august-release Contoso@1.0.0
+dotnet nuget stage group remove august-release Contoso@1.0.0 --kind symbols
 ```
 
 ##### **`stage group delete`**
@@ -230,9 +245,10 @@ dotnet nuget stage group remove august-release Contoso@1.0.0
 **Synopsis**
 
 ```text
-dotnet nuget stage group delete <GROUP_ID>
+dotnet nuget stage group delete <GROUP_ID> [--kind <package|symbols>]
 ```
 
+`--kind` defaults to `package`.
 `group delete` requests deletion of a group:
 
 ```console
@@ -268,58 +284,64 @@ The staging implementation reuses existing NuGet infrastructure for source resol
 
 #### Authentication and ownership
 
-Every staging request, including reads, requires:
-
-```http
-X-NuGet-ApiKey: <key>
-```
-
-API-key resolution and precedence match `dotnet nuget push`:
+API-key resolution uses:
 
 ```text
 -k|--api-key
-NUGET_API_KEY
+NUGET_STAGE_API_KEY
 NuGet.config key for the staging endpoint
-NuGet.config key for the source
-NuGet.config key for the default nuget.org Gallery URL
 ```
 
+`NUGET_API_KEY` is not used by staging commands.
+The NuGet.config key is mapped to the `@id` of the discovered `PackageStaging` resource.
+The same staging API key is used for package and symbol operations.
 The CLI treats the API key as opaque and provides no `--owner` or `--organization` option.
+The credential must carry the dedicated staging permission.
+Ordinary push permission does not imply staging permission.
+The CLI sends the resolved key in the `X-NuGet-ApiKey` header.
+Trusted Publishing must exchange its identity token for a short-lived staging API key before invoking the command.
 
 Because staged content is private, list and view operations require authentication and return only content the authenticated identity is authorized to access.
 
 #### API mapping
 
-The server routes and HTTP methods in this table are settled and are relative to the discovered staging resource URL.
-The remaining server-contract work is to document their request and response schemas.
+This table describes the server operations required by the CLI.
+Each operation must have a committed route, method, and request contract before its client implementation begins.
 
 | CLI command | Server operation |
 | --- | --- |
-| `stage push <path>` | `PUT package` |
-| `stage list` | `GET package` |
-| `stage view <id@version>` | `GET package/{id}/{version}` |
-| `stage delete <id@version>` | `DELETE package/{id}/{version}` |
-| `stage delete <id@version> --symbols-only` | `DELETE package/{id}/{version}/symbols` |
-| `stage group create` | `POST group` |
-| `stage group list` | `GET group` |
-| `stage group add <group> <id@version>` | `PUT group/{groupId}/entries/{id}/{version}` |
-| `stage group remove` | `DELETE group/{groupId}/entries/{id}/{version}` |
-| `stage group delete` | `DELETE group/{groupId}` |
+| `stage push <nupkg>` | `PUT package` |
+| `stage push <snupkg>` | `PUT symbols` |
+| `stage list --kind package` | `GET package` |
+| `stage list --kind symbols` | `GET symbols` |
+| `stage view <id@version> --kind package` | `GET package/{id}/{version}` |
+| `stage view <id@version> --kind symbols` | `GET symbols/{id}/{version}` |
+| `stage delete <id@version> --kind package` | `DELETE package/{id}/{version}` |
+| `stage delete <id@version> --kind symbols` | `DELETE symbols/{id}/{version}` |
+| `stage group create <group> --kind <kind>` | `POST groups/{kind}` |
+| `stage group list --kind <kind>` | `GET groups/{kind}` |
+| `stage group add <group> <id@version> --kind <kind>` | `PUT groups/{kind}/{groupId}/items/{id}/{version}` |
+| `stage group remove <group> <id@version> --kind <kind>` | `DELETE groups/{kind}/{groupId}/items/{id}/{version}` |
+| `stage group delete <group> --kind <kind>` | `DELETE groups/{kind}/{groupId}` |
 
-The package upload uses multipart form data.
-It sends the `.nupkg`, an optional matching `.snupkg`, and an optional `stagingGroup` field.
+Package and symbol uploads use separate multipart requests.
+The package request sends one `.nupkg`.
+The symbol request sends one `.snupkg`.
 
-Package identities supplied on the command line use `<PACKAGE_ID>@<VERSION>`.
+Artifact identities supplied on the command line use `<PACKAGE_ID>@<VERSION>`.
 
-The CLI does not define replacement behavior and must not issue a preflight read before upload.
-It sends the upload and reports the server result.
-The written server response schema must document how new, identical, conflicting, or replaced content is represented.
+The CLI does not issue a preflight request or determine replacement behavior.
+The server decides whether an upload creates, replaces, ignores, or rejects content.
+The CLI reports the server's HTTP outcome.
 
 #### Listing and pagination
 
-`stage list` mirrors `GET package`, not `GET group`.
-With no filter, it returns all staged packages visible to the supplied API key, both grouped and ungrouped.
-`--group` maps to the server's group filter, and `--ungrouped` maps to its ungrouped filter.
+`stage list` uses the package or symbol collection selected by `--kind`.
+It returns all staged artifacts of that kind visible to the supplied API key.
+List requests use `page` and `pageSize`.
+The default server page size is 100 and the maximum is 500.
+The CLI requests up to 500 items per page until the complete result is collected.
+If any page fails, the command fails without returning a partial result.
 
 #### Output
 
@@ -327,8 +349,8 @@ Console output is the default.
 Structured output is selected with `--format json`.
 
 JSON output is a versioned CLI contract rather than a direct copy of the server response.
-The normative version 1 envelope and command-result schemas are stored in [`nuget-package-staging-cli/schemas/v1`](nuget-package-staging-cli/schemas/v1), with an index and versioning policy in [`nuget-package-staging-cli/README.md`](nuget-package-staging-cli/README.md).
-These schemas apply only to CLI standard output; they do not define server request or response JSON.
+The version 1 command combinations and output shapes are defined in [`nuget-package-staging-cli-json-output.md`](nuget-package-staging-cli-json-output.md).
+This contract applies only to CLI standard output and does not define server request or response JSON.
 
 Every command emits one document shaped like:
 
@@ -342,25 +364,28 @@ Every command emits one document shaped like:
 ```
 
 Warnings and errors are listed in `problems`, using the same `text` and `problemType` shape as `dotnet package search`.
-Every command returns a `result` object, including successful mutation commands that have no server response body.
-Credentials, authorization headers, and continuation tokens must never appear in output, logs, or telemetry.
+Failed commands return `result: null`.
+Credentials and authorization headers must never appear in output, logs, or telemetry.
 
 Commands return exit code `1` for invalid usage or when `problems` contains an `Error`.
 Successful commands and commands containing only `Warning` problems return exit code `0`.
 
 #### Errors and retries
 
-The implementation parses the staging server's error contract and translates problems into the CLI output model.
-Console output presents actionable messages.
+Any `2xx` response is successful.
+Non-`2xx` responses use existing `HttpSource` failure and retry handling.
+The CLI does not require or parse a staging-specific error envelope.
+List and view commands deserialize successful response bodies.
 
-The CLI reuses `HttpSource` for existing NuGet transport behavior.
+#### Implementation phases
 
-#### Required server-contract dependency
+Discovery, command plumbing, uploads, deletes, and group mutations can be implemented once their routes and request fields are stable.
+Mutation commands do not require successful response bodies.
+Their JSON output can be produced from command inputs.
 
-Implementation of request and response models is blocked because the settled server endpoints do not yet have implementation-grade schemas written down.
-Before client implementation begins, the server team must document exact JSON property names and casing, required and nullable fields, enum values, timestamp formats, pagination limits and defaults, error extensions, and success response bodies for every endpoint.
-OpenAPI or JSON Schema is preferred.
-This work does not reopen the routes or HTTP methods in the API mapping.
+List, view, and group-list implementation requires successful response schemas.
+Those schemas must define property names, casing, required and nullable fields, enum values, timestamps, and pagination.
+Their JSON output is implemented after those response contracts are committed.
 
 ## Rationale and alternatives
 
@@ -370,18 +395,9 @@ This would make initial upload familiar, but it cannot naturally represent listi
 
 ## Unresolved Questions
 
-The following must be resolved before implementation:
+The following must be resolved before the corresponding commands are implemented:
 
-1. What are the documented request and response schemas for every settled `PackageStaging/1.0.0` endpoint?
-2. Which fields are required, optional, or nullable, and what compatibility rules apply to additive server fields?
-3. Should staged symbols always use the discovered staging resource and package API key, or should staging support separate `--symbol-source` and `--symbol-api-key` options?
-4. What group ID syntax and validation rules will the client and server share, including casing, length, normalization, uniqueness, and reserved values?
-5. Can a staged package belong to more than one group, and how should the server handle `group add` when the package already belongs to a group?
-6. After `group remove`, does the package remain staged and ungrouped, remain in other groups, or follow another server-defined lifecycle?
-7. Does `group delete` remove only group metadata, remove memberships, or also delete staged package content?
-8. How does `group create` respond when the requested group ID already exists?
-9. How should staging integrate with Trusted Publishing, including whether OIDC exchange remains external to the command?
-10. How does `stage push --group` behave when the requested group does not exist?
+1. Does `group delete` remove only group metadata, remove memberships, or also delete staged artifact content?
 
 ## Future Possibilities
 
@@ -390,4 +406,3 @@ The following must be resolved before implementation:
 - Allow `stage group add` to accept a package path and upload it directly into the group.
 - Add `stage push --disable-buffering` if staging measurements show meaningful memory pressure for large packages.
 - Add group display-name updates.
-- Add approval or promotion commands
