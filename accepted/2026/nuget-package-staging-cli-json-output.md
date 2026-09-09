@@ -3,6 +3,8 @@
 Common options do not change JSON output.
 `--kind package` is the default and is not listed separately.
 Empty collections use `[]` and `totalCount: 0`.
+Package push results include the effective `listed` intent.
+Symbol push results do not include `listed`.
 
 ## `stage push package.nupkg --format json`
 
@@ -13,6 +15,7 @@ Empty collections use `[]` and `totalCount: 0`.
   "result": {
     "path": "package.nupkg",
     "kind": "package",
+    "listed": true,
     "groupId": null
   },
   "problems": []
@@ -28,11 +31,30 @@ Empty collections use `[]` and `totalCount: 0`.
   "result": {
     "path": "package.nupkg",
     "kind": "package",
+    "listed": true,
     "groupId": "release"
   },
   "problems": []
 }
 ```
+
+## `stage push package.nupkg --unlisted --format json`
+
+```json
+{
+  "version": 1,
+  "command": "push",
+  "result": {
+    "path": "package.nupkg",
+    "kind": "package",
+    "listed": false,
+    "groupId": null
+  },
+  "problems": []
+}
+```
+
+`--group release` uses the same output with `"groupId": "release"`.
 
 ## `stage push package.snupkg --format json`
 
@@ -172,11 +194,7 @@ Empty collections use `[]` and `totalCount: 0`.
 {
   "version": 1,
   "command": "delete",
-  "result": {
-    "id": "Contoso",
-    "version": "1.0.0",
-    "kind": "package"
-  },
+  "result": null,
   "problems": []
 }
 ```
@@ -187,11 +205,7 @@ Empty collections use `[]` and `totalCount: 0`.
 {
   "version": 1,
   "command": "delete",
-  "result": {
-    "id": "Contoso",
-    "version": "1.0.0",
-    "kind": "symbols"
-  },
+  "result": null,
   "problems": []
 }
 ```
@@ -244,7 +258,6 @@ Empty collections use `[]` and `totalCount: 0`.
         "created": "2026-09-01T12:00:00Z",
         "expires": "2026-10-01T12:00:00Z",
         "itemCount": 1,
-        "status": "ready",
         "canPromote": true,
         "galleryUrl": "https://www.nuget.org/account/staging/..."
       }
@@ -294,17 +307,12 @@ Empty collections use `[]` and `totalCount: 0`.
 {
   "version": 1,
   "command": "group remove",
-  "result": {
-    "groupId": "release",
-    "id": "Contoso",
-    "version": "1.0.0",
-    "kind": "package"
-  },
+  "result": null,
   "problems": []
 }
 ```
 
-`--kind symbols` uses the same output with `kind: "symbols"`.
+`--kind symbols` uses the same output.
 
 ## `stage group delete release --format json`
 
@@ -312,15 +320,12 @@ Empty collections use `[]` and `totalCount: 0`.
 {
   "version": 1,
   "command": "group delete",
-  "result": {
-    "id": "release",
-    "kind": "package"
-  },
+  "result": null,
   "problems": []
 }
 ```
 
-`--kind symbols` uses the same output with `kind: "symbols"`.
+`--kind symbols` uses the same output.
 
 ## Command failure
 

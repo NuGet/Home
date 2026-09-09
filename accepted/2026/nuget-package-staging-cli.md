@@ -28,7 +28,7 @@ The feature introduces a separate command family:
 
 ```text
 dotnet nuget stage
-|-- push <PACKAGE_PATH> [--group <GROUP_ID>]
+|-- push <PACKAGE_PATH> [--group <GROUP_ID>] [--unlisted]
 |-- list [--kind <package|symbols>]
 |-- view <PACKAGE_ID@VERSION> [--kind <package|symbols>]
 |-- delete <PACKAGE_ID@VERSION> [--kind <package|symbols>]
@@ -78,20 +78,29 @@ The CLI warns when this option is used.
 **Synopsis**
 
 ```text
-dotnet nuget stage push <PACKAGE_PATH> [--group <GROUP_ID>]
+dotnet nuget stage push <PACKAGE_PATH> [--group <GROUP_ID>] [--unlisted]
 ```
 
 **Options**
 
 - **`--group <GROUP_ID>`** uploads the artifact directly into the specified package or symbol group based on the file extension.
+- **`--unlisted`** sets the package's listed intent to `false`.
+  This option is valid only when uploading a `.nupkg`.
+  Using it with a `.snupkg` fails before a staging request is sent.
 
 `dotnet nuget stage push` uploads one `.nupkg` or `.snupkg` to private staging.
 It returns when the server accepts the upload and does not wait for validation to finish.
 Each invocation uploads exactly one artifact.
 The file extension selects the package or symbol staging endpoint.
 
+Package uploads use a listed intent of `true` by default.
+`--unlisted` changes that intent to `false`.
+Listed intent does not affect the privacy of staged content; it determines whether the
+package is listed if it is later promoted and published.
+
 ```console
 dotnet nuget stage push artifacts/Contoso.1.0.0.nupkg
+dotnet nuget stage push artifacts/Contoso.1.0.0.nupkg --unlisted
 ```
 
 Symbols can be uploaded directly:
@@ -184,9 +193,11 @@ dotnet nuget stage group create <GROUP_ID> [--name <DISPLAY_NAME>] [--kind <pack
 **Options**
 
 - **`--name <DISPLAY_NAME>`** assigns a human-readable display name to the group.
+  When omitted, the display name defaults to `<GROUP_ID>`.
 - **`--kind <package|symbols>`** selects the group kind and defaults to `package`.
 
 Groups use a user-selected, immutable ID for commands and API routes.
+The CLI always sends both the group ID and display name in the create request.
 Package and symbol groups are independent.
 The same group ID may exist once for each kind.
 The CLI requires a non-empty group ID and URL-escapes it.
@@ -249,7 +260,9 @@ dotnet nuget stage group delete <GROUP_ID> [--kind <package|symbols>]
 ```
 
 `--kind` defaults to `package`.
-`group delete` requests deletion of a group:
+`group delete` sends one request to delete the selected group.
+The server defines this operation as deleting the group and all staged artifacts in it;
+the CLI does not enumerate or delete group members individually.
 
 ```console
 dotnet nuget stage group delete august-release
@@ -305,12 +318,14 @@ Because staged content is private, list and view operations require authenticati
 
 #### API mapping
 
-This table describes the server operations required by the CLI.
-Each operation must have a committed route, method, and request contract before its client implementation begins.
+The authoritative server routes, request fields, response schemas, and error behavior
+are defined in the
+[`PackageStaging/1.0.0` API contract](https://devdiv.visualstudio.com/DevDiv/_git/NuGet.Services?path=/docs/specs/2026/StagingAPIContracts.md&version=GBjaparson/staging-spec&_a=preview).
+The following table maps the CLI commands to those server operations.
 
 | CLI command | Server operation |
 | --- | --- |
-| `stage push <nupkg>` | `PUT package` |
+| `stage push <nupkg> [--unlisted]` | `PUT package` |
 | `stage push <snupkg>` | `PUT symbols` |
 | `stage list --kind package` | `GET package` |
 | `stage list --kind symbols` | `GET symbols` |
@@ -326,6 +341,8 @@ Each operation must have a committed route, method, and request contract before 
 
 Package and symbol uploads use separate multipart requests.
 The package request sends one `.nupkg`.
+When `--unlisted` is supplied, the package request includes `listed: false`.
+Otherwise, the CLI omits `listed` and the server default of `true` applies.
 The symbol request sends one `.snupkg`.
 
 Artifact identities supplied on the command line use `<PACKAGE_ID>@<VERSION>`.
@@ -337,11 +354,14 @@ The CLI reports the server's HTTP outcome.
 #### Listing and pagination
 
 `stage list` uses the package or symbol collection selected by `--kind`.
-It returns all staged artifacts of that kind visible to the supplied API key.
+It returns the staged artifacts of that kind visible to the authenticated identity.
 List requests use `page` and `pageSize`.
 The default server page size is 100 and the maximum is 500.
-The CLI requests up to 500 items per page until the complete result is collected.
+The CLI requests up to 500 items per page and aggregates all returned pages into one result.
 If any page fails, the command fails without returning a partial result.
+
+The initial CLI does not expose `--page` or `--page-size` because staging inventories
+are expected to be small enough for automatic aggregation.
 
 #### Output
 
@@ -375,17 +395,7 @@ Successful commands and commands containing only `Warning` problems return exit 
 Any `2xx` response is successful.
 Non-`2xx` responses use existing `HttpSource` failure and retry handling.
 The CLI does not require or parse a staging-specific error envelope.
-List and view commands deserialize successful response bodies.
-
-#### Implementation phases
-
-Discovery, command plumbing, uploads, deletes, and group mutations can be implemented once their routes and request fields are stable.
-Mutation commands do not require successful response bodies.
-Their JSON output can be produced from command inputs.
-
-List, view, and group-list implementation requires successful response schemas.
-Those schemas must define property names, casing, required and nullable fields, enum values, timestamps, and pagination.
-Their JSON output is implemented after those response contracts are committed.
+List, view, and group-list commands deserialize successful response bodies.
 
 ## Rationale and alternatives
 
@@ -393,14 +403,10 @@ Their JSON output is implemented after those response contracts are committed.
 
 This would make initial upload familiar, but it cannot naturally represent listing, viewing, deletion, or group management.
 
-## Unresolved Questions
-
-The following must be resolved before the corresponding commands are implemented:
-
-1. Does `group delete` remove only group metadata, remove memberships, or also delete staged artifact content?
-
 ## Future Possibilities
 
+- Add `--page` and `--page-size` to `stage list` and `stage group list` if automatic
+  aggregation becomes impractical for large staging inventories.
 - Add `stage push --wait` with timeout and polling controls.
 - Allow `stage push` to accept multiple package paths and file globs.
 - Allow `stage group add` to accept a package path and upload it directly into the group.
