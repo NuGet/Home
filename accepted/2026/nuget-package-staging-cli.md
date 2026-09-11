@@ -318,9 +318,8 @@ Because staged content is private, list and view operations require authenticati
 
 #### API mapping
 
-The authoritative server routes, request fields, response schemas, and error behavior
-are defined in the
-[`PackageStaging/1.0.0` API contract](https://devdiv.visualstudio.com/DevDiv/_git/NuGet.Services?path=/docs/specs/2026/StagingAPIContracts.md&version=GBjaparson/staging-spec&_a=preview).
+The server-side design is defined in the [`PackageStaging/1.0.0` API contract](https://devdiv.visualstudio.com/DevDiv/_git/NuGet.Services?path=/docs/specs/2026/StagingAPIContracts.md&version=GBjaparson/staging-spec&_a=preview).
+Derived from that design, the CLI's own expected request and response contract for each route is specified in [`package-staging-api-contract-md.md`](package-staging-api-contract-md.md).
 The following table maps the CLI commands to those server operations.
 
 | CLI command | Server operation |
