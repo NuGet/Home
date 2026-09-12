@@ -84,6 +84,8 @@ dotnet nuget stage push <PACKAGE_PATH> [--group <GROUP_ID>] [--no-symbols]
 **Options**
 
 - **`--group <GROUP_ID>`** uploads the artifact directly into the specified group.
+  The CLI assumes the user has supplied an existing group and does not verify or create it before uploading.
+  The group ID must contain at least one non-whitespace character.
 - **`--no-symbols`** prevents automatic discovery and staging of a sibling symbols package.
 
 `dotnet nuget stage push` accepts one `.nupkg`, `.snupkg`, or legacy `.symbols.nupkg` path.
@@ -128,6 +130,7 @@ dotnet nuget stage list [--group <GROUP_ID>]
 
 `dotnet nuget stage list` outputs all package and symbol artifacts returned by the staging endpoints.
 The CLI does not add filtering based on whether an artifact was promoted or published.
+The CLI displays staging quota information when the server provides it.
 When `--group` is supplied, the CLI uses the group detail endpoint and returns all members.
 The command automatically requests every page before producing a successful result.
 
@@ -286,7 +289,7 @@ dotnet nuget stage group delete august-release
 
 #### Protocol resource
 
-The CLI discovers a supported `PackageStaging` resource from the selected source's V3 service index using standard NuGet resource-provider selection.
+The CLI discovers `PackageStaging/1.0.0` from the selected source's V3 service index using standard NuGet resource-provider selection.
 The first supported contract is:
 
 ```json

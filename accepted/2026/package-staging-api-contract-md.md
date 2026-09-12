@@ -1,11 +1,17 @@
 
-# Staging APIs
+# Package Staging CLI Request and Response Expectations
 
-Resource Type: PackageStaging
+Resource Type: PackageStaging/1.0.0
 
-This document describes the API contract that the CLI expects from any server implementing
-`PackageStaging`. Server implementers should follow this design when building the endpoints
-below.
+## Scope
+
+This document defines the requests the NuGet CLI sends and the response data it consumes or requires when using `PackageStaging/1.0.0`.
+It is a client contract and is not an exhaustive description of every capability supported by the server.
+Server implementations may accept request fields or return response fields that are not documented here when the CLI does not depend on them.
+In this document, a required response field is one the CLI requires to process the response.
+An optional response field may be consumed when present, but its absence does not cause the CLI operation to fail.
+
+The server-side design is defined in the [`PackageStaging/1.0.0` API contract](https://devdiv.visualstudio.com/DevDiv/_git/NuGet.Services?path=%2Fdocs%2Fspecs%2F2026%2FStagingAPIContracts.md&version=GBjaparson%2Fstaging-spec&_a=preview).
 
 ## Objects
 
@@ -22,7 +28,7 @@ package. Referenced by name (`Artifact`) wherever it applies below.
 | `version` | string | yes | |
 | `kind` | string | yes | One of `package`, `symbols`. |
 | `status` | string | yes | One of `waitingForParent`, `validating`, `ready`, `validationFailed`, `promoting`, `succeeded`, `promotionFailed`. |
-| `group` | object, nullable | yes | `null` when ungrouped. See `Group` below. |
+| `group` | object, nullable | yes | `null` when ungrouped. Otherwise, a `GroupSummary`. |
 | `listed` | boolean | no | Only applies when `kind` is `package`. |
 | `canPromote` | boolean | yes | |
 | `blockers` | array | no | Array of `Blocker` objects, may be empty. See `Blocker` below. |
@@ -30,7 +36,15 @@ package. Referenced by name (`Artifact`) wherever it applies below.
 | `uploaded` | string | no | ISO 8601 timestamp of when the artifact was staged. |
 | `validated` | string, nullable | no | ISO 8601 timestamp of when validation completed successfully. `null` until then. |
 | `expires` | string | no | ISO 8601 timestamp of when the staged artifact will be automatically removed if not promoted. |
+| `managementUrl` | string | no | URL for managing the staged artifact in the source's web UI. |
 
+
+### GroupSummary
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `id` | string | yes | Group ID. |
+| `name` | string | yes | Group display name. |
 
 ### Group
 
@@ -44,6 +58,7 @@ package. Referenced by name (`Artifact`) wherever it applies below.
 | `owner` | string | no | |
 | `created` | string | no | ISO 8601 timestamp of when the group was created. |
 | `expires` | string | no | ISO 8601 timestamp, if the group has its own expiry separate from its members. |
+| `managementUrl` | string | no | URL for managing the staged group in the source's web UI. |
 
 ### Blocker
 
@@ -51,6 +66,24 @@ package. Referenced by name (`Artifact`) wherever it applies below.
 |---|---|---|
 | `code` | string | yes |
 | `message` | string | yes |
+
+### Error
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `code` | string | yes | Machine-readable error code. |
+| `message` | string | yes | User-facing error message. |
+| `target` | string | no | Request field associated with the error. |
+
+Every failure response body is JSON containing an `error` property whose value is an `Error` object.
+If the body is missing or cannot be read, the CLI falls back to the status code and reason phrase.
+
+### Quota
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `usedArtifacts` | number | yes | Number of artifacts currently using the staging quota. |
+| `limit` | number | yes | Maximum number of staged artifacts. |
 
 ## Stage packages
 
@@ -68,21 +101,18 @@ package. Referenced by name (`Artifact`) wherever it applies below.
 - **`groupId`** (optional)
   - Assigns the package (and its symbols) to this group.
   - Omitted entirely (not an empty string) when no group is targeted.
-  - Servers must create the group automatically if it does not already exist, and add the
-    package to it.
+  - When supplied by the CLI, it contains at least one non-whitespace character.
+  - The CLI sends the user-supplied value without a preliminary group lookup or create request.
+  - The CLI assumes the group exists and forwards any resulting server error to the user.
 
 ### Response
 
 - **Success**
-  - Any `2xx` status code.
+  - `201 Created` when a new artifact is staged.
+  - `200 OK` when an artifact is replaced or the upload is identical.
   - Body is a single `Artifact`.
 - **Failure**
   - Any non-`2xx` status code.
-  - The body must be JSON containing:
-    - `error.code` (required)
-    - `error.message` (required)
-  - If the body is missing or cannot be read, the CLI falls back to the status code and
-    reason phrase.
 
 ## Stage symbols
 
@@ -98,14 +128,15 @@ package. Referenced by name (`Artifact`) wherever it applies below.
   - The part's `filename` is not authoritative; identity comes from the package inside.
 
 - **`groupId`** (optional)
-  - Same rules as `package`'s `groupId`: assigns to this group, auto-created if missing.
+  - Same client behavior as `package`'s `groupId`.
 
 ### Response
 
-- **Success:** any `2xx` status code. Body is a single `Artifact`.
-- **Failure:** any non-`2xx` status code. The body must be JSON containing:
-  - `error.code` (required)
-  - `error.message` (required)
+- **Success**
+  - `201 Created` when a new artifact is staged.
+  - `200 OK` when an artifact is replaced or the upload is identical.
+  - Body is a single `Artifact`.
+- **Failure:** any non-`2xx` status code.
 
 ## List staged packages
 
@@ -130,8 +161,9 @@ package. Referenced by name (`Artifact`) wherever it applies below.
     | `page` | number | yes | Echoes the requested (or defaulted) `page`. |
     | `pageSize` | number | yes | Echoes the requested (or defaulted) `pageSize`. |
     | `totalCount` | number | yes | Total number of items across all pages. |
+    | `quota` | object | no | Staging quota information. See `Quota`. |
 - **Failure**
-  - Same `error.code` / `error.message` rule as above.
+  - Any non-`2xx` status code.
 
 ## List staged symbols
 
@@ -150,8 +182,9 @@ Same request and response shape as **List staged packages**, scoped to symbols.
 ### Response
 
 - **Success:** `200`. Body is a single `Artifact`.
-- **Failure:** `404` if not found or not visible to the caller; otherwise same
-  `error.code` / `error.message` rule as above.
+- **Failure**
+  - `404 Not Found` if not found or not visible to the caller.
+  - Any other non-`2xx` status code.
 
 ## View staged symbols
 
@@ -169,10 +202,10 @@ Same shape as **View a staged package**, scoped to symbols.
 
 ### Response
 
-- **Success:** any `2xx`. No required body.
-- **Failure:** non-`2xx`, same `error.code` / `error.message` rule as above. A delete of an
-  already-absent package is treated as success by the CLI (the desired end state is already
-  reached), so servers should return a status the CLI can treat that way.
+- **Success:** `204 No Content`.
+- **Failure**
+  - `404 Not Found` when the artifact is already absent or not visible.
+  - Any other non-`2xx` status code.
 
 ## Delete staged symbols
 
@@ -194,14 +227,13 @@ Same shape as **Delete a staged package**, scoped to symbols.
 - **`id`** (required): immutable, case-insensitive, unique per owner.
 - **`name`** (required): display name.
 
-*Note: since **Stage packages** already auto-creates a group on push, this route is for
-explicitly creating a group ahead of time, e.g. with a custom display name, or for creating
-an empty group with no packages yet.*
+*Note: this route explicitly creates a group before it is referenced by an upload or
+membership operation.*
 
 ### Response
 
-- **Success:** any `2xx`. No required body.
-- **Failure:** non-`2xx`, same `error.code` / `error.message` rule as above.
+- **Success:** `201 Created`. Body is the created `Group`.
+- **Failure:** any non-`2xx` status code.
 
 ## List groups
 
@@ -227,7 +259,7 @@ an empty group with no packages yet.*
     | `pageSize` | number | yes | Echoes the requested (or defaulted) `pageSize`. |
     | `totalCount` | number | yes | Total number of items across all pages. |
 - **Failure**
-  - Same `error.code` / `error.message` rule as above.
+  - Any non-`2xx` status code.
 
 ## Get a group and its members
 
@@ -254,8 +286,8 @@ an empty group with no packages yet.*
     | `pageSize` | number | yes | Echoes the requested (or defaulted) `pageSize`. |
     | `totalCount` | number | yes | Total number of members across all pages. |
 - **Failure**
-  - `404` if not found or not visible.
-  - Otherwise same `error.code` / `error.message` rule as above.
+  - `404 Not Found` if not found or not visible.
+  - Any other non-`2xx` status code.
 
 ## Rename a group
 
@@ -270,8 +302,8 @@ an empty group with no packages yet.*
 
 ### Response
 
-- **Success:** any `2xx`. No required body.
-- **Failure:** non-`2xx`, same `error.code` / `error.message` rule as above.
+- **Success:** `200 OK`. Body is the updated `Group`.
+- **Failure:** any non-`2xx` status code.
 
 ## Delete a group
 
@@ -283,8 +315,10 @@ Deletes the group and all its members.
 
 ### Response
 
-- **Success:** any `2xx`. No required body.
-- **Failure:** non-`2xx`, same `error.code` / `error.message` rule as above.
+- **Success:** `204 No Content`.
+- **Failure**
+  - `404 Not Found` when the group is already absent or not visible.
+  - Any other non-`2xx` status code.
 
 ## Add or move a package into a group
 
@@ -298,7 +332,7 @@ symbols) to the group, moving it if it already belongs to a different group.
 ### Response
 
 - **Success:** any `2xx`. No required body.
-- **Failure:** non-`2xx`, same `error.code` / `error.message` rule as above.
+- **Failure:** any non-`2xx` status code.
 
 ## Remove a package from a group
 
@@ -312,4 +346,4 @@ artifacts themselves.
 ### Response
 
 - **Success:** any `2xx`. No required body.
-- **Failure:** non-`2xx`, same `error.code` / `error.message` rule as above.
+- **Failure:** any non-`2xx` status code.
