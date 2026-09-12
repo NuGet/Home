@@ -9,7 +9,7 @@ Add a `dotnet nuget stage` command family for preparing NuGet packages without p
 The CLI allows users and CI systems to upload packages to private staging, list and inspect staged packages, organize packages into release groups, and delete staged content.
 Promotion is excluded from the initial CLI and remains a NuGet Gallery action.
 
-> **Note:** Of the commands described in this proposal, only `dotnet nuget stage push <PACKAGE_PATH>` is targeted for .NET 11 RC 2.
+> **Note:** Of the commands described in this proposal, only `dotnet nuget stage push` is targeted for .NET 11 RC 2, including its options and automatic sibling-symbol discovery.
 
 ## Motivation
 
@@ -148,6 +148,9 @@ dotnet nuget stage view <PACKAGE_ID@VERSION>
 ```
 
 `dotnet nuget stage view` displays the detailed server-provided state for the package and symbols artifacts with the requested identity:
+The command succeeds when either artifact exists and displays every artifact found.
+A `404` for one artifact is treated as an absent counterpart.
+The command fails when neither artifact exists or when either request fails for another reason.
 
 ```console
 dotnet nuget stage view Contoso@1.0.0
@@ -165,8 +168,9 @@ dotnet nuget stage delete <PACKAGE_ID@VERSION> [--symbols-only]
 
 - **`--symbols-only`** deletes the symbols artifact while leaving the package staged.
 
-Staged content can be deleted by identity.
-Symbols can be deleted independently while leaving the parent package staged:
+Without `--symbols-only`, the command deletes the package and its symbols using separate requests.
+With `--symbols-only`, the command deletes only the symbols artifact and leaves the package staged.
+If one deletion succeeds and the other fails, the CLI reports the partial deletion and exits with code `1`.
 
 ```console
 dotnet nuget stage delete Contoso@1.0.0
@@ -339,7 +343,7 @@ The following table maps the CLI commands to those server operations.
 | `stage list` | `GET package` and `GET symbols` |
 | `stage list --group <group>` | `GET groups/{groupId}` member collection |
 | `stage view <id@version>` | `GET package/{id}/{version}` and `GET symbols/{id}/{version}` |
-| `stage delete <id@version>` | `DELETE package/{id}/{version}` |
+| `stage delete <id@version>` | `DELETE package/{id}/{version}` and `DELETE symbols/{id}/{version}` |
 | `stage delete <id@version> --symbols-only` | `DELETE symbols/{id}/{version}` |
 | `stage group create <group>` | `POST groups` |
 | `stage group list` | `GET groups` |
@@ -354,6 +358,7 @@ The package request contains one `package` file part and may contain a separate 
 The symbol request contains one `symbols` file part and may contain a separate `groupId` form field.
 Package and symbol files are never combined in the same request.
 When a package push discovers a sibling symbols package, the CLI waits for the package response before sending the symbols request.
+If the package succeeds but the symbols request fails, the package remains staged, the CLI reports both outcomes, and the command exits with code `1`.
 
 Artifact identities supplied on the command line use `<PACKAGE_ID>@<VERSION>`.
 
@@ -383,9 +388,12 @@ Successful commands return exit code `0`.
 
 #### Errors and retries
 
-Any `2xx` response is successful.
+Success requires the status and body defined for the route.
+Missing or invalid required response bodies fail the command.
+Bodyless operations accept any `2xx`.
 Non-`2xx` responses use existing `HttpSource` failure and retry handling.
-The CLI does not require or parse a staging-specific error envelope.
+When the response contains the staging error shape, the CLI displays `error.code` and `error.message`.
+The CLI does not add error-code-specific behavior.
 
 ## Rationale and alternatives
 
