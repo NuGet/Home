@@ -117,7 +117,7 @@ The NuGet MCP server has tools to fix vulnerable packages and update packages th
 
 #### Changes to restore
 
-Fail restore when cooldown is configured to a non-zero value, and at least one `PackageReference` uses a floating version.
+Fail restore if a PackageReference using a floating version needs to do cooldown calculations.
 The NU code will be determined when the feature is implemented.
 Otherwise, restore will not use cooldown settings, and will not warn if a package that was restored is still in the cooldown period.
 
@@ -127,7 +127,7 @@ Please see the [cooldown during restore section](#cooldown-during-restore) for m
 
 This feature does not propose any changes to the NuGet protocol at this time.
 The [package metadata resource](https://learn.microsoft.com/en-us/nuget/api/registration-base-url-resource) contains an optional `published` field.
-If a nuget.config file is using package sources that do not provide `published` metadata, then NuGet can't do cooldown calculations and should provide warning messages.
+If a nuget.config file is using package sources that do not provide `published` metadata, then NuGet can't do cooldown calculations.
 
 NuGet.Protocol already populates the `Published` property for local file feeds using the file's last modified timestamp.
 So, cooldown on file feeds will work, but customers are responsible for setting the last modified time carefully.
