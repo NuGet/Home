@@ -85,7 +85,7 @@ dotnet nuget stage push <PACKAGE_PATH> [--group <GROUP_ID>] [--no-symbols]
 
 - **`--group <GROUP_ID>`** uploads the artifact directly into the specified group.
   The CLI assumes the user has supplied an existing group and does not verify or create it before uploading.
-  The group ID must contain at least one non-whitespace character.
+  The group ID must contain at least one non-whitespace character and follow `^[A-Za-z0-9](?:[A-Za-z0-9._-]{0,62}[A-Za-z0-9])?$` regular expression.
 - **`--no-symbols`** prevents automatic discovery and staging of a sibling symbols package.
 
 `dotnet nuget stage push` accepts one `.nupkg`, `.snupkg`, or legacy `.symbols.nupkg` path.
