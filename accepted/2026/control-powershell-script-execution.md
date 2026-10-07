@@ -178,7 +178,9 @@ After the change ships, we can get customer feedback.
 Projects using `PackageReference` can avoid importing package MSBuild files by using `ExcludeAssets="build;buildTransitive"`.
 However, package MSBuild file import is per-project, unlike `init.ps1` in the Package Manager Console.
 
-npm has an `--ignore-scripts` option on the command line, or a `ignore-scripts=true` setting in the config file, to ignore post-install scripts in packages.
-It also has `allowScripts` in the config file, which can be managed by `npm approve-scripts` and `npm deny-scripts`
+[npm 12 disables dependency lifecycle scripts by default](https://github.blog/changelog/2026-06-09-upcoming-breaking-changes-for-npm-v12/).
+Dependency `preinstall`, `install` and `postinstall` scripts run only for packages explicitly approved through `allowScripts`.
+The allowlist is stored in `package.json` and can be managed with `npm approve-scripts` and `npm deny-scripts`.
+Earlier npm versions run dependency scripts by default, but provide an `--ignore-scripts` command-line option and an `ignore-scripts=true` configuration setting to disable them.
 
 ## Unresolved Questions
