@@ -48,19 +48,9 @@ Since few packages use PowerShell scripts, this suggests that disabling automati
 
 #### Package Manager Console (PMC)
 
-The `Install-Package`, `Remove-Package` and `Update-Package` cmdlets will have an `-AllowPackageScripts` switch.
-Without it, package `tools/install.ps1` and `tools/uninstall.ps1` scripts will not be run.
-When the scripts are not run, the cmdlets will output a message notifying the user that package scripts were not run, and provide the list of files that were not run, so they can copy and paste the filenames to open the files and inspect what the scripts will do if run.
-The output should also have some aka.ms link that redirects to a dedicated docs page on this feature, with clear instructions on how to run the scripts if desired.
-This allows us to modify the wording without the customer needing to install updates to Visual Studio.
-
-In general, `Update-Package <id> -Reinstall -AllowPackageScripts` will be sufficient.
-However, if a package was uninstalled, that's not going to work.
-Similarly, an upgrade is implemented as an uninstall of the old version followed by an install of the new version.
-If the old version has a `tools/uninstall.ps1`, then re-installing the new version isn't going to run the previous version's uninstall script.
-If the new version has a `tools/uninstall.ps1`, then re-installing will run it and might have unintended consequences.
-Therefore, in several scenarios it's preferred to use source control to revert any package uninstalls and then run the command again with `-AllowPackageScripts`.
-It's difficult to explain all of this concisely in a hardcoded message in the product, which is why a link to a docs page is preferred.
+The `Install-Package`, `Remove-Package` and `Update-Package` cmdlets will have an `-AllowPackageScripts` switch and `-IgnorePackageScripts` switch.
+Only one of these switches can be used at a time.
+Without either switch, packages without `tools/install.ps1` and `tools/uninstall.ps1` scripts will work the same as before, but packages with either of these scripts, the cmdlet will fail instructing the customer to use either `-AllowPackageScripts` or `-IgnorePackageScripts`, along with the filenames of the scripts, so the customer can inspect the scripts.
 
 Additionally, PMC will no longer run `tools/init.ps1` automatically.
 A new `Import-NuGetPackageInitScripts` cmdlet will be added to explicitly run selected `tools/init.ps1` scripts.
@@ -71,8 +61,12 @@ There will also be a `Get-NuGetPackageInitScripts` cmdlet that lists matching sc
 #### Package Manager UI
 
 NuGet's PM UI will no longer run any package's PowerShell scripts.
-When PM UI detects that a script would previously have been run, it will output a message to the "Package Manager" output window, and bring this output window to focus.
-The message will provide the same script details and recovery guidance described for PMC commands above.
+Before any project files are modified, when PM UI detects that a script would previously have been run, the operation fails, with an error message instructing the customer to use the Package Manager Console (PMC) to perform the operation.
+See the [rationale and alternatives section](#rationale-and-alternatives) for justification.
+This does not prevent a future change from improving the scenario, but for the first version this is the design and then we'll gather customer feedback.
+
+If feasible, output the script paths; each path identifies the package ID and version.
+However, as long as the message instructs the customer to run the appropriate PMC cmdlet, that command without either the `-AllowPackageScripts` or `-IgnorePackageScripts` switches will also output the script path(s).
 
 #### Command line tooling
 
@@ -83,7 +77,10 @@ As NuGet only runs PowerShell scripts in Visual Studio, no command line tooling 
 #### Install, Update, and Remove cmdlets
 
 The `Install-Package`, `Update-Package` and `Remove-Package` cmdlets will choose packages and versions to upgrade the same way as before, when `-ProjectName` or `-Id` are omitted.
-The only difference is that `install.ps1` and `uninstall.ps1` are no longer run without the `-AllowPackageScripts` switch.
+Before modifying any project files, NuGet will inspect every package action in the resolved operation, including dependency actions, for `install.ps1` and `uninstall.ps1`.
+When `-AllowPackageScripts` is used, all discovered scripts will run.
+When `-IgnorePackageScripts` is used, all discovered scripts will be skipped and the operation will continue.
+When neither switch is used and any scripts are discovered, the operation will fail before modifying any project files.
 
 #### Init script cmdlets
 
@@ -109,7 +106,7 @@ The cmdlet will never execute `install.ps1` or `uninstall.ps1`.
 Importing `$null` or an empty collection is no-op.
 
 When installing multiple versions of a package, each of which have their own `tools/init.ps1`, NuGet has never attempted to "uninit" or undo any changes that `init.ps1` has made.
-`Import-NuGetPackagesInitScripts` will also treat this as an unsupported scenario and customers will need to restart Visual Studio to unload any changes that were made by previous invocations.
+`Import-NuGetPackageInitScripts` will also treat this as an unsupported scenario and customers will need to restart Visual Studio to unload any changes that were made by previous invocations.
 
 ## Drawbacks
 
@@ -117,6 +114,15 @@ Packages that are using `install.ps1`, `uninstall.ps1` or `init.ps1` for legitim
 Unfortunately, this is the nature of security hardening.
 
 ## Rationale and alternatives
+
+### Package Manager UI blocked gestures
+
+The Visual Studio data we have on Package Manager UI actions and PowerShell script execution shows that a very small percentage of actions runs `install.ps1` or `uninstall.ps1`.
+Therefore, the customer impact in blocking PM UI for projects using packages.config when the package contains either a `tools/install.ps1` or `tools/uninstall.ps1` is estimated to be low.
+
+An alternative is to provide a UI to allow customers to choose which scripts to run and which to skip is possible.
+But the PMC commands will mean that this is not a blocking issue, just a convenience issue.
+The low usage makes the work low priority until more data can be gathered to justify it over other features.
 
 ### Persisted settings
 
