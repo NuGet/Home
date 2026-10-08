@@ -66,13 +66,15 @@ This behavior already existed when NuGet ran init scripts automatically; `Import
 
 #### Package Manager UI
 
-NuGet's PM UI will no longer run any package's PowerShell scripts.
-Before any project files are modified, when PM UI detects that a script would previously have been run, the operation fails, with an error message instructing the customer to use the Package Manager Console (PMC) to perform the operation.
-See the [rationale and alternatives section](#rationale-and-alternatives) for justification.
-This does not prevent a future change from improving the scenario, but for the first version this is the design and then we'll gather customer feedback.
+The options section of the PM UI package details page, where dependency behavior and file conflict actions are configured, will have a package scripts dropdown with `Run`, `Skip` and `Fail` values for `install.ps1` and `uninstall.ps1`.
+The default will be `Fail`.
+Changing the selected package or package version will reset the value to `Fail`, preventing approval for one package version from being unintentionally applied to another.
+The selection will not be persisted.
 
-If feasible, output the script paths; each path identifies the package ID and version.
-However, as long as the message instructs the customer to run the appropriate PMC cmdlet, that command's default `-PackageScripts Fail` behavior will also output the script path(s).
+Before modifying any project files, NuGet will inspect the resolved operation for scripts.
+`Run`, `Skip` and `Fail` will have the same behavior as the corresponding `-PackageScripts` values in PMC.
+When `Fail` blocks an operation, the error will list the script paths so the customer can inspect them before choosing `Run` or `Skip`.
+The dropdown does not apply to `init.ps1`, which can only be run explicitly through `Import-PackageInitScript`.
 
 #### Command line tooling
 
@@ -122,18 +124,9 @@ Unfortunately, this is the nature of security hardening.
 
 ## Rationale and alternatives
 
-### Package Manager UI blocked gestures
-
-The Visual Studio data we have on Package Manager UI actions and PowerShell script execution shows that a very small percentage of actions runs `install.ps1` or `uninstall.ps1`.
-Therefore, the customer impact in blocking PM UI for projects using packages.config when the package contains either a `tools/install.ps1` or `tools/uninstall.ps1` is estimated to be low.
-
-An alternative is to provide a UI to allow customers to choose which scripts to run and which to skip is possible.
-But the PMC commands will mean that this is not a blocking issue, just a convenience issue.
-The low usage makes the work low priority until more data can be gathered to justify it over other features.
-
 ### Fail commands or skip scripts by default
 
-This proposal is that both PMC and PM UI will fail on install, uninstall, or upgrade, when any package contains an install.ps1 or uninstall.ps1.
+This proposal is that both PMC and PM UI default to `Fail` on install, uninstall, or upgrade when any package contains an install.ps1 or uninstall.ps1.
 An alternate design is to use `-PackageScripts Skip` by default, warn customers that scripts were skipped, and have them re-install in PMC with `-PackageScripts Run` when they want.
 
 This would be ok for packages with an install.ps1, as customers could run `Update-Package PackageName -Reinstall -PackageScripts Run`.
@@ -142,9 +135,6 @@ Although there's a risk that customers don't notice the warning, and would there
 However, packages with uninstall.ps1 are much more difficult.
 Customers would need to revert to the previous state, perhaps through source control, or otherwise by reinstalling or downgrading a package, before they could run the uninstall or upgrade again, this time allowing the scripts to run.
 Failing the original command to avoid this complexity may be the simpler option.
-
-Similar to the PM UI gestures above, given the low usage data we have, we value speed in delivering this feature and then focusing on other high priority work, over polishing this feature at this time.
-Once this ships we can gather customer feedback for potential improvements.
 
 ### Persisted settings
 
