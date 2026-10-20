@@ -5,11 +5,11 @@
 
 ## Summary
 
-Add a `dotnet nuget stage` command family for preparing NuGet packages without publishing them immediately.
+Add a `dotnet package stage` command family for preparing NuGet packages without publishing them immediately.
 The CLI allows users and CI systems to upload packages to private staging, list and inspect staged packages, organize packages into release groups, and delete staged content.
 Promotion is excluded from the initial CLI and remains a NuGet Gallery action.
 
-> **Note:** Of the commands described in this proposal, only `dotnet nuget stage push` is targeted for .NET 11 RC 2, including its options and automatic sibling-symbol discovery.
+> **Note:** Of the commands described in this proposal, only `dotnet package stage push` is targeted for .NET 11 RC 2, including its options and automatic sibling-symbol discovery.
 
 ## Motivation
 
@@ -29,7 +29,7 @@ It builds on the earlier [`Release staging and deprecation`](https://github.com/
 The feature introduces a separate command family:
 
 ```text
-dotnet nuget stage
+dotnet package stage
 |-- push <PACKAGE_PATH> [--group <GROUP_ID>] [--no-symbols]
 |-- list [--group <GROUP_ID>]
 |-- view <PACKAGE_ID@VERSION>
@@ -66,10 +66,10 @@ Otherwise, the normal configuration hierarchy is used.
 
 `--interactive` allows NuGet credential providers to prompt while accessing the selected source or staging resource.
 
-**`--allow-insecure-connections`**
+#### HTTPS requirement
 
-HTTP sources are rejected unless `--allow-insecure-connections` is supplied.
-The CLI warns when this option is used.
+The initial `stage push` CLI requires HTTPS sources and rejects HTTP sources.
+It does not expose an `--allow-insecure-connections` option.
 
 #### Commands
 
@@ -78,7 +78,7 @@ The CLI warns when this option is used.
 **Synopsis**
 
 ```text
-dotnet nuget stage push <PACKAGE_PATH> [--group <GROUP_ID>] [--no-symbols]
+dotnet package stage push <PACKAGE_PATH> [--group <GROUP_ID>] [--no-symbols]
 ```
 
 **Options**
@@ -88,7 +88,7 @@ dotnet nuget stage push <PACKAGE_PATH> [--group <GROUP_ID>] [--no-symbols]
   The group ID must contain at least one non-whitespace character and follow `^[A-Za-z0-9](?:[A-Za-z0-9._-]{0,62}[A-Za-z0-9])?$` regular expression.
 - **`--no-symbols`** prevents automatic discovery and staging of a sibling symbols package.
 
-`dotnet nuget stage push` accepts one `.nupkg`, `.snupkg`, or legacy `.symbols.nupkg` path.
+`dotnet package stage push` accepts one `.nupkg`, `.snupkg`, or legacy `.symbols.nupkg` path.
 It returns when the server accepts the upload and does not wait for validation to finish.
 When `<PACKAGE_PATH>` is a `.nupkg`, the CLI stages it first and, unless `--no-symbols` is supplied, looks in the same directory for a sibling symbols package with the same filename stem.
 The CLI prefers `.snupkg`, falls back to `.symbols.nupkg` only when no matching `.snupkg` exists, and stages at most one symbols package in a second request.
@@ -96,23 +96,23 @@ The file extension selects the package or symbol staging endpoint.
 
 
 ```console
-dotnet nuget stage push artifacts/Contoso.1.0.0.nupkg
+dotnet package stage push artifacts/Contoso.1.0.0.nupkg
 ```
 
 Symbols can be uploaded directly:
 
 ```console
-dotnet nuget stage push artifacts/Contoso.1.0.0.snupkg
-dotnet nuget stage push artifacts/Contoso.1.0.0.symbols.nupkg
+dotnet package stage push artifacts/Contoso.1.0.0.snupkg
+dotnet package stage push artifacts/Contoso.1.0.0.symbols.nupkg
 ```
 
 An artifact can be uploaded directly into a group:
 
 ```console
-dotnet nuget stage push artifacts/Contoso.1.0.0.nupkg \
+dotnet package stage push artifacts/Contoso.1.0.0.nupkg \
   --group august-release
 
-dotnet nuget stage push artifacts/Contoso.1.0.0.snupkg \
+dotnet package stage push artifacts/Contoso.1.0.0.snupkg \
   --group august-release
 ```
 
@@ -121,25 +121,25 @@ dotnet nuget stage push artifacts/Contoso.1.0.0.snupkg \
 **Synopsis**
 
 ```text
-dotnet nuget stage list [--group <GROUP_ID>]
+dotnet package stage list [--group <GROUP_ID>]
 ```
 
 **Options**
 
 - **`--group <GROUP_ID>`** limits the result to artifacts in the specified group.
 
-`dotnet nuget stage list` outputs all package and symbol artifacts returned by the staging endpoints.
+`dotnet package stage list` outputs all package and symbol artifacts returned by the staging endpoints.
 The CLI does not add filtering based on whether an artifact was promoted or published.
 The CLI displays staging quota information when the server provides it.
 When `--group` is supplied, the CLI uses the group detail endpoint and returns all members.
 The command automatically requests every page before producing a successful result.
 
 ```console
-dotnet nuget stage list
-dotnet nuget stage list --group august-release
+dotnet package stage list
+dotnet package stage list --group august-release
 ```
 
-Group summaries are available separately through `dotnet nuget stage group list`.
+Group summaries are available separately through `dotnet package stage group list`.
 Each group summary contains group metadata and an artifact count, but not membership.
 
 ##### **`stage view`**
@@ -147,16 +147,16 @@ Each group summary contains group metadata and an artifact count, but not member
 **Synopsis**
 
 ```text
-dotnet nuget stage view <PACKAGE_ID@VERSION>
+dotnet package stage view <PACKAGE_ID@VERSION>
 ```
 
-`dotnet nuget stage view` displays the detailed server-provided state for the package and symbols artifacts with the requested identity:
+`dotnet package stage view` displays the detailed server-provided state for the package and symbols artifacts with the requested identity:
 The command succeeds when either artifact exists and displays every artifact found.
 A `404` for one artifact is treated as an absent counterpart.
 The command fails when neither artifact exists or when either request fails for another reason.
 
 ```console
-dotnet nuget stage view Contoso@1.0.0
+dotnet package stage view Contoso@1.0.0
 ```
 
 ##### **`stage delete`**
@@ -164,7 +164,7 @@ dotnet nuget stage view Contoso@1.0.0
 **Synopsis**
 
 ```text
-dotnet nuget stage delete <PACKAGE_ID@VERSION> [--symbols-only]
+dotnet package stage delete <PACKAGE_ID@VERSION> [--symbols-only]
 ```
 
 **Options**
@@ -176,8 +176,8 @@ With `--symbols-only`, the command deletes only the symbols artifact and leaves 
 If one deletion succeeds and the other fails, the CLI reports the partial deletion and exits with code `1`.
 
 ```console
-dotnet nuget stage delete Contoso@1.0.0
-dotnet nuget stage delete Contoso@1.0.0 --symbols-only
+dotnet package stage delete Contoso@1.0.0
+dotnet package stage delete Contoso@1.0.0 --symbols-only
 ```
 
 Package, symbol, and group deletion do not prompt for confirmation.
@@ -188,7 +188,7 @@ Authentication and authorization are enforced by the server.
 **Synopsis**
 
 ```text
-dotnet nuget stage group create <GROUP_ID> [--name <DISPLAY_NAME>]
+dotnet package stage group create <GROUP_ID> [--name <DISPLAY_NAME>]
 ```
 
 **Options**
@@ -203,7 +203,7 @@ The CLI requires a non-empty group ID and URL-escapes it.
 The server enforces the API contract's group identity and uniqueness rules.
 
 ```console
-dotnet nuget stage group create august-release \
+dotnet package stage group create august-release \
   --name "August Release"
 ```
 
@@ -212,10 +212,10 @@ dotnet nuget stage group create august-release \
 **Synopsis**
 
 ```text
-dotnet nuget stage group list
+dotnet package stage group list
 ```
 
-`dotnet nuget stage group list` returns group summaries without membership details.
+`dotnet package stage group list` returns group summaries without membership details.
 Each summary includes the server-provided `canPromote` value and blockers explaining why promotion is unavailable.
 The command automatically requests every page before producing a successful result.
 
@@ -224,17 +224,17 @@ The command automatically requests every page before producing a successful resu
 **Synopsis**
 
 ```text
-dotnet nuget stage group view <GROUP_ID>
+dotnet package stage group view <GROUP_ID>
 ```
 
-`dotnet nuget stage group view` displays the selected group's metadata and status without its members.
+`dotnet package stage group view` displays the selected group's metadata and status without its members.
 
 ##### **`stage group rename`**
 
 **Synopsis**
 
 ```text
-dotnet nuget stage group rename <GROUP_ID> --name <DISPLAY_NAME>
+dotnet package stage group rename <GROUP_ID> --name <DISPLAY_NAME>
 ```
 
 `stage group rename` changes the display name without changing the immutable group ID.
@@ -244,7 +244,7 @@ dotnet nuget stage group rename <GROUP_ID> --name <DISPLAY_NAME>
 **Synopsis**
 
 ```text
-dotnet nuget stage group add <GROUP_ID> <PACKAGE_ID@VERSION>
+dotnet package stage group add <GROUP_ID> <PACKAGE_ID@VERSION>
 ```
 
 An existing staged package identity can be added or moved to a group.
@@ -252,7 +252,7 @@ The operation moves its staged symbols with it when symbols exist.
 The package and symbols must both be ungrouped or belong to the same group.
 
 ```console
-dotnet nuget stage group add august-release Contoso@1.0.0
+dotnet package stage group add august-release Contoso@1.0.0
 ```
 
 ##### **`stage group remove`**
@@ -260,13 +260,13 @@ dotnet nuget stage group add august-release Contoso@1.0.0
 **Synopsis**
 
 ```text
-dotnet nuget stage group remove <GROUP_ID> <PACKAGE_ID@VERSION>
+dotnet package stage group remove <GROUP_ID> <PACKAGE_ID@VERSION>
 ```
 
 `group remove` removes a package identity and its staged symbols from the selected group without deleting the artifacts:
 
 ```console
-dotnet nuget stage group remove august-release Contoso@1.0.0
+dotnet package stage group remove august-release Contoso@1.0.0
 ```
 
 ##### **`stage group delete`**
@@ -274,7 +274,7 @@ dotnet nuget stage group remove august-release Contoso@1.0.0
 **Synopsis**
 
 ```text
-dotnet nuget stage group delete <GROUP_ID>
+dotnet package stage group delete <GROUP_ID>
 ```
 
 `group delete` sends one request to delete the selected group.
@@ -282,7 +282,7 @@ The server defines this operation as deleting the group and all staged artifacts
 The CLI does not enumerate or delete group members individually.
 
 ```console
-dotnet nuget stage group delete august-release
+dotnet package stage group delete august-release
 ```
 
 ### Technical explanation
@@ -391,12 +391,16 @@ Successful commands return exit code `0`.
 
 #### Errors and retries
 
-Success requires the status and body defined for the route.
-Missing or invalid required response bodies fail the command.
-Bodyless operations accept any `2xx`.
+The initial `stage push` implementation accepts any `2xx` upload response without reading or validating its body.
+The upload response schemas in the API contract describe the expected server responses, not validation currently performed by the client.
 Non-`2xx` responses use existing `HttpSource` failure and retry handling.
-When the response contains the staging error shape, the CLI displays `error.code` and `error.message`.
+The initial implementation reports standard HTTP status and reason diagnostics; it does not parse or display staging `error.code` and `error.message` fields.
 The CLI does not add error-code-specific behavior.
+
+The following response-handling requirements remain unimplemented:
+
+- Require the status and body defined for each route, failing on missing or invalid required response bodies. Bodyless operations accept any `2xx`.
+- Display `error.code` and `error.message` when a response contains the staging error shape.
 
 ## Rationale and alternatives
 

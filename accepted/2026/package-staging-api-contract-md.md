@@ -5,11 +5,15 @@ Resource Type: PackageStaging/1.0.0
 
 ## Scope
 
-This document defines the requests the NuGet CLI sends and the response data it consumes or requires when using `PackageStaging/1.0.0`.
+This document defines the proposed requests the NuGet CLI sends and the response data it consumes or requires when using `PackageStaging/1.0.0`.
 It is a client contract and is not an exhaustive description of every capability supported by the server.
 Server implementations may accept request fields or return response fields that are not documented here when the CLI does not depend on them.
 In this document, a required response field is one the CLI requires to process the response.
 An optional response field may be consumed when present, but its absence does not cause the CLI operation to fail.
+
+The initial `dotnet package stage push` implementation accepts any `2xx` upload response without consuming or validating its body.
+It reports standard HTTP failure diagnostics without parsing the `Error` object.
+Required upload response bodies and structured error display remain unimplemented client requirements, as described in the [CLI proposal](nuget-package-staging-cli.md#errors-and-retries).
 
 The server-side design is defined in the [`PackageStaging/1.0.0` API contract](https://devdiv.visualstudio.com/DevDiv/_git/NuGet.Services?path=%2Fdocs%2Fspecs%2F2026%2FStagingAPIContracts.md&version=GBjaparson%2Fstaging-spec&_a=preview).
 
