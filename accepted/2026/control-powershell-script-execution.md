@@ -1,7 +1,7 @@
 # Control PowerShell script execution in Visual Studio
 
 - Author: [zivkan](https://github.com/zivkan/)
-- GitHub Issue: TBD
+- GitHub Issue: https://github.com/NuGet/Home/issues/15141
 
 ## Summary
 
