@@ -2,24 +2,57 @@
 
 - [Nigusu](https://github.com/Nigusu-Allehu)
 - [GitHub Issue #15014](https://github.com/NuGet/Home/issues/15014)
+- [Grouping and listing issue #15015](https://github.com/NuGet/Home/issues/15015)
 
 ## Summary
 
-`dotnet package stage push` uploads a NuGet package or symbols package to a source's private staging service without publishing it.
-It can assign the upload to an existing staging group and automatically upload a sibling symbols package.
-
-This document describes the initial implementation merged in [NuGet/NuGet.Client#7712](https://github.com/NuGet/NuGet.Client/pull/7712), using the protocol foundation from [NuGet/NuGet.Client#7703](https://github.com/NuGet/NuGet.Client/pull/7703).
+`dotnet package stage` uploads NuGet packages and symbols to private staging, lists and inspects staged content, organizes release groups, and deletes staged artifacts.
+Publishers can prepare packages without making them available to consumers.
 
 ## Motivation
 
-Publishers need to upload packages privately before making them available to consumers.
-A dedicated staging command gives CI systems an explicit upload operation separate from ordinary publication.
+Publishers need to upload packages privately, inspect validation state, organize release groups, and remove staged content from automated workflows.
+A dedicated staging command family separates this preparation from ordinary publication.
 
 ## Explanation
 
 ### Functional explanation
 
-#### Command
+#### Commands
+
+```text
+dotnet package stage
+|-- push <PACKAGE_PATH> [--group <GROUP_ID>] [--no-symbols]
+|-- list [--group <GROUP_ID>] [-v|--verbosity <LEVEL>]
+|-- view <PACKAGE_ID@VERSION>
+|-- delete <PACKAGE_ID@VERSION> [--symbols-only]
+`-- group
+    |-- create <GROUP_ID> [--name <DISPLAY_NAME>]
+    |-- list [-v|--verbosity <LEVEL>]
+    `-- view <GROUP_ID>
+```
+
+#### Group IDs
+
+Group IDs must contain 1-64 ASCII letters, digits, periods, underscores, or hyphens, beginning and ending with a letter or digit.
+NuGet.Client validates the entire ID against this regular expression:
+
+```regex
+^[A-Za-z0-9](?:[A-Za-z0-9._-]{0,62}[A-Za-z0-9])?$
+```
+
+The CLI rejects invalid IDs before accessing the source and sends valid IDs unchanged.
+
+#### Common options
+
+| Option | Behavior |
+| --- | --- |
+| `-s\|--source <SOURCE>` | Configured source name or V3 service-index URL. Defaults to `DefaultPushSource`; fails if neither is supplied. |
+| `-k\|--api-key <API_KEY>` | API key for the staging service. Takes precedence over the environment variable and configured keys. |
+| `--configfile <FILE>` | Uses only the specified NuGet configuration file. Without it, uses the normal configuration hierarchy for the current working directory. |
+| `--interactive` | Allows NuGet credential providers to prompt for credentials. |
+
+#### Upload artifacts
 
 ```text
 dotnet package stage push <PACKAGE_PATH>
@@ -42,15 +75,8 @@ The file extension selects the package or symbols upload operation.
 
 | Option | Behavior |
 | --- | --- |
-| `-s|--source <SOURCE>` | Configured source name or V3 service-index URL. Defaults to `DefaultPushSource`; fails if neither is supplied. |
-| `-k|--api-key <API_KEY>` | API key for the staging service. Takes precedence over the environment variable and configured keys. |
 | `--group <GROUP_ID>` | Sends the group ID with each upload. The CLI assumes the group exists and does not look it up or create it. |
 | `--no-symbols` | Disables automatic discovery and upload of a sibling symbols package. A symbols file supplied directly is still uploaded. |
-| `--configfile <FILE>` | Uses only the specified NuGet configuration file. Without it, uses the normal configuration hierarchy for the current working directory. |
-| `--interactive` | Allows NuGet credential providers to prompt for credentials. |
-
-When supplied, a group ID must be 1-64 ASCII letters, digits, periods, underscores, or hyphens, beginning and ending with a letter or digit.
-The CLI rejects invalid IDs before accessing the source and sends valid IDs unchanged.
 
 ##### Package and symbols behavior
 
@@ -87,6 +113,74 @@ Upload symbols directly:
 dotnet package stage push artifacts/Contoso.1.0.0.snupkg --source StagingFeed
 ```
 
+#### List artifacts
+
+`stage list` returns package and symbols artifacts from their respective staging inventories.
+
+`--group` instead lists the selected group's packages and symbols.
+The command retrieves all pages before displaying results.
+
+```console
+dotnet package stage list
+dotnet package stage list --group august-release
+dotnet package stage list --verbosity minimal
+```
+
+#### View artifacts
+
+`stage view <PACKAGE_ID@VERSION>` displays status for both package and symbols artifacts.
+
+```console
+dotnet package stage view Contoso@1.0.0
+```
+
+#### Delete artifacts
+
+`stage delete <PACKAGE_ID@VERSION>` attempts package deletion first, then symbols deletion.
+With `--symbols-only`, it deletes only symbols and leaves the package staged.
+
+```console
+dotnet package stage delete Contoso@1.0.0
+dotnet package stage delete Contoso@1.0.0 --symbols-only
+```
+
+#### Create a group
+
+`stage group create <GROUP_ID> [--name <DISPLAY_NAME>]` explicitly creates a group.
+The name defaults to the group ID when omitted.
+IDs are immutable, case-insensitive, and unique per owner.
+
+Display names are trimmed and must contain 1-128 characters.
+The CLI rejects invalid IDs and names before accessing the source.
+
+```console
+dotnet package stage group create august-release --name "August Release"
+```
+
+#### List and view groups
+
+`stage group list` displays all group summaries without membership details.
+It retrieves all pages and displays summary detail according to `--verbosity`.
+
+`stage group view <GROUP_ID>` displays the selected group's metadata and status, not its members.
+Use `stage list --group <GROUP_ID>` for the full member collection.
+
+```console
+dotnet package stage group list
+dotnet package stage group view august-release
+```
+
+#### Response output
+
+`stage list` and `stage group list` accept `-v|--verbosity <minimal|normal|detailed>`, defaulting to `normal`.
+Verbosity controls result fields, not the number of results.
+Every level lists every returned item.
+
+| Model | `minimal` | `normal` | `detailed` |
+| --- | --- | --- | --- |
+| Artifact | `id`, `version`, `kind` | Minimal fields plus `status`, group ID, `canPromote` | Normal fields plus `owner`, group name, `uploaded`, `expires`, `listed` when applicable, `blockers`, `managementUrl` |
+| Group | `id` | Minimal fields plus `name`, `itemCount`, `canPromote` | Normal fields plus `owner`, `created`, `expires`, `blockers`, `managementUrl` |
+
 ### Technical explanation
 
 #### Protocol and authentication
@@ -104,7 +198,7 @@ For example:
 ```
 
 A source without this resource fails the command.
-Both the source URL and discovered upload endpoint reject insecure HTTP.
+Both the source URL and discovered staging endpoint reject insecure HTTP.
 There is no CLI option to allow insecure connections.
 
 ##### Credentials
@@ -115,7 +209,7 @@ The CLI resolves the API key in this order:
 2. `NUGET_API_KEY`.
 3. NuGet configuration, looking up the discovered staging resource URL first, then the source URL, with the existing NuGet.org API-key fallback.
 
-The same key is used for package and symbols uploads.
+The same API-key resolution applies to all commands and to both package and symbols requests.
 A non-empty resolved key is sent as `X-NuGet-ApiKey`; without one, the header is omitted.
 The CLI does not validate API-key permissions or select an owner.
 Authorization is enforced by the service, and credential-provider interaction follows the `--interactive` setting.
@@ -132,17 +226,38 @@ Package and symbols files are never combined in one request.
 The CLI makes no preliminary existence check; replacement and duplicate-upload behavior are determined by the service.
 Each request uses a five-minute timeout and the existing NuGet `HttpSource` retry handling.
 
-The [companion upload contract](package-staging-api-contract-md.md) describes the request details and response handling used by this implementation.
+The [companion upload contract](package-staging-api-contract-md.md) describes the upload request details and response handling.
 
-#### Output and errors
+##### Read, delete, and group requests
 
-The command writes human-readable package and symbols upload outcomes.
-It returns exit code `0` on success and `1` for invalid arguments or failed operations, including a failed sibling-symbol upload.
+All routes below are relative to the discovered resource.
 
-Any `2xx` upload response is accepted as success.
-The CLI does not read or validate the response body and does not display server-side validation status.
-Non-success responses use existing NuGet HTTP diagnostics and retry handling; the CLI does not parse staging-specific JSON error codes or messages.
+| CLI operation | Server operation | Response model |
+| --- | --- | --- |
+| `stage list` | `GET package` and `GET symbols` | Artifact page for each kind |
+| `stage list --group <group>` | `GET groups/{groupId}` | Group detail with paged artifacts |
+| `stage view <id@version>` | `GET package/{id}/{version}/status` and `GET symbols/{id}/{version}/status` | Single Artifact for each kind found |
+| `stage delete <id@version>` | `DELETE package/{id}/{version}` and `DELETE symbols/{id}/{version}` | No body on success |
+| `stage delete <id@version> --symbols-only` | `DELETE symbols/{id}/{version}` | No body on success |
+| `stage group create <group>` | `POST groups` | Single Group |
+| `stage group list` | `GET groups` | Group page |
+| `stage group view <group>` | `GET groups/{groupId}` | Group detail with paged artifacts |
+
+Artifact pages contain `items`, `page`, `pageSize`, `totalCount`, and owner-wide `quota`.
+Group pages contain the same paging fields and Group items, without quota.
+Group detail contains a `group` object and a paged Artifact collection.
+Group creation and view display the Group object; only `stage list --group` aggregates and displays members.
 
 ## Prior Art
 
 This design builds on [`Release staging and deprecation`](https://github.com/NuGet/Home/pull/12874) and the [refreshed NuGet staging proposal](https://github.com/NuGet/Home/pull/14978).
+
+The management operations are implemented server-side in [NuGet/NuGetGallery#11056](https://github.com/NuGet/NuGetGallery/pull/11056).
+The upload command and protocol foundation are implemented in [NuGet/NuGet.Client#7712](https://github.com/NuGet/NuGet.Client/pull/7712) and [NuGet/NuGet.Client#7703](https://github.com/NuGet/NuGet.Client/pull/7703).
+
+## Unresolved Questions
+
+## Future Possibilities
+
+- JSON output for consuming list and view results in automation.
+- `stage group delete <GROUP_ID>` to delete a group and its staged artifacts
