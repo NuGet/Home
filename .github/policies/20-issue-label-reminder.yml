@@ -50,6 +50,46 @@ configuration:
           reply: Issue is missing Type label, remember to add a [Type label](https://github.com/NuGet/Client.Engineering/blob/main/designs/nuget-issues-approach.md#issue-type)
       - addLabel:
           label: missing-required-type
+    - description: '[20-30] Remind NuGet Client member (issue author) to add Type label'
+      frequencies:
+      - daily:
+          time: 12:0
+      filters:
+      - isOpen
+      - isIssue
+      - isNotLabeledWith:
+          label: Type:Spec
+      - isNotLabeledWith:
+          label: Type:Test
+      - isNotLabeledWith:
+          label: Type:Feature
+      - isNotLabeledWith:
+          label: Type:Docs
+      - isNotLabeledWith:
+          label: Type:DCR
+      - isNotLabeledWith:
+          label: Type:Bug
+      - isNotLabeledWith:
+          label: Type:DeveloperDocs
+      - isNotLabeledWith:
+          label: Type:DataAnalysis
+      - isNotLabeledWith:
+          label: Type:Learning
+      - isNotLabeledWith:
+          label: Type:Tracking
+      - isNotLabeledWith:
+          label: Type:Engineering
+      - isNotLabeledWith:
+          label: Type:BreakingChange
+      - isNotLabeledWith:
+          label: missing-required-type
+      - isNotLabeledWith:
+          label: Epic
+      actions:
+      - addReply:
+          reply: '@${issueAuthor} Issue is missing Type label, remember to add a [Type label](https://github.com/NuGet/Client.Engineering/blob/main/designs/nuget-issues-approach.md#issue-type)'
+      - addLabel:
+          label: missing-required-type
     eventResponderTasks:
     - description: '[20-20] Remove "missing-required-type" if it has Type label'
       if:
@@ -85,113 +125,6 @@ configuration:
             label: Type:BreakingChange
       then:
       - removeLabel:
-          label: missing-required-type
-    - description: '[20-30] Remind NuGet Client member (issue author) to add Type label'
-      if:
-      - payloadType: Issues
-      - not:
-          hasLabel:
-            label: Type:Spec
-      - not:
-          hasLabel:
-            label: Type:Test
-      - not:
-          hasLabel:
-            label: Type:Feature
-      - not:
-          hasLabel:
-            label: Type:Docs
-      - not:
-          hasLabel:
-            label: Type:DCR
-      - not:
-          hasLabel:
-            label: Type:Bug
-      - not:
-          hasLabel:
-            label: Type:DeveloperDocs
-      - not:
-          hasLabel:
-            label: Type:DataAnalysis
-      - not:
-          hasLabel:
-            label: Type:Learning
-      - not:
-          hasLabel:
-            label: Type:Tracking
-      - not:
-          hasLabel:
-            label: Type:Engineering
-      - not:
-          hasLabel:
-            label: Type:BreakingChange
-      - and:
-        - isAction:
-            action: Opened
-        - activitySenderHasPermission:
-            permission: Write
-      - not:
-          hasLabel:
-            label: Epic
-      then:
-      - addReply:
-          reply: '@${issueAuthor} Issue is missing Type label, remember to add a [Type label](https://github.com/NuGet/Client.Engineering/blob/main/designs/nuget-issues-approach.md#issue-type)'
-      - addLabel:
-          label: missing-required-type
-    - description: '[20-40] Remind NuGet Client member (issue assignee) to add Type label'
-      if:
-      - payloadType: Issues
-      - and:
-        - not:
-            hasLabel:
-              label: Type:Spec
-        - not:
-            hasLabel:
-              label: Type:Test
-        - not:
-            hasLabel:
-              label: Type:Feature
-        - not:
-            hasLabel:
-              label: Type:Docs
-        - not:
-            hasLabel:
-              label: Type:DCR
-        - not:
-            hasLabel:
-              label: Type:Bug
-        - not:
-            hasLabel:
-              label: Type:DeveloperDocs
-        - not:
-            hasLabel:
-              label: Type:DataAnalysis
-        - not:
-            hasLabel:
-              label: Type:Learning
-        - not:
-            hasLabel:
-              label: Type:Tracking
-        - not:
-            hasLabel:
-              label: Type:Engineering
-        - not:
-            hasLabel:
-              label: Type:BreakingChange
-        - or:
-          - isAction:
-              action: Reopened
-          - isAction:
-              action: Assigned
-          - isAction:
-              action: Closed
-      - not:
-          hasLabel:
-            label: Epic
-      then:
-      - addReply:
-          reply: ${assignees} Issue is missing Type label, remember to add a [Type label](https://github.com/NuGet/Client.Engineering/blob/main/designs/nuget-issues-approach.md#issue-type)
-      - addLabel:
           label: missing-required-type
 onFailure: 
 onSuccess: 
